@@ -133,13 +133,29 @@ function ExchangePage() {
           </select>
 
           <span className="num ml-auto text-xs text-muted-foreground">
-            {filtered.length} / {all.length} companies
+            {filtered.length.toLocaleString()} / {all.length.toLocaleString()} companies
           </span>
         </div>
 
         <div className="mt-6">
-          <StockTable stocks={filtered} />
+          <StockTable stocks={filtered.slice(0, limit)} />
         </div>
+
+        {filtered.length > limit && (
+          <div className="mt-4 flex items-center justify-center gap-3">
+            <button
+              onClick={() => setLimit((n) => n + 200)}
+              className="rounded border border-border px-4 py-2 text-xs uppercase tracking-wide text-muted-foreground transition-colors hover:border-primary/60 hover:text-foreground"
+            >
+              Load 200 more
+            </button>
+            <span className="num text-xs text-muted-foreground">
+              showing {Math.min(limit, filtered.length).toLocaleString()} of{" "}
+              {filtered.length.toLocaleString()}
+            </span>
+          </div>
+        )}
+
 
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
           <NewsFeed items={exchangeNews(exchange.code, 8)} title={`${exchange.code} market news`} />
