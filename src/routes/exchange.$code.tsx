@@ -42,6 +42,8 @@ function ExchangePage() {
   const [caps, setCaps] = useState<CapTier[]>([]);
   const [sector, setSector] = useState("all");
   const [sort, setSort] = useState<SortKey>("score");
+  const [limit, setLimit] = useState(100);
+
 
   const all = useMemo(() => stocksByExchange(exchange.code), [exchange.code]);
 
