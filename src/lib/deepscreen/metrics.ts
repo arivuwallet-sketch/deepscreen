@@ -42,8 +42,19 @@ function scoreHigh(value: number, worst: number, best: number): number {
   return Math.round(5 + ((value - worst) / (best - worst)) * 95);
 }
 
+const analysisCache = new WeakMap<Stock, Analysis>();
+
 export function analyze(stock: Stock): Analysis {
+  const cached = analysisCache.get(stock);
+  if (cached) return cached;
+  const result = computeAnalysis(stock);
+  analysisCache.set(stock, result);
+  return result;
+}
+
+function computeAnalysis(stock: Stock): Analysis {
   const f = stock.fundamentals;
+
 
   const metrics: MetricRead[] = [
     {
