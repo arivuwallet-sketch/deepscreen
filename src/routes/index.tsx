@@ -60,7 +60,7 @@ function Home() {
               <Globe2 className="size-4 text-primary" /> {EXCHANGES.length} exchanges
             </span>
             <span className="flex items-center gap-2">
-              <LineChart className="size-4 text-primary" /> {STOCKS.length} companies scored
+              <LineChart className="size-4 text-primary" /> {STOCKS.length.toLocaleString()} companies scored
             </span>
             <span className="flex items-center gap-2">
               <ShieldCheck className="size-4 text-primary" /> 12-factor model
