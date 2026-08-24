@@ -10,33 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ExchangeCodeRouteImport } from './routes/exchange.$code'
+import { Route as StockExchangeSymbolRouteImport } from './routes/stock.$exchange.$symbol'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExchangeCodeRoute = ExchangeCodeRouteImport.update({
+  id: '/exchange/$code',
+  path: '/exchange/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StockExchangeSymbolRoute = StockExchangeSymbolRouteImport.update({
+  id: '/stock/$exchange/$symbol',
+  path: '/stock/$exchange/$symbol',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/exchange/$code': typeof ExchangeCodeRoute
+  '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/exchange/$code': typeof ExchangeCodeRoute
+  '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/exchange/$code': typeof ExchangeCodeRoute
+  '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/exchange/$code' | '/stock/$exchange/$symbol'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/exchange/$code' | '/stock/$exchange/$symbol'
+  id: '__root__' | '/' | '/exchange/$code' | '/stock/$exchange/$symbol'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ExchangeCodeRoute: typeof ExchangeCodeRoute
+  StockExchangeSymbolRoute: typeof StockExchangeSymbolRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +68,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/exchange/$code': {
+      id: '/exchange/$code'
+      path: '/exchange/$code'
+      fullPath: '/exchange/$code'
+      preLoaderRoute: typeof ExchangeCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stock/$exchange/$symbol': {
+      id: '/stock/$exchange/$symbol'
+      path: '/stock/$exchange/$symbol'
+      fullPath: '/stock/$exchange/$symbol'
+      preLoaderRoute: typeof StockExchangeSymbolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ExchangeCodeRoute: ExchangeCodeRoute,
+  StockExchangeSymbolRoute: StockExchangeSymbolRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
