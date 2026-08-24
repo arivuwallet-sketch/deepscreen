@@ -1,4 +1,6 @@
+import { LISTINGS } from "./listings";
 import type { CapTier, Fundamentals, Stock } from "./types";
+
 
 type Seed = [symbol: string, name: string, sector: string, price: number, marketCapBn: number];
 
