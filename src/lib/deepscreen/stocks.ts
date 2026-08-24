@@ -193,26 +193,114 @@ function buildFundamentals(symbol: string, sector: string, cap: CapTier): Fundam
   };
 }
 
+const SECTOR_LIST = [
+  "Information Technology",
+  "Financials",
+  "Healthcare",
+  "Consumer Discretionary",
+  "Consumer Staples",
+  "Industrials",
+  "Materials",
+  "Energy",
+  "Utilities",
+  "Communication Services",
+  "Real Estate",
+];
+
+const SECTOR_KEYWORDS: [RegExp, string][] = [
+  [/bank|financ|capital|insur|invest|securit|credit|asset|holding|fund|bourse|leasing/i, "Financials"],
+  [/tech|software|systems|infotech|semiconduct|micro|data|cyber|digital|computer|solutions|infosys|electronics/i, "Information Technology"],
+  [/pharma|health|life ?science|medic|hospital|bio|labor|diagnost|drug|care/i, "Healthcare"],
+  [/oil|gas|petro|energy|coal|fuel|refin|drilling/i, "Energy"],
+  [/power|electric|utilit|water|grid|renewable|solar|wind/i, "Utilities"],
+  [/steel|cement|chemical|mining|metal|paper|paint|polym|plastic|alumin|fertil|resource/i, "Materials"],
+  [/engineer|industr|construct|infrastruct|machin|tools|logistic|transport|aviation|airline|defen[cs]e|shipping|rail|cargo/i, "Industrials"],
+  [/food|bevera|consumer|foods|dairy|sugar|tea|agro|brew|distill|tobacc|household/i, "Consumer Staples"],
+  [/motor|auto|retail|apparel|textil|hotel|resort|travel|leisure|restaur|footwear|jewell|entertain|toys|home/i, "Consumer Discretionary"],
+  [/media|telecom|broadcast|communicat|network|publish|music|studios|games/i, "Communication Services"],
+  [/realt|estate|properti|land|develop|reit|infra ?trust/i, "Real Estate"],
+];
+
+function sectorFor(symbol: string, name: string): string {
+  for (const [re, sector] of SECTOR_KEYWORDS) if (re.test(name)) return sector;
+  return SECTOR_LIST[hash(`sector:${symbol}`) % SECTOR_LIST.length]!;
+}
+
+// Typical top-end market cap (exchange-local billions) used to spread the universe.
+const CAP_SCALE: Record<string, number> = {
+  NSE: 20000,
+  BSE: 18000,
+  NYSE: 700,
+  NASDAQ: 3500,
+  LSE: 180,
+};
+
+const PRICE_SCALE: Record<string, [number, number]> = {
+  NSE: [12, 9000],
+  BSE: [9, 11000],
+  NYSE: [3, 620],
+  NASDAQ: [2, 900],
+  LSE: [18, 9800],
+};
+
+function syntheticCap(code: string, symbol: string): number {
+  const top = CAP_SCALE[code] ?? 500;
+  const u = (hash(`cap:${code}:${symbol}`) % 100000) / 100000;
+  // Cubic skew: most listings are small, a handful are mega caps.
+  const value = top * Math.pow(u, 3.6);
+  const floor = top / 20000;
+  return Number(Math.max(floor, value).toFixed(2));
+}
+
+function syntheticPrice(code: string, symbol: string): number {
+  const [min, max] = PRICE_SCALE[code] ?? [5, 500];
+  const u = (hash(`price:${code}:${symbol}`) % 100000) / 100000;
+  return Number((min + Math.pow(u, 2.4) * (max - min)).toFixed(2));
+}
+
+function makeStock(code: string, symbol: string, name: string, seed?: Seed): Stock {
+  const sector = seed ? seed[2] : sectorFor(symbol, name);
+  const marketCapBn = seed ? seed[4] : syntheticCap(code, symbol);
+  const price = seed ? seed[3] : syntheticPrice(code, symbol);
+  const cap = capOf(code, marketCapBn);
+  const fundamentals = buildFundamentals(symbol, sector, cap);
+  return {
+    symbol,
+    name,
+    exchange: code,
+    sector,
+    cap,
+    marketCap: marketCapBn,
+    price,
+    changePct: rand(symbol, "chg", -4.2, 5.1, 2),
+    volume: Math.round(rand(symbol, "vol", 0.15, 48, 2) * 1_000_000),
+    epsTtm: Number((price / fundamentals.pe).toFixed(2)),
+    revenue: Number((marketCapBn / Math.max(fundamentals.ps, 0.3)).toFixed(2)),
+    fundamentals,
+  };
+}
+
 function build(): Stock[] {
   const out: Stock[] = [];
-  for (const [code, seeds] of Object.entries(SEEDS)) {
-    for (const [symbol, name, sector, price, marketCapBn] of seeds) {
-      const cap = capOf(code, marketCapBn);
-      const fundamentals = buildFundamentals(symbol, sector, cap);
-      out.push({
-        symbol,
-        name,
-        exchange: code,
-        sector,
-        cap,
-        marketCap: marketCapBn,
-        price,
-        changePct: rand(symbol, "chg", -4.2, 5.1, 2),
-        volume: Math.round(rand(symbol, "vol", 0.15, 48, 2) * 1_000_000),
-        epsTtm: Number((price / fundamentals.pe).toFixed(2)),
-        revenue: Number((marketCapBn / Math.max(fundamentals.ps, 0.3)).toFixed(2)),
-        fundamentals,
-      });
+  for (const code of Object.keys(LISTINGS)) {
+    const seeds = new Map<string, Seed>((SEEDS[code] ?? []).map((s) => [s[0], s]));
+    const seen = new Set<string>();
+
+    for (const line of LISTINGS[code]!.split("\n")) {
+      if (!line) continue;
+      const tab = line.indexOf("\t");
+      const symbol = (tab === -1 ? line : line.slice(0, tab)).trim();
+      const name = tab === -1 ? symbol : line.slice(tab + 1).trim();
+      if (!symbol || seen.has(symbol)) continue;
+      seen.add(symbol);
+      out.push(makeStock(code, symbol, name, seeds.get(symbol)));
+    }
+
+    // Curated companies that are not part of the downloaded listing file.
+    for (const seed of SEEDS[code] ?? []) {
+      if (seen.has(seed[0])) continue;
+      seen.add(seed[0]);
+      out.push(makeStock(code, seed[0], seed[1], seed));
     }
   }
   return out;
@@ -222,22 +310,45 @@ export const STOCKS: Stock[] = build();
 
 export const SECTORS: string[] = Array.from(new Set(STOCKS.map((s) => s.sector))).sort();
 
+const BY_EXCHANGE = new Map<string, Stock[]>();
+for (const s of STOCKS) {
+  const key = s.exchange.toLowerCase();
+  const list = BY_EXCHANGE.get(key);
+  if (list) list.push(s);
+  else BY_EXCHANGE.set(key, [s]);
+}
+
+const BY_KEY = new Map<string, Stock>(
+  STOCKS.map((s) => [`${s.exchange.toLowerCase()}:${s.symbol.toLowerCase()}`, s]),
+);
+
 export function stocksByExchange(code: string): Stock[] {
-  return STOCKS.filter((s) => s.exchange.toLowerCase() === code.toLowerCase());
+  return BY_EXCHANGE.get(code.toLowerCase()) ?? [];
 }
 
 export function findStock(exchange: string, symbol: string): Stock | undefined {
-  return STOCKS.find(
-    (s) =>
-      s.exchange.toLowerCase() === exchange.toLowerCase() &&
-      s.symbol.toLowerCase() === symbol.toLowerCase(),
-  );
+  return BY_KEY.get(`${exchange.toLowerCase()}:${symbol.toLowerCase()}`);
 }
 
-export function searchStocks(query: string, limit = 8): Stock[] {
+export function searchStocks(query: string, limit = 10): Stock[] {
   const q = query.trim().toLowerCase();
   if (!q) return [];
-  return STOCKS.filter(
-    (s) => s.symbol.toLowerCase().includes(q) || s.name.toLowerCase().includes(q),
-  ).slice(0, limit);
+  const exact: Stock[] = [];
+  const starts: Stock[] = [];
+  const contains: Stock[] = [];
+
+  for (const s of STOCKS) {
+    const sym = s.symbol.toLowerCase();
+    const name = s.name.toLowerCase();
+    if (sym === q) exact.push(s);
+    else if (sym.startsWith(q) || name.startsWith(q)) starts.push(s);
+    else if (sym.includes(q) || name.includes(q)) contains.push(s);
+    if (exact.length >= limit) break;
+  }
+
+  const rank = (a: Stock, b: Stock) => b.marketCap / (CAP_SCALE[b.exchange] ?? 1) - a.marketCap / (CAP_SCALE[a.exchange] ?? 1);
+  starts.sort(rank);
+  contains.sort(rank);
+  return [...exact, ...starts, ...contains].slice(0, limit);
 }
+
