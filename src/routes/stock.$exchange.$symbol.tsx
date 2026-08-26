@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 
 import { Shell } from "@/components/ds/Shell";
 import { NewsFeed } from "@/components/ds/NewsFeed";
+import { HoldingPlanCard } from "@/components/ds/HoldingPlanCard";
 import { ScoreBar } from "@/components/ds/StockTable";
 import { findStock } from "@/lib/deepscreen/stocks";
 import { stockNews } from "@/lib/deepscreen/news";
@@ -128,6 +129,8 @@ function StockPage() {
             </div>
           </div>
         </section>
+
+        <HoldingPlanCard stock={stock} />
 
         <section className="mt-8">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide">
