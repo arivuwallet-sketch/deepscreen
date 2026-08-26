@@ -223,17 +223,25 @@ function computeAnalysis(stock: Stock): Analysis {
   const verdict: Verdict =
     score >= 78 ? "Strong Buy" : score >= 64 ? "Buy" : score >= 48 ? "Hold" : score >= 34 ? "Caution" : "Avoid";
 
-  const strengths = metrics
-    .filter((m) => m.band === "good")
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 4)
-    .map((m) => `${m.label}: ${m.display} — ${m.reading.toLowerCase()}`);
+  const line = (m: MetricRead) => `${m.label}: ${m.display} — ${m.reading.toLowerCase()}`;
 
-  const risks = metrics
-    .filter((m) => m.band === "poor")
-    .sort((a, b) => a.score - b.score)
+  const byBest = [...metrics].sort((a, b) => b.score - a.score);
+  const byWorst = [...metrics].sort((a, b) => a.score - b.score);
+
+  // Always surface something: prefer clear good/poor bands, otherwise fall back to the
+  // strongest / weakest factors so neither box is ever blank.
+  const goodOnes = byBest.filter((m) => m.band === "good");
+  const poorOnes = byWorst.filter((m) => m.band === "poor");
+
+  const strengths = (goodOnes.length >= 2 ? goodOnes : byBest.filter((m) => m.score >= 55))
     .slice(0, 4)
-    .map((m) => `${m.label}: ${m.display} — ${m.reading.toLowerCase()}`);
+    .map(line);
+  const risks = (poorOnes.length >= 2 ? poorOnes : byWorst.filter((m) => m.score <= 65))
+    .slice(0, 4)
+    .map(line);
+
+  if (strengths.length === 0) strengths.push(line(byBest[0]!));
+  if (risks.length === 0) risks.push(line(byWorst[0]!));
 
   const summary = `${stock.name} scores ${score}/100 on the DeepScreen quality-and-value model. Growth is running near ${f.growth}% with a PEG of ${f.peg}, ROCE of ${f.roce}% and debt/equity at ${f.debtToEquity}x. ${
     verdict === "Strong Buy" || verdict === "Buy"
