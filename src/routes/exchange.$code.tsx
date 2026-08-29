@@ -6,7 +6,6 @@ import { LiveNewsFeed } from "@/components/ds/LiveNewsFeed";
 import { StockTable } from "@/components/ds/StockTable";
 import { EXCHANGES, getExchange } from "@/lib/deepscreen/exchanges";
 import { SECTORS, stocksByExchange } from "@/lib/deepscreen/stocks";
-import { exchangeNews } from "@/lib/deepscreen/news";
 import { analyze } from "@/lib/deepscreen/metrics";
 import { CAP_LABEL } from "@/lib/deepscreen/format";
 import type { CapTier } from "@/lib/deepscreen/types";
@@ -158,7 +157,11 @@ function ExchangePage() {
 
 
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
-          <NewsFeed items={exchangeNews(exchange.code, 8)} title={`${exchange.code} market news`} />
+          <LiveNewsFeed
+            query={`${exchange.code} ${exchange.country} stock market`}
+            title={`${exchange.code} market news`}
+            limit={12}
+          />
           <section className="rounded-lg border border-border bg-panel p-4">
             <h2 className="text-sm font-semibold uppercase tracking-wide">Other exchanges</h2>
             <ul className="mt-3 space-y-2 text-sm">
