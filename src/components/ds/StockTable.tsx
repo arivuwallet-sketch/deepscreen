@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
 
+import { quoteKey, useLiveQuotes } from "@/hooks/useLiveQuotes";
+
 import { analyze, verdictClass } from "@/lib/deepscreen/metrics";
 import { formatCap, formatPrice, formatVolume } from "@/lib/deepscreen/format";
 import type { Stock } from "@/lib/deepscreen/types";
@@ -18,6 +20,10 @@ export function ScoreBar({ score }: { score: number }) {
 }
 
 export function StockTable({ stocks }: { stocks: Stock[] }) {
+  const { data: live } = useLiveQuotes(
+    stocks.map((s) => ({ exchange: s.exchange, symbol: s.symbol })),
+  );
+
   if (stocks.length === 0) {
     return (
       <p className="rounded-lg border border-border bg-panel p-8 text-center text-sm text-muted-foreground">
@@ -47,6 +53,10 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
         <tbody className="divide-y divide-border">
           {stocks.map((s) => {
             const a = analyze(s);
+            const q = live?.[quoteKey(s)];
+            const price = q?.price ?? s.price;
+            const changePct = q?.changePct ?? s.changePct;
+            const volume = q?.volume || s.volume;
             return (
               <tr key={`${s.exchange}-${s.symbol}`} className="group hover:bg-accent/40">
                 <td className="num px-4 py-2.5 font-semibold text-primary">
@@ -60,22 +70,22 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
                   </Link>
                   <span className="ml-2 text-xs text-muted-foreground">{s.sector}</span>
                 </td>
-                <td className="num px-2 py-2.5 text-right">{formatPrice(s.price, s.exchange)}</td>
+                <td className="num px-2 py-2.5 text-right">{formatPrice(price, s.exchange)}</td>
                 <td
                   className={cn(
                     "num px-2 py-2.5 text-right font-medium",
-                    s.changePct >= 0 ? "text-bull" : "text-bear",
+                    changePct >= 0 ? "text-bull" : "text-bear",
                   )}
                 >
-                  {s.changePct >= 0 ? "+" : ""}
-                  {s.changePct.toFixed(2)}%
+                  {changePct >= 0 ? "+" : ""}
+                  {changePct.toFixed(2)}%
                 </td>
                 <td className="num px-2 py-2.5 text-right">{formatCap(s.marketCap, s.exchange)}</td>
                 <td className="num px-2 py-2.5 text-right">{s.fundamentals.pe.toFixed(1)}</td>
                 <td className="num px-2 py-2.5 text-right">{s.fundamentals.peg.toFixed(2)}</td>
                 <td className="num px-2 py-2.5 text-right">{s.fundamentals.roce.toFixed(1)}%</td>
                 <td className="num px-2 py-2.5 text-right text-muted-foreground">
-                  {formatVolume(s.volume)}
+                  {formatVolume(volume)}
                 </td>
                 <td className="px-2 py-2.5">
                   <ScoreBar score={a.score} />
