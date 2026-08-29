@@ -64,7 +64,10 @@ export function WatchlistButton({ stock }: { stock: Stock }) {
       name: stock.name,
     });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     setTracked(true);
     toast.success(`${stock.symbol} added — daily alerts will cover it`);
   }
