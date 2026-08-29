@@ -38,7 +38,7 @@ function AuthPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && session) void navigate({ to: "/alerts" });
+    if (!loading && session) void navigate({ to: "/" });
   }, [loading, session, navigate]);
 
   async function submit(e: React.FormEvent) {
@@ -50,7 +50,7 @@ function AuthPage() {
         : supabase.auth.signUp({
             email,
             password,
-            options: { emailRedirectTo: `${window.location.origin}/alerts` },
+            options: { emailRedirectTo: `${window.location.origin}` },
           });
     const { error } = await fn;
     setBusy(false);
@@ -59,7 +59,7 @@ function AuthPage() {
       return;
     }
     toast.success(mode === "signin" ? "Signed in" : "Account created — you can set up alerts now");
-    void navigate({ to: "/alerts" });
+    void navigate({ to: "/" });
   }
 
   async function google() {
@@ -71,7 +71,7 @@ function AuthPage() {
       return;
     }
     if (result.redirected) return;
-    void navigate({ to: "/alerts" });
+    void navigate({ to: "/" });
   }
 
   return (

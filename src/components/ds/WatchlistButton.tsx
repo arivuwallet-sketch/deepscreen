@@ -28,6 +28,7 @@ export function WatchlistButton({ stock }: { stock: Stock }) {
       .maybeSingle()
       .then(({ data }) => {
         if (active) setTracked(Boolean(data));
+        return undefined;
       });
     return () => {
       active = false;
