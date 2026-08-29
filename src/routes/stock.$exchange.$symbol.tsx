@@ -1,11 +1,11 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 
 import { Shell } from "@/components/ds/Shell";
-import { NewsFeed } from "@/components/ds/NewsFeed";
+import { LiveNewsFeed } from "@/components/ds/LiveNewsFeed";
+import { useLiveQuote } from "@/hooks/useLiveQuotes";
 import { HoldingPlanCard } from "@/components/ds/HoldingPlanCard";
 import { ScoreBar } from "@/components/ds/StockTable";
 import { findStock } from "@/lib/deepscreen/stocks";
-import { stockNews } from "@/lib/deepscreen/news";
 import { analyze, verdictClass } from "@/lib/deepscreen/metrics";
 import { CAP_LABEL, formatCap, formatPrice, formatVolume } from "@/lib/deepscreen/format";
 import { cn } from "@/lib/utils";
@@ -51,6 +51,9 @@ function StockPage() {
   const { stock } = Route.useLoaderData();
   const a = analyze(stock);
   const f = stock.fundamentals;
+  const { data: quote, dataUpdatedAt } = useLiveQuote(stock.exchange, stock.symbol);
+  const price = quote?.price ?? stock.price;
+  const changePct = quote?.changePct ?? stock.changePct;
 
   return (
     <Shell>
@@ -78,11 +81,23 @@ function StockPage() {
             </p>
           </div>
           <div className="text-right">
-            <p className="num text-3xl font-bold">{formatPrice(stock.price, stock.exchange)}</p>
-            <p className={cn("num text-sm font-medium", stock.changePct >= 0 ? "text-bull" : "text-bear")}>
-              {stock.changePct >= 0 ? "▲ +" : "▼ "}
-              {stock.changePct.toFixed(2)}% today
+            <p className="num text-3xl font-bold">{formatPrice(price, stock.exchange)}</p>
+            <p className={cn("num text-sm font-medium", changePct >= 0 ? "text-bull" : "text-bear")}>
+              {changePct >= 0 ? "▲ +" : "▼ "}
+              {changePct.toFixed(2)}% today
             </p>
+            <p className="num mt-1 text-[11px] text-muted-foreground">
+              {quote
+                ? `Live · ${quote.marketState || "market"} · updated ${new Date(dataUpdatedAt).toLocaleTimeString()}`
+                : "Fetching live price…"}
+            </p>
+            {quote ? (
+              <p className="num mt-0.5 text-[11px] text-muted-foreground">
+                Day {formatPrice(quote.dayLow, stock.exchange)}–{formatPrice(quote.dayHigh, stock.exchange)} · 52w{" "}
+                {formatPrice(quote.fiftyTwoWeekLow, stock.exchange)}–
+                {formatPrice(quote.fiftyTwoWeekHigh, stock.exchange)}
+              </p>
+            ) : null}
           </div>
         </header>
 
@@ -186,7 +201,11 @@ function StockPage() {
               <dd className="text-right">{f.debtToEquity}x</dd>
             </dl>
           </div>
-          <NewsFeed items={stockNews(stock, 6)} title={`${stock.symbol} news`} />
+          <LiveNewsFeed
+            query={`"${stock.name}" OR ${stock.symbol} stock`}
+            title={`${stock.symbol} live news`}
+            limit={10}
+          />
         </section>
       </div>
     </Shell>

@@ -28,13 +28,14 @@ export function WatchlistButton({ stock }: { stock: Stock }) {
       .maybeSingle()
       .then(({ data }) => {
         if (active) setTracked(Boolean(data));
+        return undefined;
       });
     return () => {
       active = false;
     };
   }, [user, stock.exchange, stock.symbol]);
 
-  async function toggle() {
+  async function toggle(): Promise<void> {
     if (!user) {
       void navigate({ to: "/auth" });
       return;
@@ -48,7 +49,10 @@ export function WatchlistButton({ stock }: { stock: Stock }) {
         .eq("exchange", stock.exchange)
         .eq("symbol", stock.symbol);
       setBusy(false);
-      if (error) return toast.error(error.message);
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
       setTracked(false);
       toast.success(`${stock.symbol} removed from your alerts`);
       return;
@@ -60,7 +64,10 @@ export function WatchlistButton({ stock }: { stock: Stock }) {
       name: stock.name,
     });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     setTracked(true);
     toast.success(`${stock.symbol} added — daily alerts will cover it`);
   }
