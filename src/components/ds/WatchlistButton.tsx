@@ -49,7 +49,10 @@ export function WatchlistButton({ stock }: { stock: Stock }) {
         .eq("exchange", stock.exchange)
         .eq("symbol", stock.symbol);
       setBusy(false);
-      if (error) return toast.error(error.message);
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
       setTracked(false);
       toast.success(`${stock.symbol} removed from your alerts`);
       return;
