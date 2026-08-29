@@ -3,12 +3,11 @@ import { ArrowUpRight, Globe2, LineChart, ShieldCheck } from "lucide-react";
 
 import { Shell } from "@/components/ds/Shell";
 import { SearchBar } from "@/components/ds/SearchBar";
-import { NewsFeed } from "@/components/ds/NewsFeed";
+import { LiveNewsFeed } from "@/components/ds/LiveNewsFeed";
 import { EconomicCalendar } from "@/components/ds/EconomicCalendar";
 import { StockTable } from "@/components/ds/StockTable";
 import { EXCHANGES } from "@/lib/deepscreen/exchanges";
 import { STOCKS } from "@/lib/deepscreen/stocks";
-import { globalNews } from "@/lib/deepscreen/news";
 import { analyze } from "@/lib/deepscreen/metrics";
 
 export const Route = createFileRoute("/")({
@@ -32,7 +31,6 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const news = globalNews(10);
   const top = [...STOCKS]
     .map((s) => ({ s, a: analyze(s) }))
     .sort((x, y) => y.a.score - x.a.score)
@@ -102,7 +100,7 @@ function Home() {
 
         <div className="grid gap-6 lg:grid-cols-2">
           <EconomicCalendar />
-          <NewsFeed items={news} title="Market-moving news" />
+          <LiveNewsFeed query="stock market" title="Market-moving news" limit={12} />
         </div>
 
         <section>

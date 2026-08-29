@@ -2,7 +2,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 
 import { Shell } from "@/components/ds/Shell";
-import { NewsFeed } from "@/components/ds/NewsFeed";
+import { LiveNewsFeed } from "@/components/ds/LiveNewsFeed";
 import { StockTable } from "@/components/ds/StockTable";
 import { EXCHANGES, getExchange } from "@/lib/deepscreen/exchanges";
 import { SECTORS, stocksByExchange } from "@/lib/deepscreen/stocks";
