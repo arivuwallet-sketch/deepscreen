@@ -35,7 +35,7 @@ export function WatchlistButton({ stock }: { stock: Stock }) {
     };
   }, [user, stock.exchange, stock.symbol]);
 
-  async function toggle() {
+  async function toggle(): Promise<void> {
     if (!user) {
       void navigate({ to: "/auth" });
       return;
