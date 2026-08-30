@@ -1,11 +1,26 @@
 import { Link } from "@tanstack/react-router";
+import { Lock } from "lucide-react";
 
-import { quoteKey, useLiveQuotes } from "@/hooks/useLiveQuotes";
+import { quoteKey, useLiveFundamentalsBatch, useLiveQuotes } from "@/hooks/useLiveQuotes";
+import { useSubscription } from "@/hooks/useSubscription";
 
 import { analyze, verdictClass } from "@/lib/deepscreen/metrics";
+import { mergeLiveStock } from "@/lib/deepscreen/live-merge";
 import { formatCap, formatPrice, formatVolume } from "@/lib/deepscreen/format";
 import type { Stock } from "@/lib/deepscreen/types";
 import { cn } from "@/lib/utils";
+
+function ProLockChip() {
+  return (
+    <Link
+      to="/pricing"
+      title="Deep score & verdict are a DeepScreen Pro feature"
+      className="num inline-flex items-center gap-1 rounded border border-dashed border-border px-2 py-0.5 text-[10px] font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
+    >
+      <Lock className="size-3" /> Pro
+    </Link>
+  );
+}
 
 export function ScoreBar({ score }: { score: number }) {
   const tone = score >= 67 ? "bg-bull" : score >= 45 ? "bg-warn" : "bg-bear";
@@ -20,9 +35,11 @@ export function ScoreBar({ score }: { score: number }) {
 }
 
 export function StockTable({ stocks }: { stocks: Stock[] }) {
-  const { data: live } = useLiveQuotes(
-    stocks.map((s) => ({ exchange: s.exchange, symbol: s.symbol })),
-  );
+  const keys = stocks.map((s) => ({ exchange: s.exchange, symbol: s.symbol }));
+  const { data: live } = useLiveQuotes(keys);
+  const { data: liveFundamentals, isFetching: fundamentalsLoading } =
+    useLiveFundamentalsBatch(keys);
+  const { isPro, loading: subLoading } = useSubscription();
 
   if (stocks.length === 0) {
     return (
@@ -52,59 +69,120 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
         </thead>
         <tbody className="divide-y divide-border">
           {stocks.map((s) => {
-            const a = analyze(s);
             const q = live?.[quoteKey(s)];
-            const price = q?.price ?? s.price;
-            const changePct = q?.changePct ?? s.changePct;
-            const volume = q?.volume || s.volume;
+            const lf = liveFundamentals?.[quoteKey(s)];
+            const { stock: merged, sources } = mergeLiveStock(s, q, lf);
+            const a = analyze(merged);
+            const isLive = sources.pe === "live";
             return (
               <tr key={`${s.exchange}-${s.symbol}`} className="group hover:bg-accent/40">
                 <td className="num px-4 py-2.5 font-semibold text-primary">
-                  <Link to="/stock/$exchange/$symbol" params={{ exchange: s.exchange, symbol: s.symbol }}>
+                  <Link
+                    to="/stock/$exchange/$symbol"
+                    params={{ exchange: s.exchange, symbol: s.symbol }}
+                  >
                     {s.symbol}
                   </Link>
                 </td>
                 <td className="max-w-[220px] truncate px-2 py-2.5">
-                  <Link to="/stock/$exchange/$symbol" params={{ exchange: s.exchange, symbol: s.symbol }}>
+                  <Link
+                    to="/stock/$exchange/$symbol"
+                    params={{ exchange: s.exchange, symbol: s.symbol }}
+                  >
                     {s.name}
                   </Link>
                   <span className="ml-2 text-xs text-muted-foreground">{s.sector}</span>
                 </td>
-                <td className="num px-2 py-2.5 text-right">{formatPrice(price, s.exchange)}</td>
+                <td className="num px-2 py-2.5 text-right">
+                  {formatPrice(merged.price, s.exchange)}
+                  {q ? (
+                    <span
+                      className="ml-1 inline-block size-1.5 rounded-full bg-bull align-middle"
+                      title="Live price"
+                    />
+                  ) : null}
+                </td>
                 <td
                   className={cn(
                     "num px-2 py-2.5 text-right font-medium",
-                    changePct >= 0 ? "text-bull" : "text-bear",
+                    merged.changePct >= 0 ? "text-bull" : "text-bear",
                   )}
                 >
-                  {changePct >= 0 ? "+" : ""}
-                  {changePct.toFixed(2)}%
+                  {merged.changePct >= 0 ? "+" : ""}
+                  {merged.changePct.toFixed(2)}%
                 </td>
-                <td className="num px-2 py-2.5 text-right">{formatCap(s.marketCap, s.exchange)}</td>
-                <td className="num px-2 py-2.5 text-right">{s.fundamentals.pe.toFixed(1)}</td>
-                <td className="num px-2 py-2.5 text-right">{s.fundamentals.peg.toFixed(2)}</td>
-                <td className="num px-2 py-2.5 text-right">{s.fundamentals.roce.toFixed(1)}%</td>
+                <td className="num px-2 py-2.5 text-right">
+                  {formatCap(merged.marketCap, s.exchange)}
+                </td>
+                <td
+                  className="num px-2 py-2.5 text-right"
+                  title={isLive ? "Live" : "Modeled estimate"}
+                >
+                  {merged.fundamentals.pe.toFixed(1)}
+                </td>
+                <td
+                  className="num px-2 py-2.5 text-right"
+                  title={sources.peg === "live" ? "Live" : "Modeled estimate"}
+                >
+                  {merged.fundamentals.peg.toFixed(2)}
+                </td>
+                <td
+                  className="num px-2 py-2.5 text-right"
+                  title="Modeled estimate — Yahoo has no public ROCE field"
+                >
+                  {merged.fundamentals.roce.toFixed(1)}%
+                </td>
                 <td className="num px-2 py-2.5 text-right text-muted-foreground">
-                  {formatVolume(volume)}
+                  {formatVolume(merged.volume)}
                 </td>
                 <td className="px-2 py-2.5">
-                  <ScoreBar score={a.score} />
+                  {subLoading ? (
+                    <span className="inline-block h-4 w-16 animate-pulse rounded bg-muted" />
+                  ) : isPro ? (
+                    <ScoreBar score={a.score} />
+                  ) : (
+                    <ProLockChip />
+                  )}
                 </td>
                 <td className="px-4 py-2.5">
-                  <span
-                    className={cn(
-                      "num rounded border px-2 py-0.5 text-[11px] font-semibold",
-                      verdictClass(a.verdict),
-                    )}
-                  >
-                    {a.verdict}
-                  </span>
+                  {subLoading ? (
+                    <span className="inline-block h-4 w-12 animate-pulse rounded bg-muted" />
+                  ) : isPro ? (
+                    <span
+                      className={cn(
+                        "num rounded border px-2 py-0.5 text-[11px] font-semibold",
+                        verdictClass(a.verdict),
+                      )}
+                    >
+                      {a.verdict}
+                    </span>
+                  ) : (
+                    <ProLockChip />
+                  )}
                 </td>
               </tr>
             );
           })}
         </tbody>
       </table>
+      <p className="border-t border-border px-4 py-2 text-[11px] text-muted-foreground">
+        <span className="mr-1 inline-block size-1.5 rounded-full bg-bull align-middle" /> Live price
+        for up to 60 rows here, refreshed every 15s. P/E and PEG are live (Yahoo Finance, refreshed
+        ~45s
+        {fundamentalsLoading ? ", updating…" : ""}) for the first {Math.min(30, stocks.length)} rows
+        in this view; the rest show modeled estimates, as does ROCE everywhere — Yahoo has no public
+        field for it.
+        {!subLoading && !isPro ? (
+          <>
+            {" "}
+            Score & verdict are a{" "}
+            <Link to="/pricing" className="text-primary hover:underline">
+              DeepScreen Pro
+            </Link>{" "}
+            feature.
+          </>
+        ) : null}
+      </p>
     </div>
   );
 }

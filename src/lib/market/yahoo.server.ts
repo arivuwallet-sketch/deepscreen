@@ -71,6 +71,21 @@ export interface LiveQuote {
   asOf: string;
 }
 
+/**
+ * Yahoo quotes most LSE-listed tickers in pence sterling ("GBp"), not pounds
+ * ("GBP") — a well-known quirk that trips up almost every Yahoo Finance
+ * integration touching London. Only per-share price fields are pence-scaled;
+ * company-level absolutes (market cap, revenue, cash, debt) are already
+ * reported in whole pounds. Getting this wrong means a real £2.85 stock shows
+ * up as £285.00 — a 100x error, exactly the kind of thing that's obviously
+ * broken for every single LSE stock in the app, not just one.
+ */
+function isPence(currency: string | null | undefined): boolean {
+  if (!currency) return false;
+  const c = currency.trim();
+  return c === "GBp" || c.toUpperCase() === "GBX";
+}
+
 export async function fetchChartQuote(ySymbol: string): Promise<LiveQuote | null> {
   try {
     const res = await fetch(
@@ -83,21 +98,24 @@ export async function fetchChartQuote(ySymbol: string): Promise<LiveQuote | null
     };
     const meta = json.chart?.result?.[0]?.meta;
     if (!meta) return null;
-    const price = Number(meta['regularMarketPrice']);
-    const prev = Number(meta['chartPreviousClose'] ?? meta['previousClose'] ?? price);
-    if (!Number.isFinite(price) || price <= 0) return null;
+    const rawPrice = Number(meta["regularMarketPrice"]);
+    if (!Number.isFinite(rawPrice) || rawPrice <= 0) return null;
+    const rawCurrency = String(meta["currency"] ?? "USD");
+    const scale = isPence(rawCurrency) ? 100 : 1;
+    const price = rawPrice / scale;
+    const prev = Number(meta["chartPreviousClose"] ?? meta["previousClose"] ?? rawPrice) / scale;
     return {
       symbol: ySymbol,
       price,
       previousClose: prev,
       changePct: prev > 0 ? ((price - prev) / prev) * 100 : 0,
-      dayHigh: Number(meta['regularMarketDayHigh'] ?? price),
-      dayLow: Number(meta['regularMarketDayLow'] ?? price),
-      volume: Number(meta['regularMarketVolume'] ?? 0),
-      currency: String(meta['currency'] ?? "USD"),
-      fiftyTwoWeekHigh: Number(meta['fiftyTwoWeekHigh'] ?? 0),
-      fiftyTwoWeekLow: Number(meta['fiftyTwoWeekLow'] ?? 0),
-      marketState: String(meta['marketState'] ?? ""),
+      dayHigh: Number(meta["regularMarketDayHigh"] ?? rawPrice) / scale,
+      dayLow: Number(meta["regularMarketDayLow"] ?? rawPrice) / scale,
+      volume: Number(meta["regularMarketVolume"] ?? 0),
+      currency: scale === 100 ? "GBP" : rawCurrency,
+      fiftyTwoWeekHigh: Number(meta["fiftyTwoWeekHigh"] ?? 0) / scale,
+      fiftyTwoWeekLow: Number(meta["fiftyTwoWeekLow"] ?? 0) / scale,
+      marketState: String(meta["marketState"] ?? ""),
       asOf: new Date().toISOString(),
     };
   } catch {
@@ -159,7 +177,7 @@ function num(v: unknown): number | null {
   if (v === null || v === undefined) return null;
   if (typeof v === "number") return Number.isFinite(v) ? v : null;
   if (typeof v === "object" && v !== null && "raw" in (v as Raw)) {
-    const r = (v as Raw)['raw'];
+    const r = (v as Raw)["raw"];
     return typeof r === "number" && Number.isFinite(r) ? r : null;
   }
   const n = Number(v);
@@ -196,70 +214,87 @@ export async function fetchFundamentals(ySymbol: string): Promise<LiveFundamenta
     const json = (await res.json()) as { quoteSummary?: { result?: Raw[] } };
     const r = json.quoteSummary?.result?.[0];
     if (!r) return null;
-    const sd = (r['summaryDetail'] ?? {}) as Raw;
-    const ks = (r['defaultKeyStatistics'] ?? {}) as Raw;
-    const fd = (r['financialData'] ?? {}) as Raw;
-    const ap = (r['assetProfile'] ?? {}) as Raw;
-    const pr = (r['price'] ?? {}) as Raw;
+    const sd = (r["summaryDetail"] ?? {}) as Raw;
+    const ks = (r["defaultKeyStatistics"] ?? {}) as Raw;
+    const fd = (r["financialData"] ?? {}) as Raw;
+    const ap = (r["assetProfile"] ?? {}) as Raw;
+    const pr = (r["price"] ?? {}) as Raw;
 
-    const revenue = num(fd['totalRevenue']);
-    const ebitda = num(fd['ebitda']);
-    const marketCap = num(sd['marketCap']) ?? num(pr['marketCap']);
-    const totalDebt = num(fd['totalDebt']);
-    const totalCash = num(fd['totalCash']);
-    const ev = num(ks['enterpriseValue']) ?? (marketCap !== null ? marketCap + (totalDebt ?? 0) - (totalCash ?? 0) : null);
+    const revenue = num(fd["totalRevenue"]);
+    const ebitda = num(fd["ebitda"]);
+    const marketCap = num(sd["marketCap"]) ?? num(pr["marketCap"]);
+    const totalDebt = num(fd["totalDebt"]);
+    const totalCash = num(fd["totalCash"]);
+    const ev =
+      num(ks["enterpriseValue"]) ??
+      (marketCap !== null ? marketCap + (totalDebt ?? 0) - (totalCash ?? 0) : null);
 
-    const officers = Array.isArray(ap['companyOfficers'])
-      ? (ap['companyOfficers'] as Raw[])
-          .map((o) => ({ name: str(o['name']) ?? "", title: str(o['title']) ?? "" }))
+    const officers = Array.isArray(ap["companyOfficers"])
+      ? (ap["companyOfficers"] as Raw[])
+          .map((o) => ({ name: str(o["name"]) ?? "", title: str(o["title"]) ?? "" }))
           .filter((o) => o.name)
           .slice(0, 5)
       : [];
 
+    // Same pence-vs-pounds issue as fetchChartQuote, but here it only touches
+    // genuine per-share figures (EPS, book value, analyst target price) —
+    // ratios like P/E, P/B, margins, ROE etc. are unaffected since both their
+    // numerator and denominator are quoted in the same unit on Yahoo's side.
+    const rawCurrency = str(sd["currency"]) ?? str(pr["currency"]);
+    const scale = isPence(rawCurrency) ? 100 : 1;
+    const scaled = (v: number | null) => (v === null ? null : Number((v / scale).toFixed(4)));
+
     return {
       symbol: ySymbol,
       marketCap,
-      currency: str(sd['currency']) ?? str(pr['currency']),
-      pe: num(sd['trailingPE']),
-      forwardPe: num(sd['forwardPE']),
-      peg: num(ks['pegRatio']),
-      ps: num(ks['priceToSalesTrailing12Months']) ?? num(sd['priceToSalesTrailing12Months']),
-      pb: num(ks['priceToBook']),
-      evRevenue: num(ks['enterpriseToRevenue']) ?? (ev && revenue ? Number((ev / revenue).toFixed(2)) : null),
-      evEbitda: num(ks['enterpriseToEbitda']) ?? (ev && ebitda ? Number((ev / ebitda).toFixed(2)) : null),
-      roe: pct(fd['returnOnEquity']),
-      roa: pct(fd['returnOnAssets']),
-      debtToEquity: num(fd['debtToEquity']) !== null ? Number((num(fd['debtToEquity'])! / 100).toFixed(2)) : null,
-      currentRatio: num(fd['currentRatio']),
-      quickRatio: num(fd['quickRatio']),
-      grossMargin: pct(fd['grossMargins']),
-      operatingMargin: pct(fd['operatingMargins']),
-      netMargin: pct(fd['profitMargins']) ?? pct(ks['profitMargins']),
-      ebitdaMargin: pct(fd['ebitdaMargins']),
+      currency: scale === 100 ? "GBP" : rawCurrency,
+      pe: num(sd["trailingPE"]),
+      forwardPe: num(sd["forwardPE"]),
+      peg: num(ks["pegRatio"]),
+      ps: num(ks["priceToSalesTrailing12Months"]) ?? num(sd["priceToSalesTrailing12Months"]),
+      pb: num(ks["priceToBook"]),
+      evRevenue:
+        num(ks["enterpriseToRevenue"]) ??
+        (ev && revenue ? Number((ev / revenue).toFixed(2)) : null),
+      evEbitda:
+        num(ks["enterpriseToEbitda"]) ?? (ev && ebitda ? Number((ev / ebitda).toFixed(2)) : null),
+      roe: pct(fd["returnOnEquity"]),
+      roa: pct(fd["returnOnAssets"]),
+      debtToEquity:
+        num(fd["debtToEquity"]) !== null
+          ? Number((num(fd["debtToEquity"])! / 100).toFixed(2))
+          : null,
+      currentRatio: num(fd["currentRatio"]),
+      quickRatio: num(fd["quickRatio"]),
+      grossMargin: pct(fd["grossMargins"]),
+      operatingMargin: pct(fd["operatingMargins"]),
+      netMargin: pct(fd["profitMargins"]) ?? pct(ks["profitMargins"]),
+      ebitdaMargin: pct(fd["ebitdaMargins"]),
       revenue,
       ebitda,
-      freeCashflow: num(fd['freeCashflow']),
-      operatingCashflow: num(fd['operatingCashflow']),
+      freeCashflow: num(fd["freeCashflow"]),
+      operatingCashflow: num(fd["operatingCashflow"]),
       totalCash,
       totalDebt,
-      revenueGrowth: pct(fd['revenueGrowth']),
-      earningsGrowth: pct(fd['earningsGrowth']) ?? pct(ks['earningsQuarterlyGrowth']),
-      dividendYield: num(sd['dividendYield']) !== null ? Number(num(sd['dividendYield'])!.toFixed(2)) : null,
-      payoutRatio: pct(sd['payoutRatio']),
-      beta: num(sd['beta']) ?? num(ks['beta']),
-      epsTtm: num(ks['trailingEps']),
-      sharesOutstanding: num(ks['sharesOutstanding']),
-      bookValue: num(ks['bookValue']),
-      targetMeanPrice: num(fd['targetMeanPrice']),
-      recommendationKey: str(fd['recommendationKey']),
-      numberOfAnalysts: num(fd['numberOfAnalystOpinions']),
-      sector: str(ap['sector']),
-      industry: str(ap['industry']),
-      website: str(ap['website']),
-      employees: num(ap['fullTimeEmployees']),
-      city: str(ap['city']),
-      country: str(ap['country']),
-      summary: str(ap['longBusinessSummary']),
+      revenueGrowth: pct(fd["revenueGrowth"]),
+      earningsGrowth: pct(fd["earningsGrowth"]) ?? pct(ks["earningsQuarterlyGrowth"]),
+      dividendYield:
+        num(sd["dividendYield"]) !== null ? Number(num(sd["dividendYield"])!.toFixed(2)) : null,
+      payoutRatio: pct(sd["payoutRatio"]),
+      beta: num(sd["beta"]) ?? num(ks["beta"]),
+      epsTtm: scaled(num(ks["trailingEps"])),
+      sharesOutstanding: num(ks["sharesOutstanding"]),
+      bookValue: scaled(num(ks["bookValue"])),
+      targetMeanPrice: scaled(num(fd["targetMeanPrice"])),
+      recommendationKey: str(fd["recommendationKey"]),
+      numberOfAnalysts: num(fd["numberOfAnalystOpinions"]),
+      sector: str(ap["sector"]),
+      industry: str(ap["industry"]),
+      website: str(ap["website"]),
+      employees: num(ap["fullTimeEmployees"]),
+      city: str(ap["city"]),
+      country: str(ap["country"]),
+      summary: str(ap["longBusinessSummary"]),
       officers,
     };
   } catch {

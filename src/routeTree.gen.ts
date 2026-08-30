@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CryptoRouteImport } from './routes/crypto'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as ExchangeCodeRouteImport } from './routes/exchange.$code'
 import { Route as StockExchangeSymbolRouteImport } from './routes/stock.$exchange.$symbol'
@@ -23,6 +24,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CryptoRoute = CryptoRouteImport.update({
+  id: '/crypto',
+  path: '/crypto',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PricingRoute = PricingRouteImport.update({
@@ -44,6 +50,7 @@ const StockExchangeSymbolRoute = StockExchangeSymbolRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/crypto': typeof CryptoRoute
   '/pricing': typeof PricingRoute
   '/exchange/$code': typeof ExchangeCodeRoute
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/crypto': typeof CryptoRoute
   '/pricing': typeof PricingRoute
   '/exchange/$code': typeof ExchangeCodeRoute
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
@@ -59,6 +67,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/crypto': typeof CryptoRoute
   '/pricing': typeof PricingRoute
   '/exchange/$code': typeof ExchangeCodeRoute
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
@@ -66,14 +75,25 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/pricing' | '/exchange/$code' | '/stock/$exchange/$symbol'
+    | '/'
+    | '/auth'
+    | '/crypto'
+    | '/pricing'
+    | '/exchange/$code'
+    | '/stock/$exchange/$symbol'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/auth' | '/pricing' | '/exchange/$code' | '/stock/$exchange/$symbol'
+    | '/'
+    | '/auth'
+    | '/crypto'
+    | '/pricing'
+    | '/exchange/$code'
+    | '/stock/$exchange/$symbol'
   id:
     | '__root__'
     | '/'
     | '/auth'
+    | '/crypto'
     | '/pricing'
     | '/exchange/$code'
     | '/stock/$exchange/$symbol'
@@ -82,6 +102,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
+  CryptoRoute: typeof CryptoRoute
   PricingRoute: typeof PricingRoute
   ExchangeCodeRoute: typeof ExchangeCodeRoute
   StockExchangeSymbolRoute: typeof StockExchangeSymbolRoute
@@ -101,6 +122,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/crypto': {
+      id: '/crypto'
+      path: '/crypto'
+      fullPath: '/crypto'
+      preLoaderRoute: typeof CryptoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pricing': {
@@ -130,6 +158,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
+  CryptoRoute: CryptoRoute,
   PricingRoute: PricingRoute,
   ExchangeCodeRoute: ExchangeCodeRoute,
   StockExchangeSymbolRoute: StockExchangeSymbolRoute,

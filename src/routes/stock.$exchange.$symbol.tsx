@@ -2,11 +2,14 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 
 import { Shell } from "@/components/ds/Shell";
 import { LiveNewsFeed } from "@/components/ds/LiveNewsFeed";
-import { useLiveQuote } from "@/hooks/useLiveQuotes";
+import { DcfCalculator } from "@/components/ds/DcfCalculator";
+import { PaywallGate } from "@/components/ds/PaywallGate";
+import { useLiveFundamentals, useLiveQuote } from "@/hooks/useLiveQuotes";
 import { HoldingPlanCard } from "@/components/ds/HoldingPlanCard";
 import { ScoreBar } from "@/components/ds/StockTable";
 import { findStock } from "@/lib/deepscreen/stocks";
 import { analyze, verdictClass } from "@/lib/deepscreen/metrics";
+import { METRIC_KEY_TO_FIELD, mergeLiveStock } from "@/lib/deepscreen/live-merge";
 import { CAP_LABEL, formatCap, formatPrice, formatVolume } from "@/lib/deepscreen/format";
 import { cn } from "@/lib/utils";
 
@@ -18,7 +21,9 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
-      return { meta: [{ title: "Stock not found | DeepScreen" }, { name: "robots", content: "noindex" }] };
+      return {
+        meta: [{ title: "Stock not found | DeepScreen" }, { name: "robots", content: "noindex" }],
+      };
     }
     const s = loaderData.stock;
     const title = `${s.symbol} — ${s.name} Fundamental Analysis | DeepScreen`;
@@ -49,11 +54,17 @@ const bandText: Record<string, string> = {
 
 function StockPage() {
   const { stock } = Route.useLoaderData();
-  const a = analyze(stock);
-  const f = stock.fundamentals;
   const { data: quote, dataUpdatedAt } = useLiveQuote(stock.exchange, stock.symbol);
-  const price = quote?.price ?? stock.price;
-  const changePct = quote?.changePct ?? stock.changePct;
+  const { data: liveFundamentals, dataUpdatedAt: fundUpdatedAt } = useLiveFundamentals(
+    stock.exchange,
+    stock.symbol,
+  );
+  const { stock: live, sources } = mergeLiveStock(stock, quote, liveFundamentals);
+  const a = analyze(live);
+  const f = live.fundamentals;
+  const price = live.price;
+  const changePct = live.changePct;
+  const hasLiveFundamentals = Object.values(sources).some((v) => v === "live");
 
   return (
     <Shell>
@@ -63,7 +74,11 @@ function StockPage() {
             Home
           </Link>{" "}
           /{" "}
-          <Link to="/exchange/$code" params={{ code: stock.exchange }} className="hover:text-foreground">
+          <Link
+            to="/exchange/$code"
+            params={{ code: stock.exchange }}
+            className="hover:text-foreground"
+          >
             {stock.exchange}
           </Link>{" "}
           / {stock.symbol}
@@ -77,12 +92,14 @@ function StockPage() {
             </h1>
             <p className="num mt-2 text-xs text-muted-foreground">
               {stock.exchange} · {stock.sector} · {CAP_LABEL[stock.cap]} · Mkt cap{" "}
-              {formatCap(stock.marketCap, stock.exchange)} · Vol {formatVolume(stock.volume)}
+              {formatCap(live.marketCap, stock.exchange)} · Vol {formatVolume(live.volume)}
             </p>
           </div>
           <div className="text-right">
             <p className="num text-3xl font-bold">{formatPrice(price, stock.exchange)}</p>
-            <p className={cn("num text-sm font-medium", changePct >= 0 ? "text-bull" : "text-bear")}>
+            <p
+              className={cn("num text-sm font-medium", changePct >= 0 ? "text-bull" : "text-bear")}
+            >
               {changePct >= 0 ? "▲ +" : "▼ "}
               {changePct.toFixed(2)}% today
             </p>
@@ -93,7 +110,8 @@ function StockPage() {
             </p>
             {quote ? (
               <p className="num mt-0.5 text-[11px] text-muted-foreground">
-                Day {formatPrice(quote.dayLow, stock.exchange)}–{formatPrice(quote.dayHigh, stock.exchange)} · 52w{" "}
+                Day {formatPrice(quote.dayLow, stock.exchange)}–
+                {formatPrice(quote.dayHigh, stock.exchange)} · 52w{" "}
                 {formatPrice(quote.fiftyTwoWeekLow, stock.exchange)}–
                 {formatPrice(quote.fiftyTwoWeekHigh, stock.exchange)}
               </p>
@@ -101,92 +119,147 @@ function StockPage() {
           </div>
         </header>
 
-        <section className="mt-6 grid gap-4 lg:grid-cols-3">
-          <div className="rounded-lg border border-border bg-panel p-5 lg:col-span-2">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold uppercase tracking-wide">DeepScreen verdict</h2>
-              <span
-                className={cn("num rounded border px-3 py-1 text-sm font-semibold", verdictClass(a.verdict))}
-              >
-                {a.verdict}
-              </span>
-            </div>
-            <div className="mt-4 flex items-center gap-4">
-              <span className="num text-5xl font-bold">{a.score}</span>
-              <div className="flex-1">
-                <ScoreBar score={a.score} />
-                <p className="num mt-1 text-xs text-muted-foreground">Weighted 12-factor score / 100</p>
+        <PaywallGate
+          feature="DeepScreen's 12-factor deep score & verdict"
+          className="mt-6"
+          minHeight="min-h-[280px]"
+        >
+          <section className="grid gap-4 lg:grid-cols-3">
+            <div className="rounded-lg border border-border bg-panel p-5 lg:col-span-2">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-semibold uppercase tracking-wide">
+                  DeepScreen verdict
+                </h2>
+                <span
+                  className={cn(
+                    "num rounded border px-3 py-1 text-sm font-semibold",
+                    verdictClass(a.verdict),
+                  )}
+                >
+                  {a.verdict}
+                </span>
               </div>
-            </div>
-            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{a.summary}</p>
-          </div>
-
-          <div className="grid gap-4">
-            <div className="rounded-lg border border-bull/30 bg-panel p-4">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-bull">Strengths</h3>
-              <ul className="num mt-2 space-y-1.5 text-xs text-muted-foreground">
-                {a.strengths.length > 0 ? (
-                  a.strengths.map((s) => <li key={s}>+ {s}</li>)
-                ) : (
-                  <li>No standout strengths in the model.</li>
-                )}
-              </ul>
-            </div>
-            <div className="rounded-lg border border-bear/30 bg-panel p-4">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-bear">Risks</h3>
-              <ul className="num mt-2 space-y-1.5 text-xs text-muted-foreground">
-                {a.risks.length > 0 ? (
-                  a.risks.map((s) => <li key={s}>− {s}</li>)
-                ) : (
-                  <li>No red flags triggered.</li>
-                )}
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        <HoldingPlanCard stock={stock} />
-
-        <section className="mt-8">
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide">
-            Fundamental breakdown{" "}
-            <span className="font-normal normal-case text-muted-foreground">
-              — hover any card for what the ratio means
-            </span>
-          </h2>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {a.metrics.map((m) => (
-              <div
-                key={m.key}
-                title={m.tooltip}
-                className={cn("cursor-help rounded-lg border p-4", bandClass[m.band])}
-              >
-                <p className="num text-xs uppercase text-muted-foreground">{m.label}</p>
-                <p className="num mt-1 text-2xl font-bold">{m.display}</p>
-                <p className={cn("mt-1 text-xs", bandText[m.band])}>{m.reading}</p>
-                <div className="mt-2 h-1 overflow-hidden rounded-full bg-muted">
-                  <div
-                    className={cn(
-                      "h-full rounded-full",
-                      m.band === "good" ? "bg-bull" : m.band === "fair" ? "bg-warn" : "bg-bear",
-                    )}
-                    style={{ width: `${m.score}%` }}
-                  />
+              <div className="mt-4 flex items-center gap-4">
+                <span className="num text-5xl font-bold">{a.score}</span>
+                <div className="flex-1">
+                  <ScoreBar score={a.score} />
+                  <p className="num mt-1 text-xs text-muted-foreground">
+                    Weighted 12-factor score / 100
+                  </p>
                 </div>
-                <p className="mt-2 text-[11px] leading-snug text-muted-foreground">{m.tooltip}</p>
               </div>
-            ))}
-          </div>
-        </section>
+              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{a.summary}</p>
+            </div>
+
+            <div className="grid gap-4">
+              <div className="rounded-lg border border-bull/30 bg-panel p-4">
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-bull">
+                  Strengths
+                </h3>
+                <ul className="num mt-2 space-y-1.5 text-xs text-muted-foreground">
+                  {a.strengths.length > 0 ? (
+                    a.strengths.map((s) => <li key={s}>+ {s}</li>)
+                  ) : (
+                    <li>No standout strengths in the model.</li>
+                  )}
+                </ul>
+              </div>
+              <div className="rounded-lg border border-bear/30 bg-panel p-4">
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-bear">Risks</h3>
+                <ul className="num mt-2 space-y-1.5 text-xs text-muted-foreground">
+                  {a.risks.length > 0 ? (
+                    a.risks.map((s) => <li key={s}>− {s}</li>)
+                  ) : (
+                    <li>No red flags triggered.</li>
+                  )}
+                </ul>
+              </div>
+            </div>
+          </section>
+        </PaywallGate>
+
+        <PaywallGate
+          feature="Target price, trim level & stop-loss"
+          className="mt-8"
+          minHeight="min-h-[220px]"
+        >
+          <HoldingPlanCard stock={live} />
+        </PaywallGate>
+
+        <PaywallGate
+          feature="12-factor fundamental breakdown"
+          className="mt-8"
+          minHeight="min-h-[420px]"
+        >
+          <section>
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide">
+              Fundamental breakdown{" "}
+              <span className="font-normal normal-case text-muted-foreground">
+                — hover any card for what the ratio means ·{" "}
+                {hasLiveFundamentals
+                  ? `live via Yahoo Finance, updated ${new Date(fundUpdatedAt).toLocaleTimeString()}`
+                  : "fetching live data — showing modeled estimates for now"}
+              </span>
+            </h2>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {a.metrics.map((m) => {
+                const isLive = sources[METRIC_KEY_TO_FIELD[m.key]!] === "live";
+                return (
+                  <div
+                    key={m.key}
+                    title={m.tooltip}
+                    className={cn("cursor-help rounded-lg border p-4", bandClass[m.band])}
+                  >
+                    <div className="flex items-center justify-between">
+                      <p className="num text-xs uppercase text-muted-foreground">{m.label}</p>
+                      <span
+                        className={cn(
+                          "num rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase",
+                          isLive ? "bg-bull/15 text-bull" : "bg-muted text-muted-foreground",
+                        )}
+                      >
+                        {isLive ? "Live" : "Modeled"}
+                      </span>
+                    </div>
+                    <p className="num mt-1 text-2xl font-bold">{m.display}</p>
+                    <p className={cn("mt-1 text-xs", bandText[m.band])}>{m.reading}</p>
+                    <div className="mt-2 h-1 overflow-hidden rounded-full bg-muted">
+                      <div
+                        className={cn(
+                          "h-full rounded-full",
+                          m.band === "good" ? "bg-bull" : m.band === "fair" ? "bg-warn" : "bg-bear",
+                        )}
+                        style={{ width: `${m.score}%` }}
+                      />
+                    </div>
+                    <p className="mt-2 text-[11px] leading-snug text-muted-foreground">
+                      {m.tooltip}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        </PaywallGate>
+
+        <PaywallGate
+          feature="DCF intrinsic value calculator"
+          className="mt-8"
+          minHeight="min-h-[360px]"
+        >
+          <section>
+            <DcfCalculator stock={live} />
+          </section>
+        </PaywallGate>
 
         <section className="mt-8 grid gap-6 lg:grid-cols-2">
           <div className="rounded-lg border border-border bg-panel p-5">
             <h2 className="text-sm font-semibold uppercase tracking-wide">Company financials</h2>
             <dl className="num mt-3 grid grid-cols-2 gap-y-2 text-sm">
               <dt className="text-muted-foreground">EPS (TTM)</dt>
-              <dd className="text-right">{formatPrice(stock.epsTtm, stock.exchange)}</dd>
+              <dd className="text-right">{formatPrice(live.epsTtm, stock.exchange)}</dd>
               <dt className="text-muted-foreground">Revenue (TTM)</dt>
-              <dd className="text-right">{formatCap(stock.revenue, stock.exchange)}</dd>
+              <dd className="text-right">{formatCap(live.revenue, stock.exchange)}</dd>
               <dt className="text-muted-foreground">Net margin</dt>
               <dd className="text-right">{f.netMargin}%</dd>
               <dt className="text-muted-foreground">EBITDA margin</dt>
@@ -200,6 +273,11 @@ function StockPage() {
               <dt className="text-muted-foreground">Debt / equity</dt>
               <dd className="text-right">{f.debtToEquity}x</dd>
             </dl>
+            <p className="mt-3 text-[11px] text-muted-foreground">
+              {hasLiveFundamentals
+                ? "Figures use live Yahoo Finance data where available; any field Yahoo doesn't report falls back to the DeepScreen model."
+                : "Live data hasn't loaded yet — figures shown are DeepScreen's modeled estimates."}
+            </p>
           </div>
           <LiveNewsFeed
             query={`"${stock.name}" OR ${stock.symbol} stock`}

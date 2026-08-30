@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { Check, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -7,6 +8,7 @@ import { Shell } from "@/components/ds/Shell";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { PLANS, useSubscription, type Plan } from "@/hooks/useSubscription";
+import { activateSubscription } from "@/lib/billing/billing.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -22,14 +24,19 @@ export const Route = createFileRoute("/pricing")({
       { property: "og:title", content: "DeepScreen Pro Pricing" },
       {
         property: "og:description",
-        content: "Weekly ₹25, monthly ₹75 or annual ₹800 access to DeepScreen's full god-mode analysis engine.",
+        content:
+          "Weekly ₹25, monthly ₹75 or annual ₹800 access to DeepScreen's full god-mode analysis engine.",
       },
     ],
   }),
   component: PricingPage,
 });
 
-const FREE = ["Search all 13,000+ listed companies", "Price, market cap and headline ratios", "Market news and economic calendar"];
+const FREE = [
+  "Search all 13,000+ listed companies",
+  "Price, market cap and headline ratios",
+  "Market news and economic calendar",
+];
 
 const PRO = [
   "Full 12-factor deep score and verdict",
@@ -47,6 +54,7 @@ function PricingPage() {
   const { isPro, tier, expiresAt, refresh } = useSubscription();
   const navigate = useNavigate();
   const [busy, setBusy] = useState<string | null>(null);
+  const activate = useServerFn(activateSubscription);
 
   const start = async (plan: Plan) => {
     if (!user) {
@@ -54,18 +62,17 @@ function PricingPage() {
       return;
     }
     setBusy(plan.tier);
-    const expires = new Date();
-    expires.setDate(expires.getDate() + plan.days);
-    const { error } = await supabase.from("subscriptions").upsert({
-      user_id: user.id,
-      tier: plan.tier,
-      status: "active",
-      started_at: new Date().toISOString(),
-      expires_at: expires.toISOString(),
-    });
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData.session?.access_token;
+    if (!accessToken) {
+      setBusy(null);
+      toast.error("Please sign in again.");
+      return;
+    }
+    const result = await activate({ data: { tier: plan.tier, accessToken } });
     setBusy(null);
-    if (error) {
-      toast.error(error.message);
+    if (!result.ok) {
+      toast.error(result.error);
       return;
     }
     refresh();
@@ -81,8 +88,8 @@ function PricingPage() {
             Unlock the full god-mode engine
           </h1>
           <p className="mx-auto mt-3 max-w-2xl text-sm text-muted-foreground">
-            Search and headline data stay free forever. Pro opens the deep score, DCF valuation, targets,
-            stop-losses, portfolio matrix and every feature we ship next.
+            Search and headline data stay free forever. Pro opens the deep score, DCF valuation,
+            targets, stop-losses, portfolio matrix and every feature we ship next.
           </p>
           {isPro && (
             <p className="num mt-4 inline-block rounded border border-primary/40 bg-primary/10 px-3 py-1 text-xs text-primary">
@@ -97,7 +104,9 @@ function PricingPage() {
               key={p.tier}
               className={cn(
                 "flex flex-col rounded-lg border bg-panel p-6",
-                p.tier === "monthly" ? "border-primary/50 shadow-[0_0_0_1px_var(--primary)]" : "border-border",
+                p.tier === "monthly"
+                  ? "border-primary/50 shadow-[0_0_0_1px_var(--primary)]"
+                  : "border-border",
               )}
             >
               {p.tier === "monthly" && (
@@ -115,7 +124,11 @@ function PricingPage() {
                 disabled={busy !== null || (isPro && tier === p.tier)}
                 onClick={() => void start(p)}
               >
-                {isPro && tier === p.tier ? "Current plan" : busy === p.tier ? "Activating…" : `Get ${p.name}`}
+                {isPro && tier === p.tier
+                  ? "Current plan"
+                  : busy === p.tier
+                    ? "Activating…"
+                    : `Get ${p.name}`}
               </Button>
             </div>
           ))}
@@ -123,7 +136,9 @@ function PricingPage() {
 
         <div className="mt-10 grid gap-4 md:grid-cols-2">
           <div className="rounded-lg border border-border bg-panel p-6">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Free</h3>
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              Free
+            </h3>
             <ul className="mt-3 space-y-2 text-sm">
               {FREE.map((f) => (
                 <li key={f} className="flex gap-2 text-muted-foreground">
@@ -147,7 +162,8 @@ function PricingPage() {
         </div>
 
         <p className="mt-8 text-center text-xs text-muted-foreground">
-          Card checkout is not connected yet — activating a plan today enables Pro instantly on your account.{" "}
+          Card checkout is not connected yet — activating a plan today enables Pro instantly on your
+          account.{" "}
           <Link to="/auth" className="text-primary hover:underline">
             Sign in
           </Link>{" "}
