@@ -156,9 +156,10 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
         <span className="mr-1 inline-block size-1.5 rounded-full bg-bull align-middle" /> Live price
         for up to 60 rows here, refreshed every 15s. P/E and PEG are live (Yahoo Finance, refreshed
         ~45s
-        {fundamentalsLoading ? ", updating…" : ""}) for the first {Math.min(30, stocks.length)} rows
+        {fundamentalsLoading ? ", updating…" : ""}) for the first {Math.min(40, stocks.length)} rows
         in this view; the rest show modeled estimates, as does ROCE everywhere — Yahoo has no public
-        field for it.
+        field for it. The score & verdict are only shown once live fundamentals for that row have
+        loaded, so they always match the number on the stock page.
       </p>
     </div>
   );
