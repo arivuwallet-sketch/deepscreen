@@ -1,26 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { Lock } from "lucide-react";
 
 import { quoteKey, useLiveFundamentalsBatch, useLiveQuotes } from "@/hooks/useLiveQuotes";
-import { useSubscription } from "@/hooks/useSubscription";
 
 import { analyze, verdictClass } from "@/lib/deepscreen/metrics";
 import { mergeLiveStock } from "@/lib/deepscreen/live-merge";
 import { formatCap, formatPrice, formatVolume } from "@/lib/deepscreen/format";
 import type { Stock } from "@/lib/deepscreen/types";
 import { cn } from "@/lib/utils";
-
-function ProLockChip() {
-  return (
-    <Link
-      to="/pricing"
-      title="Deep score & verdict are a DeepScreen Pro feature"
-      className="num inline-flex items-center gap-1 rounded border border-dashed border-border px-2 py-0.5 text-[10px] font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
-    >
-      <Lock className="size-3" /> Pro
-    </Link>
-  );
-}
 
 export function ScoreBar({ score }: { score: number }) {
   const tone = score >= 67 ? "bg-bull" : score >= 45 ? "bg-warn" : "bg-bear";
@@ -39,7 +25,6 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
   const { data: live } = useLiveQuotes(keys);
   const { data: liveFundamentals, isFetching: fundamentalsLoading } =
     useLiveFundamentalsBatch(keys);
-  const { isPro, loading: subLoading } = useSubscription();
 
   if (stocks.length === 0) {
     return (
@@ -174,16 +159,6 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
         {fundamentalsLoading ? ", updating…" : ""}) for the first {Math.min(30, stocks.length)} rows
         in this view; the rest show modeled estimates, as does ROCE everywhere — Yahoo has no public
         field for it.
-        {!subLoading && !isPro ? (
-          <>
-            {" "}
-            Score & verdict are a{" "}
-            <Link to="/pricing" className="text-primary hover:underline">
-              DeepScreen Pro
-            </Link>{" "}
-            feature.
-          </>
-        ) : null}
       </p>
     </div>
   );
