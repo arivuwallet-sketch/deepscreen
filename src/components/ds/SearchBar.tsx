@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { searchStocks } from "@/lib/deepscreen/stocks";
 import { formatPrice } from "@/lib/deepscreen/format";
+import { quoteKey, useLiveQuotes } from "@/hooks/useLiveQuotes";
 import { cn } from "@/lib/utils";
 import type { Stock } from "@/lib/deepscreen/types";
 
