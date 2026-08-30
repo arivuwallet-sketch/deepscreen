@@ -20,7 +20,7 @@ export const quoteKey = (k: QuoteKey) => `${k.exchange}:${k.symbol}`;
 const QUOTE_BATCH_LIMIT = 60;
 // quoteSummary (fundamentals) needs a shared session/crumb and is heavier, so
 // keep that batch smaller to stay gentle on Yahoo's free endpoint.
-const FUNDAMENTALS_BATCH_LIMIT = 30;
+const FUNDAMENTALS_BATCH_LIMIT = 40;
 
 /** Batch live quotes for a list of rows. Refreshes every 15s. */
 export function useLiveQuotes(keys: QuoteKey[]) {

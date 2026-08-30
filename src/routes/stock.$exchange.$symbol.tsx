@@ -119,11 +119,7 @@ function StockPage() {
           </div>
         </header>
 
-        <PaywallGate
-          feature="DeepScreen's 12-factor deep score & verdict"
-          className="mt-6"
-          minHeight="min-h-[280px]"
-        >
+        <div className="mt-6">
           <section className="grid gap-4 lg:grid-cols-3">
             <div className="rounded-lg border border-border bg-panel p-5 lg:col-span-2">
               <div className="flex items-center justify-between">
@@ -176,7 +172,7 @@ function StockPage() {
               </div>
             </div>
           </section>
-        </PaywallGate>
+        </div>
 
         <PaywallGate
           feature="Target price, trim level & stop-loss"
@@ -186,11 +182,7 @@ function StockPage() {
           <HoldingPlanCard stock={live} />
         </PaywallGate>
 
-        <PaywallGate
-          feature="12-factor fundamental breakdown"
-          className="mt-8"
-          minHeight="min-h-[420px]"
-        >
+        <div className="mt-8">
           <section>
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide">
               Fundamental breakdown{" "}
@@ -240,7 +232,7 @@ function StockPage() {
               })}
             </div>
           </section>
-        </PaywallGate>
+        </div>
 
         <PaywallGate
           feature="DCF intrinsic value calculator"
