@@ -15,6 +15,7 @@ export function SearchBar({ className, placeholder }: { className?: string; plac
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
   const results = useMemo(() => searchStocks(query), [query]);
+  const { data: live } = useLiveQuotes(open ? results : []);
 
   useEffect(() => setActive(0), [query]);
 
@@ -88,7 +89,9 @@ export function SearchBar({ className, placeholder }: { className?: string; plac
                   <span className="ml-2 truncate text-muted-foreground">{s.name}</span>
                 </span>
                 <span className="num shrink-0 text-xs text-muted-foreground">
-                  {s.exchange} · {formatPrice(s.price, s.exchange)}
+                  {s.exchange} · {live?.[quoteKey(s)]?.price != null
+                    ? formatPrice(live[quoteKey(s)]!.price, s.exchange)
+                    : "—"}
                 </span>
               </button>
             </li>
