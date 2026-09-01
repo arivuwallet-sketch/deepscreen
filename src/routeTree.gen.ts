@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as CryptoRouteImport } from './routes/crypto'
+import { Route as OptionsRouteImport } from './routes/options'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as ExchangeCodeRouteImport } from './routes/exchange.$code'
@@ -36,6 +37,11 @@ const CalendarRoute = CalendarRouteImport.update({
 const CryptoRoute = CryptoRouteImport.update({
   id: '/crypto',
   path: '/crypto',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OptionsRoute = OptionsRouteImport.update({
+  id: '/options',
+  path: '/options',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PortfolioRoute = PortfolioRouteImport.update({
@@ -64,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/calendar': typeof CalendarRoute
   '/crypto': typeof CryptoRoute
+  '/options': typeof OptionsRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
   '/exchange/$code': typeof ExchangeCodeRoute
@@ -74,6 +81,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/calendar': typeof CalendarRoute
   '/crypto': typeof CryptoRoute
+  '/options': typeof OptionsRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
   '/exchange/$code': typeof ExchangeCodeRoute
@@ -85,6 +93,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/calendar': typeof CalendarRoute
   '/crypto': typeof CryptoRoute
+  '/options': typeof OptionsRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
   '/exchange/$code': typeof ExchangeCodeRoute
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/calendar'
     | '/crypto'
+    | '/options'
     | '/portfolio'
     | '/pricing'
     | '/exchange/$code'
@@ -107,6 +117,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/calendar'
     | '/crypto'
+    | '/options'
     | '/portfolio'
     | '/pricing'
     | '/exchange/$code'
@@ -117,6 +128,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/calendar'
     | '/crypto'
+    | '/options'
     | '/portfolio'
     | '/pricing'
     | '/exchange/$code'
@@ -128,6 +140,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CalendarRoute: typeof CalendarRoute
   CryptoRoute: typeof CryptoRoute
+  OptionsRoute: typeof OptionsRoute
   PortfolioRoute: typeof PortfolioRoute
   PricingRoute: typeof PricingRoute
   ExchangeCodeRoute: typeof ExchangeCodeRoute
@@ -162,6 +175,13 @@ declare module '@tanstack/react-router' {
       path: '/crypto'
       fullPath: '/crypto'
       preLoaderRoute: typeof CryptoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/options': {
+      id: '/options'
+      path: '/options'
+      fullPath: '/options'
+      preLoaderRoute: typeof OptionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/portfolio': {
@@ -200,6 +220,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CalendarRoute: CalendarRoute,
   CryptoRoute: CryptoRoute,
+  OptionsRoute: OptionsRoute,
   PortfolioRoute: PortfolioRoute,
   PricingRoute: PricingRoute,
   ExchangeCodeRoute: ExchangeCodeRoute,
