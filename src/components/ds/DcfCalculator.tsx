@@ -100,7 +100,7 @@ export function DcfCalculator({ stock }: { stock: Stock }) {
   );
 }
 
-function SliderRow({
+export function SliderRow({
   label,
   value,
   min,
