@@ -30,7 +30,12 @@ function tag(block: string, name: string): string {
 }
 
 /** Fetch and parse an RSS or Atom feed. Never throws — returns [] on failure. */
-export async function fetchFeed(url: string, source: string, category: string, limit = 12): Promise<FeedItem[]> {
+export async function fetchFeed(
+  url: string,
+  source: string,
+  category: string,
+  limit = 12,
+): Promise<FeedItem[]> {
   try {
     const res = await fetch(url, {
       headers: {
@@ -69,6 +74,18 @@ export async function fetchFeed(url: string, source: string, category: string, l
 
 export function googleNewsFeed(query: string): string {
   return `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`;
+}
+
+/**
+ * Independent second source for the same query. Google News RSS is a
+ * frequent target of anti-bot rate-limiting against cloud/datacenter IPs
+ * (exactly what a server-hosted app calls from) — when that happens the
+ * single-source version of this feed goes silently empty. Bing's is a
+ * different provider with a different anti-bot posture, so the two rarely
+ * fail at the same time.
+ */
+export function bingNewsFeed(query: string): string {
+  return `https://www.bing.com/news/search?q=${encodeURIComponent(query)}&format=rss`;
 }
 
 export function dedupe(items: FeedItem[]): FeedItem[] {

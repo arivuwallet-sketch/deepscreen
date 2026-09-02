@@ -54,18 +54,29 @@ export function analyze(stock: Stock): Analysis {
 
 function computeAnalysis(stock: Stock): Analysis {
   const f = stock.fundamentals;
-
+  // Same light/heavy split the seed model itself uses (see buildFundamentals
+  // in stocks.ts) — a services business's main "asset" is people, who don't
+  // show up on the balance sheet, so P/B runs structurally high there
+  // regardless of whether the stock is actually expensive.
+  const isAssetLight =
+    stock.sector === "Information Technology" ||
+    stock.sector === "Communication Services" ||
+    stock.sector === "Healthcare";
 
   const metrics: MetricRead[] = [
     {
       key: "pe",
-      label: "P/E Ratio",
+      label: "P/E Ratio (TTM)",
       value: f.pe,
       display: fmt(f.pe, "x", 1),
       score: scoreLow(f.pe, 12, 60),
       band: "fair",
       reading:
-        f.pe > 40 ? "Expensive — priced for high growth" : f.pe < 15 ? "Cheap vs. earnings" : "Fairly priced",
+        f.pe > 40
+          ? "Expensive — priced for high growth"
+          : f.pe < 15
+            ? "Cheap vs. earnings"
+            : "Fairly priced",
       tooltip:
         "Price divided by earnings per share: how much you pay today for ₹1/$1 of annual profit. Only compare within the same industry.",
     },
@@ -76,9 +87,14 @@ function computeAnalysis(stock: Stock): Analysis {
       display: fmt(f.peg, "", 2),
       score: scoreLow(f.peg, 0.8, 3),
       band: "fair",
-      reading: f.peg < 1 ? "Undervalued vs. growth" : f.peg <= 1.5 ? "Fairly valued" : "Overvalued vs. growth",
+      reading:
+        f.peg < 1
+          ? "Undervalued vs. growth"
+          : f.peg <= 1.5
+            ? "Fairly valued"
+            : "Overvalued vs. growth",
       tooltip:
-        "P/E divided by the earnings growth rate. Below 1 means the price has not caught up with the growth — the classic good deal.",
+        "P/E (TTM) divided by the annual earnings growth rate (%). Below 1 means the price has not caught up with the profit trajectory -- the classic good deal signal. Uses actual earnings growth (not revenue growth), sourced from Screener.in for Indian stocks and Yahoo for US/UK.",
     },
     {
       key: "ps",
@@ -89,40 +105,68 @@ function computeAnalysis(stock: Stock): Analysis {
       band: "fair",
       reading: f.ps < 2 ? "Modest sales multiple" : f.ps < 6 ? "Moderate" : "Rich sales multiple",
       tooltip:
-        "Price relative to revenue. Useful for loss-making or early-stage companies where P/E does not exist, but it ignores profitability.",
+        "Price relative to revenue. Sales are much harder to accounting-fudge than earnings, so this is a trustworthy number — and it's often the only usable multiple for loss-making or early-stage companies where P/E doesn't exist. But revenue without margin means nothing on its own: always read it alongside net margin.",
     },
     {
       key: "pb",
       label: "P/B Ratio",
       value: f.pb,
       display: fmt(f.pb, "x", 2),
-      score: scoreLow(f.pb, 1, 10),
+      // Asset-light businesses carry value in people/IP, not on the balance
+      // sheet, so P/B runs structurally high — penalize them less.
+      score: isAssetLight ? scoreLow(f.pb, 2, 18) : scoreLow(f.pb, 1, 10),
       band: "fair",
-      reading: f.pb < 1 ? "Below book value" : f.pb < 3 ? "Reasonable" : "Premium to book",
-      tooltip:
-        "Price versus net asset value on the balance sheet. Most meaningful for banks and asset-heavy businesses.",
+      reading: isAssetLight
+        ? f.pb < 3 ? "Low for an asset-light business" : f.pb <= 10 ? "Typical for the sector" : "Priced for exceptional growth"
+        : f.pb < 1 ? "Below book value" : f.pb < 3 ? "Reasonable" : "Premium to book",
+      tooltip: isAssetLight
+        ? "Price versus net asset value. Asset-light businesses like this one carry most of their value in people and IP, not machinery or property, so P/B runs structurally high here — not a red flag by itself. Weigh P/E and ROE more heavily instead."
+        : "Price versus net asset value on the balance sheet. Most meaningful for banks, NBFCs and asset-heavy businesses (manufacturing, real estate) where book value closely tracks real worth.",
     },
     {
       key: "evRevenue",
       label: "EV/Revenue",
       value: f.evRevenue,
       display: fmt(f.evRevenue, "x", 2),
-      score: scoreLow(f.evRevenue, 1, 10),
+      // "Cheap" and "expensive" here depend heavily on the business model:
+      // asset-heavy, low-margin industries (manufacturing, steel, retail)
+      // normally trade at 0.5-2x, stable-margin businesses (FMCG, pharma) at
+      // 2-5x, and asset-light/high-growth ones (SaaS, cloud, AI) routinely
+      // sit at 5-10x+ without being mispriced — so the same absolute number
+      // needs a different bar depending on which of those this is.
+      score: isAssetLight ? scoreLow(f.evRevenue, 4, 14) : scoreLow(f.evRevenue, 1, 6),
       band: "fair",
-      reading: f.evRevenue < 2 ? "Low (value zone)" : f.evRevenue <= 5 ? "Moderate" : "High expectations",
-      tooltip:
-        "Enterprise value over revenue. Better than P/S because it includes debt and subtracts cash — a truer takeover price.",
+      reading: isAssetLight
+        ? f.evRevenue < 4
+          ? "Low for an asset-light business"
+          : f.evRevenue <= 9
+            ? "Typical for the sector"
+            : "Priced for exceptional growth"
+        : f.evRevenue < 2
+          ? "Low (value zone)"
+          : f.evRevenue <= 5
+            ? "Moderate"
+            : "High for an asset-heavy business",
+      tooltip: isAssetLight
+        ? "Enterprise value over revenue. Asset-light, high-growth sectors like this one normally trade at 5-10x+ revenue — that's the market pricing in margin expansion, not necessarily overpaying. Below ~4x is cheap for this kind of business; north of ~10x needs genuinely exceptional growth to justify. Read the trend against this company's own 5-year average rather than the absolute number alone."
+        : "Enterprise value over revenue. Better than P/S because it includes debt and subtracts cash — a truer takeover price. Asset-heavy, lower-margin businesses (manufacturing, steel, retail) typically trade at 0.5-2x; stable-margin ones (FMCG, pharma) around 2-5x — above that is rich for this kind of business. Read the trend against this company's own 5-year average rather than the absolute number alone.",
     },
     {
       key: "evEbitda",
       label: "EV/EBITDA",
       value: f.evEbitda,
       display: fmt(f.evEbitda, "x", 1),
-      score: scoreLow(f.evEbitda, 8, 30),
+      // Asset-light / high-growth businesses (SaaS, cloud, AI) routinely trade
+      // at 20-30x+ EV/EBITDA; asset-heavy ones (manufacturing, utilities)
+      // rarely justify >12x.
+      score: isAssetLight ? scoreLow(f.evEbitda, 12, 40) : scoreLow(f.evEbitda, 8, 30),
       band: "fair",
-      reading: f.evEbitda < 10 ? "Attractive" : f.evEbitda <= 15 ? "Fair" : "Expensive",
-      tooltip:
-        "Strips out debt structure, tax and depreciation, so capital-intensive companies can be compared fairly. Under 10 is generally attractive.",
+      reading: isAssetLight
+        ? f.evEbitda < 15 ? "Low for asset-light" : f.evEbitda <= 25 ? "Fair" : "Priced for exceptional growth"
+        : f.evEbitda < 10 ? "Attractive" : f.evEbitda <= 15 ? "Fair" : "Expensive",
+      tooltip: isAssetLight
+        ? "Strips out debt structure, tax and depreciation. Asset-light, high-growth businesses like this one normally trade at 15-25x+ EV/EBITDA — the market is pricing in margin expansion. Below ~12x is cheap for this kind of business."
+        : "Strips out debt structure, tax and depreciation, so capital-intensive companies can be compared fairly. Under 10 is generally attractive.",
     },
     {
       key: "roe",
@@ -133,17 +177,24 @@ function computeAnalysis(stock: Stock): Analysis {
       band: "fair",
       reading: f.roe > 20 ? "Excellent shareholder returns" : f.roe > 12 ? "Healthy" : "Weak",
       tooltip:
-        "Return on shareholder equity. High ROE is great — unless it is manufactured by heavy debt, so always read it next to D/E and ROCE.",
+        "Return on shareholder equity. High ROE is great — unless it is manufactured by heavy debt, so always read it next to ROA and D/E: high ROE with low ROA is the classic debt-trap pattern.",
     },
     {
       key: "roa",
       label: "ROA",
       value: f.roa,
       display: fmt(f.roa, "%", 1),
-      score: scoreHigh(f.roa, 2, 18),
+      // Asset-light businesses always show higher ROA because they carry
+      // less on the balance sheet — raise the bar so they aren't all
+      // automatically "excellent" compared to asset-heavy peers.
+      score: isAssetLight ? scoreHigh(f.roa, 5, 28) : scoreHigh(f.roa, 2, 18),
       band: "fair",
-      reading: f.roa > 10 ? "Assets working hard" : f.roa > 5 ? "Adequate" : "Asset-heavy / inefficient",
-      tooltip: "Profit generated per unit of total assets — how efficiently the whole business is run.",
+      reading:
+        isAssetLight
+          ? f.roa > 15 ? "Strong for asset-light" : f.roa > 8 ? "Adequate" : "Low for the sector"
+          : f.roa > 10 ? "Assets working hard" : f.roa > 5 ? "Adequate" : "Asset-heavy / inefficient",
+      tooltip:
+        "Net Income / Total Assets — how efficiently the whole business converts its asset base into profit. Computed as ROE / (1 + D/E) when live data is unavailable. Only compare within the same industry: asset-light businesses (IT, services) will always show a structurally higher ROA than asset-heavy ones (steel, airlines, utilities) simply because they carry far less on the balance sheet to begin with, not because they're better run.",
     },
     {
       key: "roce",
@@ -152,7 +203,12 @@ function computeAnalysis(stock: Stock): Analysis {
       display: fmt(f.roce, "%", 1),
       score: scoreHigh(f.roce, 6, 28),
       band: "fair",
-      reading: f.roce > 20 ? "High-quality compounder" : f.roce > 12 ? "Solid" : "Below cost of capital risk",
+      reading:
+        f.roce > 20
+          ? "High-quality compounder"
+          : f.roce > 12
+            ? "Solid"
+            : "Below cost of capital risk",
       tooltip:
         "Return on all capital employed (equity plus debt). The cleanest quality signal because debt cannot flatter it.",
     },
@@ -163,24 +219,63 @@ function computeAnalysis(stock: Stock): Analysis {
       display: fmt(f.debtToEquity, "x", 2),
       score: scoreLow(f.debtToEquity, 0.3, 2),
       band: "fair",
-      reading: f.debtToEquity < 0.5 ? "Conservative balance sheet" : f.debtToEquity < 1.2 ? "Manageable" : "Leveraged",
-      tooltip: "Borrowed capital versus owners' capital. High leverage boosts ROE in good years and destroys it in bad ones.",
+      reading:
+        f.debtToEquity < 0.5
+          ? "Conservative balance sheet"
+          : f.debtToEquity < 1.2
+            ? "Manageable"
+            : "Leveraged",
+      tooltip:
+        "Total liabilities divided by shareholders' equity — the broadest leverage measure. High leverage boosts ROE in good years and destroys it in bad ones.",
+    },
+    {
+      key: "ltde",
+      label: "LT Debt / Equity",
+      value: f.longTermDebtToEquity,
+      display: fmt(f.longTermDebtToEquity, "x", 2),
+      score: scoreLow(f.longTermDebtToEquity, 0.2, 1.5),
+      band: "fair",
+      reading:
+        f.longTermDebtToEquity < 0.3
+          ? "Very low structural debt"
+          : f.longTermDebtToEquity < 0.8
+            ? "Moderate long-term leverage"
+            : "Heavy long-term obligations",
+      tooltip:
+        "Long-term debt divided by shareholders' equity. Excludes short-term operational liabilities like accounts payable — shows only the structural, long-term borrowing burden. A company can have a high total D/E from working-capital financing while its LT debt is modest, or vice versa.",
     },
     {
       key: "payout",
       label: "Payout Ratio",
       value: f.payoutRatio,
       display: fmt(f.payoutRatio, "%", 0),
-      score: f.payoutRatio > 85 ? 25 : f.payoutRatio < 5 ? 55 : 85,
+      score:
+        f.payoutRatio > 100
+          ? 10
+          : f.payoutRatio > 85
+            ? 35
+            : f.payoutRatio > 60
+              ? 60
+              : f.payoutRatio >= 30
+                ? 95
+                : f.payoutRatio >= 5
+                  ? 82
+                  : 75,
       band: "fair",
       reading:
-        f.payoutRatio > 85
-          ? "Unsustainably high payout"
-          : f.payoutRatio < 5
-            ? "Reinvesting everything"
-            : "Balanced payout",
+        f.payoutRatio > 100
+          ? "Red flag — paying out more than it earns"
+          : f.payoutRatio > 85
+            ? "High payout, little left to reinvest"
+            : f.payoutRatio > 60
+              ? "Mature, high-payout company"
+              : f.payoutRatio >= 30
+                ? "Ideal balance — sustainable with room to reinvest"
+                : f.payoutRatio >= 5
+                  ? "Growth company — reinvesting most profit"
+                  : "Full reinvestment — no dividend",
       tooltip:
-        "Share of profit paid out as dividend. Very high payouts leave nothing to reinvest; very low ones suit growth companies.",
+        "Share of profit paid out as dividend. Above 100% means the company is funding the dividend from debt or reserves, not profit — a genuine red flag, not just 'high'. 30–60% is the classic sustainable balance; well below that usually just means a growth company reinvesting rather than anything wrong.",
     },
     {
       key: "oplev",
@@ -196,7 +291,7 @@ function computeAnalysis(stock: Stock): Analysis {
             ? "Good upside gearing"
             : "Low fixed-cost gearing",
       tooltip:
-        "How much profit jumps for each 1% of extra sales. High leverage means explosive upside in a boom and sharp pain in a downturn.",
+        "How much profit jumps for each 1% of extra sales — driven by how much of the cost base is fixed (rent, salaries) versus variable (raw materials). It's a double-edged sword: high fixed-cost businesses (manufacturing, airlines, software) see profit jump disproportionately as sales grow, but the same fixed costs turn a small sales dip into an outsized loss. That's also why these businesses tend to lead in a bull market and get hit hardest first when demand turns down.",
     },
   ].map((m) => ({ ...m, band: band(m.score) }));
 
@@ -211,6 +306,7 @@ function computeAnalysis(stock: Stock): Analysis {
     roa: 0.9,
     roce: 1.6,
     de: 1.1,
+    ltde: 0.8,
     payout: 0.5,
     oplev: 0.6,
   };
@@ -221,7 +317,15 @@ function computeAnalysis(stock: Stock): Analysis {
   );
 
   const verdict: Verdict =
-    score >= 78 ? "Strong Buy" : score >= 64 ? "Buy" : score >= 48 ? "Hold" : score >= 34 ? "Caution" : "Avoid";
+    score >= 78
+      ? "Strong Buy"
+      : score >= 64
+        ? "Buy"
+        : score >= 48
+          ? "Hold"
+          : score >= 34
+            ? "Caution"
+            : "Avoid";
 
   const line = (m: MetricRead) => `${m.label}: ${m.display} — ${m.reading.toLowerCase()}`;
 
@@ -242,6 +346,35 @@ function computeAnalysis(stock: Stock): Analysis {
 
   if (strengths.length === 0) strengths.push(line(byBest[0]!));
   if (risks.length === 0) risks.push(line(byWorst[0]!));
+
+  // Cross-metric checks: some of the most useful reads here come from
+  // comparing two ratios against each other, not from either one alone —
+  // exactly the "always check X alongside Y" pro-tips a ratio's tooltip
+  // can't express by itself.
+
+  // High ROE built on a thin asset base and heavy leverage is the classic
+  // "debt trap" — the return looks great until the interest bill doesn't.
+  if (f.roe > 20 && f.roa < 5) {
+    risks.unshift(
+      `Debt trap pattern: ROE ${f.roe.toFixed(1)}% looks strong but ROA is only ${f.roa.toFixed(1)}% — the return is coming from leverage, not genuine efficiency.`,
+    );
+  } else if (f.roe > 30 && f.debtToEquity > 1.5) {
+    risks.unshift(
+      `Very high ROE (${f.roe.toFixed(1)}%) alongside heavy leverage (D/E ${f.debtToEquity.toFixed(2)}x) — returns may be debt-amplified rather than purely operational.`,
+    );
+  }
+
+  // ROE cannot be gamed by debt the way ROCE can be — both clearing a solid
+  // bar together is a much stronger "quality compounder" signal than either
+  // alone.
+  if (f.roe >= 15 && f.roce >= 15) {
+    strengths.unshift(
+      `ROE and ROCE both above 15% (${f.roe.toFixed(1)}% / ${f.roce.toFixed(1)}%) — genuine capital efficiency, not just debt-flattered equity returns.`,
+    );
+  }
+
+  strengths.splice(4);
+  risks.splice(4);
 
   const summary = `${stock.name} scores ${score}/100 on the DeepScreen quality-and-value model. Growth is running near ${f.growth}% with a PEG of ${f.peg}, ROCE of ${f.roce}% and debt/equity at ${f.debtToEquity}x. ${
     verdict === "Strong Buy" || verdict === "Buy"
