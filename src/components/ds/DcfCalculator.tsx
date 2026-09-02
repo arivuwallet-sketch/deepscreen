@@ -14,11 +14,7 @@ export function DcfCalculator({ stock }: { stock: Stock }) {
     setInputs((prev) => ({ ...prev, [key]: v[0] ?? prev[key] }));
 
   const tone =
-    result.verdict === "Undervalued"
-      ? "text-bull"
-      : result.verdict === "Overvalued"
-        ? "text-bear"
-        : "text-neutralq";
+    result.verdict === "Undervalued" ? "text-bull" : result.verdict === "Overvalued" ? "text-bear" : "text-neutralq";
   const badge =
     result.verdict === "Undervalued"
       ? "border-bull/40 bg-bull/10 text-bull"
@@ -35,14 +31,7 @@ export function DcfCalculator({ stock }: { stock: Stock }) {
             Two-stage discounted cash flow — growth fades to the terminal rate over ten years.
           </p>
         </div>
-        <span
-          className={cn(
-            "num rounded border px-3 py-1 text-xs font-semibold transition-colors duration-300",
-            badge,
-          )}
-        >
-          {result.verdict}
-        </span>
+        <span className={cn("num rounded border px-3 py-1 text-xs font-semibold", badge)}>{result.verdict}</span>
       </div>
 
       <div className="mt-5 grid gap-6 lg:grid-cols-2">
@@ -80,20 +69,20 @@ export function DcfCalculator({ stock }: { stock: Stock }) {
         </div>
 
         <div className="space-y-3">
-          <div className="card-hover rounded-lg border border-border p-4">
+          <div className="rounded-lg border border-border p-4">
             <p className="num text-xs uppercase text-muted-foreground">Intrinsic value per share</p>
-            <p className={cn("num mt-1 text-4xl font-bold transition-colors duration-300", tone)}>
+            <p className={cn("num mt-1 text-4xl font-bold", tone)}>
               {formatPrice(result.intrinsicValue, stock.exchange)}
             </p>
             <p className="num mt-1 text-xs text-muted-foreground">
               Market price {formatPrice(stock.price, stock.exchange)} ·{" "}
-              <span className={cn("transition-colors duration-300", tone)}>
+              <span className={tone}>
                 {result.upsidePct >= 0 ? "+" : ""}
                 {result.upsidePct}% {result.upsidePct >= 0 ? "upside" : "downside"}
               </span>
             </p>
           </div>
-          <dl className="num card-hover grid grid-cols-2 gap-y-2 rounded-lg border border-border p-4 text-sm">
+          <dl className="num grid grid-cols-2 gap-y-2 rounded-lg border border-border p-4 text-sm">
             <dt className="text-muted-foreground">FCF (TTM)</dt>
             <dd className="text-right">{formatCap(result.fcfTtm, stock.exchange)}</dd>
             <dt className="text-muted-foreground">FCF per share</dt>
@@ -111,7 +100,7 @@ export function DcfCalculator({ stock }: { stock: Stock }) {
   );
 }
 
-export function SliderRow({
+function SliderRow({
   label,
   value,
   min,
@@ -133,22 +122,13 @@ export function SliderRow({
   return (
     <div>
       <div className="flex items-baseline justify-between">
-        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          {label}
-        </span>
+        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</span>
         <span className="num text-sm font-bold">
           {value}
           {suffix}
         </span>
       </div>
-      <Slider
-        className="mt-2"
-        value={[value]}
-        min={min}
-        max={max}
-        step={step}
-        onValueChange={onChange}
-      />
+      <Slider className="mt-2" value={[value]} min={min} max={max} step={step} onValueChange={onChange} />
       <p className="mt-1 text-[11px] text-muted-foreground">{hint}</p>
     </div>
   );

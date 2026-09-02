@@ -186,7 +186,6 @@ function buildFundamentals(symbol: string, sector: string, cap: CapTier): Fundam
     roa,
     roce,
     debtToEquity,
-    longTermDebtToEquity: Number((debtToEquity * rand(symbol, "ltde", 0.5, 0.85, 2)).toFixed(2)),
     dividendYield,
     payoutRatio,
     operatingLeverage: rand(symbol, "ol", 0.9, 3.4, 2),

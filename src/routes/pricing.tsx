@@ -99,12 +99,11 @@ function PricingPage() {
         </div>
 
         <div className="mt-10 grid gap-4 md:grid-cols-3">
-          {PLANS.map((p, i) => (
+          {PLANS.map((p) => (
             <div
               key={p.tier}
-              style={{ animationDelay: `${i * 80}ms` }}
               className={cn(
-                "card-hover flex animate-fade-in-up flex-col rounded-lg border bg-panel p-6",
+                "flex flex-col rounded-lg border bg-panel p-6",
                 p.tier === "monthly"
                   ? "border-primary/50 shadow-[0_0_0_1px_var(--primary)]"
                   : "border-border",

@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { RefreshCw } from "lucide-react";
 
 import { getNewsFeed } from "@/lib/market/market.functions";
 import type { FeedItem } from "@/lib/rss.server";
@@ -19,17 +18,13 @@ export function FeedList({ items, empty }: { items: FeedItem[]; empty: string })
   }
   return (
     <ul className="divide-y divide-border">
-      {items.map((n, i) => (
-        <li
-          key={n.id}
-          className="animate-fade-in-up px-4 py-3 transition-colors hover:bg-accent/30"
-          style={{ animationDelay: `${Math.min(i, 12) * 30}ms` }}
-        >
+      {items.map((n) => (
+        <li key={n.id} className="px-4 py-3">
           <a
             href={n.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm leading-snug transition-colors hover:text-primary"
+            className="text-sm leading-snug hover:text-primary"
           >
             {n.title}
           </a>
@@ -54,7 +49,7 @@ export function LiveNewsFeed({
   className?: string;
 }) {
   const fetchNews = useServerFn(getNewsFeed);
-  const { data, isLoading, isFetching, dataUpdatedAt, refetch } = useQuery({
+  const { data, isLoading, dataUpdatedAt } = useQuery({
     queryKey: ["news-feed", query, limit],
     queryFn: () => fetchNews({ data: { query, limit } }),
     refetchInterval: 60_000,
@@ -68,13 +63,6 @@ export function LiveNewsFeed({
         <span className="num flex items-center gap-1.5 text-xs text-muted-foreground">
           <span className="size-1.5 animate-pulse rounded-full bg-bull" />
           {dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleTimeString() : "LIVE"}
-          <button
-            onClick={() => void refetch()}
-            title="Refresh"
-            className="rounded p-0.5 transition-colors hover:bg-accent hover:text-foreground"
-          >
-            <RefreshCw className={cn("size-3", isFetching && "animate-spin")} />
-          </button>
         </span>
       </header>
       {isLoading ? (

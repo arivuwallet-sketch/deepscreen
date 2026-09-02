@@ -1,4 +1,7 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
+
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "./useAuth";
 
 export type Tier = "weekly" | "monthly" | "annual";
 
@@ -48,15 +51,47 @@ export interface SubscriptionState {
 }
 
 export function useSubscription(): SubscriptionState {
-  const refresh = useCallback(() => {}, []);
+  const { user, loading: authLoading } = useAuth();
+  const [row, setRow] = useState<{ tier: Tier; expires_at: string } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [nonce, setNonce] = useState(0);
 
-  // Paywall disabled — everyone is Pro.
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user) {
+      setRow(null);
+      setLoading(false);
+      return;
+    }
+    let active = true;
+    setLoading(true);
+    supabase
+      .from("subscriptions")
+      .select("tier, expires_at, status")
+      .eq("user_id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!active) return;
+        setRow(
+          data && data.status === "active" && new Date(data.expires_at) > new Date()
+            ? { tier: data.tier as Tier, expires_at: data.expires_at }
+            : null,
+        );
+        setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [user, authLoading, nonce]);
+
+  const refresh = useCallback(() => setNonce((n) => n + 1), []);
+
   return {
-    isPro: true,
-    tier: "annual",
-    expiresAt: null,
-    loading: false,
-    signedIn: true,
+    isPro: row !== null,
+    tier: row?.tier ?? null,
+    expiresAt: row?.expires_at ?? null,
+    loading: authLoading || loading,
+    signedIn: !!user,
     refresh,
   };
 }

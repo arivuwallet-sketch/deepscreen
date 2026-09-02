@@ -44,36 +44,6 @@ export type Database = {
         }
         Relationships: []
       }
-      pine_script_purchases: {
-        Row: {
-          amount_inr: number
-          download_count: number
-          last_downloaded_at: string | null
-          product: string
-          purchased_at: string
-          status: string
-          user_id: string
-        }
-        Insert: {
-          amount_inr?: number
-          download_count?: number
-          last_downloaded_at?: string | null
-          product?: string
-          purchased_at?: string
-          status?: string
-          user_id: string
-        }
-        Update: {
-          amount_inr?: number
-          download_count?: number
-          last_downloaded_at?: string | null
-          product?: string
-          purchased_at?: string
-          status?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       subscriptions: {
         Row: {
           created_at: string

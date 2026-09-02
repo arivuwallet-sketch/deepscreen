@@ -22,7 +22,6 @@ export interface Fundamentals {
   roa: number;
   roce: number;
   debtToEquity: number;
-  longTermDebtToEquity: number;
   dividendYield: number;
   payoutRatio: number;
   operatingLeverage: number;

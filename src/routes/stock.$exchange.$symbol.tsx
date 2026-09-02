@@ -3,21 +3,14 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
 import { LiveNewsFeed } from "@/components/ds/LiveNewsFeed";
 import { DcfCalculator } from "@/components/ds/DcfCalculator";
-import { GrahamCalculator } from "@/components/ds/GrahamCalculator";
 import { PaywallGate } from "@/components/ds/PaywallGate";
-import { useLiveFundamentals, useLiveQuote, useScreenerRatios } from "@/hooks/useLiveQuotes";
+import { useLiveFundamentals, useLiveQuote } from "@/hooks/useLiveQuotes";
 import { HoldingPlanCard } from "@/components/ds/HoldingPlanCard";
 import { ScoreBar } from "@/components/ds/StockTable";
 import { findStock } from "@/lib/deepscreen/stocks";
 import { analyze, verdictClass } from "@/lib/deepscreen/metrics";
 import { METRIC_KEY_TO_FIELD, mergeLiveStock } from "@/lib/deepscreen/live-merge";
-import {
-  CAP_LABEL,
-  formatCap,
-  formatPrice,
-  formatVolume,
-  newsSearchQuery,
-} from "@/lib/deepscreen/format";
+import { CAP_LABEL, formatCap, formatPrice, formatVolume } from "@/lib/deepscreen/format";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/stock/$exchange/$symbol")({
@@ -66,14 +59,12 @@ function StockPage() {
     stock.exchange,
     stock.symbol,
   );
-  const { data: screenerRatios } = useScreenerRatios(stock.exchange, stock.symbol);
-  const { stock: live, sources } = mergeLiveStock(stock, quote, liveFundamentals, screenerRatios);
+  const { stock: live, sources } = mergeLiveStock(stock, quote, liveFundamentals);
   const a = analyze(live);
   const f = live.fundamentals;
   const price = live.price;
   const changePct = live.changePct;
   const hasLiveFundamentals = Object.values(sources).some((v) => v === "live");
-  const isIndianExchange = stock.exchange === "NSE" || stock.exchange === "BSE";
 
   return (
     <Shell>
@@ -128,13 +119,9 @@ function StockPage() {
           </div>
         </header>
 
-        <PaywallGate
-          feature="DeepScreen's 12-factor deep score & verdict"
-          className="mt-6"
-          minHeight="min-h-[280px]"
-        >
+        <div className="mt-6">
           <section className="grid gap-4 lg:grid-cols-3">
-            <div className="card-hover rounded-lg border border-border bg-panel p-5 lg:col-span-2">
+            <div className="rounded-lg border border-border bg-panel p-5 lg:col-span-2">
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-semibold uppercase tracking-wide">
                   DeepScreen verdict
@@ -161,7 +148,7 @@ function StockPage() {
             </div>
 
             <div className="grid gap-4">
-              <div className="card-hover rounded-lg border border-bull/30 bg-panel p-4">
+              <div className="rounded-lg border border-bull/30 bg-panel p-4">
                 <h3 className="text-xs font-semibold uppercase tracking-wide text-bull">
                   Strengths
                 </h3>
@@ -173,7 +160,7 @@ function StockPage() {
                   )}
                 </ul>
               </div>
-              <div className="card-hover rounded-lg border border-bear/30 bg-panel p-4">
+              <div className="rounded-lg border border-bear/30 bg-panel p-4">
                 <h3 className="text-xs font-semibold uppercase tracking-wide text-bear">Risks</h3>
                 <ul className="num mt-2 space-y-1.5 text-xs text-muted-foreground">
                   {a.risks.length > 0 ? (
@@ -185,7 +172,7 @@ function StockPage() {
               </div>
             </div>
           </section>
-        </PaywallGate>
+        </div>
 
         <PaywallGate
           feature="Target price, trim level & stop-loss"
@@ -195,41 +182,31 @@ function StockPage() {
           <HoldingPlanCard stock={live} />
         </PaywallGate>
 
-        <PaywallGate
-          feature="12-factor fundamental breakdown"
-          className="mt-8"
-          minHeight="min-h-[420px]"
-        >
+        <div className="mt-8">
           <section>
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide">
               Fundamental breakdown{" "}
               <span className="font-normal normal-case text-muted-foreground">
                 — hover any card for what the ratio means ·{" "}
                 {hasLiveFundamentals
-                  ? isIndianExchange && screenerRatios
-                    ? `live via Yahoo Finance & Screener.in, updated ${new Date(fundUpdatedAt).toLocaleTimeString()}`
-                    : `live via Yahoo Finance, updated ${new Date(fundUpdatedAt).toLocaleTimeString()}`
+                  ? `live via Yahoo Finance, updated ${new Date(fundUpdatedAt).toLocaleTimeString()}`
                   : "fetching live data — showing modeled estimates for now"}
               </span>
             </h2>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              {a.metrics.map((m, i) => {
+              {a.metrics.map((m) => {
                 const isLive = sources[METRIC_KEY_TO_FIELD[m.key]!] === "live";
                 return (
                   <div
                     key={m.key}
                     title={m.tooltip}
-                    style={{ animationDelay: `${i * 40}ms` }}
-                    className={cn(
-                      "card-hover animate-fade-in-up cursor-help rounded-lg border p-4",
-                      bandClass[m.band],
-                    )}
+                    className={cn("cursor-help rounded-lg border p-4", bandClass[m.band])}
                   >
                     <div className="flex items-center justify-between">
                       <p className="num text-xs uppercase text-muted-foreground">{m.label}</p>
                       <span
                         className={cn(
-                          "num rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase transition-colors",
+                          "num rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase",
                           isLive ? "bg-bull/15 text-bull" : "bg-muted text-muted-foreground",
                         )}
                       >
@@ -241,7 +218,7 @@ function StockPage() {
                     <div className="mt-2 h-1 overflow-hidden rounded-full bg-muted">
                       <div
                         className={cn(
-                          "h-full rounded-full transition-[width] duration-700 ease-out",
+                          "h-full rounded-full",
                           m.band === "good" ? "bg-bull" : m.band === "fair" ? "bg-warn" : "bg-bear",
                         )}
                         style={{ width: `${m.score}%` }}
@@ -255,16 +232,15 @@ function StockPage() {
               })}
             </div>
           </section>
-        </PaywallGate>
+        </div>
 
         <PaywallGate
-          feature="DCF & Graham intrinsic value calculators"
+          feature="DCF intrinsic value calculator"
           className="mt-8"
           minHeight="min-h-[360px]"
         >
-          <section className="space-y-6">
+          <section>
             <DcfCalculator stock={live} />
-            <GrahamCalculator stock={live} />
           </section>
         </PaywallGate>
 
@@ -296,7 +272,7 @@ function StockPage() {
             </p>
           </div>
           <LiveNewsFeed
-            query={newsSearchQuery(stock.name, stock.symbol)}
+            query={`"${stock.name}" OR ${stock.symbol} stock`}
             title={`${stock.symbol} live news`}
             limit={10}
           />
