@@ -173,3 +173,74 @@
     font-variant-numeric: tabular-nums;
   }
 }
+
+@layer utilities {
+  /* Page/section entrance. Applied once on mount — never re-triggers on
+     re-render, since it's driven by the element appearing, not by state. */
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fade-in-up {
+    animation: fade-in-up 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  .animate-fade-in {
+    animation: fade-in 0.35s ease-out both;
+  }
+
+  /* Live price ticks: a brief colored wash on the cell that just changed,
+     so an update is *noticed* on a screen full of numbers instead of just
+     silently becoming a different number. */
+  @keyframes flash-bull {
+    0% {
+      background-color: color-mix(in oklch, var(--bull) 35%, transparent);
+    }
+    100% {
+      background-color: transparent;
+    }
+  }
+  @keyframes flash-bear {
+    0% {
+      background-color: color-mix(in oklch, var(--bear) 35%, transparent);
+    }
+    100% {
+      background-color: transparent;
+    }
+  }
+  .animate-flash-bull {
+    animation: flash-bull 0.7s ease-out;
+  }
+  .animate-flash-bear {
+    animation: flash-bear 0.7s ease-out;
+  }
+
+  /* Shared card hover: a small lift, not a bounce. Used on anything meant to
+     read as a discrete, focusable block (result cards, list rows, plan
+     cards) — not on dense table rows, which already have a background-hover. */
+  .card-hover {
+    transition:
+      transform 0.18s ease-out,
+      box-shadow 0.18s ease-out,
+      border-color 0.18s ease-out;
+  }
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px -12px oklch(0 0 0 / 0.4);
+    border-color: var(--color-ring);
+  }
+}

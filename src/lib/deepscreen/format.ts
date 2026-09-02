@@ -37,3 +37,26 @@ export const CAP_LABEL: Record<string, string> = {
   mid: "Mid Cap",
   small: "Small Cap",
 };
+
+/**
+ * Builds a news-search query for a stock. The previous version wrapped the
+ * FULL legal name — "Microsoft Corporation", "ITC Limited", "Shell plc" — in
+ * an exact-phrase quote, but press coverage almost never writes the legal
+ * suffix verbatim; headlines say "Microsoft", "ITC", "Shell". That
+ * over-restriction was why per-stock news pools came back thin and stale
+ * even for heavily-covered companies. Stripping the suffix and dropping the
+ * old ANDed "stock" keyword (which required that literal word to co-occur
+ * with the ticker, excluding most real headlines) widens the match pool
+ * back to what a person would actually search for.
+ */
+const LEGAL_SUFFIX =
+  /\s+(ltd\.?|limited|inc\.?|incorporated|corp\.?|corporation|plc|co\.?|company|sa|ag|nv|se)\.?$/i;
+
+/** Strips the trailing legal-entity suffix press coverage almost never repeats verbatim. */
+export function cleanCompanyName(name: string): string {
+  return name.replace(LEGAL_SUFFIX, "").trim();
+}
+
+export function newsSearchQuery(name: string, symbol: string): string {
+  return `"${cleanCompanyName(name)}" OR "${symbol}"`;
+}
