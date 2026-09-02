@@ -34,26 +34,39 @@ export function PaywallGate({
   const { isPro, loading } = useSubscription();
 
   if (loading) {
-    return <div className={cn("animate-pulse rounded-lg border border-border bg-panel", minHeight, className)} />;
+    return (
+      <div
+        className={cn(
+          "animate-pulse rounded-lg border border-border bg-panel",
+          minHeight,
+          className,
+        )}
+      />
+    );
   }
-  if (isPro) return <>{children}</>;
+  if (isPro) return <div className="animate-fade-in">{children}</div>;
 
   return (
-    <div className={cn("relative overflow-hidden rounded-lg", className)}>
+    <div className={cn("relative animate-fade-in overflow-hidden rounded-lg", className)}>
       <div aria-hidden className="pointer-events-none select-none blur-[6px] saturate-50">
         {children}
       </div>
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-background/70 p-6 text-center backdrop-blur-[2px]">
-        <span className="flex size-10 items-center justify-center rounded-full border border-primary/40 bg-primary/10 text-primary">
+        <span className="flex size-10 animate-fade-in-up items-center justify-center rounded-full border border-primary/40 bg-primary/10 text-primary transition-transform duration-300 hover:rotate-12">
           <Lock className="size-4" />
         </span>
-        <div>
+        <div className="animate-fade-in-up" style={{ animationDelay: "60ms" }}>
           <p className="text-sm font-semibold">{feature} is a DeepScreen Pro feature</p>
           <p className="num mt-1 text-xs text-muted-foreground">
             Unlock from ₹{PLANS[0]!.price}/week · ₹{PLANS[1]!.price}/month · ₹{PLANS[2]!.price}/year
           </p>
         </div>
-        <Button asChild size="sm">
+        <Button
+          asChild
+          size="sm"
+          className="animate-fade-in-up"
+          style={{ animationDelay: "120ms" }}
+        >
           <Link to="/pricing">
             <Sparkles className="size-4" /> Unlock Pro
           </Link>

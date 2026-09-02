@@ -15,6 +15,7 @@ import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as CryptoRouteImport } from './routes/crypto'
 import { Route as IpoRouteImport } from './routes/ipo'
 import { Route as OptionsRouteImport } from './routes/options'
+import { Route as PineScriptRouteImport } from './routes/pine-script'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as ExchangeCodeRouteImport } from './routes/exchange.$code'
@@ -50,6 +51,11 @@ const OptionsRoute = OptionsRouteImport.update({
   path: '/options',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PineScriptRoute = PineScriptRouteImport.update({
+  id: '/pine-script',
+  path: '/pine-script',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PortfolioRoute = PortfolioRouteImport.update({
   id: '/portfolio',
   path: '/portfolio',
@@ -78,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/crypto': typeof CryptoRoute
   '/ipo': typeof IpoRoute
   '/options': typeof OptionsRoute
+  '/pine-script': typeof PineScriptRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
   '/exchange/$code': typeof ExchangeCodeRoute
@@ -90,6 +97,7 @@ export interface FileRoutesByTo {
   '/crypto': typeof CryptoRoute
   '/ipo': typeof IpoRoute
   '/options': typeof OptionsRoute
+  '/pine-script': typeof PineScriptRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
   '/exchange/$code': typeof ExchangeCodeRoute
@@ -103,6 +111,7 @@ export interface FileRoutesById {
   '/crypto': typeof CryptoRoute
   '/ipo': typeof IpoRoute
   '/options': typeof OptionsRoute
+  '/pine-script': typeof PineScriptRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
   '/exchange/$code': typeof ExchangeCodeRoute
@@ -117,6 +126,7 @@ export interface FileRouteTypes {
     | '/crypto'
     | '/ipo'
     | '/options'
+    | '/pine-script'
     | '/portfolio'
     | '/pricing'
     | '/exchange/$code'
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/crypto'
     | '/ipo'
     | '/options'
+    | '/pine-script'
     | '/portfolio'
     | '/pricing'
     | '/exchange/$code'
@@ -141,6 +152,7 @@ export interface FileRouteTypes {
     | '/crypto'
     | '/ipo'
     | '/options'
+    | '/pine-script'
     | '/portfolio'
     | '/pricing'
     | '/exchange/$code'
@@ -154,6 +166,7 @@ export interface RootRouteChildren {
   CryptoRoute: typeof CryptoRoute
   IpoRoute: typeof IpoRoute
   OptionsRoute: typeof OptionsRoute
+  PineScriptRoute: typeof PineScriptRoute
   PortfolioRoute: typeof PortfolioRoute
   PricingRoute: typeof PricingRoute
   ExchangeCodeRoute: typeof ExchangeCodeRoute
@@ -204,6 +217,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OptionsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pine-script': {
+      id: '/pine-script'
+      path: '/pine-script'
+      fullPath: '/pine-script'
+      preLoaderRoute: typeof PineScriptRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/portfolio': {
       id: '/portfolio'
       path: '/portfolio'
@@ -242,6 +262,7 @@ const rootRouteChildren: RootRouteChildren = {
   CryptoRoute: CryptoRoute,
   IpoRoute: IpoRoute,
   OptionsRoute: OptionsRoute,
+  PineScriptRoute: PineScriptRoute,
   PortfolioRoute: PortfolioRoute,
   PricingRoute: PricingRoute,
   ExchangeCodeRoute: ExchangeCodeRoute,

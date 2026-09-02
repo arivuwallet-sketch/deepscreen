@@ -1,0 +1,752 @@
+//@version=5
+indicator("Advanced SMC Predictor | Sessions + Structure + OB + FVG + Liquidity + S/R + Patterns", shorttitle="SMC Predictor", overlay=true, max_boxes_count=500, max_lines_count=500, max_labels_count=500)
+
+// ============================================================================
+// INPUTS
+// ============================================================================
+grpSess = "Sessions"
+showSessions   = input.bool(true, "Show Sessions", group=grpSess)
+asiaSess       = input.session("0000-0900", "Asian Session", group=grpSess)
+londonSess     = input.session("0800-1700", "London Session", group=grpSess)
+nySess         = input.session("1300-2200", "New York Session", group=grpSess)
+asiaColor      = input.color(color.new(color.blue, 88), "Asian Color", group=grpSess)
+londonColor    = input.color(color.new(color.orange, 88), "London Color", group=grpSess)
+nyColor        = input.color(color.new(color.green, 88), "New York Color", group=grpSess)
+
+grpStruct = "Market Structure"
+swingLen             = input.int(5, "Swing Lookback (Left/Right Bars)", minval=1, group=grpStruct)
+showStructureLabels  = input.bool(true, "Show HH / HL / LH / LL Labels", group=grpStruct)
+showBOS              = input.bool(true, "Show BOS / CHoCH Lines", group=grpStruct)
+
+grpEMA = "EMA Cross"
+showEMA     = input.bool(true, "Show EMA Cross", group=grpEMA)
+emaFastLen  = input.int(9, "Fast EMA", group=grpEMA)
+emaSlowLen  = input.int(21, "Slow EMA", group=grpEMA)
+
+grpFVG = "Fair Value Gap"
+showFVG      = input.bool(true, "Show FVG", group=grpFVG)
+fvgExtend    = input.int(25, "FVG Box Extend (bars)", group=grpFVG)
+fvgBullColor = input.color(color.new(color.teal, 75), "Bullish FVG Color", group=grpFVG)
+fvgBearColor = input.color(color.new(color.red, 75), "Bearish FVG Color", group=grpFVG)
+maxFVG       = input.int(10, "Max FVG Boxes Kept", minval=1, maxval=40, group=grpFVG)
+
+grpVP = "Volume Profile - Strongest FVG (POC)"
+showVP          = input.bool(true, "Enable Volume Profile POC Check", group=grpVP)
+vpLookback      = input.int(30, "Profile Lookback (bars, covers the impulsive leg)", minval=5, maxval=200, group=grpVP)
+vpBins          = input.int(24, "Number of Volume Bins", minval=5, maxval=50, group=grpVP)
+showVPHistogram = input.bool(true, "Draw Mini Volume Profile Histogram", group=grpVP)
+vpOnlyStrongest = input.bool(true, "Only Draw Histogram for POC-Confirmed FVGs", group=grpVP)
+vpHistWidth     = input.int(15, "Histogram Max Width (bars)", minval=3, maxval=40, group=grpVP)
+pocColor        = input.color(color.new(color.yellow, 0), "POC Line Color", group=grpVP)
+strongFVGColor  = input.color(color.new(color.yellow, 55), "Strongest FVG Highlight", group=grpVP)
+
+grpOB = "Order Blocks"
+showOB           = input.bool(true, "Show Order Blocks", group=grpOB)
+obDisplaceFactor = input.float(1.5, "Displacement Factor (x ATR)", minval=0.3, step=0.1, group=grpOB)
+maxOB            = input.int(6, "Max Order Blocks Shown", minval=1, maxval=20, group=grpOB)
+obBullColor      = input.color(color.new(color.lime, 75), "Bullish OB Color", group=grpOB)
+obBearColor      = input.color(color.new(color.maroon, 70), "Bearish OB Color", group=grpOB)
+
+grpSD = "Supply & Demand Zones"
+showSD        = input.bool(true, "Show Supply/Demand Zones", group=grpSD)
+sdLookback    = input.int(20, "Consolidation Lookback", group=grpSD)
+sdBreakFactor = input.float(1.3, "Breakout Displacement (x ATR)", minval=0.3, step=0.1, group=grpSD)
+maxSD         = input.int(4, "Max Zones Kept", minval=1, maxval=15, group=grpSD)
+sdSupplyColor = input.color(color.new(color.purple, 82), "Supply Color", group=grpSD)
+sdDemandColor = input.color(color.new(color.blue, 82), "Demand Color", group=grpSD)
+
+grpSR = "Support & Resistance"
+showSR      = input.bool(true, "Show Support/Resistance", group=grpSR)
+srMaxLevels = input.int(6, "Max S/R Levels (each side)", minval=1, maxval=20, group=grpSR)
+srMergeATR  = input.float(0.6, "Merge Threshold (x ATR)", minval=0.1, step=0.1, group=grpSR)
+
+grpLiq = "Liquidity Sweep"
+showLiq = input.bool(true, "Show Liquidity Sweeps", group=grpLiq)
+
+grpPat = "Candlestick Patterns"
+showPatterns      = input.bool(true, "Enable Candlestick Pattern Detection", group=grpPat)
+showBullPatterns   = input.bool(true, "Show Bullish Patterns", group=grpPat)
+showBearPatterns   = input.bool(true, "Show Bearish Patterns", group=grpPat)
+showNeutralPatterns = input.bool(true, "Show Neutral / Indecision Patterns", group=grpPat)
+dojiThresh    = input.float(0.10, "Doji Body Ratio (of range)", minval=0.02, maxval=0.5, step=0.01, group=grpPat)
+smallBodyRatio = input.float(0.30, "Small Body Ratio (star/spinning top)", minval=0.05, maxval=0.5, step=0.01, group=grpPat)
+longBodyRatio  = input.float(0.60, "Long Body Ratio (marubozu/soldiers)", minval=0.3, maxval=1.0, step=0.01, group=grpPat)
+patShadowMult  = input.float(2.0, "Long Shadow Multiple of Body", minval=1.0, maxval=5.0, step=0.1, group=grpPat)
+patTrendLen    = input.int(10, "Pattern Trend Context Length (bars)", minval=3, maxval=50, group=grpPat)
+patTol         = input.float(0.10, "Level-Match Tolerance (x range)", minval=0.02, maxval=0.3, step=0.01, group=grpPat)
+
+grpRev = "Early Reversal / Prediction"
+showReversal   = input.bool(true, "Show Early Reversal Signals", group=grpRev)
+minScoreToShow = input.int(3, "Minimum Confluence Score (0-5)", minval=1, maxval=5, group=grpRev)
+showDashboard  = input.bool(true, "Show Dashboard Table", group=grpRev)
+
+// ============================================================================
+// SESSIONS
+// ============================================================================
+inSession(sess) =>
+    not na(time(timeframe.period, sess))
+
+bgcolor(showSessions and inSession(asiaSess)   ? asiaColor   : na)
+bgcolor(showSessions and inSession(londonSess) ? londonColor : na)
+bgcolor(showSessions and inSession(nySess)     ? nyColor     : na)
+
+// ============================================================================
+// ATR (shared)
+// ============================================================================
+atrVal = ta.atr(14)
+
+// ============================================================================
+// EMA CROSS
+// ============================================================================
+emaFast = ta.ema(close, emaFastLen)
+emaSlow = ta.ema(close, emaSlowLen)
+plot(showEMA ? emaFast : na, "EMA Fast", color=color.new(color.yellow, 0), linewidth=1)
+plot(showEMA ? emaSlow : na, "EMA Slow", color=color.new(color.fuchsia, 0), linewidth=1)
+
+emaBullCross = ta.crossover(emaFast, emaSlow)
+emaBearCross = ta.crossunder(emaFast, emaSlow)
+
+plotshape(showEMA and emaBullCross, title="EMA Bull Cross", location=location.belowbar, style=shape.triangleup, color=color.lime, size=size.tiny)
+plotshape(showEMA and emaBearCross, title="EMA Bear Cross", location=location.abovebar, style=shape.triangledown, color=color.red, size=size.tiny)
+
+if showEMA and emaBullCross
+    label.new(bar_index, low - atrVal * 0.6, "BUY", style=label.style_label_up, color=color.new(color.lime, 10), textcolor=color.black, size=size.small)
+
+if showEMA and emaBearCross
+    label.new(bar_index, high + atrVal * 0.6, "SELL", style=label.style_label_down, color=color.new(color.red, 10), textcolor=color.white, size=size.small)
+
+// ============================================================================
+// MARKET STRUCTURE: SWING HIGHS/LOWS + HH/HL/LH/LL + BOS/CHoCH
+// ============================================================================
+pivHigh = ta.pivothigh(high, swingLen, swingLen)
+pivLow  = ta.pivotlow(low, swingLen, swingLen)
+
+var float lastSwingHigh = na
+var float prevSwingHigh = na
+var float lastSwingLow  = na
+var float prevSwingLow  = na
+var int   structTrend   = 0     // 1 = bullish structure, -1 = bearish structure
+
+var bool bullBOSFlag = false
+var bool bearBOSFlag = false
+
+if not na(pivHigh)
+    prevSwingHigh := lastSwingHigh
+    lastSwingHigh := pivHigh
+    if not na(prevSwingHigh)
+        bool isHH = pivHigh > prevSwingHigh
+        structTrend := isHH ? 1 : -1
+        if showStructureLabels
+            label.new(bar_index - swingLen, pivHigh, isHH ? "HH" : "LH",
+                 style=label.style_label_down, color=color.new(color.white, 100),
+                 textcolor=isHH ? color.lime : color.orange, size=size.tiny)
+
+if not na(pivLow)
+    prevSwingLow := lastSwingLow
+    lastSwingLow := pivLow
+    if not na(prevSwingLow)
+        bool isLL = pivLow < prevSwingLow
+        structTrend := isLL ? -1 : 1
+        if showStructureLabels
+            label.new(bar_index - swingLen, pivLow, isLL ? "LL" : "HL",
+                 style=label.style_label_up, color=color.new(color.white, 100),
+                 textcolor=isLL ? color.red : color.aqua, size=size.tiny)
+
+// BOS / CHoCH : close breaking the last confirmed swing level
+bullBOS = not na(lastSwingHigh) and ta.crossover(close, lastSwingHigh)
+bearBOS = not na(lastSwingLow)  and ta.crossunder(close, lastSwingLow)
+
+if showBOS and bullBOS
+    line.new(bar_index, lastSwingHigh, bar_index + 1, lastSwingHigh, color=color.new(color.lime, 30), width=1, style=line.style_dashed)
+    label.new(bar_index, lastSwingHigh, "BOS ▲", style=label.style_label_down, color=color.new(color.lime, 80), textcolor=color.lime, size=size.small)
+
+if showBOS and bearBOS
+    line.new(bar_index, lastSwingLow, bar_index + 1, lastSwingLow, color=color.new(color.red, 30), width=1, style=line.style_dashed)
+    label.new(bar_index, lastSwingLow, "BOS ▼", style=label.style_label_up, color=color.new(color.red, 80), textcolor=color.red, size=size.small)
+
+// ============================================================================
+// LIQUIDITY SWEEP
+// ============================================================================
+bullishSweep = not na(lastSwingLow)  and low  < lastSwingLow  and close > lastSwingLow  and close > open
+bearishSweep = not na(lastSwingHigh) and high > lastSwingHigh and close < lastSwingHigh and close < open
+
+if showLiq and bullishSweep
+    label.new(bar_index, low, "SWEEP", style=label.style_label_up, color=color.new(color.aqua, 60), textcolor=color.white, size=size.tiny)
+
+if showLiq and bearishSweep
+    label.new(bar_index, high, "SWEEP", style=label.style_label_down, color=color.new(color.orange, 60), textcolor=color.white, size=size.tiny)
+
+// ============================================================================
+// FAIR VALUE GAP (FVG)
+// ============================================================================
+var box[] bullFVGBoxes  = array.new<box>(0)
+var float[] bullFVGBot  = array.new<float>(0)
+var box[] bearFVGBoxes  = array.new<box>(0)
+var float[] bearFVGTop  = array.new<float>(0)
+
+// ============================================================================
+// VOLUME PROFILE (mini, per-leg) — finds the Point of Control (POC)
+// Technique: build a volume-by-price profile over the impulsive leg, then
+// whichever FVG contains the POC is the "strongest" FVG (highest-volume node).
+// ============================================================================
+f_volumeProfile(len, bins) =>
+    float hi = ta.highest(high, len)
+    float lo = ta.lowest(low, len)
+    float binSize = (hi - lo) / bins
+    binsArr = array.new_float(bins, 0.0)
+    if binSize > 0
+        for i = 0 to len - 1
+            float px = (high[i] + low[i] + close[i]) / 3.0
+            int binIdx = int(math.min(bins - 1, math.max(0, math.floor((px - lo) / binSize))))
+            array.set(binsArr, binIdx, array.get(binsArr, binIdx) + volume[i])
+    int maxIdx = 0
+    float maxVol = -1.0
+    for i = 0 to bins - 1
+        float v = array.get(binsArr, i)
+        if v > maxVol
+            maxVol := v
+            maxIdx := i
+    float pocPrice = lo + (maxIdx + 0.5) * binSize
+    [binsArr, pocPrice, lo, binSize, maxVol]
+
+// draws a compact horizontal histogram anchored just left of the leg, mimicking
+// a real volume profile, sized by relative volume per bin
+f_drawProfileHistogram(binsArr, lo, binSize, maxVol, bins, anchorBar, maxWidth, boxArr) =>
+    if maxVol > 0
+        for i = 0 to bins - 1
+            float v = array.get(binsArr, i)
+            float wRatio = v / maxVol
+            int barsWide = int(math.round(wRatio * maxWidth))
+            if barsWide > 0
+                float binBottom = lo + i * binSize
+                float binTop = binBottom + binSize
+                int rightX = anchorBar
+                int leftX = rightX - barsWide
+                box pbx = box.new(leftX, binTop, rightX, binBottom, border_color=color.new(color.gray, 70), bgcolor=color.new(color.aqua, 65))
+                array.push(boxArr, pbx)
+
+var box[] vpHistBoxes = array.new<box>(0)
+
+bool bullFVGCond = low > high[2] and close[1] > open[1]
+bool bearFVGCond = high < low[2] and close[1] < open[1]
+
+
+
+var bool lastFVGStrong = false
+var string lastFVGStrongType = "None"
+
+if showFVG and bullFVGCond
+    box b = box.new(bar_index - 2, high[2], bar_index + fvgExtend, low, border_color=color.new(fvgBullColor, 40), bgcolor=fvgBullColor, extend=extend.none)
+    label.new(bar_index - 2, high[2], "Bullish FVG", style=label.style_label_down, color=color.new(color.white, 100), textcolor=fvgBullColor, size=size.tiny)
+    array.push(bullFVGBoxes, b)
+    array.push(bullFVGBot, high[2])
+    if array.size(bullFVGBoxes) > maxFVG
+        box.delete(array.shift(bullFVGBoxes))
+        array.shift(bullFVGBot)
+    if showVP
+        [binsArr, pocPrice, vpLo, vpBinSize, vpMaxVol] = f_volumeProfile(vpLookback, vpBins)
+        bool isStrong = pocPrice >= high[2] and pocPrice <= low
+        lastFVGStrong := isStrong
+        lastFVGStrongType := isStrong ? "Bullish" : lastFVGStrongType
+        if isStrong
+            box.set_border_color(b, strongFVGColor)
+            box.set_border_width(b, 2)
+            line.new(bar_index - 2, pocPrice, bar_index + fvgExtend, pocPrice, color=pocColor, width=1, style=line.style_dashed)
+            label.new(bar_index, low, "★ STRONGEST FVG (POC)", style=label.style_label_up, color=color.new(color.black, 15), textcolor=pocColor, size=size.small)
+            if showVPHistogram
+                if array.size(vpHistBoxes) > 0
+                    for i = array.size(vpHistBoxes) - 1 to 0
+                        box.delete(array.shift(vpHistBoxes))
+                f_drawProfileHistogram(binsArr, vpLo, vpBinSize, vpMaxVol, vpBins, bar_index - vpLookback, vpHistWidth, vpHistBoxes)
+        else if showVPHistogram and not vpOnlyStrongest
+            if array.size(vpHistBoxes) > 0
+                for i = array.size(vpHistBoxes) - 1 to 0
+                    box.delete(array.shift(vpHistBoxes))
+            f_drawProfileHistogram(binsArr, vpLo, vpBinSize, vpMaxVol, vpBins, bar_index - vpLookback, vpHistWidth, vpHistBoxes)
+
+if showFVG and bearFVGCond
+    box b = box.new(bar_index - 2, low[2], bar_index + fvgExtend, high, border_color=color.new(fvgBearColor, 40), bgcolor=fvgBearColor, extend=extend.none)
+    label.new(bar_index - 2, high, "Bearish FVG", style=label.style_label_up, color=color.new(color.white, 100), textcolor=fvgBearColor, size=size.tiny)
+    array.push(bearFVGBoxes, b)
+    array.push(bearFVGTop, low[2])
+    if array.size(bearFVGBoxes) > maxFVG
+        box.delete(array.shift(bearFVGBoxes))
+        array.shift(bearFVGTop)
+    if showVP
+        [binsArrB, pocPriceB, vpLoB, vpBinSizeB, vpMaxVolB] = f_volumeProfile(vpLookback, vpBins)
+        bool isStrongB = pocPriceB >= high and pocPriceB <= low[2]
+        lastFVGStrong := isStrongB
+        lastFVGStrongType := isStrongB ? "Bearish" : lastFVGStrongType
+        if isStrongB
+            box.set_border_color(b, strongFVGColor)
+            box.set_border_width(b, 2)
+            line.new(bar_index - 2, pocPriceB, bar_index + fvgExtend, pocPriceB, color=pocColor, width=1, style=line.style_dashed)
+            label.new(bar_index, high, "★ STRONGEST FVG (POC)", style=label.style_label_down, color=color.new(color.black, 15), textcolor=pocColor, size=size.small)
+            if showVPHistogram
+                if array.size(vpHistBoxes) > 0
+                    for i = array.size(vpHistBoxes) - 1 to 0
+                        box.delete(array.shift(vpHistBoxes))
+                f_drawProfileHistogram(binsArrB, vpLoB, vpBinSizeB, vpMaxVolB, vpBins, bar_index - vpLookback, vpHistWidth, vpHistBoxes)
+        else if showVPHistogram and not vpOnlyStrongest
+            if array.size(vpHistBoxes) > 0
+                for i = array.size(vpHistBoxes) - 1 to 0
+                    box.delete(array.shift(vpHistBoxes))
+            f_drawProfileHistogram(binsArrB, vpLoB, vpBinSizeB, vpMaxVolB, vpBins, bar_index - vpLookback, vpHistWidth, vpHistBoxes)
+
+// mitigation cleanup (gray out filled gaps)
+var bool bullFVGFilledRecent = false
+var bool bearFVGFilledRecent = false
+bullFVGFilledRecent := false
+bearFVGFilledRecent := false
+
+if array.size(bullFVGBoxes) > 0
+    for i = array.size(bullFVGBoxes) - 1 to 0
+        box bx = array.get(bullFVGBoxes, i)
+        float bot = array.get(bullFVGBot, i)
+        box.set_right(bx, bar_index + fvgExtend)
+        if close < bot
+            box.set_bgcolor(bx, color.new(color.gray, 90))
+            bullFVGFilledRecent := true
+
+if array.size(bearFVGBoxes) > 0
+    for i = array.size(bearFVGBoxes) - 1 to 0
+        box bx = array.get(bearFVGBoxes, i)
+        float top = array.get(bearFVGTop, i)
+        box.set_right(bx, bar_index + fvgExtend)
+        if close > top
+            box.set_bgcolor(bx, color.new(color.gray, 90))
+            bearFVGFilledRecent := true
+
+bool freshBullFVG = showFVG and bullFVGCond
+bool freshBearFVG = showFVG and bearFVGCond
+
+// ============================================================================
+// ORDER BLOCKS
+// ============================================================================
+var box[] bullOBBoxes = array.new<box>(0)
+var float[] bullOBBot = array.new<float>(0)
+var box[] bearOBBoxes = array.new<box>(0)
+var float[] bearOBTop = array.new<float>(0)
+
+bigBullCandle = (close - open) > atrVal * obDisplaceFactor and close > open
+bigBearCandle = (open - close) > atrVal * obDisplaceFactor and close < open
+
+bool newBullOB = bigBullCandle and close[1] < open[1]
+bool newBearOB = bigBearCandle and close[1] > open[1]
+
+if showOB and newBullOB
+    box b = box.new(bar_index - 1, open[1], bar_index + 15, low[1], border_color=color.new(obBullColor, 20), bgcolor=obBullColor, extend=extend.none)
+    label.new(bar_index - 1, open[1], "Bullish OB", style=label.style_label_down, color=color.new(color.white, 100), textcolor=obBullColor, size=size.tiny)
+    array.push(bullOBBoxes, b)
+    array.push(bullOBBot, low[1])
+    if array.size(bullOBBoxes) > maxOB
+        box.delete(array.shift(bullOBBoxes))
+        array.shift(bullOBBot)
+
+if showOB and newBearOB
+    box b = box.new(bar_index - 1, high[1], bar_index + 15, open[1], border_color=color.new(obBearColor, 20), bgcolor=obBearColor, extend=extend.none)
+    label.new(bar_index - 1, high[1], "Bearish OB", style=label.style_label_up, color=color.new(color.white, 100), textcolor=obBearColor, size=size.tiny)
+    array.push(bearOBBoxes, b)
+    array.push(bearOBTop, high[1])
+    if array.size(bearOBBoxes) > maxOB
+        box.delete(array.shift(bearOBBoxes))
+        array.shift(bearOBTop)
+
+if array.size(bullOBBoxes) > 0
+    for i = array.size(bullOBBoxes) - 1 to 0
+        box bx = array.get(bullOBBoxes, i)
+        float bot = array.get(bullOBBot, i)
+        box.set_right(bx, bar_index + 15)
+        if close < bot
+            box.set_bgcolor(bx, color.new(color.gray, 92))
+
+if array.size(bearOBBoxes) > 0
+    for i = array.size(bearOBBoxes) - 1 to 0
+        box bx = array.get(bearOBBoxes, i)
+        float top = array.get(bearOBTop, i)
+        box.set_right(bx, bar_index + 15)
+        if close > top
+            box.set_bgcolor(bx, color.new(color.gray, 92))
+
+// ============================================================================
+// SUPPLY & DEMAND ZONES (consolidation range before a displacement breakout)
+// ============================================================================
+var box[] supplyBoxes = array.new<box>(0)
+var box[] demandBoxes = array.new<box>(0)
+
+rangeHigh = ta.highest(high, sdLookback)[1]
+rangeLow  = ta.lowest(low, sdLookback)[1]
+
+bool demandBreakout = close > rangeHigh and (close - open) > atrVal * sdBreakFactor
+bool supplyBreakout = close < rangeLow  and (open - close) > atrVal * sdBreakFactor
+
+if showSD and demandBreakout
+    float demandMid = rangeLow + (rangeHigh - rangeLow) * 0.175
+    int demandBarMid = bar_index - int(sdLookback / 2)
+    box b = box.new(bar_index - sdLookback, rangeLow, bar_index, rangeLow + (rangeHigh - rangeLow) * 0.35, border_color=color.new(sdDemandColor, 30), bgcolor=sdDemandColor, extend=extend.none)
+    label.new(demandBarMid, demandMid, "Demand Zone", style=label.style_label_up, color=color.new(color.white, 100), textcolor=sdDemandColor, size=size.tiny)
+    array.push(demandBoxes, b)
+    if array.size(demandBoxes) > maxSD
+        box.delete(array.shift(demandBoxes))
+
+if showSD and supplyBreakout
+    float supplyMid = rangeHigh - (rangeHigh - rangeLow) * 0.175
+    int supplyBarMid = bar_index - int(sdLookback / 2)
+    box b = box.new(bar_index - sdLookback, rangeHigh - (rangeHigh - rangeLow) * 0.35, bar_index, rangeHigh, border_color=color.new(sdSupplyColor, 30), bgcolor=sdSupplyColor, extend=extend.none)
+    label.new(supplyBarMid, supplyMid, "Supply Zone", style=label.style_label_down, color=color.new(color.white, 100), textcolor=sdSupplyColor, size=size.tiny)
+    array.push(supplyBoxes, b)
+    if array.size(supplyBoxes) > maxSD
+        box.delete(array.shift(supplyBoxes))
+
+// ============================================================================
+// SUPPORT & RESISTANCE (from pivots, merged, capped)
+// ============================================================================
+var line[] resLines   = array.new<line>(0)
+var float[] resLevels = array.new<float>(0)
+var line[] supLines   = array.new<line>(0)
+var float[] supLevels = array.new<float>(0)
+
+mergeThresh = atrVal * srMergeATR
+
+addLevel(arrLines, arrLevels, price, col, labelTxt) =>
+    bool merged = false
+    if array.size(arrLevels) > 0
+        for i = 0 to array.size(arrLevels) - 1
+            if math.abs(array.get(arrLevels, i) - price) < mergeThresh
+                merged := true
+    if not merged
+        ln = line.new(bar_index, price, bar_index + 1, price, color=color.new(col, 40), width=1, style=line.style_dotted, extend=extend.right)
+        array.push(arrLines, ln)
+        array.push(arrLevels, price)
+        label.new(bar_index, price, labelTxt, style=label.style_label_left, color=color.new(col, 70), textcolor=col, size=size.tiny)
+        if array.size(arrLines) > srMaxLevels
+            line.delete(array.shift(arrLines))
+            array.shift(arrLevels)
+    merged
+
+if showSR and not na(pivHigh)
+    addLevel(resLines, resLevels, pivHigh, color.red, "Resistance")
+
+if showSR and not na(pivLow)
+    addLevel(supLines, supLevels, pivLow, color.lime, "Support")
+
+// ============================================================================
+// CANDLESTICK PATTERN RECOGNITION
+// Rule-based detection of classic single/double/triple/multi-candle patterns.
+// Honest note: textbook candlestick definitions always involve judgement calls
+// (what counts as "small body", "long shadow", etc.) — these are implemented
+// with consistent, transparent ratio-based rules (tunable above), not claimed
+// as flawless. Some patterns can legitimately co-fire on the same candle,
+// same as a human chartist might see more than one pattern in the same spot.
+// The four "N new price lines" entries from the reference sheet are counting
+// exercises, not real named patterns, so they're intentionally not included.
+// ============================================================================
+bodyS     = math.abs(close - open)
+rangeS    = math.max(high - low, syminfo.mintick)
+upWickS   = high - math.max(close, open)
+dnWickS   = math.min(close, open) - low
+bullS     = close > open
+bearS     = close < open
+avgBodyP  = ta.sma(bodyS, 14)
+
+f_isDoji(n) => (high[n] - low[n]) > 0 and bodyS[n] <= rangeS[n] * dojiThresh
+f_isSmall(n) => bodyS[n] <= rangeS[n] * smallBodyRatio
+f_isLong(n) => bodyS[n] >= rangeS[n] * longBodyRatio and bodyS[n] >= avgBodyP[n]
+f_bodyInside(nOuter, nInner) =>
+    math.max(open[nInner], close[nInner]) < math.max(open[nOuter], close[nOuter]) and math.min(open[nInner], close[nInner]) > math.min(open[nOuter], close[nOuter])
+
+patTrendUp   = close[1] > close[patTrendLen + 1]
+patTrendDown = close[1] < close[patTrendLen + 1]
+
+f_patLabel(cond, txt, kind) =>
+    if cond
+        if kind == 1
+            label.new(bar_index, low - atrVal * 0.5, txt, style=label.style_label_up, color=color.new(color.green, 80), textcolor=color.lime, size=size.tiny)
+        else if kind == -1
+            label.new(bar_index, high + atrVal * 0.5, txt, style=label.style_label_down, color=color.new(color.red, 80), textcolor=color.red, size=size.tiny)
+        else
+            label.new(bar_index, high + atrVal * 0.8, txt, style=label.style_label_down, color=color.new(color.gray, 60), textcolor=color.silver, size=size.tiny)
+
+// --- Doji family ---
+p_dojiDragonfly     = f_isDoji(0) and dnWickS >= rangeS * 0.6 and upWickS <= rangeS * 0.08
+p_dojiGravestone    = f_isDoji(0) and upWickS >= rangeS * 0.6 and dnWickS <= rangeS * 0.08
+p_dojiLongLegged    = f_isDoji(0) and upWickS >= rangeS * 0.35 and dnWickS >= rangeS * 0.35
+p_dojiStandard      = f_isDoji(0) and not p_dojiDragonfly and not p_dojiGravestone and not p_dojiLongLegged
+p_dojiGapUp         = f_isDoji(0) and low > high[1]
+p_dojiGapDown       = f_isDoji(0) and high < low[1]
+p_dojiNorthern      = f_isDoji(0) and patTrendUp
+p_dojiSouthern      = f_isDoji(0) and patTrendDown
+p_dojiStarBull      = f_isDoji(0) and bearS[1] and f_isLong(1) and high < close[1]
+p_dojiStarBear      = f_isDoji(0) and bullS[1] and f_isLong(1) and low > close[1]
+p_dojiStarCollapse  = bullS[2] and f_isLong(2) and f_isDoji(1) and low[1] > high[2] and bearS and high < low[1] and close < open[2]
+
+// --- Hammer family ---
+p_hammerShape    = bodyS <= rangeS * 0.35 and dnWickS >= bodyS * patShadowMult and upWickS <= bodyS * 0.5
+p_invHammerShape = bodyS <= rangeS * 0.35 and upWickS >= bodyS * patShadowMult and dnWickS <= bodyS * 0.5
+p_hammer         = p_hammerShape and patTrendDown
+p_hangingMan     = p_hammerShape and patTrendUp
+p_invertedHammer = p_invHammerShape and patTrendDown
+p_shootingStar   = p_invHammerShape and patTrendUp
+
+// --- Belt hold ---
+p_beltHoldBull = bullS and open <= low + rangeS * 0.05 and bodyS >= rangeS * longBodyRatio
+p_beltHoldBear = bearS and open >= high - rangeS * 0.05 and bodyS >= rangeS * longBodyRatio
+
+// --- Engulfing ---
+p_engulfBull       = bearS[1] and bullS and open <= close[1] and close >= open[1] and bodyS > bodyS[1]
+p_engulfBear       = bullS[1] and bearS and open >= close[1] and close <= open[1] and bodyS > bodyS[1]
+p_lastEngulfBottom = p_engulfBull and patTrendDown[1]
+p_lastEngulfTop    = p_engulfBear and patTrendUp[1]
+p_engulfBullPlain  = p_engulfBull and not p_lastEngulfBottom
+p_engulfBearPlain  = p_engulfBear and not p_lastEngulfTop
+
+// --- Harami ---
+p_haramiBull      = bearS[1] and bullS and f_bodyInside(1, 0) and bodyS <= bodyS[1] * 0.7 and patTrendDown
+p_haramiBear      = bullS[1] and bearS and f_bodyInside(1, 0) and bodyS <= bodyS[1] * 0.7 and patTrendUp
+p_haramiCrossBull = p_haramiBull and f_isDoji(0)
+p_haramiCrossBear = p_haramiBear and f_isDoji(0)
+p_haramiBullPlain = p_haramiBull and not f_isDoji(0)
+p_haramiBearPlain = p_haramiBear and not f_isDoji(0)
+p_homingPigeon    = bearS[1] and bearS and f_bodyInside(1, 0) and patTrendDown
+
+// --- Piercing / Dark Cloud / Stomach ---
+p_piercingBull  = bearS[1] and bullS and open < low[1] and close > (open[1] + close[1]) / 2 and close < open[1]
+p_darkCloud     = bullS[1] and bearS and open > high[1] and close < (open[1] + close[1]) / 2 and close > open[1]
+p_aboveStomach  = bearS[1] and bullS and open > (open[1] + close[1]) / 2 and open < open[1] and close > open[1]
+p_belowStomach  = bullS[1] and bearS and open < (open[1] + close[1]) / 2 and open > open[1] and close < open[1]
+
+// --- Stars (3-candle) ---
+p_morningStar     = bearS[2] and f_isLong(2) and f_isSmall(1) and math.max(open[1], close[1]) < close[2] and bullS and close > (open[2] + close[2]) / 2 and f_isLong(0)
+p_eveningStar     = bullS[2] and f_isLong(2) and f_isSmall(1) and math.min(open[1], close[1]) > close[2] and bearS and close < (open[2] + close[2]) / 2 and f_isLong(0)
+p_morningDojiStar = bearS[2] and f_isLong(2) and f_isDoji(1) and math.max(open[1], close[1]) < close[2] and bullS and close > (open[2] + close[2]) / 2
+p_eveningDojiStar = bullS[2] and f_isLong(2) and f_isDoji(1) and math.min(open[1], close[1]) > close[2] and bearS and close < (open[2] + close[2]) / 2
+p_morningStarPlain = p_morningStar and not p_morningDojiStar
+p_eveningStarPlain = p_eveningStar and not p_eveningDojiStar
+
+// --- Abandoned Baby / Tri-Star ---
+p_abandonedBull = bearS[2] and f_isLong(2) and f_isDoji(1) and high[1] < low[2] and bullS and low > high[1]
+p_abandonedBear = bullS[2] and f_isLong(2) and f_isDoji(1) and low[1] > high[2] and bearS and high < low[1]
+p_triStarBull   = f_isDoji(2) and f_isDoji(1) and f_isDoji(0) and high[1] < low[2] and high[1] < low and patTrendDown
+p_triStarBear   = f_isDoji(2) and f_isDoji(1) and f_isDoji(0) and low[1] > high[2] and low[1] > high and patTrendUp
+
+// --- Three Soldiers / Crows ---
+p_threeWhiteSoldiers = bullS[2] and bullS[1] and bullS and close[2] < close[1] and close[1] < close and open[1] > open[2] and open[1] < close[2] and open > open[1] and open < close[1] and bodyS[2] >= avgBodyP[2] * 0.8 and bodyS[1] >= avgBodyP[1] * 0.8 and bodyS >= avgBodyP * 0.8
+p_threeBlackCrows   = bearS[2] and bearS[1] and bearS and close[2] > close[1] and close[1] > close and open[1] < open[2] and open[1] > close[2] and open < open[1] and open > close[1] and bodyS[2] >= avgBodyP[2] * 0.8 and bodyS[1] >= avgBodyP[1] * 0.8 and bodyS >= avgBodyP * 0.8
+p_identicalThreeCrows = p_threeBlackCrows and math.abs(open[1] - close[2]) <= rangeS[2] * 0.1 and math.abs(open - close[1]) <= rangeS[1] * 0.1
+p_threeBlackCrowsPlain = p_threeBlackCrows and not p_identicalThreeCrows
+p_advanceBlock = p_threeWhiteSoldiers and bodyS[1] < bodyS[2] and bodyS < bodyS[1] and upWickS > upWickS[1]
+p_threeWhiteSoldiersPlain = p_threeWhiteSoldiers and not p_advanceBlock
+p_deliberation = bullS[2] and bullS[1] and f_isLong(2) and f_isLong(1) and close[1] > close[2] and bullS and f_isSmall(0) and open >= close[1] * 0.999
+p_threeStarsSouth = bearS[2] and f_isLong(2) and dnWickS[2] >= bodyS[2] and bearS[1] and low[1] < low[2] and close[1] > close[2] and dnWickS[1] >= bodyS[1] * patShadowMult and bearS and f_isSmall(0) and high <= high[1] and low >= low[1]
+
+// --- Three Inside / Outside ---
+p_threeInsideUp   = bearS[2] and bullS[1] and f_bodyInside(2, 1) and bullS and close > open[2]
+p_threeInsideDown = bullS[2] and bearS[1] and f_bodyInside(2, 1) and bearS and close < open[2]
+p_threeOutsideUp   = bearS[2] and bullS[1] and open[1] <= close[2] and close[1] >= open[2] and bodyS[1] > bodyS[2] and bullS and close > close[1]
+p_threeOutsideDown = bullS[2] and bearS[1] and open[1] >= close[2] and close[1] <= open[2] and bodyS[1] > bodyS[2] and bearS and close < close[1]
+
+// --- Kicking ---
+p_kickingBull = bearS[1] and open[1] >= high[1] - rangeS[1] * 0.05 and bodyS[1] >= rangeS[1] * longBodyRatio and bullS and open <= low + rangeS * 0.05 and bodyS >= rangeS * longBodyRatio and low > high[1]
+p_kickingBear = bullS[1] and open[1] <= low[1] + rangeS[1] * 0.05 and bodyS[1] >= rangeS[1] * longBodyRatio and bearS and open >= high - rangeS * 0.05 and bodyS >= rangeS * longBodyRatio and high < low[1]
+
+// --- Tweezers / Matching Low ---
+p_tweezersTop    = math.abs(high - high[1]) <= rangeS[1] * patTol and patTrendUp
+p_tweezersBottom = math.abs(low - low[1]) <= rangeS[1] * patTol and patTrendDown
+p_matchingLow    = bearS[1] and bearS and math.abs(close - close[1]) <= rangeS[1] * patTol and patTrendDown
+
+// --- On Neck / In Neck ---
+p_onNeck = bearS[1] and bullS and patTrendDown and math.abs(close - low[1]) <= rangeS[1] * patTol and open < close[1]
+p_inNeck = bearS[1] and bullS and patTrendDown and close > close[1] and close <= close[1] + rangeS[1] * patTol and open < close[1] and not p_onNeck
+
+// --- Meeting / Separating Lines ---
+p_meetingLinesBull    = bearS[1] and bullS and math.abs(close - close[1]) <= rangeS[1] * patTol and patTrendDown and f_isLong(1) and f_isLong(0)
+p_meetingLinesBear    = bullS[1] and bearS and math.abs(close - close[1]) <= rangeS[1] * patTol and patTrendUp and f_isLong(1) and f_isLong(0)
+p_separatingLinesBull = bearS[1] and bullS and math.abs(open - open[1]) <= rangeS[1] * patTol and patTrendUp
+p_separatingLinesBear = bullS[1] and bearS and math.abs(open - open[1]) <= rangeS[1] * patTol and patTrendDown
+
+// --- Stick Sandwich / Unique Three River / Concealing Baby / Ladder Bottom ---
+p_stickSandwich = bearS[2] and bullS[1] and bearS and math.abs(close - close[2]) <= rangeS[2] * patTol and close[1] > close[2] and close[1] > close
+p_uniqueThreeRiver = bearS[2] and f_isLong(2) and bearS[1] and low[1] < low[2] and open[1] <= high[2] and close[1] > low[2] and bullS and close < close[1] and high < high[1]
+p_concealingBabySwallow = bearS[3] and f_isLong(3) and bearS[2] and f_isLong(2) and open[2] <= close[3] and bearS[1] and upWickS[1] >= bodyS[1] * patShadowMult and open[1] <= high[2] and bearS and open >= high[1] and close < low[1]
+p_ladderBottom = bearS[4] and bearS[3] and bearS[2] and close[4] > close[3] and close[3] > close[2] and bearS[1] and upWickS[1] >= bodyS[1] * patShadowMult and bullS and open > math.max(open[1], close[1]) and close > high[1]
+
+// --- Breakaway ---
+p_breakawayBull = bearS[4] and f_isLong(4) and bearS[3] and open[3] < close[4] and close[3] < close[4] and bearS[2] and close[2] < close[3] and bearS[1] and close[1] < close[2] and bullS and close > open[3] and close < open[4]
+p_breakawayBear = bullS[4] and f_isLong(4) and bullS[3] and open[3] > close[4] and close[3] > close[4] and bullS[2] and close[2] > close[3] and bullS[1] and close[1] > close[2] and bearS and close < open[3] and close > open[4]
+
+// --- Rising/Falling Three Methods, Mat Hold ---
+p_risingThreeMethods  = bullS[4] and f_isLong(4) and high[3] <= high[4] and low[3] >= low[4] and high[2] <= high[4] and low[2] >= low[4] and high[1] <= high[4] and low[1] >= low[4] and bullS and close > high[4]
+p_fallingThreeMethods = bearS[4] and f_isLong(4) and high[3] <= high[4] and low[3] >= low[4] and high[2] <= high[4] and low[2] >= low[4] and high[1] <= high[4] and low[1] >= low[4] and bearS and close < low[4]
+p_matHold = bullS[4] and f_isLong(4) and low[3] > close[4] * 0.995 and high[2] <= high[3] and high[1] <= high[3] and bullS and close > high[4]
+
+// --- Gap Three Methods / Tasuki Gap / Side by Side ---
+p_upsideGap3Methods   = bullS[2] and bullS[1] and low[1] > high[2] and bearS and open < close[1] and open > open[1] and close > close[2] and close < open[1]
+p_downsideGap3Methods = bearS[2] and bearS[1] and high[1] < low[2] and bullS and open > close[1] and open < open[1] and close < close[2] and close > open[1]
+p_upsideTasuki   = bullS[2] and bullS[1] and low[1] > high[2] and bearS and open < close[1] and open > open[1] and close < open[1] and close > close[2]
+p_downsideTasuki = bearS[2] and bearS[1] and high[1] < low[2] and bullS and open > close[1] and open < open[1] and close > open[1] and close < close[2]
+p_sideBySideBull = bullS[2] and bullS[1] and low[1] > high[2] and bullS and math.abs(open - open[1]) <= rangeS[1] * patTol
+p_sideBySideBear = bullS[2] and bullS[1] and high[1] < low[2] and bullS and math.abs(open - open[1]) <= rangeS[1] * patTol and patTrendDown
+
+// --- Two Black Gapping / Two Crows ---
+p_twoBlackGapping   = patTrendUp[2] and bearS[1] and high[1] < low[2] and bearS and high < low[1]
+p_twoCrows          = bullS[2] and f_isLong(2) and bearS[1] and open[1] > close[2] and close[1] < close[2] and close[1] > open[2] and bearS and open < open[1] and open > close[1] and close < close[2]
+p_upsideGapTwoCrows = bullS[2] and f_isLong(2) and bearS[1] and low[1] > high[2] and bearS and open > open[1] and close < close[1] and close > close[2]
+
+// --- Three Line Strike ---
+p_threeLineStrikeBull = bullS[3] and bullS[2] and bullS[1] and close[3] < close[2] and close[2] < close[1] and bearS and open > close[1] and close < open[3]
+p_threeLineStrikeBear = bearS[3] and bearS[2] and bearS[1] and close[3] > close[2] and close[2] > close[1] and bullS and open < close[1] and close > open[3]
+
+// --- High Wave / Spinning Top / Windows ---
+p_highWave    = bodyS <= rangeS * smallBodyRatio and upWickS >= rangeS * 0.35 and dnWickS >= rangeS * 0.35 and not f_isDoji(0)
+p_spinningTop = bodyS <= rangeS * smallBodyRatio and bodyS > rangeS * dojiThresh and upWickS > bodyS and dnWickS > bodyS and not p_highWave
+p_windowRising  = low > high[1] and patTrendUp
+p_windowFalling = high < low[1] and patTrendDown
+
+if showPatterns and showBullPatterns
+    f_patLabel(p_hammer, "Hammer", 1)
+    f_patLabel(p_invertedHammer, "Inverted Hammer", 1)
+    f_patLabel(p_beltHoldBull, "Belt Hold, Bullish", 1)
+    f_patLabel(p_engulfBullPlain, "Engulfing, Bullish", 1)
+    f_patLabel(p_lastEngulfBottom, "Last Engulfing Bottom", 1)
+    f_patLabel(p_haramiBullPlain, "Harami, Bullish", 1)
+    f_patLabel(p_haramiCrossBull, "Harami Cross, Bullish", 1)
+    f_patLabel(p_homingPigeon, "Homing Pigeon", 1)
+    f_patLabel(p_piercingBull, "Piercing, Bullish", 1)
+    f_patLabel(p_aboveStomach, "Above the Stomach", 1)
+    f_patLabel(p_morningStarPlain, "Morning Star", 1)
+    f_patLabel(p_morningDojiStar, "Morning Doji Star", 1)
+    f_patLabel(p_abandonedBull, "Abandoned Baby, Bullish", 1)
+    f_patLabel(p_triStarBull, "Tri-Star, Bullish", 1)
+    f_patLabel(p_threeWhiteSoldiersPlain, "Three White Soldiers", 1)
+    f_patLabel(p_threeStarsSouth, "Three Stars in the South", 1)
+    f_patLabel(p_threeInsideUp, "Three Inside Up", 1)
+    f_patLabel(p_threeOutsideUp, "Three Outside Up", 1)
+    f_patLabel(p_kickingBull, "Kicking, Bullish", 1)
+    f_patLabel(p_tweezersBottom, "Tweezers Bottom", 1)
+    f_patLabel(p_matchingLow, "Matching Low", 1)
+    f_patLabel(p_separatingLinesBull, "Separating Lines, Bullish", 1)
+    f_patLabel(p_meetingLinesBull, "Meeting Lines, Bullish", 1)
+    f_patLabel(p_stickSandwich, "Stick Sandwich", 1)
+    f_patLabel(p_uniqueThreeRiver, "Unique Three River Bottom", 1)
+    f_patLabel(p_concealingBabySwallow, "Concealing Baby Swallow", 1)
+    f_patLabel(p_ladderBottom, "Ladder Bottom", 1)
+    f_patLabel(p_breakawayBull, "Breakaway, Bullish", 1)
+    f_patLabel(p_risingThreeMethods, "Rising 3 Methods", 1)
+    f_patLabel(p_matHold, "Mat Hold", 1)
+    f_patLabel(p_upsideGap3Methods, "Upside Gap Three Methods", 1)
+    f_patLabel(p_upsideTasuki, "Upside Tasuki Gap", 1)
+    f_patLabel(p_sideBySideBull, "Side by Side White Lines, Bullish", 1)
+    f_patLabel(p_threeLineStrikeBull, "Three Line Strike, Bullish", 1)
+    f_patLabel(p_windowRising, "Window, Rising", 1)
+
+if showPatterns and showBearPatterns
+    f_patLabel(p_hangingMan, "Hanging Man", -1)
+    f_patLabel(p_shootingStar, "Shooting Star", -1)
+    f_patLabel(p_beltHoldBear, "Belt Hold, Bearish", -1)
+    f_patLabel(p_engulfBearPlain, "Engulfing, Bearish", -1)
+    f_patLabel(p_lastEngulfTop, "Last Engulfing Top", -1)
+    f_patLabel(p_haramiBearPlain, "Harami, Bearish", -1)
+    f_patLabel(p_haramiCrossBear, "Harami Cross, Bearish", -1)
+    f_patLabel(p_darkCloud, "Dark Cloud Cover", -1)
+    f_patLabel(p_belowStomach, "Below the Stomach", -1)
+    f_patLabel(p_eveningStarPlain, "Evening Star", -1)
+    f_patLabel(p_eveningDojiStar, "Evening Doji Star", -1)
+    f_patLabel(p_abandonedBear, "Abandoned Baby, Bearish", -1)
+    f_patLabel(p_triStarBear, "Tri-Star, Bearish", -1)
+    f_patLabel(p_threeBlackCrowsPlain, "Three Black Crows", -1)
+    f_patLabel(p_identicalThreeCrows, "Identical Three Crows", -1)
+    f_patLabel(p_advanceBlock, "Advance Block", -1)
+    f_patLabel(p_deliberation, "Deliberation", -1)
+    f_patLabel(p_threeInsideDown, "Three Inside Down", -1)
+    f_patLabel(p_threeOutsideDown, "Three Outside Down", -1)
+    f_patLabel(p_kickingBear, "Kicking, Bearish", -1)
+    f_patLabel(p_tweezersTop, "Tweezers Top", -1)
+    f_patLabel(p_onNeck, "On Neck", -1)
+    f_patLabel(p_inNeck, "In Neck", -1)
+    f_patLabel(p_separatingLinesBear, "Separating Lines, Bearish", -1)
+    f_patLabel(p_meetingLinesBear, "Meeting Lines, Bearish", -1)
+    f_patLabel(p_breakawayBear, "Breakaway, Bearish", -1)
+    f_patLabel(p_fallingThreeMethods, "Falling 3 Methods", -1)
+    f_patLabel(p_downsideGap3Methods, "Downside Gap Three Methods", -1)
+    f_patLabel(p_downsideTasuki, "Downside Tasuki Gap", -1)
+    f_patLabel(p_sideBySideBear, "Side by Side White Lines, Bearish", -1)
+    f_patLabel(p_twoBlackGapping, "Two Black Gapping", -1)
+    f_patLabel(p_twoCrows, "Two Crows", -1)
+    f_patLabel(p_upsideGapTwoCrows, "Upside Gap Two Crows", -1)
+    f_patLabel(p_threeLineStrikeBear, "Three Line Strike, Bearish", -1)
+    f_patLabel(p_windowFalling, "Window, Falling", -1)
+
+if showPatterns and showNeutralPatterns
+    f_patLabel(p_dojiStandard, "Doji", 0)
+    f_patLabel(p_dojiDragonfly, "Doji, Dragonfly", 0)
+    f_patLabel(p_dojiGravestone, "Doji, Gravestone", 0)
+    f_patLabel(p_dojiLongLegged, "Doji, Long Legged", 0)
+    f_patLabel(p_dojiGapUp, "Doji, Gapping Up", 0)
+    f_patLabel(p_dojiGapDown, "Doji, Gapping Down", 0)
+    f_patLabel(p_dojiNorthern, "Doji, Northern", 0)
+    f_patLabel(p_dojiSouthern, "Doji, Southern", 0)
+    f_patLabel(p_dojiStarBull, "Doji Star, Bullish", 0)
+    f_patLabel(p_dojiStarBear, "Doji Star, Bearish", 0)
+    f_patLabel(p_dojiStarCollapse, "Doji Star, Collapsing", 0)
+    f_patLabel(p_highWave, "High Wave", 0)
+    f_patLabel(p_spinningTop, "Spinning Top", 0)
+
+// ============================================================================
+// EARLY REVERSAL / NEXT-MOVE PREDICTION (confluence scoring)
+// ============================================================================
+int bullScore = 0
+bullScore += bullishSweep ? 1 : 0
+bullScore += freshBullFVG ? 1 : 0
+bullScore += newBullOB ? 1 : 0
+bullScore += emaBullCross ? 1 : 0
+bullScore += (structTrend == -1 and not na(pivLow) and pivLow > prevSwingLow) ? 1 : 0
+
+int bearScore = 0
+bearScore += bearishSweep ? 1 : 0
+bearScore += freshBearFVG ? 1 : 0
+bearScore += newBearOB ? 1 : 0
+bearScore += emaBearCross ? 1 : 0
+bearScore += (structTrend == 1 and not na(pivHigh) and pivHigh < prevSwingHigh) ? 1 : 0
+
+bool earlyBullReversal = showReversal and bullScore >= minScoreToShow
+bool earlyBearReversal = showReversal and bearScore >= minScoreToShow
+
+if earlyBullReversal
+    label.new(bar_index, low - atrVal, "EARLY BULLISH\nREVERSAL (" + str.tostring(bullScore) + "/5)",
+         style=label.style_label_up, color=color.new(color.lime, 10), textcolor=color.black, size=size.small)
+    alert("Early Bullish Reversal detected, score " + str.tostring(bullScore) + "/5", alert.freq_once_per_bar_close)
+
+if earlyBearReversal
+    label.new(bar_index, high + atrVal, "EARLY BEARISH\nREVERSAL (" + str.tostring(bearScore) + "/5)",
+         style=label.style_label_down, color=color.new(color.red, 10), textcolor=color.white, size=size.small)
+    alert("Early Bearish Reversal detected, score " + str.tostring(bearScore) + "/5", alert.freq_once_per_bar_close)
+
+alertcondition(earlyBullReversal, title="Early Bullish Reversal", message="Early Bullish Reversal confluence detected")
+alertcondition(earlyBearReversal, title="Early Bearish Reversal", message="Early Bearish Reversal confluence detected")
+alertcondition(bullBOS, title="Bullish BOS", message="Bullish Break of Structure")
+alertcondition(bearBOS, title="Bearish BOS", message="Bearish Break of Structure")
+alertcondition(bullishSweep, title="Bullish Liquidity Sweep", message="Liquidity swept below swing low, reversal watch")
+alertcondition(bearishSweep, title="Bearish Liquidity Sweep", message="Liquidity swept above swing high, reversal watch")
+
+// ============================================================================
+// DASHBOARD
+// ============================================================================
+if showDashboard and barstate.islast
+    var table dash = table.new(position.top_right, 2, 8, bgcolor=color.new(color.black, 20), border_width=1, border_color=color.gray)
+    table.cell(dash, 0, 0, "SMC Predictor", text_color=color.white, bgcolor=color.new(color.blue, 40), text_size=size.small)
+    table.cell(dash, 1, 0, "", bgcolor=color.new(color.blue, 40))
+    table.cell(dash, 0, 1, "Structure", text_color=color.gray, text_size=size.small)
+    table.cell(dash, 1, 1, structTrend == 1 ? "Bullish" : structTrend == -1 ? "Bearish" : "Neutral", text_color=structTrend == 1 ? color.lime : structTrend == -1 ? color.red : color.gray, text_size=size.small)
+    table.cell(dash, 0, 2, "EMA Trend", text_color=color.gray, text_size=size.small)
+    table.cell(dash, 1, 2, emaFast > emaSlow ? "Bullish" : "Bearish", text_color=emaFast > emaSlow ? color.lime : color.red, text_size=size.small)
+    table.cell(dash, 0, 3, "Bull Score", text_color=color.gray, text_size=size.small)
+    table.cell(dash, 1, 3, str.tostring(bullScore) + " / 5", text_color=color.lime, text_size=size.small)
+    table.cell(dash, 0, 4, "Bear Score", text_color=color.gray, text_size=size.small)
+    table.cell(dash, 1, 4, str.tostring(bearScore) + " / 5", text_color=color.red, text_size=size.small)
+    table.cell(dash, 0, 5, "Session", text_color=color.gray, text_size=size.small)
+    string sessTxt = inSession(nySess) ? "New York" : inSession(londonSess) ? "London" : inSession(asiaSess) ? "Asian" : "Off-Session"
+    table.cell(dash, 1, 5, sessTxt, text_color=color.yellow, text_size=size.small)
+    table.cell(dash, 0, 6, "ATR(14)", text_color=color.gray, text_size=size.small)
+    table.cell(dash, 1, 6, str.tostring(math.round(atrVal, 4)), text_color=color.white, text_size=size.small)
+    table.cell(dash, 0, 7, "Strongest FVG", text_color=color.gray, text_size=size.small)
+    table.cell(dash, 1, 7, lastFVGStrong ? lastFVGStrongType + " (POC)" : "None yet", text_color=lastFVGStrong ? color.yellow : color.gray, text_size=size.small)
