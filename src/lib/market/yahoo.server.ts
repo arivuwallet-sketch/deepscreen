@@ -149,6 +149,9 @@ export interface LiveFundamentals {
   operatingCashflow: number | null;
   totalCash: number | null;
   totalDebt: number | null;
+  longTermDebt: number | null;
+  netIncome: number | null;
+  totalAssets: number | null;
   revenueGrowth: number | null;
   earningsGrowth: number | null;
   dividendYield: number | null;
@@ -276,6 +279,9 @@ export async function fetchFundamentals(ySymbol: string): Promise<LiveFundamenta
       operatingCashflow: num(fd["operatingCashflow"]),
       totalCash,
       totalDebt,
+      longTermDebt: num(fd["longTermDebt"]),
+      netIncome: num(ks["netIncomeToCommon"]),
+      totalAssets: num(ks["totalAssets"]),
       revenueGrowth: pct(fd["revenueGrowth"]),
       earningsGrowth: pct(fd["earningsGrowth"]) ?? pct(ks["earningsQuarterlyGrowth"]),
       dividendYield:

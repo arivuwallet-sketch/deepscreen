@@ -2,10 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 
 import {
+  getAaaBondYield,
   getLiveFundamentals,
   getLiveFundamentalsBatch,
   getLiveQuote,
   getLiveQuotes,
+  getScreenerRatios,
 } from "@/lib/market/market.functions";
 
 export interface QuoteKey {
@@ -20,7 +22,7 @@ export const quoteKey = (k: QuoteKey) => `${k.exchange}:${k.symbol}`;
 const QUOTE_BATCH_LIMIT = 60;
 // quoteSummary (fundamentals) needs a shared session/crumb and is heavier, so
 // keep that batch smaller to stay gentle on Yahoo's free endpoint.
-const FUNDAMENTALS_BATCH_LIMIT = 40;
+const FUNDAMENTALS_BATCH_LIMIT = 30;
 
 /** Batch live quotes for a list of rows. Refreshes every 15s. */
 export function useLiveQuotes(keys: QuoteKey[]) {
@@ -75,5 +77,31 @@ export function useLiveFundamentals(exchange: string, symbol: string) {
     refetchInterval: 30_000,
     refetchOnWindowFocus: true,
     staleTime: 20_000,
+  });
+}
+
+/** Live AAA corporate bond yield for the Graham Formula's "Y" — changes slowly, so this rarely needs to refetch. */
+export function useAaaYield() {
+  const fetchYield = useServerFn(getAaaBondYield);
+  return useQuery({
+    queryKey: ["aaa-bond-yield"],
+    queryFn: () => fetchYield(),
+    staleTime: 60 * 60_000,
+    refetchOnWindowFocus: false,
+  });
+}
+
+/**
+ * Screener.in ratios for NSE/BSE stocks — scoped to the stock detail page
+ * only (never batched across a table) to keep request volume against their
+ * site low. Long stale time since these barely move intraday.
+ */
+export function useScreenerRatios(exchange: string, symbol: string) {
+  const fetchRatios = useServerFn(getScreenerRatios);
+  return useQuery({
+    queryKey: ["screener-ratios", exchange, symbol],
+    queryFn: () => fetchRatios({ data: { exchange, symbol } }),
+    enabled: exchange === "NSE" || exchange === "BSE",
+    staleTime: 20 * 60_000,
   });
 }
