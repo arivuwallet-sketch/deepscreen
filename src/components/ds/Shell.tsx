@@ -38,13 +38,25 @@ export function Shell({ children }: { children: ReactNode }) {
             >
               Crypto
             </Link>
-            <Link
-              to="/pricing"
-              activeProps={{ className: "bg-accent text-foreground" }}
-              className="num whitespace-nowrap rounded px-2.5 py-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-            >
-              Pricing
-            </Link>
+            {(
+              [
+                ["/portfolio", "Portfolio"],
+                ["/calendar", "Calendar"],
+                ["/options", "Options"],
+                ["/ipo", "IPO"],
+                ["/pricing", "Pricing"],
+              ] as const
+            ).map(([to, label]) => (
+              <Link
+                key={to}
+                to={to}
+                activeProps={{ className: "bg-accent text-foreground" }}
+                className="num whitespace-nowrap rounded px-2.5 py-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              >
+                {label}
+              </Link>
+            ))}
+
           </nav>
           <div className="ml-auto w-full md:w-80">
             <SearchBar />
