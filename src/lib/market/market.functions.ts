@@ -289,11 +289,12 @@ export const getAaaBondYield = createServerFn({ method: "GET" }).handler(
   },
 );
 
-// Per-symbol cache, 30 minutes — screener.in's summary ratios don't move
-// intraday except price, and this keeps the request volume against their
-// site low (this is scoped to the stock detail page only, never batched
-// across a table, unlike the Yahoo fetches above).
-const SCREENER_CACHE_TTL_MS = 30 * 60_000;
+// Per-symbol cache. Screener.in's summary ratios are the authoritative source
+// for Indian stocks (Yahoo's ROE/ROCE/D-E/PEG for NSE/BSE names are frequently
+// wrong or missing), so this is kept short enough that the page keeps pace with
+// their intraday updates while staying gentle on their site.
+const SCREENER_CACHE_TTL_MS = 5 * 60_000;
+
 const screenerCache = new Map<
   string,
   { data: import("./screener.server").ScreenerRatios; fetchedAt: number }
