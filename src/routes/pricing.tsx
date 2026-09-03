@@ -45,7 +45,6 @@ const PRO = [
   "Holding period and live sell alerts",
   "Portfolio health & risk matrix",
   "Earnings and dividend calendar",
-  "Crypto SMC confirmed signals",
   "Every upcoming feature (IPOs, options chain)",
 ];
 

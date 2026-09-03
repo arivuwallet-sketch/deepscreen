@@ -2,7 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Lock } from "lucide-react";
 
-import { quoteKey, useLiveFundamentalsBatch, useLiveQuotes } from "@/hooks/useLiveQuotes";
+import {
+  quoteKey,
+  useLiveFundamentalsBatch,
+  useLiveQuotes,
+  useScreenerRatiosBatch,
+} from "@/hooks/useLiveQuotes";
 import { useSubscription } from "@/hooks/useSubscription";
 
 import { analyze, verdictClass } from "@/lib/deepscreen/metrics";
@@ -10,6 +15,7 @@ import { mergeLiveStock } from "@/lib/deepscreen/live-merge";
 import { formatCap, formatPrice, formatVolume } from "@/lib/deepscreen/format";
 import type { Stock } from "@/lib/deepscreen/types";
 import type { LiveFundamentals, LiveQuote } from "@/lib/market/yahoo.server";
+import type { ScreenerRatios } from "@/lib/market/screener.server";
 import { cn } from "@/lib/utils";
 
 function ProLockChip() {
@@ -61,6 +67,7 @@ function StockRow({
   stock,
   quote,
   fundamentals,
+  screener,
   isPro,
   subLoading,
   delayMs,
@@ -68,11 +75,12 @@ function StockRow({
   stock: Stock;
   quote: LiveQuote | null | undefined;
   fundamentals: LiveFundamentals | null | undefined;
+  screener: ScreenerRatios | null | undefined;
   isPro: boolean;
   subLoading: boolean;
   delayMs: number;
 }) {
-  const { stock: merged, sources } = mergeLiveStock(stock, quote, fundamentals);
+  const { stock: merged, sources } = mergeLiveStock(stock, quote, fundamentals, screener);
   const a = analyze(merged);
   const isLive = sources.pe === "live";
   const priceFlash = usePriceFlash(merged.price);
@@ -135,7 +143,9 @@ function StockRow({
       </td>
       <td
         className="num px-2 py-2.5 text-right"
-        title="Modeled estimate — Yahoo has no public ROCE field"
+        title={
+          sources.roce === "live" ? "Live — screener.in" : "Modeled estimate"
+        }
       >
         {merged.fundamentals.roce.toFixed(1)}%
       </td>
@@ -176,6 +186,7 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
   const { data: live } = useLiveQuotes(keys);
   const { data: liveFundamentals, isFetching: fundamentalsLoading } =
     useLiveFundamentalsBatch(keys);
+  const { data: screenerRatios } = useScreenerRatiosBatch(keys);
   const { isPro, loading: subLoading } = useSubscription();
 
   if (stocks.length === 0) {
@@ -211,6 +222,7 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
               stock={s}
               quote={live?.[quoteKey(s)]}
               fundamentals={liveFundamentals?.[quoteKey(s)]}
+              screener={screenerRatios?.[quoteKey(s)]}
               isPro={isPro}
               subLoading={subLoading}
               delayMs={Math.min(i, 20) * 15}
@@ -220,11 +232,10 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
       </table>
       <p className="border-t border-border px-4 py-2 text-[11px] text-muted-foreground">
         <span className="mr-1 inline-block size-1.5 rounded-full bg-bull align-middle" /> Live price
-        for up to 60 rows here, refreshed every 15s. P/E and PEG are live (Yahoo Finance, refreshed
-        ~45s
+        for up to 60 rows here, refreshed every 15s. P/E, PEG and ROCE come from screener.in for
+        Indian stocks (refreshed ~60s) and Yahoo Finance elsewhere (refreshed ~45s
         {fundamentalsLoading ? ", updating…" : ""}) for the first {Math.min(30, stocks.length)} rows
-        in this view; the rest show modeled estimates, as does ROCE everywhere — Yahoo has no public
-        field for it.
+        in this view; the rest show modeled estimates until they refresh in.
         {!subLoading && !isPro ? (
           <>
             {" "}

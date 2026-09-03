@@ -31,13 +31,6 @@ export function Shell({ children }: { children: ReactNode }) {
               </Link>
             ))}
             <span className="mx-1 my-auto h-4 w-px shrink-0 bg-border" aria-hidden="true" />
-            <Link
-              to="/crypto"
-              activeProps={{ className: "bg-accent text-foreground" }}
-              className="num whitespace-nowrap rounded px-2.5 py-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-            >
-              Crypto
-            </Link>
             {(
               [
                 ["/portfolio", "Portfolio"],

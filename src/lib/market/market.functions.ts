@@ -245,24 +245,8 @@ export const getNewsFeed = createServerFn({ method: "GET" })
       .slice(0, limit);
   });
 
-export const getCryptoNews = createServerFn({ method: "GET" }).handler(
-  async (): Promise<FeedItem[]> => {
-    const { fetchFeed, dedupe } = await import("@/lib/rss.server");
-    const [a, b, c] = await Promise.all([
-      fetchFeed("https://www.coindesk.com/arc/outboundfeeds/rss/", "CoinDesk", "crypto", 10),
-      fetchFeed("https://cointelegraph.com/rss", "Cointelegraph", "crypto", 10),
-      fetchFeed(
-        "https://news.google.com/rss/search?q=bitcoin+OR+ethereum+OR+crypto+market&hl=en-US&gl=US&ceid=US:en",
-        "Google News",
-        "crypto",
-        10,
-      ),
-    ]);
-    return dedupe([...a, ...b, ...c])
-      .sort((x, y) => x.minutesAgo - y.minutesAgo)
-      .slice(0, 18);
-  },
-);
+
+
 
 // --- AAA corporate bond yield (feeds the Graham Formula's "Y") -------------
 
@@ -305,11 +289,12 @@ export const getAaaBondYield = createServerFn({ method: "GET" }).handler(
   },
 );
 
-// Per-symbol cache, 30 minutes — screener.in's summary ratios don't move
-// intraday except price, and this keeps the request volume against their
-// site low (this is scoped to the stock detail page only, never batched
-// across a table, unlike the Yahoo fetches above).
-const SCREENER_CACHE_TTL_MS = 30 * 60_000;
+// Per-symbol cache. Screener.in's summary ratios are the authoritative source
+// for Indian stocks (Yahoo's ROE/ROCE/D-E/PEG for NSE/BSE names are frequently
+// wrong or missing), so this is kept short enough that the page keeps pace with
+// their intraday updates while staying gentle on their site.
+const SCREENER_CACHE_TTL_MS = 5 * 60_000;
+
 const screenerCache = new Map<
   string,
   { data: import("./screener.server").ScreenerRatios; fetchedAt: number }
@@ -336,3 +321,51 @@ export const getScreenerRatios = createServerFn({ method: "GET" })
     // elsewhere (economic calendar, AAA yield).
     return cached?.data ?? null;
   });
+
+/**
+ * Batched screener.in ratios for a visible page of Indian rows.
+ *
+ * screener.in is rate-limited to one request every 2s inside
+ * screener.server.ts, so this stays deliberately small: cached symbols return
+ * instantly and only the uncached remainder (capped) actually hits the site.
+ * Anything not resolved this round simply falls back to Yahoo + the modeled
+ * estimate, and gets picked up on a later refresh once its cache entry warms.
+ */
+const SCREENER_BATCH_FETCH_LIMIT = 8;
+
+export const getScreenerRatiosBatch = createServerFn({ method: "GET" })
+  .inputValidator((d: { keys: { exchange: string; symbol: string }[] }) => d)
+  .handler(
+    async ({
+      data,
+    }): Promise<Record<string, import("./screener.server").ScreenerRatios | null>> => {
+      const indian = data.keys.filter((k) => k.exchange === "NSE" || k.exchange === "BSE");
+      const out: Record<string, import("./screener.server").ScreenerRatios | null> = {};
+      const toFetch: { exchange: string; symbol: string }[] = [];
+
+      for (const k of indian) {
+        const cached = screenerCache.get(k.symbol);
+        if (cached && Date.now() - cached.fetchedAt < SCREENER_CACHE_TTL_MS) {
+          out[`${k.exchange}:${k.symbol}`] = cached.data;
+        } else {
+          toFetch.push(k);
+        }
+      }
+
+      if (toFetch.length > 0) {
+        const { fetchScreenerRatios } = await import("./screener.server");
+        for (const k of toFetch.slice(0, SCREENER_BATCH_FETCH_LIMIT)) {
+          const ratios = await fetchScreenerRatios(k.symbol);
+          if (ratios) screenerCache.set(k.symbol, { data: ratios, fetchedAt: Date.now() });
+          out[`${k.exchange}:${k.symbol}`] =
+            ratios ?? screenerCache.get(k.symbol)?.data ?? null;
+        }
+        // Anything beyond the per-round cap: serve a stale entry if we have one.
+        for (const k of toFetch.slice(SCREENER_BATCH_FETCH_LIMIT)) {
+          out[`${k.exchange}:${k.symbol}`] = screenerCache.get(k.symbol)?.data ?? null;
+        }
+      }
+
+      return out;
+    },
+  );
