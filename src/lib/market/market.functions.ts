@@ -321,3 +321,51 @@ export const getScreenerRatios = createServerFn({ method: "GET" })
     // elsewhere (economic calendar, AAA yield).
     return cached?.data ?? null;
   });
+
+/**
+ * Batched screener.in ratios for a visible page of Indian rows.
+ *
+ * screener.in is rate-limited to one request every 2s inside
+ * screener.server.ts, so this stays deliberately small: cached symbols return
+ * instantly and only the uncached remainder (capped) actually hits the site.
+ * Anything not resolved this round simply falls back to Yahoo + the modeled
+ * estimate, and gets picked up on a later refresh once its cache entry warms.
+ */
+const SCREENER_BATCH_FETCH_LIMIT = 8;
+
+export const getScreenerRatiosBatch = createServerFn({ method: "GET" })
+  .inputValidator((d: { keys: { exchange: string; symbol: string }[] }) => d)
+  .handler(
+    async ({
+      data,
+    }): Promise<Record<string, import("./screener.server").ScreenerRatios | null>> => {
+      const indian = data.keys.filter((k) => k.exchange === "NSE" || k.exchange === "BSE");
+      const out: Record<string, import("./screener.server").ScreenerRatios | null> = {};
+      const toFetch: { exchange: string; symbol: string }[] = [];
+
+      for (const k of indian) {
+        const cached = screenerCache.get(k.symbol);
+        if (cached && Date.now() - cached.fetchedAt < SCREENER_CACHE_TTL_MS) {
+          out[`${k.exchange}:${k.symbol}`] = cached.data;
+        } else {
+          toFetch.push(k);
+        }
+      }
+
+      if (toFetch.length > 0) {
+        const { fetchScreenerRatios } = await import("./screener.server");
+        for (const k of toFetch.slice(0, SCREENER_BATCH_FETCH_LIMIT)) {
+          const ratios = await fetchScreenerRatios(k.symbol);
+          if (ratios) screenerCache.set(k.symbol, { data: ratios, fetchedAt: Date.now() });
+          out[`${k.exchange}:${k.symbol}`] =
+            ratios ?? screenerCache.get(k.symbol)?.data ?? null;
+        }
+        // Anything beyond the per-round cap: serve a stale entry if we have one.
+        for (const k of toFetch.slice(SCREENER_BATCH_FETCH_LIMIT)) {
+          out[`${k.exchange}:${k.symbol}`] = screenerCache.get(k.symbol)?.data ?? null;
+        }
+      }
+
+      return out;
+    },
+  );
