@@ -2,7 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 
 import { Shell } from "@/components/ds/Shell";
-import { quoteKey, useLiveFundamentalsBatch, useLiveQuotes } from "@/hooks/useLiveQuotes";
+import { quoteKey, useLiveFundamentalsBatch, useLiveQuotes
+  useScreenerRatiosBatch,
+} from "@/hooks/useLiveQuotes";
 import { useWatchlist } from "@/hooks/useWatchlist";
 import { formatPrice } from "@/lib/deepscreen/format";
 import { mergeLiveStock } from "@/lib/deepscreen/live-merge";
@@ -37,15 +39,16 @@ function PortfolioPage() {
   const keys = useMemo(() => stocks.map((s) => ({ exchange: s.exchange, symbol: s.symbol })), [stocks]);
   const { data: quotes } = useLiveQuotes(keys);
   const { data: funds } = useLiveFundamentalsBatch(keys);
+  const { data: screener } = useScreenerRatiosBatch(keys);
 
   const rows = useMemo(
     () =>
       stocks.map((s) => {
         const k = quoteKey(s);
-        const { stock } = mergeLiveStock(s, quotes?.[k], funds?.[k]);
+        const { stock } = mergeLiveStock(s, quotes?.[k], funds?.[k], screener?.[k]);
         return { stock, analysis: analyze(stock), plan: holdingPlan(stock) };
       }),
-    [stocks, quotes, funds],
+    [stocks, quotes, funds, screener],
   );
 
   const totals = useMemo(() => {

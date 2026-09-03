@@ -25,6 +25,8 @@ const QUOTE_BATCH_LIMIT = 60;
 // quoteSummary (fundamentals) needs a shared session/crumb and is heavier, so
 // keep that batch smaller to stay gentle on Yahoo's free endpoint.
 const FUNDAMENTALS_BATCH_LIMIT = 30;
+// screener.in ratios are cache-served per symbol, so a wider window is fine.
+const SCREENER_BATCH_LIMIT = 200;
 
 /** Batch live quotes for a list of rows. Refreshes every 15s. */
 export function useLiveQuotes(keys: QuoteKey[]) {
@@ -113,9 +115,12 @@ export function useScreenerRatios(exchange: string, symbol: string) {
 /** Batched screener.in ratios for the visible Indian rows of a table. */
 export function useScreenerRatiosBatch(keys: QuoteKey[]) {
   const fetchBatch = useServerFn(getScreenerRatiosBatch);
+  // Every Indian row in view is covered (not just the Yahoo batch window) —
+  // the server resolves cached symbols instantly and warms a few uncached ones
+  // each round, so coverage fills in across refreshes instead of being capped.
   const slice = keys
     .filter((k) => k.exchange === "NSE" || k.exchange === "BSE")
-    .slice(0, FUNDAMENTALS_BATCH_LIMIT);
+    .slice(0, SCREENER_BATCH_LIMIT);
   const idKey = slice.map(quoteKey).join(",");
 
   return useQuery({
