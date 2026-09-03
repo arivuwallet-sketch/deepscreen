@@ -92,9 +92,9 @@ export function useAaaYield() {
 }
 
 /**
- * Screener.in ratios for NSE/BSE stocks — scoped to the stock detail page
- * only (never batched across a table) to keep request volume against their
- * site low. Long stale time since these barely move intraday.
+ * Screener.in ratios for a single NSE/BSE stock. These are the authoritative
+ * P/E, ROE, ROCE, P/B, D/E, ROA and growth figures for Indian names (Yahoo's
+ * are often stale or missing), so keep them refreshing during the session.
  */
 export function useScreenerRatios(exchange: string, symbol: string) {
   const fetchRatios = useServerFn(getScreenerRatios);
@@ -102,6 +102,27 @@ export function useScreenerRatios(exchange: string, symbol: string) {
     queryKey: ["screener-ratios", exchange, symbol],
     queryFn: () => fetchRatios({ data: { exchange, symbol } }),
     enabled: exchange === "NSE" || exchange === "BSE",
-    staleTime: 20 * 60_000,
+    refetchInterval: 5 * 60_000,
+    refetchOnWindowFocus: true,
+    staleTime: 4 * 60_000,
   });
 }
+
+/** Batched screener.in ratios for the visible Indian rows of a table. */
+export function useScreenerRatiosBatch(keys: QuoteKey[]) {
+  const fetchBatch = useServerFn(getScreenerRatiosBatch);
+  const slice = keys
+    .filter((k) => k.exchange === "NSE" || k.exchange === "BSE")
+    .slice(0, FUNDAMENTALS_BATCH_LIMIT);
+  const idKey = slice.map(quoteKey).join(",");
+
+  return useQuery({
+    queryKey: ["screener-ratios-batch", idKey],
+    queryFn: () => fetchBatch({ data: { keys: slice } }),
+    enabled: slice.length > 0,
+    refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
+    staleTime: 45_000,
+  });
+}
+
