@@ -2,7 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 
 import { Shell } from "@/components/ds/Shell";
-import { quoteKey, useLiveFundamentalsBatch, useLiveQuotes
+import {
+  quoteKey,
+  useLiveFundamentalsBatch,
+  useLiveQuotes,
   useScreenerRatiosBatch,
 } from "@/hooks/useLiveQuotes";
 import { useWatchlist } from "@/hooks/useWatchlist";
