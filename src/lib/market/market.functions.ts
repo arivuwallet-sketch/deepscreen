@@ -245,24 +245,8 @@ export const getNewsFeed = createServerFn({ method: "GET" })
       .slice(0, limit);
   });
 
-export const getCryptoNews = createServerFn({ method: "GET" }).handler(
-  async (): Promise<FeedItem[]> => {
-    const { fetchFeed, dedupe } = await import("@/lib/rss.server");
-    const [a, b, c] = await Promise.all([
-      fetchFeed("https://www.coindesk.com/arc/outboundfeeds/rss/", "CoinDesk", "crypto", 10),
-      fetchFeed("https://cointelegraph.com/rss", "Cointelegraph", "crypto", 10),
-      fetchFeed(
-        "https://news.google.com/rss/search?q=bitcoin+OR+ethereum+OR+crypto+market&hl=en-US&gl=US&ceid=US:en",
-        "Google News",
-        "crypto",
-        10,
-      ),
-    ]);
-    return dedupe([...a, ...b, ...c])
-      .sort((x, y) => x.minutesAgo - y.minutesAgo)
-      .slice(0, 18);
-  },
-);
+
+
 
 // --- AAA corporate bond yield (feeds the Graham Formula's "Y") -------------
 
