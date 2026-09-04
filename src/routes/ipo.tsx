@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 import { Shell } from "@/components/ds/Shell";
 import { EXCHANGES } from "@/lib/deepscreen/exchanges";
 import { formatPrice } from "@/lib/deepscreen/format";
-import { IPOS, daysAway, ipoStatus, isTradable, type IpoStatus } from "@/lib/deepscreen/ipos";
+import { IPOS, daysAway, ipoStatus, type IpoStatus } from "@/lib/deepscreen/ipos";
 import { findStock } from "@/lib/deepscreen/stocks";
 import { getLiveIpos } from "@/lib/market/market.functions";
 import type { LiveIpo } from "@/lib/market/ipo.server";
@@ -277,6 +277,3 @@ function IpoPage() {
     </Shell>
   );
 }
-
-// isTradable kept exported-in-use elsewhere; referenced here to preserve import parity.
-void isTradable;
