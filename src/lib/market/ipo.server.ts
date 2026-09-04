@@ -224,9 +224,17 @@ async function fetchUs(): Promise<LiveIpo[]> {
     ),
   );
   for (const res of results) {
-    const data = (res as { data?: Record<string, { rows?: NasdaqRow[] } | null> } | null)?.data;
+    const data = (
+      res as {
+        data?: {
+          upcoming?: { upcomingTable?: { rows?: NasdaqRow[] } | null } | null;
+          priced?: { rows?: NasdaqRow[] } | null;
+          filed?: { rows?: NasdaqRow[] } | null;
+        };
+      } | null
+    )?.data;
     if (!data) continue;
-    out.push(...mapNasdaq(data.upcoming?.rows ?? [], "upcoming"));
+    out.push(...mapNasdaq(data.upcoming?.upcomingTable?.rows ?? [], "upcoming"));
     out.push(...mapNasdaq(data.priced?.rows ?? [], "priced"));
     out.push(...mapNasdaq(data.filed?.rows ?? [], "filed"));
   }
