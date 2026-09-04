@@ -139,10 +139,10 @@ function IpoPage() {
 
         <div className="num mt-3 flex flex-wrap gap-4 text-xs text-muted-foreground">
           <span>{all.length} issues tracked</span>
-          <span className="text-bull">{counts.open} open</span>
-          <span className="text-primary">{counts.upcoming} upcoming</span>
-          <span>{counts.closed} closed</span>
-          <span>{counts.listed} listed</span>
+          <span className="text-bull">{counts["open"]} open</span>
+          <span className="text-primary">{counts["upcoming"]} upcoming</span>
+          <span>{counts["closed"]} closed</span>
+          <span>{counts["listed"]} listed</span>
         </div>
 
         <input

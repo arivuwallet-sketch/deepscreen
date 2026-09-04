@@ -47,7 +47,7 @@ function parseNseDate(s: string | undefined): Date | null {
   const m = /^(\d{1,2})-([A-Za-z]{3})-(\d{4})$/.exec(s.trim());
   if (!m) return null;
   const months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
-  const mi = months.indexOf(m[2].toLowerCase());
+  const mi = months.indexOf((m[2] ?? "").toLowerCase());
   if (mi < 0) return null;
   return new Date(Date.UTC(Number(m[3]), mi, Number(m[1])));
 }
@@ -72,7 +72,7 @@ function parseBand(s: string | undefined): [number | null, number | null] {
   if (!s) return [null, null];
   const nums = (s.match(/[\d,]+(?:\.\d+)?/g) ?? []).map((x) => Number(x.replace(/,/g, "")));
   if (nums.length === 0) return [null, null];
-  if (nums.length === 1) return [nums[0], nums[0]];
+  if (nums.length === 1) return [nums[0] ?? null, nums[0] ?? null];
   return [Math.min(...nums), Math.max(...nums)];
 }
 
