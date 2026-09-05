@@ -74,6 +74,30 @@ export type Database = {
         }
         Relationships: []
       }
+      screener_ratios: {
+        Row: {
+          exchange: string
+          fetched_at: string
+          ratios: Json
+          resolved_slug: string | null
+          symbol: string
+        }
+        Insert: {
+          exchange: string
+          fetched_at?: string
+          ratios: Json
+          resolved_slug?: string | null
+          symbol: string
+        }
+        Update: {
+          exchange?: string
+          fetched_at?: string
+          ratios?: Json
+          resolved_slug?: string | null
+          symbol?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           created_at: string

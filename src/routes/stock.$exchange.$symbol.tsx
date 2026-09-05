@@ -66,7 +66,11 @@ function StockPage() {
     stock.exchange,
     stock.symbol,
   );
-  const { data: screenerRatios } = useScreenerRatios(stock.exchange, stock.symbol);
+  const { data: screenerRatios, dataUpdatedAt: screenerUpdatedAt } = useScreenerRatios(
+    stock.exchange,
+    stock.symbol,
+    stock.name,
+  );
   const { stock: live, sources } = mergeLiveStock(stock, quote, liveFundamentals, screenerRatios);
   const a = analyze(live);
   const f = live.fundamentals;
@@ -207,7 +211,7 @@ function StockPage() {
                 — hover any card for what the ratio means ·{" "}
                 {hasLiveFundamentals
                   ? isIndianExchange && screenerRatios
-                    ? `live via Yahoo Finance & Screener.in, updated ${new Date(fundUpdatedAt).toLocaleTimeString()}`
+                    ? `Screener.in filing ratios + live market data, updated ${new Date(Math.max(fundUpdatedAt, screenerUpdatedAt)).toLocaleTimeString()}`
                     : `live via Yahoo Finance, updated ${new Date(fundUpdatedAt).toLocaleTimeString()}`
                   : "fetching live data — showing modeled estimates for now"}
               </span>
@@ -233,7 +237,11 @@ function StockPage() {
                           isLive ? "bg-bull/15 text-bull" : "bg-muted text-muted-foreground",
                         )}
                       >
-                        {isLive ? "Live" : "Modeled"}
+                        {isLive
+                          ? isIndianExchange && screenerRatios
+                            ? "Screener"
+                            : "Live"
+                          : "Modeled"}
                       </span>
                     </div>
                     <p className="num mt-1 text-2xl font-bold">{m.display}</p>
