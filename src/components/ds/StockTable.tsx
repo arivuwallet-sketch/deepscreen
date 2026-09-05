@@ -182,7 +182,7 @@ function StockRow({
 }
 
 export function StockTable({ stocks }: { stocks: Stock[] }) {
-  const keys = stocks.map((s) => ({ exchange: s.exchange, symbol: s.symbol }));
+  const keys = stocks.map((s) => ({ exchange: s.exchange, symbol: s.symbol, name: s.name }));
   const { data: live } = useLiveQuotes(keys);
   const { data: liveFundamentals, isFetching: fundamentalsLoading } =
     useLiveFundamentalsBatch(keys);
@@ -232,10 +232,9 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
       </table>
       <p className="border-t border-border px-4 py-2 text-[11px] text-muted-foreground">
         <span className="mr-1 inline-block size-1.5 rounded-full bg-bull align-middle" /> Live price
-        for up to 60 rows here, refreshed every 15s. P/E, PEG and ROCE come from screener.in for
-        Indian stocks (refreshed ~60s) and Yahoo Finance elsewhere (refreshed ~45s
-        {fundamentalsLoading ? ", updating…" : ""}) for the first {Math.min(30, stocks.length)} rows
-        in this view; the rest show modeled estimates until they refresh in.
+        refreshed every 15s. Indian ratios are fetched from Screener.in and retained in the shared
+        cache; Yahoo Finance supplies other exchanges
+        {fundamentalsLoading ? " (updating…)" : ""}. Hover a ratio to see its source.
         {!subLoading && !isPro ? (
           <>
             {" "}

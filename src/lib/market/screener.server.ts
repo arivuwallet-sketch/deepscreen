@@ -35,6 +35,8 @@ export interface ScreenerRatios {
   deRatio: number | null;
   /** Return on assets % computed from balance sheet + P&L (most recent year). */
   roaPct: number | null;
+  /** Screener company path that produced these figures. */
+  resolvedSlug?: string;
 }
 
 /**
@@ -184,21 +186,8 @@ function extractBalanceSheetAndCompute(html: string): {
   };
 }
 
-// Global rate limiter — Screener.in returns 429 when hit with too many
-// requests in quick succession.  Serialise fetches with a 2-second gap.
-let lastFetchAt = 0;
-const MIN_GAP_MS = 2000;
-
-async function rateLimitedFetch(url: string, init: RequestInit): Promise<Response> {
-  const now = Date.now();
-  const wait = Math.max(0, MIN_GAP_MS - (now - lastFetchAt));
-  if (wait > 0) await new Promise((r) => setTimeout(r, wait));
-  lastFetchAt = Date.now();
-  return fetch(url, init);
-}
-
 async function fetchAndParse(url: string): Promise<ScreenerRatios | null> {
-  const res = await rateLimitedFetch(url, {
+  const res = await fetch(url, {
     headers: { "User-Agent": UA, Accept: "text/html" },
     signal: AbortSignal.timeout(9000),
   });
@@ -223,6 +212,7 @@ async function fetchAndParse(url: string): Promise<ScreenerRatios | null> {
     earningsGrowth3YPct: extractProfitGrowth(html, "3 Years"),
     deRatio,
     roaPct,
+    resolvedSlug: new URL(res.url).pathname,
   };
 
   // If NONE of the fields resolved, the label-matching heuristic almost
@@ -232,8 +222,54 @@ async function fetchAndParse(url: string): Promise<ScreenerRatios | null> {
   return anyField ? ratios : null;
 }
 
-export async function fetchScreenerRatios(symbol: string): Promise<ScreenerRatios | null> {
+interface SearchHit {
+  id?: number;
+  name?: string;
+  url?: string;
+}
+
+function normalizedWords(value: string): string[] {
+  return value
+    .toLowerCase()
+    .replace(/\b(limited|ltd|plc|inc|company|co)\b/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+}
+
+async function searchCompany(query: string, companyName?: string): Promise<string | null> {
+  if (!query.trim()) return null;
+  const res = await fetch(`https://www.screener.in/api/company/search/?q=${encodeURIComponent(query)}`, {
+    headers: { "User-Agent": UA, Accept: "application/json" },
+    signal: AbortSignal.timeout(7000),
+  });
+  if (!res.ok) return null;
+  const hits = (await res.json()) as SearchHit[];
+  if (!Array.isArray(hits) || hits.length === 0) return null;
+
+  const wanted = new Set(normalizedWords(companyName ?? query));
+  const ranked = hits
+    .filter((hit) => typeof hit.url === "string" && hit.url.startsWith("/company/"))
+    .map((hit) => {
+      const words = normalizedWords(hit.name ?? "");
+      const overlap = words.filter((word) => wanted.has(word)).length;
+      return { hit, score: overlap / Math.max(1, wanted.size) };
+    })
+    .sort((a, b) => b.score - a.score);
+  return ranked[0]?.hit.url ?? null;
+}
+
+export async function fetchScreenerRatios(
+  symbol: string,
+  companyName?: string,
+  knownSlug?: string | null,
+): Promise<ScreenerRatios | null> {
   try {
+    if (knownSlug) {
+      const known = await fetchAndParse(new URL(knownSlug, "https://www.screener.in").toString());
+      if (known) return known;
+    }
     // /consolidated/ first — the standalone page shows wrong values for
     // some companies (e.g. RELIANCE shows P/E 44.4 which is actually
     // PB×PE, not the real P/E of 23.2). Consolidated is correct.
@@ -252,7 +288,19 @@ export async function fetchScreenerRatios(symbol: string): Promise<ScreenerRatio
     );
     if (consolidated) return consolidated;
 
-    return await fetchAndParse(`https://www.screener.in/company/${encodeURIComponent(symbol)}/`);
+    const standalone = await fetchAndParse(
+      `https://www.screener.in/company/${encodeURIComponent(symbol)}/`,
+    );
+    if (standalone) return standalone;
+
+    // Some exchange symbols do not match Screener's slug (notably numeric BSE
+    // pages and renamed/demerged companies). Resolve those through the same
+    // search endpoint used by Screener's own search box.
+    const symbolMatch = await searchCompany(symbol, companyName);
+    const nameMatch = symbolMatch ?? (companyName ? await searchCompany(companyName, companyName) : null);
+    return nameMatch
+      ? await fetchAndParse(new URL(nameMatch, "https://www.screener.in").toString())
+      : null;
   } catch {
     return null;
   }

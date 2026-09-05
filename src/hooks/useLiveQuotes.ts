@@ -15,6 +15,7 @@ import {
 export interface QuoteKey {
   exchange: string;
   symbol: string;
+  name?: string;
 }
 
 export const quoteKey = (k: QuoteKey) => `${k.exchange}:${k.symbol}`;
@@ -100,11 +101,11 @@ export function useAaaYield() {
  * P/E, ROE, ROCE, P/B, D/E, ROA and growth figures for Indian names (Yahoo's
  * are often stale or missing), so keep them refreshing during the session.
  */
-export function useScreenerRatios(exchange: string, symbol: string) {
+export function useScreenerRatios(exchange: string, symbol: string, name?: string) {
   const fetchRatios = useServerFn(getScreenerRatios);
   return useQuery({
     queryKey: ["screener-ratios", exchange, symbol],
-    queryFn: () => fetchRatios({ data: { exchange, symbol } }),
+    queryFn: () => fetchRatios({ data: { exchange, symbol, name } }),
     enabled: exchange === "NSE" || exchange === "BSE",
     refetchInterval: 5 * 60_000,
     refetchOnWindowFocus: true,
