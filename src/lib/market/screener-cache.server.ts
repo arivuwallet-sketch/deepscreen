@@ -48,7 +48,7 @@ export async function writeScreenerCache(rows: CachedScreenerRatio[]): Promise<v
         exchange: row.exchange,
         symbol: row.symbol,
         resolved_slug: row.resolvedSlug,
-        ratios: row.data,
+        ratios: row.data as unknown as import("@/integrations/supabase/types").Json,
         fetched_at: new Date(row.fetchedAt).toISOString(),
       })),
       { onConflict: "exchange,symbol" },

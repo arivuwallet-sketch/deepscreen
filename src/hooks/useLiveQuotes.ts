@@ -105,7 +105,7 @@ export function useScreenerRatios(exchange: string, symbol: string, name?: strin
   const fetchRatios = useServerFn(getScreenerRatios);
   return useQuery({
     queryKey: ["screener-ratios", exchange, symbol],
-    queryFn: () => fetchRatios({ data: { exchange, symbol, name } }),
+    queryFn: () => fetchRatios({ data: name ? { exchange, symbol, name } : { exchange, symbol } }),
     enabled: exchange === "NSE" || exchange === "BSE",
     refetchInterval: 5 * 60_000,
     refetchOnWindowFocus: true,
