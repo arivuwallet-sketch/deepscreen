@@ -289,86 +289,149 @@ export const getAaaBondYield = createServerFn({ method: "GET" }).handler(
   },
 );
 
-// Per-symbol cache. Screener.in's summary ratios are the authoritative source
-// for Indian stocks (Yahoo's ROE/ROCE/D-E/PEG for NSE/BSE names are frequently
-// wrong or missing), so this is kept short enough that the page keeps pace with
-// their intraday updates while staying gentle on their site.
+// Screener.in's summary ratios are the authoritative source for Indian stocks
+// (Yahoo's ROE/ROCE/D-E/PEG for NSE/BSE names are frequently wrong or
+// missing). Two cache layers sit in front of it: a per-instance memory map for
+// the hot path, and the shared `screener_ratios` table so a symbol fetched for
+// one visitor is instantly available to everyone else (and survives restarts).
 const SCREENER_CACHE_TTL_MS = 5 * 60_000;
+// How many uncached symbols one batch round is allowed to resolve upstream,
+// and how many of those may be in flight at once. Everything else is served
+// from cache this round and warmed on a later refresh.
+const SCREENER_WARM_LIMIT = 24;
+const SCREENER_WARM_CONCURRENCY = 6;
 
-const screenerCache = new Map<
-  string,
-  { data: import("./screener.server").ScreenerRatios; fetchedAt: number }
->();
+type Ratios = import("./screener.server").ScreenerRatios;
+
+const screenerCache = new Map<string, { data: Ratios; fetchedAt: number; slug: string | null }>();
+
+const ck = (exchange: string, symbol: string) => `${exchange}:${symbol}`;
+const isIndian = (exchange: string) => exchange === "NSE" || exchange === "BSE";
+
+/** Resolve one symbol upstream and persist it to both cache layers. */
+async function warmScreener(
+  key: { exchange: string; symbol: string; name?: string },
+  knownSlug: string | null,
+): Promise<Ratios | null> {
+  const { fetchScreenerRatios } = await import("./screener.server");
+  const ratios = await fetchScreenerRatios(key.symbol, key.name, knownSlug);
+  if (!ratios) return null;
+  screenerCache.set(ck(key.exchange, key.symbol), {
+    data: ratios,
+    fetchedAt: Date.now(),
+    slug: ratios.resolvedSlug ?? knownSlug ?? null,
+  });
+  return ratios;
+}
 
 export const getScreenerRatios = createServerFn({ method: "GET" })
-  .inputValidator((d: { exchange: string; symbol: string }) => d)
-  .handler(async ({ data }): Promise<import("./screener.server").ScreenerRatios | null> => {
-    // Screener.in only covers Indian exchanges — nothing to fetch otherwise.
-    if (data.exchange !== "NSE" && data.exchange !== "BSE") return null;
+  .inputValidator((d: { exchange: string; symbol: string; name?: string }) => d)
+  .handler(async ({ data }): Promise<Ratios | null> => {
+    if (!isIndian(data.exchange)) return null;
+    const key = ck(data.exchange, data.symbol);
 
-    const cached = screenerCache.get(data.symbol);
-    if (cached && Date.now() - cached.fetchedAt < SCREENER_CACHE_TTL_MS) {
-      return cached.data;
+    const mem = screenerCache.get(key);
+    if (mem && Date.now() - mem.fetchedAt < SCREENER_CACHE_TTL_MS) return mem.data;
+
+    const { readScreenerCache, writeScreenerCache } = await import("./screener-cache.server");
+    const db = (await readScreenerCache([data])).get(key);
+    if (db) {
+      screenerCache.set(key, { data: db.data, fetchedAt: db.fetchedAt, slug: db.resolvedSlug });
+      if (Date.now() - db.fetchedAt < SCREENER_CACHE_TTL_MS) return db.data;
     }
 
-    const { fetchScreenerRatios } = await import("./screener.server");
-    const ratios = await fetchScreenerRatios(data.symbol);
-    if (ratios) {
-      screenerCache.set(data.symbol, { data: ratios, fetchedAt: Date.now() });
-      return ratios;
+    const slug = db?.resolvedSlug ?? mem?.slug ?? null;
+    const fresh = await warmScreener(data, slug);
+    if (fresh) {
+      await writeScreenerCache([
+        {
+          exchange: data.exchange as "NSE" | "BSE",
+          symbol: data.symbol,
+          resolvedSlug: fresh.resolvedSlug ?? slug,
+          data: fresh,
+          fetchedAt: Date.now(),
+        },
+      ]);
+      return fresh;
     }
-    // Serve stale cache over nothing, same resilience pattern used
-    // elsewhere (economic calendar, AAA yield).
-    return cached?.data ?? null;
+    // Serve stale over nothing — same resilience pattern used elsewhere.
+    return db?.data ?? mem?.data ?? null;
   });
 
 /**
- * Batched screener.in ratios for a visible page of Indian rows.
- *
- * screener.in is rate-limited to one request every 2s inside
- * screener.server.ts, so this stays deliberately small: cached symbols return
- * instantly and only the uncached remainder (capped) actually hits the site.
- * Anything not resolved this round simply falls back to Yahoo + the modeled
- * estimate, and gets picked up on a later refresh once its cache entry warms.
+ * Batched screener.in ratios for a visible page of Indian rows. Cached symbols
+ * (memory, then the shared table) return instantly; a bounded slice of the
+ * uncached remainder is resolved upstream in parallel each round and written
+ * back so subsequent views — for every user — are served straight from cache.
  */
-const SCREENER_BATCH_FETCH_LIMIT = 8;
+export const getScreenerRatiosBatch = createServerFn({ method: "POST" })
+  .inputValidator((d: { keys: { exchange: string; symbol: string; name?: string }[] }) => d)
+  .handler(async ({ data }): Promise<Record<string, Ratios | null>> => {
+    const indian = data.keys.filter((k) => isIndian(k.exchange));
+    const out: Record<string, Ratios | null> = {};
+    if (indian.length === 0) return out;
 
-export const getScreenerRatiosBatch = createServerFn({ method: "GET" })
-  .inputValidator((d: { keys: { exchange: string; symbol: string }[] }) => d)
-  .handler(
-    async ({
-      data,
-    }): Promise<Record<string, import("./screener.server").ScreenerRatios | null>> => {
-      const indian = data.keys.filter((k) => k.exchange === "NSE" || k.exchange === "BSE");
-      const out: Record<string, import("./screener.server").ScreenerRatios | null> = {};
-      const toFetch: { exchange: string; symbol: string }[] = [];
+    const now = () => Date.now();
+    const pending: typeof indian = [];
 
-      for (const k of indian) {
-        const cached = screenerCache.get(k.symbol);
-        if (cached && Date.now() - cached.fetchedAt < SCREENER_CACHE_TTL_MS) {
-          out[`${k.exchange}:${k.symbol}`] = cached.data;
-        } else {
-          toFetch.push(k);
-        }
+    for (const k of indian) {
+      const mem = screenerCache.get(ck(k.exchange, k.symbol));
+      if (mem && now() - mem.fetchedAt < SCREENER_CACHE_TTL_MS) {
+        out[ck(k.exchange, k.symbol)] = mem.data;
+      } else {
+        pending.push(k);
       }
+    }
 
-      if (toFetch.length > 0) {
-        const { fetchScreenerRatios } = await import("./screener.server");
-        for (const k of toFetch.slice(0, SCREENER_BATCH_FETCH_LIMIT)) {
-          const ratios = await fetchScreenerRatios(k.symbol);
-          if (ratios) screenerCache.set(k.symbol, { data: ratios, fetchedAt: Date.now() });
-          out[`${k.exchange}:${k.symbol}`] =
-            ratios ?? screenerCache.get(k.symbol)?.data ?? null;
-        }
-        // Anything beyond the per-round cap: serve a stale entry if we have one.
-        for (const k of toFetch.slice(SCREENER_BATCH_FETCH_LIMIT)) {
-          out[`${k.exchange}:${k.symbol}`] = screenerCache.get(k.symbol)?.data ?? null;
-        }
+    if (pending.length === 0) return out;
+
+    const { readScreenerCache, writeScreenerCache } = await import("./screener-cache.server");
+    const db = await readScreenerCache(pending);
+    const toWarm: { key: (typeof pending)[number]; slug: string | null }[] = [];
+
+    for (const k of pending) {
+      const key = ck(k.exchange, k.symbol);
+      const row = db.get(key);
+      if (row) {
+        screenerCache.set(key, {
+          data: row.data,
+          fetchedAt: row.fetchedAt,
+          slug: row.resolvedSlug,
+        });
+        out[key] = row.data; // stale-but-real beats a Yahoo fallback
+        if (now() - row.fetchedAt < SCREENER_CACHE_TTL_MS) continue;
+      } else {
+        out[key] = null;
       }
+      toWarm.push({ key: k, slug: row?.resolvedSlug ?? null });
+    }
 
-      return out;
-    },
-  );
+    const queue = toWarm.slice(0, SCREENER_WARM_LIMIT);
+    const written: import("./screener-cache.server").CachedScreenerRatio[] = [];
+    let cursor = 0;
+
+    await Promise.all(
+      Array.from({ length: Math.min(SCREENER_WARM_CONCURRENCY, queue.length) }, async () => {
+        while (cursor < queue.length) {
+          const job = queue[cursor++]!;
+          const ratios = await warmScreener(job.key, job.slug);
+          if (!ratios) continue;
+          const key = ck(job.key.exchange, job.key.symbol);
+          out[key] = ratios;
+          written.push({
+            exchange: job.key.exchange as "NSE" | "BSE",
+            symbol: job.key.symbol,
+            resolvedSlug: ratios.resolvedSlug ?? job.slug,
+            data: ratios,
+            fetchedAt: Date.now(),
+          });
+        }
+      }),
+    );
+
+    await writeScreenerCache(written);
+    return out;
+  });
 
 /** Full live IPO pipeline across NSE, BSE, NYSE and NASDAQ. */
 export const getLiveIpos = createServerFn({ method: "GET" }).handler(async () => {
