@@ -364,7 +364,7 @@ export const getScreenerRatios = createServerFn({ method: "GET" })
  * uncached remainder is resolved upstream in parallel each round and written
  * back so subsequent views — for every user — are served straight from cache.
  */
-export const getScreenerRatiosBatch = createServerFn({ method: "GET" })
+export const getScreenerRatiosBatch = createServerFn({ method: "POST" })
   .inputValidator((d: { keys: { exchange: string; symbol: string; name?: string }[] }) => d)
   .handler(async ({ data }): Promise<Record<string, Ratios | null>> => {
     const indian = data.keys.filter((k) => isIndian(k.exchange));
