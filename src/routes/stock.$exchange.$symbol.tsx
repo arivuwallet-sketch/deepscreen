@@ -85,6 +85,12 @@ function StockPage() {
   const changePct = live.changePct;
   const hasLiveFundamentals = Object.values(sources).some((v) => v === "live");
   const isIndianExchange = stock.exchange === "NSE" || stock.exchange === "BSE";
+  const intel = buildIntel({
+    stock: live,
+    live: liveFundamentals,
+    screener: screenerRatios,
+    quote,
+  });
 
   return (
     <Shell>
