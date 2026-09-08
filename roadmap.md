@@ -35,3 +35,9 @@ Source: uploaded 12-section spec (Sept 2026).
 ## Phase 6 — Portfolio X-Ray
 - [ ] CSV import (broker exports)
 - [ ] Portfolio Piotroski audit, forensic exposure, generational moat coverage
+
+## Index mapping (uploaded spec)
+- [x] Index membership engine (all 25 indices, 5 exchanges) — src/lib/deepscreen/indices.ts
+- [x] Membership pill bar on stock detail pages
+- [x] Multi-select "Filter by Index" in exchange screener
+- Note: flagship indices use curated constituents; broad indices derive from live market-cap ranking so zero stocks are orphaned
