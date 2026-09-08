@@ -162,11 +162,13 @@ function AuthPage() {
           <Button type="submit" className="w-full" disabled={busy}>
             {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
           </Button>
-          <Button type="button" variant="outline" className="w-full" onClick={google}>
+          <Button type="button" variant="outline" className="w-full" onClick={google} disabled={busy}>
             Continue with Google
           </Button>
         </form>
+        )}
 
+        {!checkEmail && (
         <button
           type="button"
           className="mt-4 text-xs text-muted-foreground underline"
@@ -174,6 +176,7 @@ function AuthPage() {
         >
           {mode === "signin" ? "No account yet? Create one" : "Already have an account? Sign in"}
         </button>
+        )}
       </div>
     </Shell>
   );
