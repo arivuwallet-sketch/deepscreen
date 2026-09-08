@@ -5,6 +5,7 @@ import { Shell } from "@/components/ds/Shell";
 import { LiveNewsFeed } from "@/components/ds/LiveNewsFeed";
 import { StockTable } from "@/components/ds/StockTable";
 import { EXCHANGES, getExchange } from "@/lib/deepscreen/exchanges";
+import { indicesForExchange, isInIndex } from "@/lib/deepscreen/indices";
 import { SECTORS, stocksByExchange } from "@/lib/deepscreen/stocks";
 import { analyze } from "@/lib/deepscreen/metrics";
 import { CAP_LABEL } from "@/lib/deepscreen/format";
