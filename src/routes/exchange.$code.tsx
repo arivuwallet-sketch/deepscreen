@@ -142,6 +142,23 @@ function ExchangePage() {
             <option value="changePct">Top movers</option>
           </select>
 
+          <span className="num ml-4 text-xs uppercase text-muted-foreground">Filter by Index</span>
+          {indicesHere.map((idx) => (
+            <button
+              key={idx.id}
+              title={idx.blurb}
+              onClick={() => toggleIndex(idx.id)}
+              className={cn(
+                "rounded border px-3 py-1.5 text-xs transition-colors",
+                indexIds.includes(idx.id)
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {idx.name}
+            </button>
+          ))}
+
           <span className="num ml-auto text-xs text-muted-foreground">
             {filtered.length.toLocaleString()} / {all.length.toLocaleString()} companies
           </span>
