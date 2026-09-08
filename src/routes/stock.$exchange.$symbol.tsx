@@ -148,6 +148,27 @@ function StockPage() {
           </div>
         </header>
 
+        {(() => {
+          const memberships = getIndexMemberships(stock.exchange, stock.symbol);
+          if (memberships.length === 0) return null;
+          return (
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <span className="num text-[11px] uppercase tracking-wide text-muted-foreground">
+                🏛️ Member of:
+              </span>
+              {memberships.map((idx) => (
+                <span
+                  key={idx.id}
+                  title={idx.blurb}
+                  className="num rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary"
+                >
+                  {idx.name}
+                </span>
+              ))}
+            </div>
+          );
+        })()}
+
         <PaywallGate
           feature="DeepScreen's 12-factor deep score & verdict"
           className="mt-6"
