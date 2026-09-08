@@ -134,11 +134,144 @@ const FLAGS: Record<string, string> = {
 // stale) is served rather than surfacing an error, since calendar data
 // barely changes minute to minute — an error page over slightly-stale data
 // is a worse trade for the user.
-const CACHE_TTL_MS = 5 * 60_000 + 30_000; // 5.5 min — under the 2-per-5-min budget with margin
+// The primary source is now TradingView's public economic-calendar endpoint,
+// which — unlike ForexFactory's weekly JSON/XML feed — publishes the ACTUAL
+// released figure alongside forecast and previous. FF stays as a fallback for
+// when TV is unreachable, but FF alone can never fill the "Actual" column.
+// A short 60s cache keeps releases appearing within a minute of publication
+// while still collapsing every visitor onto one upstream request.
+const CACHE_TTL_MS = 60_000;
 let calendarCache: { data: LiveEvent[]; fetchedAt: number } | null = null;
 let inFlight: Promise<LiveEvent[]> | null = null;
 
+const CURRENCY_BY_COUNTRY: Record<string, string> = {
+  US: "USD",
+  EU: "EUR",
+  DE: "EUR",
+  FR: "EUR",
+  IT: "EUR",
+  ES: "EUR",
+  GB: "GBP",
+  JP: "JPY",
+  IN: "INR",
+  CN: "CNY",
+  AU: "AUD",
+  NZ: "NZD",
+  CA: "CAD",
+  CH: "CHF",
+  SG: "SGD",
+  HK: "HKD",
+};
+
+const COUNTRY_FLAGS: Record<string, string> = {
+  US: "🇺🇸",
+  EU: "🇪🇺",
+  DE: "🇩🇪",
+  FR: "🇫🇷",
+  IT: "🇮🇹",
+  ES: "🇪🇸",
+  GB: "🇬🇧",
+  JP: "🇯🇵",
+  IN: "🇮🇳",
+  CN: "🇨🇳",
+  AU: "🇦🇺",
+  NZ: "🇳🇿",
+  CA: "🇨🇦",
+  CH: "🇨🇭",
+  SG: "🇸🇬",
+  HK: "🇭🇰",
+  BR: "🇧🇷",
+  KR: "🇰🇷",
+  MX: "🇲🇽",
+  ZA: "🇿🇦",
+  RU: "🇷🇺",
+  TR: "🇹🇷",
+};
+
+/** Renders a TradingView numeric release with its unit/scale, e.g. 2.5% or $1.2B. */
+function formatEventValue(
+  value: number | null | undefined,
+  unit: string | null | undefined,
+  scale: string | null | undefined,
+): string {
+  if (typeof value !== "number" || !Number.isFinite(value)) return "—";
+  const n = Math.abs(value) >= 1000 ? value.toLocaleString("en-US") : String(Number(value.toFixed(2)));
+  const tail = `${n}${scale ?? ""}`;
+  if (!unit) return tail;
+  if (unit === "%") return `${tail}%`;
+  // Currency symbols read as prefixes ($1.2B), everything else as a suffix.
+  return /^[$€¥£]$/.test(unit) ? `${unit}${tail}` : `${tail} ${unit}`;
+}
+
+interface TvEvent {
+  id: string;
+  title: string;
+  country: string;
+  currency?: string | null;
+  period?: string | null;
+  importance: number;
+  date: string;
+  unit?: string | null;
+  scale?: string | null;
+  actual?: number | null;
+  forecast?: number | null;
+  previous?: number | null;
+}
+
+/** TradingView economic calendar — the only free source here that carries actuals. */
+async function fetchTradingViewCalendar(): Promise<LiveEvent[] | null> {
+  const from = new Date();
+  from.setUTCDate(from.getUTCDate() - 2);
+  from.setUTCHours(0, 0, 0, 0);
+  const to = new Date(from);
+  to.setUTCDate(to.getUTCDate() + 9);
+
+  const url =
+    `https://economic-calendar.tradingview.com/events?from=${from.toISOString()}&to=${to.toISOString()}` +
+    `&countries=US,EU,DE,FR,IT,ES,GB,JP,IN,CN,AU,NZ,CA,CH,HK,SG,BR,KR,MX,ZA,TR`;
+
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; DeepScreen Market Research)",
+        Origin: "https://www.tradingview.com",
+        Accept: "application/json",
+      },
+      signal: AbortSignal.timeout(9000),
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as { status?: string; result?: TvEvent[] };
+    const rows = json.result;
+    if (!Array.isArray(rows) || rows.length === 0) return null;
+
+    return rows.map((e) => {
+      const d = new Date(e.date);
+      const currency = e.currency || CURRENCY_BY_COUNTRY[e.country] || e.country;
+      return {
+        id: `tv-${e.id}`,
+        title: e.period ? `${e.title} (${e.period})` : e.title,
+        currency,
+        flag: COUNTRY_FLAGS[e.country] ?? FLAGS[currency] ?? "🏳️",
+        impact: e.importance >= 1 ? "high" : e.importance === 0 ? "medium" : "low",
+        actual: formatEventValue(e.actual, e.unit, e.scale),
+        forecast: formatEventValue(e.forecast, e.unit, e.scale),
+        previous: formatEventValue(e.previous, e.unit, e.scale),
+        dateIso: d.toISOString(),
+        dayKey: d.toISOString().slice(0, 10),
+      } satisfies LiveEvent;
+    });
+  } catch {
+    return null;
+  }
+}
+
 async function fetchAndBuildCalendar(): Promise<LiveEvent[]> {
+  const tv = await fetchTradingViewCalendar();
+  if (tv && tv.length > 0) return tv;
+  return fetchForexFactoryCalendar();
+}
+
+async function fetchForexFactoryCalendar(): Promise<LiveEvent[]> {
   type RawEvent = {
     title: string;
     country: string;
