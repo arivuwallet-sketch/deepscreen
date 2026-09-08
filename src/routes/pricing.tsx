@@ -13,8 +13,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/pricing")({
-  validateSearch: (search: Record<string, unknown>): { cf_link_id?: string } =>
-    typeof search["cf_link_id"] === "string" ? { cf_link_id: search["cf_link_id"] } : {},
   head: () => ({
     meta: [
       { title: "DeepScreen Pro Pricing — ₹25 Weekly, ₹75 Monthly, ₹800 Yearly" },
@@ -59,7 +57,7 @@ function PricingPage() {
   const { user } = useAuth();
   const { isPro, tier, expiresAt, refresh } = useSubscription();
   const navigate = useNavigate();
-  const search = Route.useSearch();
+  const [linkId, setLinkId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
   const checkout = useServerFn(createCheckout);
@@ -67,7 +65,11 @@ function PricingPage() {
   const confirmed = useRef<string | null>(null);
 
   useEffect(() => {
-    const linkId = search.cf_link_id;
+    const q = new URLSearchParams(window.location.search).get("cf_link_id");
+    if (q) setLinkId(q);
+  }, []);
+
+  useEffect(() => {
     if (!linkId || !user || confirmed.current === linkId) return;
     confirmed.current = linkId;
     setVerifying(true);
@@ -80,7 +82,7 @@ function PricingPage() {
       }
       const res = await confirm({ data: { linkId, accessToken } });
       setVerifying(false);
-      void navigate({ to: "/pricing", search: () => ({}), replace: true });
+      window.history.replaceState({}, "", "/pricing");
       if (!res.ok) {
         toast.error(res.error);
         return;
@@ -92,7 +94,7 @@ function PricingPage() {
         toast.error(`Payment not completed (${res.status}). Nothing was charged.`);
       }
     })();
-  }, [search.cf_link_id, user, confirm, navigate, refresh]);
+  }, [linkId, user, confirm, refresh]);
 
   const start = async (plan: Plan) => {
     if (!user) {
