@@ -17,6 +17,7 @@ import { Route as OptionsRouteImport } from './routes/options'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as ExchangeCodeRouteImport } from './routes/exchange.$code'
+import { Route as ApiPublicCashfreeWebhookRouteImport } from './routes/api/public/cashfree-webhook'
 import { Route as StockExchangeSymbolRouteImport } from './routes/stock.$exchange.$symbol'
 
 const IndexRoute = IndexRouteImport.update({
@@ -59,6 +60,12 @@ const ExchangeCodeRoute = ExchangeCodeRouteImport.update({
   path: '/exchange/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCashfreeWebhookRoute =
+  ApiPublicCashfreeWebhookRouteImport.update({
+    id: '/api/public/cashfree-webhook',
+    path: '/api/public/cashfree-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const StockExchangeSymbolRoute = StockExchangeSymbolRouteImport.update({
   id: '/stock/$exchange/$symbol',
   path: '/stock/$exchange/$symbol',
@@ -74,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
   '/exchange/$code': typeof ExchangeCodeRoute
+  '/api/public/cashfree-webhook': typeof ApiPublicCashfreeWebhookRoute
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
 }
 export interface FileRoutesByTo {
@@ -85,6 +93,7 @@ export interface FileRoutesByTo {
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
   '/exchange/$code': typeof ExchangeCodeRoute
+  '/api/public/cashfree-webhook': typeof ApiPublicCashfreeWebhookRoute
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
 }
 export interface FileRoutesById {
@@ -97,6 +106,7 @@ export interface FileRoutesById {
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
   '/exchange/$code': typeof ExchangeCodeRoute
+  '/api/public/cashfree-webhook': typeof ApiPublicCashfreeWebhookRoute
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
 }
 export interface FileRouteTypes {
@@ -110,6 +120,7 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/pricing'
     | '/exchange/$code'
+    | '/api/public/cashfree-webhook'
     | '/stock/$exchange/$symbol'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -121,6 +132,7 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/pricing'
     | '/exchange/$code'
+    | '/api/public/cashfree-webhook'
     | '/stock/$exchange/$symbol'
   id:
     | '__root__'
@@ -132,6 +144,7 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/pricing'
     | '/exchange/$code'
+    | '/api/public/cashfree-webhook'
     | '/stock/$exchange/$symbol'
   fileRoutesById: FileRoutesById
 }
@@ -144,6 +157,7 @@ export interface RootRouteChildren {
   PortfolioRoute: typeof PortfolioRoute
   PricingRoute: typeof PricingRoute
   ExchangeCodeRoute: typeof ExchangeCodeRoute
+  ApiPublicCashfreeWebhookRoute: typeof ApiPublicCashfreeWebhookRoute
   StockExchangeSymbolRoute: typeof StockExchangeSymbolRoute
 }
 
@@ -205,6 +219,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExchangeCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/cashfree-webhook': {
+      id: '/api/public/cashfree-webhook'
+      path: '/api/public/cashfree-webhook'
+      fullPath: '/api/public/cashfree-webhook'
+      preLoaderRoute: typeof ApiPublicCashfreeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/stock/$exchange/$symbol': {
       id: '/stock/$exchange/$symbol'
       path: '/stock/$exchange/$symbol'
@@ -224,6 +245,7 @@ const rootRouteChildren: RootRouteChildren = {
   PortfolioRoute: PortfolioRoute,
   PricingRoute: PricingRoute,
   ExchangeCodeRoute: ExchangeCodeRoute,
+  ApiPublicCashfreeWebhookRoute: ApiPublicCashfreeWebhookRoute,
   StockExchangeSymbolRoute: StockExchangeSymbolRoute,
 }
 export const routeTree = rootRouteImport
