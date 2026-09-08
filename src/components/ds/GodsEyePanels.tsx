@@ -105,7 +105,7 @@ function ScoreBlock({
   );
 }
 
-export function ForensicPanel({ intel }: { intel: Intel }) {
+export function ForensicPanel({ intel, locked = false }: { intel: Intel; locked?: boolean }) {
   const { piotroski, altman, beneish } = intel.forensics;
   return (
     <div className="card-hover rounded-lg border border-border bg-panel p-5">
