@@ -149,23 +149,31 @@ function PricingPage() {
               key={p.tier}
               className={cn(
                 "flex flex-col rounded-lg border bg-panel p-6",
-                p.tier === "monthly"
+                p.tier === "annual"
                   ? "border-primary/50 shadow-[0_0_0_1px_var(--primary)]"
                   : "border-border",
               )}
             >
-              {p.tier === "monthly" && (
+              {p.badge && (
                 <span className="num mb-3 w-fit rounded bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase text-primary">
-                  Most popular
+                  {p.badge} · Most Popular
                 </span>
               )}
               <h2 className="text-sm font-semibold uppercase tracking-wide">{p.name}</h2>
               <p className="num mt-2 text-4xl font-bold">₹{p.price}</p>
-              <p className="num mt-1 text-xs text-muted-foreground">{p.perMonth}</p>
+              <p className="num mt-1 text-xs font-medium text-primary">{p.perMonth}</p>
+              <p className="mt-2 text-xs italic text-muted-foreground/80">{p.anchorQuote}</p>
               <p className="mt-3 flex-1 text-sm text-muted-foreground">{p.blurb}</p>
+              <ul className="mt-4 space-y-1.5 text-sm text-muted-foreground">
+                {p.features.map((f) => (
+                  <li key={f} className="flex gap-2">
+                    <Check className="mt-0.5 size-4 shrink-0 text-bull" /> {f}
+                  </li>
+                ))}
+              </ul>
               <Button
                 className="mt-5"
-                variant={p.tier === "monthly" ? "default" : "outline"}
+                variant={p.tier === "annual" ? "default" : "outline"}
                 disabled={busy !== null || verifying}
                 onClick={() => void start(p)}
               >
