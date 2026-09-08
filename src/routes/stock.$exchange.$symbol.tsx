@@ -87,9 +87,9 @@ function StockPage() {
   const isIndianExchange = stock.exchange === "NSE" || stock.exchange === "BSE";
   const intel = buildIntel({
     stock: live,
-    live: liveFundamentals,
-    screener: screenerRatios,
-    quote,
+    live: liveFundamentals ?? null,
+    screener: screenerRatios ?? null,
+    quote: quote ?? null,
   });
 
   return (
