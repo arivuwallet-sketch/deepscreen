@@ -34,6 +34,7 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [checkEmail, setCheckEmail] = useState(false);
   const { session, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -44,34 +45,65 @@ function AuthPage() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
-    const fn =
-      mode === "signin"
-        ? supabase.auth.signInWithPassword({ email, password })
-        : supabase.auth.signUp({
-            email,
-            password,
-            options: { emailRedirectTo: `${window.location.origin}` },
-          });
-    const { error } = await fn;
-    setBusy(false);
-    if (error) {
-      toast.error(error.message);
-      return;
+    try {
+      if (mode === "signin") {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) {
+          toast.error(
+            error.message.toLowerCase().includes("invalid login")
+              ? "Wrong email or password."
+              : error.message,
+          );
+          return;
+        }
+        toast.success("Signed in");
+        void navigate({ to: "/" });
+        return;
+      }
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: `${window.location.origin}` },
+      });
+      if (error) {
+        toast.error(
+          error.message.toLowerCase().includes("already registered")
+            ? "That email already has an account — sign in instead."
+            : error.message,
+        );
+        return;
+      }
+      if (!data.session) {
+        setCheckEmail(true);
+        toast.success("Check your email to confirm your account.");
+        return;
+      }
+      toast.success("Account created");
+      void navigate({ to: "/" });
+    } finally {
+      setBusy(false);
     }
-    toast.success(mode === "signin" ? "Signed in" : "Account created — you can set up alerts now");
-    void navigate({ to: "/" });
   }
 
   async function google() {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      toast.error("Google sign-in failed");
-      return;
+    setBusy(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        toast.error("Google sign-in failed. Please try again.");
+        return;
+      }
+      if (result.redirected) return;
+      toast.success("Signed in with Google");
+      void navigate({ to: "/" });
+    } catch {
+      toast.error("Google sign-in failed. Please try again.");
+    } finally {
+      setBusy(false);
     }
-    if (result.redirected) return;
-    void navigate({ to: "/" });
   }
 
   return (
