@@ -120,13 +120,20 @@ export function ForensicPanel({ intel, locked = false }: { intel: Intel; locked?
         <ScoreBlock title="Beneish (earnings quality)" score={beneish} />
       </div>
       {piotroski.checks.length > 0 ? (
-        <ul className="num mt-3 grid gap-1 text-[11px] sm:grid-cols-3">
-          {piotroski.checks.map((c) => (
-            <li key={c.label} className={c.pass ? "text-bull" : "text-muted-foreground"}>
-              {c.pass ? "✓" : "×"} {c.label}
-            </li>
-          ))}
-        </ul>
+        locked ? (
+          <p className="mt-3 rounded border border-dashed border-border p-3 text-[11px] text-muted-foreground">
+            Scores are free. The criteria-by-criteria breakdown — exactly which checks this
+            company failed — is part of DeepScreen Pro.
+          </p>
+        ) : (
+          <ul className="num mt-3 grid gap-1 text-[11px] sm:grid-cols-3">
+            {piotroski.checks.map((c) => (
+              <li key={c.label} className={c.pass ? "text-bull" : "text-muted-foreground"}>
+                {c.pass ? "✓" : "×"} {c.label}
+              </li>
+            ))}
+          </ul>
+        )
       ) : null}
     </div>
   );
