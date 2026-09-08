@@ -228,12 +228,7 @@ function StockPage() {
           <HoldingPlanCard stock={live} />
         </PaywallGate>
 
-        <PaywallGate
-          feature="12-factor fundamental breakdown"
-          className="mt-8"
-          minHeight="min-h-[420px]"
-        >
-          <section>
+        <section className="mt-8">
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide">
               Fundamental breakdown{" "}
               <span className="font-normal normal-case text-muted-foreground">
