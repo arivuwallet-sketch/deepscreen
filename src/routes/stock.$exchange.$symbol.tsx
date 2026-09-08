@@ -280,14 +280,13 @@ function StockPage() {
                       />
                     </div>
                     <p className="mt-2 text-[11px] leading-snug text-muted-foreground">
-                      {m.tooltip}
+                      {isPro ? m.tooltip : "Contextual insight — DeepScreen Pro"}
                     </p>
                   </div>
                 );
               })}
             </div>
           </section>
-        </PaywallGate>
 
         <PaywallGate
           feature="DCF & Graham intrinsic value calculators"
