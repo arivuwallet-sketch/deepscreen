@@ -15,6 +15,7 @@ import {
   VisionCard,
 } from "@/components/ds/GodsEyePanels";
 import { buildIntel } from "@/lib/deepscreen/intel";
+import { getIndexMemberships } from "@/lib/deepscreen/indices";
 import { ScoreBar } from "@/components/ds/StockTable";
 import { findStock } from "@/lib/deepscreen/stocks";
 import { analyze, verdictClass } from "@/lib/deepscreen/metrics";
