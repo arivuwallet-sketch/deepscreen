@@ -116,6 +116,25 @@ function AuthPage() {
           A free account unlocks your watchlist, holding-period tracking and daily sell alerts by email.
         </p>
 
+        {checkEmail ? (
+          <div className="mt-6 rounded-lg border border-border bg-panel p-5 text-sm">
+            <p className="font-medium">Confirm your email</p>
+            <p className="mt-2 text-muted-foreground">
+              We sent a confirmation link to <span className="text-foreground">{email}</span>. Click it
+              to activate your account, then come back and sign in.
+            </p>
+            <Button
+              variant="outline"
+              className="mt-4 w-full"
+              onClick={() => {
+                setCheckEmail(false);
+                setMode("signin");
+              }}
+            >
+              Back to sign in
+            </Button>
+          </div>
+        ) : (
         <form onSubmit={submit} className="mt-6 space-y-4 rounded-lg border border-border bg-panel p-5">
           <div className="space-y-1.5">
             <Label htmlFor="email">Email</Label>
