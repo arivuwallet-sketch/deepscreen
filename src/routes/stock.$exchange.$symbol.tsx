@@ -219,7 +219,12 @@ function StockPage() {
 
         <section className="mt-8 space-y-4">
           <ForensicPanel intel={intel} locked={!isPro} />
-          <ExtendedRatiosPanel intel={intel} />
+          <PaywallGate
+            feature="Advanced ratios — margins, cash flow, EV/EBITDA, turnover & DuPont"
+            minHeight="min-h-[280px]"
+          >
+            <ExtendedRatiosPanel intel={intel} />
+          </PaywallGate>
         </section>
 
         <PaywallGate
