@@ -7,6 +7,13 @@ import { GrahamCalculator } from "@/components/ds/GrahamCalculator";
 import { PaywallGate } from "@/components/ds/PaywallGate";
 import { useLiveFundamentals, useLiveQuote, useScreenerRatios } from "@/hooks/useLiveQuotes";
 import { HoldingPlanCard } from "@/components/ds/HoldingPlanCard";
+import {
+  ExtendedRatiosPanel,
+  ForensicPanel,
+  SecretTipsPanel,
+  VisionCard,
+} from "@/components/ds/GodsEyePanels";
+import { buildIntel } from "@/lib/deepscreen/intel";
 import { ScoreBar } from "@/components/ds/StockTable";
 import { findStock } from "@/lib/deepscreen/stocks";
 import { analyze, verdictClass } from "@/lib/deepscreen/metrics";
@@ -78,6 +85,12 @@ function StockPage() {
   const changePct = live.changePct;
   const hasLiveFundamentals = Object.values(sources).some((v) => v === "live");
   const isIndianExchange = stock.exchange === "NSE" || stock.exchange === "BSE";
+  const intel = buildIntel({
+    stock: live,
+    live: liveFundamentals ?? null,
+    screener: screenerRatios ?? null,
+    quote: quote ?? null,
+  });
 
   return (
     <Shell>
@@ -188,6 +201,22 @@ function StockPage() {
                 </ul>
               </div>
             </div>
+          </section>
+        </PaywallGate>
+
+        <section className="mt-8 grid gap-4 lg:grid-cols-2">
+          <VisionCard intel={intel} />
+          <SecretTipsPanel intel={intel} />
+        </section>
+
+        <PaywallGate
+          feature="Forensic accounting suite & extended ratios"
+          className="mt-8"
+          minHeight="min-h-[320px]"
+        >
+          <section className="space-y-4">
+            <ForensicPanel intel={intel} />
+            <ExtendedRatiosPanel intel={intel} />
           </section>
         </PaywallGate>
 
