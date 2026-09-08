@@ -5,6 +5,7 @@ import { LiveNewsFeed } from "@/components/ds/LiveNewsFeed";
 import { DcfCalculator } from "@/components/ds/DcfCalculator";
 import { GrahamCalculator } from "@/components/ds/GrahamCalculator";
 import { PaywallGate } from "@/components/ds/PaywallGate";
+import { useSubscription } from "@/hooks/useSubscription";
 import { useLiveFundamentals, useLiveQuote, useScreenerRatios } from "@/hooks/useLiveQuotes";
 import { HoldingPlanCard } from "@/components/ds/HoldingPlanCard";
 import {
@@ -68,6 +69,7 @@ const bandText: Record<string, string> = {
 
 function StockPage() {
   const { stock } = Route.useLoaderData();
+  const { isPro } = useSubscription();
   const { data: quote, dataUpdatedAt } = useLiveQuote(stock.exchange, stock.symbol);
   const { data: liveFundamentals, dataUpdatedAt: fundUpdatedAt } = useLiveFundamentals(
     stock.exchange,
@@ -204,21 +206,21 @@ function StockPage() {
           </section>
         </PaywallGate>
 
-        <section className="mt-8 grid gap-4 lg:grid-cols-2">
-          <VisionCard intel={intel} />
-          <SecretTipsPanel intel={intel} />
-        </section>
-
         <PaywallGate
-          feature="Forensic accounting suite & extended ratios"
+          feature="Vision &amp; Utility score and Secret Tips badges"
           className="mt-8"
-          minHeight="min-h-[320px]"
+          minHeight="min-h-[260px]"
         >
-          <section className="space-y-4">
-            <ForensicPanel intel={intel} />
-            <ExtendedRatiosPanel intel={intel} />
+          <section className="grid gap-4 lg:grid-cols-2">
+            <VisionCard intel={intel} />
+            <SecretTipsPanel intel={intel} />
           </section>
         </PaywallGate>
+
+        <section className="mt-8 space-y-4">
+          <ForensicPanel intel={intel} locked={!isPro} />
+          <ExtendedRatiosPanel intel={intel} />
+        </section>
 
         <PaywallGate
           feature="Target price, trim level & stop-loss"
@@ -228,16 +230,11 @@ function StockPage() {
           <HoldingPlanCard stock={live} />
         </PaywallGate>
 
-        <PaywallGate
-          feature="12-factor fundamental breakdown"
-          className="mt-8"
-          minHeight="min-h-[420px]"
-        >
-          <section>
+        <section className="mt-8">
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide">
               Fundamental breakdown{" "}
               <span className="font-normal normal-case text-muted-foreground">
-                — hover any card for what the ratio means ·{" "}
+                — raw ratios are free{isPro ? ", hover any card for context" : ""} ·{" "}
                 {hasLiveFundamentals
                   ? isIndianExchange && screenerRatios
                     ? `Screener.in filing ratios + live market data, updated ${new Date(Math.max(fundUpdatedAt, screenerUpdatedAt)).toLocaleTimeString()}`
@@ -251,7 +248,7 @@ function StockPage() {
                 return (
                   <div
                     key={m.key}
-                    title={m.tooltip}
+                    title={isPro ? m.tooltip : "Unlock contextual insights with DeepScreen Pro"}
                     style={{ animationDelay: `${i * 40}ms` }}
                     className={cn(
                       "card-hover animate-fade-in-up cursor-help rounded-lg border p-4",
@@ -285,14 +282,13 @@ function StockPage() {
                       />
                     </div>
                     <p className="mt-2 text-[11px] leading-snug text-muted-foreground">
-                      {m.tooltip}
+                      {isPro ? m.tooltip : "Contextual insight — DeepScreen Pro"}
                     </p>
                   </div>
                 );
               })}
             </div>
           </section>
-        </PaywallGate>
 
         <PaywallGate
           feature="DCF & Graham intrinsic value calculators"

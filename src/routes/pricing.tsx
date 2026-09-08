@@ -1,31 +1,35 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Check, Sparkles } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Shell } from "@/components/ds/Shell";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { PLANS, useSubscription, type Plan } from "@/hooks/useSubscription";
-import { activateSubscription } from "@/lib/billing/billing.functions";
+import { confirmCheckout, createCheckout } from "@/lib/billing/billing.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/pricing")({
+  validateSearch: (search: Record<string, unknown>): { cf_link_id?: string } =>
+    typeof search["cf_link_id"] === "string" ? { cf_link_id: search["cf_link_id"] } : {},
   head: () => ({
     meta: [
       { title: "DeepScreen Pro Pricing — ₹25 Weekly, ₹75 Monthly, ₹800 Yearly" },
       {
         name: "description",
         content:
-          "Unlock DeepScreen Pro: 12-factor deep scores, DCF intrinsic value, target prices, stop-losses, portfolio risk matrix and event calendar.",
+          "Unlock DeepScreen Pro: 12-factor deep scores, DCF & Graham valuation, Vision score, Secret Tips, forensic breakdowns, sell alerts and portfolio X-ray.",
       },
       { property: "og:title", content: "DeepScreen Pro Pricing" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       {
         property: "og:description",
         content:
-          "Weekly ₹25, monthly ₹75 or annual ₹800 access to DeepScreen's full god-mode analysis engine.",
+          "Weekly ₹25, monthly ₹75 or annual ₹800 access to DeepScreen's full god-mode analysis engine. Pay by UPI, card or netbanking via Cashfree.",
       },
     ],
   }),
@@ -33,27 +37,62 @@ export const Route = createFileRoute("/pricing")({
 });
 
 const FREE = [
-  "Search all 13,000+ listed companies",
-  "Price, market cap and headline ratios",
-  "Market news and economic calendar",
+  "Search all 13,000+ listed companies with live prices",
+  "Raw fundamental ratios (P/E, ROE, ROCE, P/B, D/E, ROA, PEG)",
+  "Live IPO pipeline across every tracked exchange",
+  "Company financials, news feed and economic calendar",
+  "Basic peer comparison — raw metrics side by side",
 ];
 
 const PRO = [
-  "Full 12-factor deep score and verdict",
-  "Automated DCF intrinsic-value calculator",
-  "Target price, trim level and stop-loss",
-  "Holding period and live sell alerts",
-  "Portfolio health & risk matrix",
-  "Earnings and dividend calendar",
-  "Every upcoming feature (IPOs, options chain)",
+  "DeepScreen Verdict — 12-factor weighted score",
+  "Holding period, target price, trim level & stop-loss",
+  "Automated DCF and Graham intrinsic-value models",
+  "Vision & Utility score (10–40 year hold horizon)",
+  "Secret Tips badges — ROE traps, fortress balance sheets, smart-money flows",
+  "God's Eye forensic breakdown — which Piotroski/Altman/Beneish checks failed",
+  "Contextual ratio insights on every metric card",
+  "Portfolio X-Ray and cross-platform alerts",
 ];
 
 function PricingPage() {
   const { user } = useAuth();
   const { isPro, tier, expiresAt, refresh } = useSubscription();
   const navigate = useNavigate();
+  const search = Route.useSearch();
   const [busy, setBusy] = useState<string | null>(null);
-  const activate = useServerFn(activateSubscription);
+  const [verifying, setVerifying] = useState(false);
+  const checkout = useServerFn(createCheckout);
+  const confirm = useServerFn(confirmCheckout);
+  const confirmed = useRef<string | null>(null);
+
+  useEffect(() => {
+    const linkId = search.cf_link_id;
+    if (!linkId || !user || confirmed.current === linkId) return;
+    confirmed.current = linkId;
+    setVerifying(true);
+    void (async () => {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (!accessToken) {
+        setVerifying(false);
+        return;
+      }
+      const res = await confirm({ data: { linkId, accessToken } });
+      setVerifying(false);
+      void navigate({ to: "/pricing", search: () => ({}), replace: true });
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      if (res.paid) {
+        refresh();
+        toast.success("Payment received — DeepScreen Pro is unlocked.");
+      } else {
+        toast.error(`Payment not completed (${res.status}). Nothing was charged.`);
+      }
+    })();
+  }, [search.cf_link_id, user, confirm, navigate, refresh]);
 
   const start = async (plan: Plan) => {
     if (!user) {
@@ -68,14 +107,15 @@ function PricingPage() {
       toast.error("Please sign in again.");
       return;
     }
-    const result = await activate({ data: { tier: plan.tier, accessToken } });
-    setBusy(null);
+    const result = await checkout({
+      data: { tier: plan.tier, accessToken, origin: window.location.origin },
+    });
     if (!result.ok) {
+      setBusy(null);
       toast.error(result.error);
       return;
     }
-    refresh();
-    toast.success(`${plan.name} activated — everything is unlocked.`);
+    window.location.href = result.url;
   };
 
   return (
@@ -87,12 +127,15 @@ function PricingPage() {
             Unlock the full god-mode engine
           </h1>
           <p className="mx-auto mt-3 max-w-2xl text-sm text-muted-foreground">
-            Search and headline data stay free forever. Pro opens the deep score, DCF valuation,
-            targets, stop-losses, portfolio matrix and every feature we ship next.
+            Search, live prices, raw ratios, IPOs and news stay free forever. Pro opens the
+            verdict, valuation models, forensic breakdowns, sell alerts and portfolio X-ray.
           </p>
+          {verifying && (
+            <p className="num mt-4 text-xs text-muted-foreground">Verifying your payment…</p>
+          )}
           {isPro && (
             <p className="num mt-4 inline-block rounded border border-primary/40 bg-primary/10 px-3 py-1 text-xs text-primary">
-              Active plan: {tier} · renews/expires {expiresAt?.slice(0, 10)}
+              Active plan: {tier} · expires {expiresAt?.slice(0, 10)}
             </p>
           )}
         </div>
@@ -120,13 +163,13 @@ function PricingPage() {
               <Button
                 className="mt-5"
                 variant={p.tier === "monthly" ? "default" : "outline"}
-                disabled={busy !== null || (isPro && tier === p.tier)}
+                disabled={busy !== null || verifying}
                 onClick={() => void start(p)}
               >
                 {isPro && tier === p.tier
-                  ? "Current plan"
+                  ? "Extend plan"
                   : busy === p.tier
-                    ? "Activating…"
+                    ? "Opening checkout…"
                     : `Get ${p.name}`}
               </Button>
             </div>
@@ -136,7 +179,7 @@ function PricingPage() {
         <div className="mt-10 grid gap-4 md:grid-cols-2">
           <div className="rounded-lg border border-border bg-panel p-6">
             <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              Free
+              Free forever
             </h3>
             <ul className="mt-3 space-y-2 text-sm">
               {FREE.map((f) => (
@@ -161,12 +204,11 @@ function PricingPage() {
         </div>
 
         <p className="mt-8 text-center text-xs text-muted-foreground">
-          Card checkout is not connected yet — activating a plan today enables Pro instantly on your
-          account.{" "}
+          Secure checkout by Cashfree — UPI, RuPay, netbanking, wallets and international cards.{" "}
           <Link to="/auth" className="text-primary hover:underline">
             Sign in
           </Link>{" "}
-          to keep it across devices.
+          to keep your plan across devices.
         </p>
       </div>
     </Shell>

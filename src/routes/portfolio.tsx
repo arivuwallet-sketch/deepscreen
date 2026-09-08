@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 
 import { Shell } from "@/components/ds/Shell";
+import { PaywallGate } from "@/components/ds/PaywallGate";
 import {
   quoteKey,
   useLiveFundamentalsBatch,
@@ -87,6 +88,8 @@ function PortfolioPage() {
           recomputed from live prices and fundamentals.
         </p>
 
+        <PaywallGate feature="Portfolio X-Ray" className="mt-6" minHeight="min-h-[420px]">
+        <div>
         {!signedIn && !loading ? (
           <EmptyCard>
             <Link to="/auth" className="text-primary underline">
@@ -183,6 +186,8 @@ function PortfolioPage() {
             </section>
           </>
         ) : null}
+        </div>
+        </PaywallGate>
       </div>
     </Shell>
   );

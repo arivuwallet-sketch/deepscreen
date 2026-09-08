@@ -44,6 +44,39 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_orders: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          link_id: string
+          status: string
+          tier: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          id?: string
+          link_id: string
+          status?: string
+          tier: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          link_id?: string
+          status?: string
+          tier?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       pine_script_purchases: {
         Row: {
           amount_inr: number
