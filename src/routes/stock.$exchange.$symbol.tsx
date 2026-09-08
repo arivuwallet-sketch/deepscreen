@@ -232,7 +232,7 @@ function StockPage() {
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide">
               Fundamental breakdown{" "}
               <span className="font-normal normal-case text-muted-foreground">
-                — hover any card for what the ratio means ·{" "}
+                — raw ratios are free{isPro ? ", hover any card for context" : ""} ·{" "}
                 {hasLiveFundamentals
                   ? isIndianExchange && screenerRatios
                     ? `Screener.in filing ratios + live market data, updated ${new Date(Math.max(fundUpdatedAt, screenerUpdatedAt)).toLocaleTimeString()}`
