@@ -204,6 +204,22 @@ function StockPage() {
           </section>
         </PaywallGate>
 
+        <section className="mt-8 grid gap-4 lg:grid-cols-2">
+          <VisionCard intel={intel} />
+          <SecretTipsPanel intel={intel} />
+        </section>
+
+        <PaywallGate
+          feature="Forensic accounting suite & extended ratios"
+          className="mt-8"
+          minHeight="min-h-[320px]"
+        >
+          <section className="space-y-4">
+            <ForensicPanel intel={intel} />
+            <ExtendedRatiosPanel intel={intel} />
+          </section>
+        </PaywallGate>
+
         <PaywallGate
           feature="Target price, trim level & stop-loss"
           className="mt-8"
