@@ -13,9 +13,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/pricing")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    cf_link_id: typeof search["cf_link_id"] === "string" ? search["cf_link_id"] : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { cf_link_id?: string } =>
+    typeof search["cf_link_id"] === "string" ? { cf_link_id: search["cf_link_id"] } : {},
   head: () => ({
     meta: [
       { title: "DeepScreen Pro Pricing — ₹25 Weekly, ₹75 Monthly, ₹800 Yearly" },
@@ -81,7 +80,7 @@ function PricingPage() {
       }
       const res = await confirm({ data: { linkId, accessToken } });
       setVerifying(false);
-      void navigate({ to: "/pricing", search: {}, replace: true });
+      void navigate({ to: "/pricing", search: () => ({}), replace: true });
       if (!res.ok) {
         toast.error(res.error);
         return;
