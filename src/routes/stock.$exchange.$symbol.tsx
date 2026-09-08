@@ -5,6 +5,7 @@ import { LiveNewsFeed } from "@/components/ds/LiveNewsFeed";
 import { DcfCalculator } from "@/components/ds/DcfCalculator";
 import { GrahamCalculator } from "@/components/ds/GrahamCalculator";
 import { PaywallGate } from "@/components/ds/PaywallGate";
+import { useSubscription } from "@/hooks/useSubscription";
 import { useLiveFundamentals, useLiveQuote, useScreenerRatios } from "@/hooks/useLiveQuotes";
 import { HoldingPlanCard } from "@/components/ds/HoldingPlanCard";
 import {
@@ -68,6 +69,7 @@ const bandText: Record<string, string> = {
 
 function StockPage() {
   const { stock } = Route.useLoaderData();
+  const { isPro } = useSubscription();
   const { data: quote, dataUpdatedAt } = useLiveQuote(stock.exchange, stock.symbol);
   const { data: liveFundamentals, dataUpdatedAt: fundUpdatedAt } = useLiveFundamentals(
     stock.exchange,
