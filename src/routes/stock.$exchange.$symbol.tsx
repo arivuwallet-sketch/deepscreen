@@ -246,7 +246,7 @@ function StockPage() {
                 return (
                   <div
                     key={m.key}
-                    title={m.tooltip}
+                    title={isPro ? m.tooltip : "Unlock contextual insights with DeepScreen Pro"}
                     style={{ animationDelay: `${i * 40}ms` }}
                     className={cn(
                       "card-hover animate-fade-in-up cursor-help rounded-lg border p-4",
