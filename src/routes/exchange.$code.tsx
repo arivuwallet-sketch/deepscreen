@@ -5,6 +5,7 @@ import { Shell } from "@/components/ds/Shell";
 import { LiveNewsFeed } from "@/components/ds/LiveNewsFeed";
 import { StockTable } from "@/components/ds/StockTable";
 import { EXCHANGES, getExchange } from "@/lib/deepscreen/exchanges";
+import { indicesForExchange, isInIndex } from "@/lib/deepscreen/indices";
 import { SECTORS, stocksByExchange } from "@/lib/deepscreen/stocks";
 import { analyze } from "@/lib/deepscreen/metrics";
 import { CAP_LABEL } from "@/lib/deepscreen/format";
@@ -40,16 +41,23 @@ function ExchangePage() {
   const { exchange } = Route.useLoaderData();
   const [caps, setCaps] = useState<CapTier[]>([]);
   const [sector, setSector] = useState("all");
+  const [indexIds, setIndexIds] = useState<string[]>([]);
   const [sort, setSort] = useState<SortKey>("score");
   const [limit, setLimit] = useState(100);
 
 
   const all = useMemo(() => stocksByExchange(exchange.code), [exchange.code]);
+  const indicesHere = useMemo(() => indicesForExchange(exchange.code), [exchange.code]);
 
   const filtered = useMemo(() => {
     const rows = all
       .filter((s) => (caps.length === 0 ? true : caps.includes(s.cap)))
-      .filter((s) => (sector === "all" ? true : s.sector === sector));
+      .filter((s) => (sector === "all" ? true : s.sector === sector))
+      .filter((s) =>
+        indexIds.length === 0
+          ? true
+          : indexIds.every((id) => isInIndex(s.exchange, s.symbol, id)),
+      );
     return rows.sort((a, b) => {
       switch (sort) {
         case "marketCap":
@@ -66,10 +74,13 @@ function ExchangePage() {
           return analyze(b).score - analyze(a).score;
       }
     });
-  }, [all, caps, sector, sort]);
+  }, [all, caps, sector, indexIds, sort]);
 
   const toggleCap = (c: CapTier) =>
     setCaps((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]));
+
+  const toggleIndex = (id: string) =>
+    setIndexIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
   const sectorsHere = SECTORS.filter((sec) => all.some((s) => s.sector === sec));
 
@@ -130,6 +141,23 @@ function ExchangePage() {
             <option value="roce">Highest ROCE</option>
             <option value="changePct">Top movers</option>
           </select>
+
+          <span className="num ml-4 text-xs uppercase text-muted-foreground">Filter by Index</span>
+          {indicesHere.map((idx) => (
+            <button
+              key={idx.id}
+              title={idx.blurb}
+              onClick={() => toggleIndex(idx.id)}
+              className={cn(
+                "rounded border px-3 py-1.5 text-xs transition-colors",
+                indexIds.includes(idx.id)
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {idx.name}
+            </button>
+          ))}
 
           <span className="num ml-auto text-xs text-muted-foreground">
             {filtered.length.toLocaleString()} / {all.length.toLocaleString()} companies
