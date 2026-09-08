@@ -3,6 +3,7 @@ import { Activity } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { EXCHANGES } from "@/lib/deepscreen/exchanges";
+import { AuthButton } from "./AuthButton";
 import { SearchBar } from "./SearchBar";
 
 export function Shell({ children }: { children: ReactNode }) {
@@ -54,6 +55,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <div className="ml-auto w-full md:w-80">
             <SearchBar />
           </div>
+          <AuthButton />
         </div>
       </header>
       <main>{children}</main>
