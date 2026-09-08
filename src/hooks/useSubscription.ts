@@ -12,15 +12,20 @@ export interface Plan {
   days: number;
   blurb: string;
   perMonth: string;
+  anchorQuote: string;
+  features: string[];
+  badge?: string;
 }
 
 export const PLANS: Plan[] = [
   {
     tier: "weekly",
-    name: "Weekly Pass",
+    name: "Weekly Plan",
     price: 25,
     days: 7,
-    perMonth: "₹100 / mo equivalent",
+    perMonth: "₹25 / week",
+    anchorQuote: "☕ Just the price of a cup of tea.",
+    features: ["Standard Pro Features"],
     blurb: "Try the full god-mode engine for a week — every metric unlocked.",
   },
   {
@@ -28,15 +33,20 @@ export const PLANS: Plan[] = [
     name: "Monthly Plan",
     price: 75,
     days: 30,
-    perMonth: "₹75 / mo",
+    perMonth: "₹75 / month",
+    anchorQuote: "🥞 The cost of one masala dosa a month.",
+    features: ["Standard Pro Features"],
     blurb: "The everyday plan: deep scores, DCF, portfolio matrix and alerts.",
   },
   {
     tier: "annual",
-    name: "Annual Plan",
+    name: "Yearly Plan",
     price: 800,
     days: 365,
-    perMonth: "₹66 / mo — save 11%",
+    perMonth: "Only ₹66/month!",
+    anchorQuote: "Cheaper than a single month of Netflix, but lasts the entire year.",
+    features: ["All Pro Features", "Priority Support"],
+    badge: "Best Value",
     blurb: "Best value. A full year of DeepScreen Pro plus every upcoming feature.",
   },
 ];
