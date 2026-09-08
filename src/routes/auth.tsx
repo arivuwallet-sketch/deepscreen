@@ -34,6 +34,7 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [checkEmail, setCheckEmail] = useState(false);
   const { session, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -44,34 +45,65 @@ function AuthPage() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
-    const fn =
-      mode === "signin"
-        ? supabase.auth.signInWithPassword({ email, password })
-        : supabase.auth.signUp({
-            email,
-            password,
-            options: { emailRedirectTo: `${window.location.origin}` },
-          });
-    const { error } = await fn;
-    setBusy(false);
-    if (error) {
-      toast.error(error.message);
-      return;
+    try {
+      if (mode === "signin") {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) {
+          toast.error(
+            error.message.toLowerCase().includes("invalid login")
+              ? "Wrong email or password."
+              : error.message,
+          );
+          return;
+        }
+        toast.success("Signed in");
+        void navigate({ to: "/" });
+        return;
+      }
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: `${window.location.origin}` },
+      });
+      if (error) {
+        toast.error(
+          error.message.toLowerCase().includes("already registered")
+            ? "That email already has an account — sign in instead."
+            : error.message,
+        );
+        return;
+      }
+      if (!data.session) {
+        setCheckEmail(true);
+        toast.success("Check your email to confirm your account.");
+        return;
+      }
+      toast.success("Account created");
+      void navigate({ to: "/" });
+    } finally {
+      setBusy(false);
     }
-    toast.success(mode === "signin" ? "Signed in" : "Account created — you can set up alerts now");
-    void navigate({ to: "/" });
   }
 
   async function google() {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      toast.error("Google sign-in failed");
-      return;
+    setBusy(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        toast.error("Google sign-in failed. Please try again.");
+        return;
+      }
+      if (result.redirected) return;
+      toast.success("Signed in with Google");
+      void navigate({ to: "/" });
+    } catch {
+      toast.error("Google sign-in failed. Please try again.");
+    } finally {
+      setBusy(false);
     }
-    if (result.redirected) return;
-    void navigate({ to: "/" });
   }
 
   return (
@@ -84,6 +116,25 @@ function AuthPage() {
           A free account unlocks your watchlist, holding-period tracking and daily sell alerts by email.
         </p>
 
+        {checkEmail ? (
+          <div className="mt-6 rounded-lg border border-border bg-panel p-5 text-sm">
+            <p className="font-medium">Confirm your email</p>
+            <p className="mt-2 text-muted-foreground">
+              We sent a confirmation link to <span className="text-foreground">{email}</span>. Click it
+              to activate your account, then come back and sign in.
+            </p>
+            <Button
+              variant="outline"
+              className="mt-4 w-full"
+              onClick={() => {
+                setCheckEmail(false);
+                setMode("signin");
+              }}
+            >
+              Back to sign in
+            </Button>
+          </div>
+        ) : (
         <form onSubmit={submit} className="mt-6 space-y-4 rounded-lg border border-border bg-panel p-5">
           <div className="space-y-1.5">
             <Label htmlFor="email">Email</Label>
@@ -111,11 +162,13 @@ function AuthPage() {
           <Button type="submit" className="w-full" disabled={busy}>
             {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
           </Button>
-          <Button type="button" variant="outline" className="w-full" onClick={google}>
+          <Button type="button" variant="outline" className="w-full" onClick={google} disabled={busy}>
             Continue with Google
           </Button>
         </form>
+        )}
 
+        {!checkEmail && (
         <button
           type="button"
           className="mt-4 text-xs text-muted-foreground underline"
@@ -123,6 +176,7 @@ function AuthPage() {
         >
           {mode === "signin" ? "No account yet? Create one" : "Already have an account? Sign in"}
         </button>
+        )}
       </div>
     </Shell>
   );
