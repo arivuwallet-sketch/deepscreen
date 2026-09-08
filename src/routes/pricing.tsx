@@ -49,6 +49,7 @@ const PRO = [
   "Vision & Utility score (10–40 year hold horizon)",
   "Secret Tips badges — ROE traps, fortress balance sheets, smart-money flows",
   "God's Eye forensic breakdown — which Piotroski/Altman/Beneish checks failed",
+  "Advanced ratios — margins, cash flow, EV/EBITDA, turnover & DuPont",
   "Contextual ratio insights on every metric card",
   "Portfolio X-Ray and cross-platform alerts",
 ];
