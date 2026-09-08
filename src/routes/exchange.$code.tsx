@@ -41,16 +41,23 @@ function ExchangePage() {
   const { exchange } = Route.useLoaderData();
   const [caps, setCaps] = useState<CapTier[]>([]);
   const [sector, setSector] = useState("all");
+  const [indexIds, setIndexIds] = useState<string[]>([]);
   const [sort, setSort] = useState<SortKey>("score");
   const [limit, setLimit] = useState(100);
 
 
   const all = useMemo(() => stocksByExchange(exchange.code), [exchange.code]);
+  const indicesHere = useMemo(() => indicesForExchange(exchange.code), [exchange.code]);
 
   const filtered = useMemo(() => {
     const rows = all
       .filter((s) => (caps.length === 0 ? true : caps.includes(s.cap)))
-      .filter((s) => (sector === "all" ? true : s.sector === sector));
+      .filter((s) => (sector === "all" ? true : s.sector === sector))
+      .filter((s) =>
+        indexIds.length === 0
+          ? true
+          : indexIds.every((id) => isInIndex(s.exchange, s.symbol, id)),
+      );
     return rows.sort((a, b) => {
       switch (sort) {
         case "marketCap":
@@ -67,10 +74,13 @@ function ExchangePage() {
           return analyze(b).score - analyze(a).score;
       }
     });
-  }, [all, caps, sector, sort]);
+  }, [all, caps, sector, indexIds, sort]);
 
   const toggleCap = (c: CapTier) =>
     setCaps((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]));
+
+  const toggleIndex = (id: string) =>
+    setIndexIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
   const sectorsHere = SECTORS.filter((sec) => all.some((s) => s.sector === sec));
 
