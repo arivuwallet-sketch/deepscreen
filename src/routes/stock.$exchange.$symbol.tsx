@@ -30,10 +30,26 @@ import {
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/stock/$exchange/$symbol")({
-  loader: ({ params }) => {
+  loader: async ({ params }) => {
     const stock = findStock(params.exchange, params.symbol);
     if (!stock) throw notFound();
-    return { stock };
+    // Server-rendered snapshot: real price, ratios, forensics, score and
+    // verdict are in the first HTML byte for crawlers, before any client JS.
+    let snapshot: StockSnapshot = {
+      quote: null,
+      fundamentals: null,
+      screener: null,
+      fetchedAt: Date.now(),
+      degraded: true,
+    };
+    try {
+      snapshot = await getStockSnapshot({
+        data: { exchange: stock.exchange, symbol: stock.symbol, name: stock.name },
+      });
+    } catch (error) {
+      console.error(`[stock-route] snapshot unavailable for ${stock.exchange}:${stock.symbol}`, error);
+    }
+    return { stock, snapshot };
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
