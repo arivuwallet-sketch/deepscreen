@@ -18,6 +18,7 @@ import { buildIntel } from "@/lib/deepscreen/intel";
 import { getIndexMemberships } from "@/lib/deepscreen/indices";
 import { ScoreBar } from "@/components/ds/StockTable";
 import { findStock } from "@/lib/deepscreen/stocks";
+import { getStockSnapshot, type StockSnapshot } from "@/lib/market/snapshot.functions";
 import { analyze, verdictClass } from "@/lib/deepscreen/metrics";
 import { METRIC_KEY_TO_FIELD, mergeLiveStock } from "@/lib/deepscreen/live-merge";
 import {
@@ -85,17 +86,22 @@ const bandText: Record<string, string> = {
 };
 
 function StockPage() {
-  const { stock } = Route.useLoaderData();
+  const { stock, snapshot } = Route.useLoaderData();
   const { isPro } = useSubscription();
-  const { data: quote, dataUpdatedAt } = useLiveQuote(stock.exchange, stock.symbol);
+  const { data: quote, dataUpdatedAt } = useLiveQuote(stock.exchange, stock.symbol, {
+    data: snapshot.quote,
+    at: snapshot.fetchedAt,
+  });
   const { data: liveFundamentals, dataUpdatedAt: fundUpdatedAt } = useLiveFundamentals(
     stock.exchange,
     stock.symbol,
+    { data: snapshot.fundamentals, at: snapshot.fetchedAt },
   );
   const { data: screenerRatios, dataUpdatedAt: screenerUpdatedAt } = useScreenerRatios(
     stock.exchange,
     stock.symbol,
     stock.name,
+    { data: snapshot.screener, at: snapshot.fetchedAt },
   );
   const { stock: live, sources } = mergeLiveStock(stock, quote, liveFundamentals, screenerRatios);
   const a = analyze(live);
