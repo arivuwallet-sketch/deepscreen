@@ -46,11 +46,16 @@ export function useLiveQuotes(keys: QuoteKey[]) {
 }
 
 /** Single live quote, refreshed every 10s. */
-export function useLiveQuote(exchange: string, symbol: string) {
+export function useLiveQuote(
+  exchange: string,
+  symbol: string,
+  initial?: { data: Awaited<ReturnType<typeof getLiveQuote>> | null; at: number },
+) {
   const fetchQuote = useServerFn(getLiveQuote);
   return useQuery({
     queryKey: ["live-quote", exchange, symbol],
     queryFn: () => fetchQuote({ data: { exchange, symbol } }),
+    ...(initial?.data ? { initialData: initial.data, initialDataUpdatedAt: initial.at } : {}),
     refetchInterval: 10_000,
     refetchOnWindowFocus: true,
     staleTime: 5_000,
@@ -74,11 +79,16 @@ export function useLiveFundamentalsBatch(keys: QuoteKey[]) {
 }
 
 /** Single-stock live fundamentals, refreshed every 30s. */
-export function useLiveFundamentals(exchange: string, symbol: string) {
+export function useLiveFundamentals(
+  exchange: string,
+  symbol: string,
+  initial?: { data: Awaited<ReturnType<typeof getLiveFundamentals>> | null; at: number },
+) {
   const fetchFundamentals = useServerFn(getLiveFundamentals);
   return useQuery({
     queryKey: ["live-fundamentals", exchange, symbol],
     queryFn: () => fetchFundamentals({ data: { exchange, symbol } }),
+    ...(initial?.data ? { initialData: initial.data, initialDataUpdatedAt: initial.at } : {}),
     refetchInterval: 30_000,
     refetchOnWindowFocus: true,
     staleTime: 20_000,
@@ -101,11 +111,17 @@ export function useAaaYield() {
  * P/E, ROE, ROCE, P/B, D/E, ROA and growth figures for Indian names (Yahoo's
  * are often stale or missing), so keep them refreshing during the session.
  */
-export function useScreenerRatios(exchange: string, symbol: string, name?: string) {
+export function useScreenerRatios(
+  exchange: string,
+  symbol: string,
+  name?: string,
+  initial?: { data: Awaited<ReturnType<typeof getScreenerRatios>> | null; at: number },
+) {
   const fetchRatios = useServerFn(getScreenerRatios);
   return useQuery({
     queryKey: ["screener-ratios", exchange, symbol],
     queryFn: () => fetchRatios({ data: name ? { exchange, symbol, name } : { exchange, symbol } }),
+    ...(initial?.data ? { initialData: initial.data, initialDataUpdatedAt: initial.at } : {}),
     enabled: exchange === "NSE" || exchange === "BSE",
     refetchInterval: 5 * 60_000,
     refetchOnWindowFocus: true,

@@ -33,10 +33,11 @@ export function PaywallGate({
 }) {
   const { isPro, loading } = useSubscription();
 
-  if (loading) {
-    return <div className={cn("animate-pulse rounded-lg border border-border bg-panel", minHeight, className)} />;
-  }
+  // While the session is resolving (and during SSR, which is what crawlers
+  // read) render the locked variant: the real content is present in the HTML,
+  // visually blurred, so search and AI crawlers index the substance.
   if (isPro) return <>{children}</>;
+  void loading;
 
   return (
     <div className={cn("relative overflow-hidden rounded-lg", className)}>
