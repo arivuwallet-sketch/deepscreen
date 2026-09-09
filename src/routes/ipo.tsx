@@ -13,6 +13,14 @@ import type { LiveIpo } from "@/lib/market/ipo.server";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/ipo")({
+  loader: async () => {
+    try {
+      return { initialIpos: (await getLiveIpos()) as LiveIpo[] };
+    } catch (error) {
+      console.error("[ipo-route] live IPO feed unavailable", error);
+      return { initialIpos: [] as LiveIpo[] };
+    }
+  },
   head: () => ({
     meta: [
       { title: "IPO Calendar — NSE, BSE, NYSE, NASDAQ, LSE — DeepScreen" },
@@ -90,10 +98,12 @@ function timing(ipo: LiveIpo): string {
 }
 
 function IpoPage() {
+  const { initialIpos } = Route.useLoaderData();
   const fetchIpos = useServerFn(getLiveIpos);
   const { data, isLoading, isError } = useQuery({
     queryKey: ["live-ipos"],
     queryFn: () => fetchIpos(),
+    ...(initialIpos.length > 0 ? { initialData: initialIpos } : {}),
     refetchInterval: 10 * 60_000,
     staleTime: 5 * 60_000,
   });
