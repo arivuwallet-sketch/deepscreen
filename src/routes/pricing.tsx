@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/pricing")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: "DeepScreen Pro Pricing — ₹25 Weekly, ₹75 Monthly, ₹800 Yearly" },
@@ -29,7 +30,9 @@ export const Route = createFileRoute("/pricing")({
         content:
           "Weekly ₹25, monthly ₹75 or annual ₹800 access to DeepScreen's full god-mode analysis engine. Pay by UPI, card or netbanking via Cashfree.",
       },
+      { property: "og:url", content: "https://deepscreen.online/pricing" },
     ],
+    links: [{ rel: "canonical", href: "https://deepscreen.online/pricing" }],
   }),
   component: PricingPage,
 });

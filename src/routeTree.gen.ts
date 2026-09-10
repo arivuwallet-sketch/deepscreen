@@ -16,6 +16,7 @@ import { Route as IpoRouteImport } from './routes/ipo'
 import { Route as OptionsRouteImport } from './routes/options'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ExchangeCodeRouteImport } from './routes/exchange.$code'
 import { Route as ApiPublicCashfreeWebhookRouteImport } from './routes/api/public/cashfree-webhook'
 import { Route as StockExchangeSymbolRouteImport } from './routes/stock.$exchange.$symbol'
@@ -55,6 +56,11 @@ const PricingRoute = PricingRouteImport.update({
   path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ExchangeCodeRoute = ExchangeCodeRouteImport.update({
   id: '/exchange/$code',
   path: '/exchange/$code',
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/options': typeof OptionsRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/exchange/$code': typeof ExchangeCodeRoute
   '/api/public/cashfree-webhook': typeof ApiPublicCashfreeWebhookRoute
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
@@ -92,6 +99,7 @@ export interface FileRoutesByTo {
   '/options': typeof OptionsRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/exchange/$code': typeof ExchangeCodeRoute
   '/api/public/cashfree-webhook': typeof ApiPublicCashfreeWebhookRoute
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
@@ -105,6 +113,7 @@ export interface FileRoutesById {
   '/options': typeof OptionsRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/exchange/$code': typeof ExchangeCodeRoute
   '/api/public/cashfree-webhook': typeof ApiPublicCashfreeWebhookRoute
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
     | '/options'
     | '/portfolio'
     | '/pricing'
+    | '/sitemap.xml'
     | '/exchange/$code'
     | '/api/public/cashfree-webhook'
     | '/stock/$exchange/$symbol'
@@ -131,6 +141,7 @@ export interface FileRouteTypes {
     | '/options'
     | '/portfolio'
     | '/pricing'
+    | '/sitemap.xml'
     | '/exchange/$code'
     | '/api/public/cashfree-webhook'
     | '/stock/$exchange/$symbol'
@@ -143,6 +154,7 @@ export interface FileRouteTypes {
     | '/options'
     | '/portfolio'
     | '/pricing'
+    | '/sitemap.xml'
     | '/exchange/$code'
     | '/api/public/cashfree-webhook'
     | '/stock/$exchange/$symbol'
@@ -156,6 +168,7 @@ export interface RootRouteChildren {
   OptionsRoute: typeof OptionsRoute
   PortfolioRoute: typeof PortfolioRoute
   PricingRoute: typeof PricingRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ExchangeCodeRoute: typeof ExchangeCodeRoute
   ApiPublicCashfreeWebhookRoute: typeof ApiPublicCashfreeWebhookRoute
   StockExchangeSymbolRoute: typeof StockExchangeSymbolRoute
@@ -212,6 +225,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/exchange/$code': {
       id: '/exchange/$code'
       path: '/exchange/$code'
@@ -244,6 +264,7 @@ const rootRouteChildren: RootRouteChildren = {
   OptionsRoute: OptionsRoute,
   PortfolioRoute: PortfolioRoute,
   PricingRoute: PricingRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   ExchangeCodeRoute: ExchangeCodeRoute,
   ApiPublicCashfreeWebhookRoute: ApiPublicCashfreeWebhookRoute,
   StockExchangeSymbolRoute: StockExchangeSymbolRoute,

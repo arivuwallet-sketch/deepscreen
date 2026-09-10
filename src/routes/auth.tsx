@@ -11,6 +11,7 @@ import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/auth")({
+  staticData: { sitemap: false },
   head: () => {
     const title = "Sign in — DeepScreen alerts";
     const description =
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/auth")({
         { property: "og:description", content: description },
         { property: "og:type", content: "website" },
         { name: "twitter:card", content: "summary" },
+        { name: "robots", content: "noindex, follow" },
       ],
     };
   },

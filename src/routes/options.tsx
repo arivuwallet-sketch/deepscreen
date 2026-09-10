@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import type { Stock } from "@/lib/deepscreen/types";
 
 export const Route = createFileRoute("/options")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: "Options Strategy Lab — Greeks & 12 Strategies | DeepScreen" },
@@ -36,7 +37,9 @@ export const Route = createFileRoute("/options")({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:url", content: "https://deepscreen.online/options" },
     ],
+    links: [{ rel: "canonical", href: "https://deepscreen.online/options" }],
   }),
   component: OptionsPage,
 });

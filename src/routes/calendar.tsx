@@ -10,6 +10,7 @@ import { STOCKS } from "@/lib/deepscreen/stocks";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/calendar")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: "Earnings & Dividend Calendar — DeepScreen" },
@@ -25,7 +26,9 @@ export const Route = createFileRoute("/calendar")({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:url", content: "https://deepscreen.online/calendar" },
     ],
+    links: [{ rel: "canonical", href: "https://deepscreen.online/calendar" }],
   }),
   component: CalendarPage,
 });

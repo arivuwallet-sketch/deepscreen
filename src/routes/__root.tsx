@@ -74,6 +74,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -85,7 +86,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:description", content: "Screen every listed company across NSE, BSE, NYSE, Nasdaq and LSE with a 12-factor fundamental model." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      
+      { name: "robots", content: "index, follow" },
+      { property: "og:site_name", content: "DeepScreen" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "DeepScreen",
+          url: "https://deepscreen.online",
+          description:
+            "Global stock screener and fundamental analysis for NSE, BSE, NYSE, Nasdaq and LSE.",
+        }),
+      },
     ],
     links: [
       {

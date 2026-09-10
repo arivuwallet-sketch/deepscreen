@@ -11,6 +11,7 @@ import { STOCKS } from "@/lib/deepscreen/stocks";
 import { analyze } from "@/lib/deepscreen/metrics";
 
 export const Route = createFileRoute("/")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: "DeepScreen — Global Stock Screener & Fundamental Analysis" },
@@ -25,7 +26,9 @@ export const Route = createFileRoute("/")({
         content:
           "Cap-based screening, 12-factor fundamental scoring, stock-level news and a live economic calendar for India, US and UK markets.",
       },
+      { property: "og:url", content: "https://deepscreen.online/" },
     ],
+    links: [{ rel: "canonical", href: "https://deepscreen.online/" }],
   }),
   component: Home,
 });
