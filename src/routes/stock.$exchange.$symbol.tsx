@@ -62,12 +62,49 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
     const s = loaderData.stock;
     const title = `${s.symbol} — ${s.name} Fundamental Analysis | DeepScreen`;
     const description = `${s.name} (${s.exchange}: ${s.symbol}) full fundamental breakdown: P/E ${s.fundamentals.pe}, PEG ${s.fundamentals.peg}, ROCE ${s.fundamentals.roce}%, plus latest news.`;
+    const url = `https://deepscreen.online/stock/${s.exchange}/${s.symbol}`;
     return {
       meta: [
         { title },
         { name: "description", content: description },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
+        { property: "og:url", content: url },
+        { property: "og:type", content: "article" },
+        { name: "twitter:card", content: "summary_large_image" },
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            name: title,
+            description,
+            url,
+            about: {
+              "@type": "Corporation",
+              name: s.name,
+              tickerSymbol: `${s.exchange}:${s.symbol}`,
+            },
+            isPartOf: { "@type": "WebSite", name: "DeepScreen", url: "https://deepscreen.online" },
+            breadcrumb: {
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                { "@type": "ListItem", position: 1, name: "Home", item: "https://deepscreen.online/" },
+                {
+                  "@type": "ListItem",
+                  position: 2,
+                  name: s.exchange,
+                  item: `https://deepscreen.online/exchange/${s.exchange}`,
+                },
+                { "@type": "ListItem", position: 3, name: s.symbol, item: url },
+              ],
+            },
+          }),
+        },
       ],
     };
   },
