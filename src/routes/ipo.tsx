@@ -13,6 +13,7 @@ import type { LiveIpo } from "@/lib/market/ipo.server";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/ipo")({
+  staticData: { sitemap: true },
   loader: async () => {
     try {
       return { initialIpos: (await getLiveIpos()) as LiveIpo[] };
@@ -37,7 +38,9 @@ export const Route = createFileRoute("/ipo")({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:url", content: "https://deepscreen.online/ipo" },
     ],
+    links: [{ rel: "canonical", href: "https://deepscreen.online/ipo" }],
   }),
   component: IpoPage,
 });

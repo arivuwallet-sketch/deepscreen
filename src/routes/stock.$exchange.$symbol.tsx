@@ -31,6 +31,7 @@ import {
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/stock/$exchange/$symbol")({
+  staticData: { sitemap: true },
   loader: async ({ params }) => {
     const stock = findStock(params.exchange, params.symbol);
     if (!stock) throw notFound();

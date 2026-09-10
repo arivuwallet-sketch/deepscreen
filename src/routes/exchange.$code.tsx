@@ -13,6 +13,7 @@ import type { CapTier } from "@/lib/deepscreen/types";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/exchange/$code")({
+  staticData: { sitemap: true },
   loader: ({ params }) => {
     const exchange = getExchange(params.code);
     if (!exchange) throw notFound();

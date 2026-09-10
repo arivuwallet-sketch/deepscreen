@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import type { Tier } from "@/hooks/useSubscription";
 
 export const Route = createFileRoute("/api/public/cashfree-webhook")({
+  staticData: { sitemap: false },
   server: {
     handlers: {
       POST: async ({ request }) => {

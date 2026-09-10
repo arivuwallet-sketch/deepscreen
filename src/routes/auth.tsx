@@ -11,6 +11,7 @@ import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/auth")({
+  staticData: { sitemap: false },
   head: () => {
     const title = "Sign in — DeepScreen alerts";
     const description =

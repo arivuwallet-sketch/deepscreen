@@ -17,6 +17,7 @@ import { holdingPlan } from "@/lib/deepscreen/horizon";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/portfolio")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Portfolio Health & Risk Matrix — DeepScreen" },
@@ -33,6 +34,7 @@ export const Route = createFileRoute("/portfolio")({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "robots", content: "noindex, follow" },
     ],
   }),
   component: PortfolioPage,
