@@ -24,12 +24,30 @@ export const Route = createFileRoute("/exchange/$code")({
     const code = loaderData?.exchange.code ?? "";
     const title = `${code} Screener — ${name} | DeepScreen`;
     const description = `Screen ${name} (${code}) listings by large, mid and small cap with full fundamental scoring and the latest market news.`;
+    const url = `https://deepscreen.online/exchange/${code}`;
     return {
       meta: [
         { title },
         { name: "description", content: description },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
+        { property: "og:url", content: url },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            name: title,
+            description,
+            url,
+            isPartOf: { "@type": "WebSite", name: "DeepScreen", url: "https://deepscreen.online" },
+          }),
+        },
       ],
     };
   },
