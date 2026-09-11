@@ -21,6 +21,8 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ExchangeCodeRouteImport } from './routes/exchange.$code'
+import { Route as LearnIndexRouteImport } from './routes/learn.index'
+import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
 import { Route as ApiPublicCashfreeWebhookRouteImport } from './routes/api/public/cashfree-webhook'
 import { Route as StockExchangeSymbolRouteImport } from './routes/stock.$exchange.$symbol'
 
@@ -84,6 +86,16 @@ const ExchangeCodeRoute = ExchangeCodeRouteImport.update({
   path: '/exchange/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LearnIndexRoute = LearnIndexRouteImport.update({
+  id: '/learn/',
+  path: '/learn/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnSlugRoute = LearnSlugRouteImport.update({
+  id: '/learn/$slug',
+  path: '/learn/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicCashfreeWebhookRoute =
   ApiPublicCashfreeWebhookRouteImport.update({
     id: '/api/public/cashfree-webhook',
@@ -109,6 +121,8 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/exchange/$code': typeof ExchangeCodeRoute
+  '/learn/$slug': typeof LearnSlugRoute
+  '/learn/': typeof LearnIndexRoute
   '/api/public/cashfree-webhook': typeof ApiPublicCashfreeWebhookRoute
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
 }
@@ -125,6 +139,8 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/exchange/$code': typeof ExchangeCodeRoute
+  '/learn/$slug': typeof LearnSlugRoute
+  '/learn': typeof LearnIndexRoute
   '/api/public/cashfree-webhook': typeof ApiPublicCashfreeWebhookRoute
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
 }
@@ -142,6 +158,8 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/exchange/$code': typeof ExchangeCodeRoute
+  '/learn/$slug': typeof LearnSlugRoute
+  '/learn/': typeof LearnIndexRoute
   '/api/public/cashfree-webhook': typeof ApiPublicCashfreeWebhookRoute
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
 }
@@ -160,6 +178,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/exchange/$code'
+    | '/learn/$slug'
+    | '/learn/'
     | '/api/public/cashfree-webhook'
     | '/stock/$exchange/$symbol'
   fileRoutesByTo: FileRoutesByTo
@@ -176,6 +196,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/exchange/$code'
+    | '/learn/$slug'
+    | '/learn'
     | '/api/public/cashfree-webhook'
     | '/stock/$exchange/$symbol'
   id:
@@ -192,6 +214,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/exchange/$code'
+    | '/learn/$slug'
+    | '/learn/'
     | '/api/public/cashfree-webhook'
     | '/stock/$exchange/$symbol'
   fileRoutesById: FileRoutesById
@@ -209,6 +233,8 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   ExchangeCodeRoute: typeof ExchangeCodeRoute
+  LearnSlugRoute: typeof LearnSlugRoute
+  LearnIndexRoute: typeof LearnIndexRoute
   ApiPublicCashfreeWebhookRoute: typeof ApiPublicCashfreeWebhookRoute
   StockExchangeSymbolRoute: typeof StockExchangeSymbolRoute
 }
@@ -299,6 +325,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExchangeCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/learn/': {
+      id: '/learn/'
+      path: '/learn'
+      fullPath: '/learn/'
+      preLoaderRoute: typeof LearnIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learn/$slug': {
+      id: '/learn/$slug'
+      path: '/learn/$slug'
+      fullPath: '/learn/$slug'
+      preLoaderRoute: typeof LearnSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/cashfree-webhook': {
       id: '/api/public/cashfree-webhook'
       path: '/api/public/cashfree-webhook'
@@ -329,6 +369,8 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   ExchangeCodeRoute: ExchangeCodeRoute,
+  LearnSlugRoute: LearnSlugRoute,
+  LearnIndexRoute: LearnIndexRoute,
   ApiPublicCashfreeWebhookRoute: ApiPublicCashfreeWebhookRoute,
   StockExchangeSymbolRoute: StockExchangeSymbolRoute,
 }

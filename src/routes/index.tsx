@@ -3,6 +3,7 @@ import { ArrowUpRight, Globe2, LineChart, ShieldCheck } from "lucide-react";
 
 import { Shell } from "@/components/ds/Shell";
 import { TopicIndex } from "@/components/ds/TopicIndex";
+import { GUIDES } from "@/lib/deepscreen/guides";
 import { learnKeywords, metaKeywords, screenerKeywords, stocksKeywords } from "@/lib/seo/keywords";
 import { SearchBar } from "@/components/ds/SearchBar";
 import { LiveNewsFeed } from "@/components/ds/LiveNewsFeed";
@@ -212,6 +213,31 @@ function Home() {
           </div>
         </section>
       </div>
+      <section aria-labelledby="guides" className="mt-12 border-t border-border pt-8">
+        <h2 id="guides" className="text-lg font-semibold text-foreground">
+          Market guides and answers
+        </h2>
+        <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
+          Plain-English explainers on screening, valuation, charts, IPOs, options and portfolio
+          construction across Indian, US and UK markets.
+        </p>
+        <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+          {GUIDES.map((g) => (
+            <li key={g.slug}>
+              <Link
+                to="/learn/$slug"
+                params={{ slug: g.slug }}
+                className="text-sm text-primary hover:underline"
+              >
+                {g.h1}
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <Link to="/learn" className="mt-4 inline-block text-xs font-medium text-primary hover:underline">
+          Browse all guides
+        </Link>
+      </section>
       <TopicIndex title={"Every stock-market topic DeepScreen covers"} intro={"Browse the search topics DeepScreen answers, from stock market basics and screening filters to IPOs, options, dividends and market-by-market coverage."} />
     </Shell>
   );

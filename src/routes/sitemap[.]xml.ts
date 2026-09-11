@@ -5,6 +5,7 @@ import { sitemapPathForLocation, sitemapStaticPaths, sitemapXML, type SitemapEnt
 import { isSitemapRouteIncluded } from "@/lib/sitemap";
 import { EXCHANGES } from "@/lib/deepscreen/exchanges";
 import { STOCKS } from "@/lib/deepscreen/stocks";
+import { GUIDES } from "@/lib/deepscreen/guides";
 
 const BASE_URL = "https://deepscreen.online";
 
@@ -41,6 +42,20 @@ export const Route = createFileRoute("/sitemap.xml")({
                 hash: "",
               });
               const path = sitemapPathForLocation(router, location, stockRouteId);
+              if (path) entries.push({ path });
+            }
+          }
+
+          const guideRouteId = "/learn/$slug";
+          if (isSitemapRouteIncluded(router.routesById[guideRouteId])) {
+            for (const guide of GUIDES) {
+              const location = router.buildLocation({
+                to: "/learn/$slug",
+                params: { slug: guide.slug },
+                search: () => ({}),
+                hash: "",
+              });
+              const path = sitemapPathForLocation(router, location, guideRouteId);
               if (path) entries.push({ path });
             }
           }
