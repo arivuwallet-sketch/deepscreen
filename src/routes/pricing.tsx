@@ -33,6 +33,57 @@ export const Route = createFileRoute("/pricing")({
       { property: "og:url", content: "https://deepscreen.online/pricing" },
     ],
     links: [{ rel: "canonical", href: "https://deepscreen.online/pricing" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: "DeepScreen Pro",
+          url: "https://deepscreen.online/pricing",
+          description:
+            "Full DeepScreen analysis engine: twelve-factor verdict, DCF and Graham valuation, forensic breakdowns, alerts and portfolio X-Ray.",
+          brand: { "@type": "Brand", name: "DeepScreen" },
+          offers: [
+            {
+              "@type": "Offer",
+              name: "Weekly",
+              price: "25",
+              priceCurrency: "INR",
+              url: "https://deepscreen.online/pricing",
+              availability: "https://schema.org/InStock",
+            },
+            {
+              "@type": "Offer",
+              name: "Monthly",
+              price: "75",
+              priceCurrency: "INR",
+              url: "https://deepscreen.online/pricing",
+              availability: "https://schema.org/InStock",
+            },
+            {
+              "@type": "Offer",
+              name: "Yearly",
+              price: "800",
+              priceCurrency: "INR",
+              url: "https://deepscreen.online/pricing",
+              availability: "https://schema.org/InStock",
+            },
+          ],
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: "https://deepscreen.online/" },
+            { "@type": "ListItem", position: 2, name: "Pricing", item: "https://deepscreen.online/pricing" },
+          ],
+        }),
+      },
+    ],
   }),
   component: PricingPage,
 });

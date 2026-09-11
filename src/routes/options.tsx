@@ -38,8 +38,22 @@ export const Route = createFileRoute("/options")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "https://deepscreen.online/options" },
+      { name: "keywords", content: "options Greeks, delta gamma theta vega, Black-Scholes calculator, options strategies, iron condor, straddle, payoff diagram" },
     ],
     links: [{ rel: "canonical", href: "https://deepscreen.online/options" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: "https://deepscreen.online/" },
+            { "@type": "ListItem", position: 2, name: "Options strategy lab", item: "https://deepscreen.online/options" },
+          ],
+        }),
+      },
+    ],
   }),
   component: OptionsPage,
 });

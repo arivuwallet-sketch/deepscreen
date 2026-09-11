@@ -22,8 +22,10 @@ export const Route = createFileRoute("/exchange/$code")({
   head: ({ loaderData }) => {
     const name = loaderData?.exchange.name ?? "Exchange";
     const code = loaderData?.exchange.code ?? "";
-    const title = `${code} Screener — ${name} | DeepScreen`;
-    const description = `Screen ${name} (${code}) listings by large, mid and small cap with full fundamental scoring and the latest market news.`;
+    const country = loaderData?.exchange.country ?? "";
+    const currency = loaderData?.exchange.currency ?? "";
+    const title = `${code} Stock Screener — ${name}${country ? `, ${country}` : ""} | DeepScreen`;
+    const description = `Screen ${name} (${code}) listings in ${country || "this market"} by large, mid and small cap with twelve-factor fundamental scoring, ${currency} prices and the latest market news.`;
     const url = `https://deepscreen.online/exchange/${code}`;
     return {
       meta: [
@@ -46,6 +48,16 @@ export const Route = createFileRoute("/exchange/$code")({
             description,
             url,
             isPartOf: { "@type": "WebSite", name: "DeepScreen", url: "https://deepscreen.online" },
+            ...(country
+              ? { spatialCoverage: { "@type": "Country", name: country } }
+              : {}),
+            breadcrumb: {
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                { "@type": "ListItem", position: 1, name: "Home", item: "https://deepscreen.online/" },
+                { "@type": "ListItem", position: 2, name: `${code} screener`, item: url },
+              ],
+            },
           }),
         },
       ],

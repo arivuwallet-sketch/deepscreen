@@ -37,5 +37,7 @@ Allow: /
 User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /auth
+Disallow: /portfolio
 
 Sitemap: https://deepscreen.online/sitemap.xml

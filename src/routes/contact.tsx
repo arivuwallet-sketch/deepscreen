@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { Shell } from "@/components/ds/Shell";
+import { LeadForm } from "@/components/ds/LeadForm";
 
 export const Route = createFileRoute("/contact")({
   staticData: { sitemap: true },
@@ -20,8 +21,51 @@ export const Route = createFileRoute("/contact")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "https://deepscreen.online/contact" },
+      { name: "keywords", content: "contact DeepScreen, support, billing help" },
     ],
     links: [{ rel: "canonical", href: "https://deepscreen.online/contact" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "ContactPage",
+          name: "Contact DeepScreen",
+          url: "https://deepscreen.online/contact",
+          mainEntity: {
+            "@type": "Organization",
+            name: "DeepScreen",
+            url: "https://deepscreen.online",
+            email: "deepscreen.online@outlook.com",
+            contactPoint: [
+              {
+                "@type": "ContactPoint",
+                contactType: "customer support",
+                email: "deepscreen.online@outlook.com",
+                availableLanguage: ["en"],
+                hoursAvailable: {
+                  "@type": "OpeningHoursSpecification",
+                  dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                  opens: "09:00",
+                  closes: "18:00",
+                },
+              },
+            ],
+          },
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: "https://deepscreen.online/" },
+            { "@type": "ListItem", position: 2, name: "Contact", item: "https://deepscreen.online/contact" },
+          ],
+        }),
+      },
+    ],
   }),
   component: ContactPage,
 });
@@ -55,6 +99,11 @@ function ContactPage() {
               Monday to Friday, 9:00 AM – 6:00 PM (IST)
             </p>
           </div>
+          <LeadForm
+            heading="Send us your question"
+            intro="Fill this in and we will reply from deepscreen.online@outlook.com, usually within 24 to 48 hours."
+            subject="DeepScreen support request"
+          />
           <div>
             <h2 className="text-base font-semibold text-foreground">For Billing Inquiries</h2>
             <p className="mt-2">

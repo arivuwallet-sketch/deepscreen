@@ -88,6 +88,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "index, follow" },
       { property: "og:site_name", content: "DeepScreen" },
+      { property: "og:locale", content: "en_IN" },
     ],
     scripts: [
       {
@@ -99,6 +100,31 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           url: "https://deepscreen.online",
           description:
             "Global stock screener and fundamental analysis for NSE, BSE, NYSE, Nasdaq and LSE.",
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "DeepScreen",
+          url: "https://deepscreen.online",
+          email: "deepscreen.online@outlook.com",
+          areaServed: ["IN", "US", "GB"],
+          contactPoint: [
+            {
+              "@type": "ContactPoint",
+              contactType: "customer support",
+              email: "deepscreen.online@outlook.com",
+              availableLanguage: ["en"],
+              hoursAvailable: {
+                "@type": "OpeningHoursSpecification",
+                dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                opens: "09:00",
+                closes: "18:00",
+              },
+            },
+          ],
         }),
       },
     ],

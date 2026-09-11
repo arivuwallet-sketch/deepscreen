@@ -39,8 +39,22 @@ export const Route = createFileRoute("/ipo")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "https://deepscreen.online/ipo" },
+      { name: "keywords", content: "IPO calendar, NSE IPO, BSE SME IPO, upcoming IPOs, IPO GMP dates, US IPO pipeline" },
     ],
     links: [{ rel: "canonical", href: "https://deepscreen.online/ipo" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: "https://deepscreen.online/" },
+            { "@type": "ListItem", position: 2, name: "IPO calendar", item: "https://deepscreen.online/ipo" },
+          ],
+        }),
+      },
+    ],
   }),
   component: IpoPage,
 });

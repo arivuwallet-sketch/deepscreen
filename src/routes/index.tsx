@@ -27,8 +27,44 @@ export const Route = createFileRoute("/")({
           "Cap-based screening, 12-factor fundamental scoring, stock-level news and a live economic calendar for India, US and UK markets.",
       },
       { property: "og:url", content: "https://deepscreen.online/" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "DeepScreen — Global Stock Screener & Fundamental Analysis" },
+      {
+        name: "twitter:description",
+        content:
+          "Screen NSE, BSE, NYSE, Nasdaq and LSE listings with 12-factor fundamental scoring, live news and an economic calendar.",
+      },
+      {
+        name: "keywords",
+        content:
+          "stock screener, NSE screener, BSE screener, NYSE screener, Nasdaq screener, LSE screener, fundamental analysis, P/E, PEG, ROCE, DCF valuation, Graham number, IPO calendar",
+      },
     ],
     links: [{ rel: "canonical", href: "https://deepscreen.online/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          name: "DeepScreen",
+          url: "https://deepscreen.online/",
+          applicationCategory: "FinanceApplication",
+          operatingSystem: "Web browser",
+          description:
+            "Multi-exchange stock screener with a twelve-factor fundamental model for Indian, US and UK listings.",
+          featureList: [
+            "Twelve-factor fundamental scoring",
+            "Cap-based screening across NSE, BSE, NYSE, Nasdaq and LSE",
+            "DCF and Graham intrinsic-value models",
+            "Live IPO calendar",
+            "Earnings and dividend calendar",
+            "Options Greeks and strategy payoffs",
+          ],
+        }),
+      },
+    ],
   }),
   component: Home,
 });
@@ -111,6 +147,71 @@ function Home() {
             Highest-scoring companies globally
           </h2>
           <StockTable stocks={top} />
+        </section>
+
+        <section aria-labelledby="answers-heading">
+          <h2 id="answers-heading" className="mb-3 text-sm font-semibold uppercase tracking-wide">
+            Common questions about DeepScreen
+          </h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-lg border border-border bg-panel p-4">
+              <h3 className="text-sm font-semibold">What is DeepScreen?</h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                DeepScreen is a stock screener that scores listed companies on {EXCHANGES.length}{" "}
+                exchanges — NSE, BSE, NYSE, Nasdaq and LSE — using a twelve-factor valuation and
+                quality model covering P/E, PEG, P/S, P/B, EV/Revenue, EV/EBITDA, ROE, ROA, ROCE,
+                leverage, payout and operating leverage.
+              </p>
+            </div>
+            <div className="rounded-lg border border-border bg-panel p-4">
+              <h3 className="text-sm font-semibold">Which markets does it cover?</h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Indian markets through the{" "}
+                <Link to="/exchange/$code" params={{ code: "NSE" }} className="text-primary hover:underline">
+                  NSE
+                </Link>{" "}
+                and{" "}
+                <Link to="/exchange/$code" params={{ code: "BSE" }} className="text-primary hover:underline">
+                  BSE
+                </Link>
+                , US markets through the{" "}
+                <Link to="/exchange/$code" params={{ code: "NYSE" }} className="text-primary hover:underline">
+                  NYSE
+                </Link>{" "}
+                and{" "}
+                <Link to="/exchange/$code" params={{ code: "NASDAQ" }} className="text-primary hover:underline">
+                  Nasdaq
+                </Link>
+                , and UK markets through the{" "}
+                <Link to="/exchange/$code" params={{ code: "LSE" }} className="text-primary hover:underline">
+                  LSE
+                </Link>
+                .
+              </p>
+            </div>
+            <div className="rounded-lg border border-border bg-panel p-4">
+              <h3 className="text-sm font-semibold">Can I use it free?</h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Yes. Search, raw fundamental ratios, the IPO pipeline, news and the economic calendar
+                are free. The full verdict, valuation models and alerts are part of Pro — see{" "}
+                <Link to="/pricing" className="text-primary hover:underline">
+                  pricing
+                </Link>
+                .
+              </p>
+            </div>
+            <div className="rounded-lg border border-border bg-panel p-4">
+              <h3 className="text-sm font-semibold">Is this investment advice?</h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                No. DeepScreen publishes analytical model output for research and education only, not
+                investment advice. Questions? Reach the team on the{" "}
+                <Link to="/contact" className="text-primary hover:underline">
+                  contact page
+                </Link>
+                .
+              </p>
+            </div>
+          </div>
         </section>
       </div>
     </Shell>

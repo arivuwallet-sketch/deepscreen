@@ -27,8 +27,22 @@ export const Route = createFileRoute("/calendar")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "https://deepscreen.online/calendar" },
+      { name: "keywords", content: "earnings calendar, dividend ex-date, EPS estimates, NSE earnings, BSE dividends, US earnings dates" },
     ],
     links: [{ rel: "canonical", href: "https://deepscreen.online/calendar" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: "https://deepscreen.online/" },
+            { "@type": "ListItem", position: 2, name: "Earnings & dividend calendar", item: "https://deepscreen.online/calendar" },
+          ],
+        }),
+      },
+    ],
   }),
   component: CalendarPage,
 });
