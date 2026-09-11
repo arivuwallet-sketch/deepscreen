@@ -213,32 +213,40 @@ function Home() {
           </div>
         </section>
       </div>
-      <section aria-labelledby="guides" className="mt-12 border-t border-border pt-8">
-        <h2 id="guides" className="text-lg font-semibold text-foreground">
-          Market guides and answers
-        </h2>
-        <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
-          Plain-English explainers on screening, valuation, charts, IPOs, options and portfolio
-          construction across Indian, US and UK markets.
-        </p>
-        <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-          {GUIDES.map((g) => (
-            <li key={g.slug}>
-              <Link
-                to="/learn/$slug"
-                params={{ slug: g.slug }}
-                className="text-sm text-primary hover:underline"
-              >
-                {g.h1}
-              </Link>
-            </li>
-          ))}
-        </ul>
-        <Link to="/learn" className="mt-4 inline-block text-xs font-medium text-primary hover:underline">
-          Browse all guides
-        </Link>
+      <section aria-labelledby="guides" className="mt-14 border-t border-border">
+        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+          <h2 id="guides" className="text-lg font-semibold tracking-tight text-foreground">
+            Market guides and answers
+          </h2>
+          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+            Plain-English explainers on screening, valuation, charts, IPOs, options and portfolio
+            construction across Indian, US and UK markets.
+          </p>
+          <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {GUIDES.map((g) => (
+              <li key={g.slug}>
+                <Link
+                  to="/learn/$slug"
+                  params={{ slug: g.slug }}
+                  className="block rounded-lg border border-border bg-card/40 px-4 py-3 text-sm text-primary transition-colors hover:bg-accent"
+                >
+                  {g.h1}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <Link
+            to="/learn"
+            className="mt-6 inline-block text-xs font-medium text-primary hover:underline"
+          >
+            Browse all guides
+          </Link>
+        </div>
       </section>
-      <TopicIndex title={"Every stock-market topic DeepScreen covers"} intro={"Browse the search topics DeepScreen answers, from stock market basics and screening filters to IPOs, options, dividends and market-by-market coverage."} />
+      <TopicIndex
+        title="Every stock-market topic DeepScreen covers"
+        intro="Browse the search topics DeepScreen answers, from screening filters and stock fundamentals to IPOs, options, dividends and market-by-market coverage."
+      />
     </Shell>
   );
 }

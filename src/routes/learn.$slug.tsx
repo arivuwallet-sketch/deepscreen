@@ -144,7 +144,7 @@ function GuidePage() {
           </ul>
         </section>
 
-        <TopicIndex ids={guide.groups} title="Related topics" />
+        <TopicIndex ids={guide.groups} title="Related topics" inContainer limit={30} />
 
         <p className="mt-10 text-xs text-muted-foreground">
           Educational content only. Nothing here is investment advice. Last updated {guide.updated}.

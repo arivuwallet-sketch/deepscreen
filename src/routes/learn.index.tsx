@@ -90,7 +90,8 @@ function LearnIndex() {
 
         <TopicIndex
           title="Every topic covered on DeepScreen"
-          intro="Browse the full subject index and jump straight to the tool that answers it."
+          intro="Browse the subject index and jump straight to the tool that answers it."
+          inContainer
         />
       </div>
     </Shell>
