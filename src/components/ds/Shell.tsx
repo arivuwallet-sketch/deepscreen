@@ -60,6 +60,17 @@ export function Shell({ children }: { children: ReactNode }) {
       </header>
       <main>{children}</main>
       <footer className="mt-16 border-t border-border py-8 text-center text-xs text-muted-foreground">
+        <nav className="mb-3 flex flex-wrap justify-center gap-4">
+          <Link to="/contact" className="hover:text-foreground">
+            Contact Us
+          </Link>
+          <Link to="/terms" className="hover:text-foreground">
+            Terms of Service
+          </Link>
+          <Link to="/privacy" className="hover:text-foreground">
+            Privacy Policy
+          </Link>
+        </nav>
         DeepScreen — cross-exchange fundamental screening for India, the US and the UK. Analytical
         model output, not investment advice.
       </footer>
