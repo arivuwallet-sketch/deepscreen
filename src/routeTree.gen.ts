@@ -12,11 +12,14 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CalendarRouteImport } from './routes/calendar'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as IpoRouteImport } from './routes/ipo'
 import { Route as OptionsRouteImport } from './routes/options'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ExchangeCodeRouteImport } from './routes/exchange.$code'
 import { Route as ApiPublicCashfreeWebhookRouteImport } from './routes/api/public/cashfree-webhook'
 import { Route as StockExchangeSymbolRouteImport } from './routes/stock.$exchange.$symbol'
@@ -34,6 +37,11 @@ const AuthRoute = AuthRouteImport.update({
 const CalendarRoute = CalendarRouteImport.update({
   id: '/calendar',
   path: '/calendar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IpoRoute = IpoRouteImport.update({
@@ -56,9 +64,19 @@ const PricingRoute = PricingRouteImport.update({
   path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExchangeCodeRoute = ExchangeCodeRouteImport.update({
@@ -82,11 +100,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/calendar': typeof CalendarRoute
+  '/contact': typeof ContactRoute
   '/ipo': typeof IpoRoute
   '/options': typeof OptionsRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/exchange/$code': typeof ExchangeCodeRoute
   '/api/public/cashfree-webhook': typeof ApiPublicCashfreeWebhookRoute
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
@@ -95,11 +116,14 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/calendar': typeof CalendarRoute
+  '/contact': typeof ContactRoute
   '/ipo': typeof IpoRoute
   '/options': typeof OptionsRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/exchange/$code': typeof ExchangeCodeRoute
   '/api/public/cashfree-webhook': typeof ApiPublicCashfreeWebhookRoute
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
@@ -109,11 +133,14 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/calendar': typeof CalendarRoute
+  '/contact': typeof ContactRoute
   '/ipo': typeof IpoRoute
   '/options': typeof OptionsRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/exchange/$code': typeof ExchangeCodeRoute
   '/api/public/cashfree-webhook': typeof ApiPublicCashfreeWebhookRoute
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
@@ -124,11 +151,14 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/calendar'
+    | '/contact'
     | '/ipo'
     | '/options'
     | '/portfolio'
     | '/pricing'
+    | '/privacy'
     | '/sitemap.xml'
+    | '/terms'
     | '/exchange/$code'
     | '/api/public/cashfree-webhook'
     | '/stock/$exchange/$symbol'
@@ -137,11 +167,14 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/calendar'
+    | '/contact'
     | '/ipo'
     | '/options'
     | '/portfolio'
     | '/pricing'
+    | '/privacy'
     | '/sitemap.xml'
+    | '/terms'
     | '/exchange/$code'
     | '/api/public/cashfree-webhook'
     | '/stock/$exchange/$symbol'
@@ -150,11 +183,14 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/calendar'
+    | '/contact'
     | '/ipo'
     | '/options'
     | '/portfolio'
     | '/pricing'
+    | '/privacy'
     | '/sitemap.xml'
+    | '/terms'
     | '/exchange/$code'
     | '/api/public/cashfree-webhook'
     | '/stock/$exchange/$symbol'
@@ -164,11 +200,14 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
   CalendarRoute: typeof CalendarRoute
+  ContactRoute: typeof ContactRoute
   IpoRoute: typeof IpoRoute
   OptionsRoute: typeof OptionsRoute
   PortfolioRoute: typeof PortfolioRoute
   PricingRoute: typeof PricingRoute
+  PrivacyRoute: typeof PrivacyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TermsRoute: typeof TermsRoute
   ExchangeCodeRoute: typeof ExchangeCodeRoute
   ApiPublicCashfreeWebhookRoute: typeof ApiPublicCashfreeWebhookRoute
   StockExchangeSymbolRoute: typeof StockExchangeSymbolRoute
@@ -195,6 +234,13 @@ declare module '@tanstack/react-router' {
       path: '/calendar'
       fullPath: '/calendar'
       preLoaderRoute: typeof CalendarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ipo': {
@@ -225,11 +271,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/exchange/$code': {
@@ -260,11 +320,14 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
   CalendarRoute: CalendarRoute,
+  ContactRoute: ContactRoute,
   IpoRoute: IpoRoute,
   OptionsRoute: OptionsRoute,
   PortfolioRoute: PortfolioRoute,
   PricingRoute: PricingRoute,
+  PrivacyRoute: PrivacyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TermsRoute: TermsRoute,
   ExchangeCodeRoute: ExchangeCodeRoute,
   ApiPublicCashfreeWebhookRoute: ApiPublicCashfreeWebhookRoute,
   StockExchangeSymbolRoute: StockExchangeSymbolRoute,
