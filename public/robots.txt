@@ -10,33 +10,37 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
+User-agent: ChatGPT-User
+Allow: /
+
 User-agent: GPTBot
 Allow: /
 
 User-agent: OAI-SearchBot
 Allow: /
 
-User-agent: ChatGPT-User
-Allow: /
-
-User-agent: ClaudeBot
-Allow: /
-
-User-agent: Claude-SearchBot
+User-agent: Google-Extended
 Allow: /
 
 User-agent: PerplexityBot
 Allow: /
 
-User-agent: Applebot
+User-agent: Anthropic-ai
 Allow: /
 
-User-agent: Google-Extended
+User-…•¹Ğè±…Õ‘”µ]•ˆ)±±½Üè€¼()UÍ•Èµ…•¹Ğè±…Õ‘•	½Ğ)±±½Üè€¼()UÍ•Èµ…•¹Ğè±…Õ‘”µM•…É¡	½Ğ)±±½Üè€¼()UÍ•Èµ…•¹ĞèÁÁ±•‰½Ğ)±±½Üè€¼()UÍ•Èµ…•¹ĞèÁÁ±•‰½ĞµáÑ•¹‘•)±±½Üè€¼()UÍ•È¶vVçC¢Ö¦öæ&÷@¤ÆÆ÷s¢ğ ¥W6W"ÖvVçC¢ÖWFÔW‡FW&æÄvVç@¤ÆÆ÷s¢ğ ¥W6W"ØYÙ[ˆY]KY^\›˜[YÙ[[İÎˆÂ‚•\Ù\‹XYÙ[ˆ]\ÜY\‚[İÎˆÂ‚•\Ù\‹XYÙ[ˆY™˜›İ[İÎˆÂ‚•\Ù\‹XYÙ[ˆZ™YœĞ›İ[İÎˆÂ‚•\Ù\‹agent: SemrushBot
+Allow: /
+
+User-agent: MJ12bot
+Allow: /
+
+User-agent: DotBot
 Allow: /
 
 User-agent: *
 Allow: /
-Disallow: /api/
+
+Disallow* /api/
 Disallow: /auth
 Disallow: /portfolio
 
