@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowUpRight, Globe2, LineChart, ShieldCheck } from "lucide-react";
 
 import { Shell } from "@/components/ds/Shell";
+import { TopicIndex } from "@/components/ds/TopicIndex";
+import { learnKeywords, metaKeywords, screenerKeywords, stocksKeywords } from "@/lib/seo/keywords";
 import { SearchBar } from "@/components/ds/SearchBar";
 import { LiveNewsFeed } from "@/components/ds/LiveNewsFeed";
 import { EconomicCalendar } from "@/components/ds/EconomicCalendar";
@@ -35,11 +37,7 @@ export const Route = createFileRoute("/")({
         content:
           "Screen NSE, BSE, NYSE, Nasdaq and LSE listings with 12-factor fundamental scoring, live news and an economic calendar.",
       },
-      {
-        name: "keywords",
-        content:
-          "stock screener, NSE screener, BSE screener, NYSE screener, Nasdaq screener, LSE screener, fundamental analysis, P/E, PEG, ROCE, DCF valuation, Graham number, IPO calendar",
-      },
+      { name: "keywords", content: metaKeywords(screenerKeywords, stocksKeywords, learnKeywords) },
     ],
     links: [{ rel: "canonical", href: "https://deepscreen.online/" }],
     scripts: [
@@ -214,6 +212,7 @@ function Home() {
           </div>
         </section>
       </div>
+      <TopicIndex title={"Every stock-market topic DeepScreen covers"} intro={"Browse the search topics DeepScreen answers, from stock market basics and screening filters to IPOs, options, dividends and market-by-market coverage."} />
     </Shell>
   );
 }

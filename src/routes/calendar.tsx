@@ -3,6 +3,8 @@ import { CalendarDays, Coins } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { Shell } from "@/components/ds/Shell";
+import { TopicIndex } from "@/components/ds/TopicIndex";
+import { calendarKeywords, metaKeywords, screenerKeywords } from "@/lib/seo/keywords";
 import { useWatchlist } from "@/hooks/useWatchlist";
 import { eventsFor, type CorporateEvent } from "@/lib/deepscreen/events";
 import { formatPrice } from "@/lib/deepscreen/format";
@@ -27,7 +29,7 @@ export const Route = createFileRoute("/calendar")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "https://deepscreen.online/calendar" },
-      { name: "keywords", content: "earnings calendar, dividend ex-date, EPS estimates, NSE earnings, BSE dividends, US earnings dates" },
+      { name: "keywords", content: metaKeywords(calendarKeywords, screenerKeywords) },
     ],
     links: [{ rel: "canonical", href: "https://deepscreen.online/calendar" }],
     scripts: [
@@ -154,6 +156,7 @@ function CalendarPage() {
           ))}
         </div>
       </div>
+      <TopicIndex ids={["calendar"]} title={"Earnings, dividend and market calendar topics"} />
     </Shell>
   );
 }

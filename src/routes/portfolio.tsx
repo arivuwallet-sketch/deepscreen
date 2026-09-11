@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 
 import { Shell } from "@/components/ds/Shell";
+import { TopicIndex } from "@/components/ds/TopicIndex";
+import { metaKeywords, portfolioKeywords, stocksKeywords } from "@/lib/seo/keywords";
 import { PaywallGate } from "@/components/ds/PaywallGate";
 import {
   quoteKey,
@@ -26,6 +28,7 @@ export const Route = createFileRoute("/portfolio")({
         content:
           "Weighted P/E, PEG, leverage risk and sector diversification for every stock on your DeepScreen watchlist, computed from live market data.",
       },
+      { name: "keywords", content: metaKeywords(portfolioKeywords, stocksKeywords) },
       { property: "og:title", content: "Portfolio Health & Risk Matrix — DeepScreen" },
       {
         property: "og:description",
@@ -191,6 +194,7 @@ function PortfolioPage() {
         </div>
         </PaywallGate>
       </div>
+      <TopicIndex ids={["portfolio"]} title={"Portfolio and diversification topics"} />
     </Shell>
   );
 }

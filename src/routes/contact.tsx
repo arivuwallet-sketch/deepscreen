@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { Shell } from "@/components/ds/Shell";
+import { TopicIndex } from "@/components/ds/TopicIndex";
+import { learnKeywords, metaKeywords, screenerKeywords } from "@/lib/seo/keywords";
 import { LeadForm } from "@/components/ds/LeadForm";
 
 export const Route = createFileRoute("/contact")({
@@ -21,7 +23,7 @@ export const Route = createFileRoute("/contact")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "https://deepscreen.online/contact" },
-      { name: "keywords", content: "contact DeepScreen, support, billing help" },
+      { name: "keywords", content: metaKeywords(learnKeywords, screenerKeywords) },
     ],
     links: [{ rel: "canonical", href: "https://deepscreen.online/contact" }],
     scripts: [
@@ -114,6 +116,7 @@ function ContactPage() {
           </div>
         </div>
       </div>
+      <TopicIndex ids={["learn"]} title={"Questions we get asked about"} />
     </Shell>
   );
 }

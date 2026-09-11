@@ -1,6 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 
 import { Shell } from "@/components/ds/Shell";
+import { TopicIndex } from "@/components/ds/TopicIndex";
+import { learnKeywords, metaKeywords, stocksKeywords } from "@/lib/seo/keywords";
 import { LiveNewsFeed } from "@/components/ds/LiveNewsFeed";
 import { DcfCalculator } from "@/components/ds/DcfCalculator";
 import { GrahamCalculator } from "@/components/ds/GrahamCalculator";
@@ -67,6 +69,7 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
       meta: [
         { title },
         { name: "description", content: description },
+      { name: "keywords", content: metaKeywords(stocksKeywords, learnKeywords) },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:url", content: url },
@@ -422,6 +425,7 @@ function StockPage() {
           />
         </section>
       </div>
+      <TopicIndex ids={["stocks"]} title={"Stock research topics"} />
     </Shell>
   );
 }

@@ -2,6 +2,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 
 import { Shell } from "@/components/ds/Shell";
+import { TopicIndex } from "@/components/ds/TopicIndex";
 import { LiveNewsFeed } from "@/components/ds/LiveNewsFeed";
 import { StockTable } from "@/components/ds/StockTable";
 import { EXCHANGES, getExchange } from "@/lib/deepscreen/exchanges";
@@ -11,6 +12,15 @@ import { analyze } from "@/lib/deepscreen/metrics";
 import { CAP_LABEL } from "@/lib/deepscreen/format";
 import type { CapTier } from "@/lib/deepscreen/types";
 import { cn } from "@/lib/utils";
+import { exchangeKeywords, metaKeywords, screenerKeywords } from "@/lib/seo/keywords";
+
+const TOPIC_BY_EXCHANGE: Record<string, string> = {
+  NSE: "india",
+  BSE: "india",
+  NYSE: "us",
+  NASDAQ: "us",
+  LSE: "uk",
+};
 
 export const Route = createFileRoute("/exchange/$code")({
   staticData: { sitemap: true },
@@ -36,6 +46,10 @@ export const Route = createFileRoute("/exchange/$code")({
         { property: "og:url", content: url },
         { property: "og:type", content: "website" },
         { name: "twitter:card", content: "summary_large_image" },
+        {
+          name: "keywords",
+          content: metaKeywords(exchangeKeywords[code] ?? [], screenerKeywords),
+        },
       ],
       links: [{ rel: "canonical", href: url }],
       scripts: [
@@ -236,6 +250,10 @@ function ExchangePage() {
           </section>
         </div>
       </div>
+      <TopicIndex
+        ids={[TOPIC_BY_EXCHANGE[exchange.code] ?? "screener", "screener"]}
+        title={`${exchange.code} search topics covered on DeepScreen`}
+      />
     </Shell>
   );
 }

@@ -12,6 +12,8 @@ import {
 } from "recharts";
 
 import { Shell } from "@/components/ds/Shell";
+import { TopicIndex } from "@/components/ds/TopicIndex";
+import { metaKeywords, optionsKeywords, screenerKeywords } from "@/lib/seo/keywords";
 import { useLiveQuote } from "@/hooks/useLiveQuotes";
 import { formatPrice } from "@/lib/deepscreen/format";
 import { searchStocks, findStock } from "@/lib/deepscreen/stocks";
@@ -38,7 +40,7 @@ export const Route = createFileRoute("/options")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "https://deepscreen.online/options" },
-      { name: "keywords", content: "options Greeks, delta gamma theta vega, Black-Scholes calculator, options strategies, iron condor, straddle, payoff diagram" },
+      { name: "keywords", content: metaKeywords(optionsKeywords, screenerKeywords) },
     ],
     links: [{ rel: "canonical", href: "https://deepscreen.online/options" }],
     scripts: [
@@ -160,6 +162,7 @@ function OptionsPage() {
           ))}
         </div>
       </div>
+      <TopicIndex ids={["options"]} title={"Options, futures and derivatives topics"} />
     </Shell>
   );
 }

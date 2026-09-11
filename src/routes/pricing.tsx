@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Shell } from "@/components/ds/Shell";
+import { TopicIndex } from "@/components/ds/TopicIndex";
+import { metaKeywords, screenerKeywords, stocksKeywords } from "@/lib/seo/keywords";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { PLANS, useSubscription, type Plan } from "@/hooks/useSubscription";
@@ -22,6 +24,7 @@ export const Route = createFileRoute("/pricing")({
         content:
           "Unlock DeepScreen Pro: 12-factor deep scores, DCF & Graham valuation, Vision score, Secret Tips, forensic breakdowns, sell alerts and portfolio X-ray.",
       },
+      { name: "keywords", content: metaKeywords(screenerKeywords, stocksKeywords) },
       { property: "og:title", content: "DeepScreen Pro Pricing" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -276,6 +279,7 @@ function PricingPage() {
           to keep your plan across devices.
         </p>
       </div>
+      <TopicIndex ids={["screener"]} title={"What you can screen for on any DeepScreen plan"} />
     </Shell>
   );
 }

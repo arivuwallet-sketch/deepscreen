@@ -4,6 +4,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 
 import { Shell } from "@/components/ds/Shell";
+import { TopicIndex } from "@/components/ds/TopicIndex";
+import { ipoKeywords, metaKeywords, screenerKeywords } from "@/lib/seo/keywords";
 import { EXCHANGES } from "@/lib/deepscreen/exchanges";
 import { formatPrice } from "@/lib/deepscreen/format";
 import { IPOS, daysAway, ipoStatus, type IpoStatus } from "@/lib/deepscreen/ipos";
@@ -39,7 +41,7 @@ export const Route = createFileRoute("/ipo")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "https://deepscreen.online/ipo" },
-      { name: "keywords", content: "IPO calendar, NSE IPO, BSE SME IPO, upcoming IPOs, IPO GMP dates, US IPO pipeline" },
+      { name: "keywords", content: metaKeywords(ipoKeywords, screenerKeywords) },
     ],
     links: [{ rel: "canonical", href: "https://deepscreen.online/ipo" }],
     scripts: [
@@ -301,6 +303,7 @@ function IpoPage() {
           </ul>
         )}
       </div>
+      <TopicIndex ids={["ipo"]} title={"IPO and new listing topics"} />
     </Shell>
   );
 }
