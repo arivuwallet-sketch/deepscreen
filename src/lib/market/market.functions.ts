@@ -360,22 +360,88 @@ export const getEconomicEvents = createServerFn({ method: "GET" }).handler(
   },
 );
 
+export interface LiveNewsResult {
+  items: FeedItem[];
+  fetchedAt: number;
+  stale: boolean;
+  providerCount: number;
+}
+
+const NEWS_CACHE_TTL_MS = 2 * 60_000;
+const newsMemoryCache = new Map<string, { data: LiveNewsResult; fetchedAt: number }>();
+const newsInFlight = new Map<string, Promise<LiveNewsResult>>();
+
+function newsKey(query: string): string {
+  return query.trim().replace(/\s+/g, " ").toLowerCase().slice(0, 240);
+}
+
 export const getNewsFeed = createServerFn({ method: "GET" })
   .inputValidator((d: { query: string; limit?: number }) => d)
-  .handler(async ({ data }): Promise<FeedItem[]> => {
-    const { fetchFeed, googleNewsFeed, bingNewsFeed, dedupe } = await import("@/lib/rss.server");
-    const limit = data.limit ?? 14;
-    // Two independent providers in parallel: if one is rate-limited or down
-    // (Google News RSS in particular is a common target for anti-bot blocks
-    // against server/cloud IPs), the feed still has the other rather than
-    // going silently empty.
-    const [google, bing] = await Promise.all([
-      fetchFeed(googleNewsFeed(data.query), "Google News", "market", limit),
-      fetchFeed(bingNewsFeed(data.query), "Bing News", "market", limit),
-    ]);
-    return dedupe([...google, ...bing])
-      .sort((a, b) => a.minutesAgo - b.minutesAgo)
-      .slice(0, limit);
+  .handler(async ({ data }): Promise<LiveNewsResult> => {
+    const { dedupe, refreshAges } = await import("@/lib/rss.server");
+    const limit = Math.min(Math.max(data.limit ?? 14, 1), 30);
+    const key = newsKey(data.query);
+    if (!key) return { items: [], fetchedAt: Date.now(), stale: false, providerCount: 0 };
+
+    const memory = newsMemoryCache.get(key);
+    if (memory && Date.now() - memory.fetchedAt < NEWS_CACHE_TTL_MS) {
+      return { ...memory.data, items: refreshAges(memory.data.items) };
+    }
+
+    const existing = newsInFlight.get(key);
+    if (existing) return existing;
+
+    const request = (async (): Promise<LiveNewsResult> => {
+      const { fetchFeed, fetchYahooNews, googleNewsFeed, bingNewsFeed } = await import("@/lib/rss.server");
+      const { readNewsCache, writeNewsCache } = await import("./news-cache.server");
+      const persisted = await readNewsCache(key);
+      if (persisted && Date.now() - persisted.fetchedAt < NEWS_CACHE_TTL_MS) {
+        const result = {
+          items: refreshAges(persisted.items).slice(0, limit),
+          fetchedAt: persisted.fetchedAt,
+          stale: false,
+          providerCount: 0,
+        };
+        newsMemoryCache.set(key, { data: result, fetchedAt: Date.now() });
+        return result;
+      }
+
+      const [google, bing, yahoo] = await Promise.all([
+        fetchFeed(googleNewsFeed(data.query), "Google News", "market", limit),
+        fetchFeed(bingNewsFeed(data.query), "Bing News", "market", limit),
+        fetchYahooNews(data.query, limit),
+      ]);
+      const providers = [google, bing, yahoo].filter((items) => items.length > 0).length;
+      const items = dedupe([...google, ...bing, ...yahoo])
+        .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
+        .slice(0, limit);
+
+      if (items.length > 0) {
+        const fetchedAt = Date.now();
+        const result = { items: refreshAges(items), fetchedAt, stale: false, providerCount: providers };
+        newsMemoryCache.set(key, { data: result, fetchedAt });
+        await writeNewsCache(key, items, fetchedAt);
+        return result;
+      }
+
+      if (persisted) {
+        console.warn(`[news] all providers failed for ${key}; serving last-good cache`);
+        const result = {
+          items: refreshAges(persisted.items).slice(0, limit),
+          fetchedAt: persisted.fetchedAt,
+          stale: true,
+          providerCount: 0,
+        };
+        newsMemoryCache.set(key, { data: result, fetchedAt: Date.now() });
+        return result;
+      }
+
+      console.error(`[news] all providers failed and no cache exists for ${key}`);
+      return { items: [], fetchedAt: Date.now(), stale: true, providerCount: 0 };
+    })().finally(() => newsInFlight.delete(key));
+
+    newsInFlight.set(key, request);
+    return request;
   });
 
 

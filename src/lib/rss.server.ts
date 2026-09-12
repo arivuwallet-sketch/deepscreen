@@ -88,6 +88,62 @@ export function bingNewsFeed(query: string): string {
   return `https://www.bing.com/news/search?q=${encodeURIComponent(query)}&format=rss`;
 }
 
+interface YahooNewsResult {
+  uuid?: string;
+  title?: string;
+  link?: string;
+  publisher?: string;
+  providerPublishTime?: number;
+}
+
+/** Independent JSON source used when RSS providers block production servers. */
+export async function fetchYahooNews(query: string, limit = 12): Promise<FeedItem[]> {
+  try {
+    const url = `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=0&newsCount=${limit}`;
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; DeepScreen Market Research)",
+        Accept: "application/json",
+      },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) return [];
+    const body = (await res.json()) as { news?: YahooNewsResult[] };
+    const now = Date.now();
+    return (body.news ?? []).flatMap((item, index) => {
+      if (!item.title || !item.link) return [];
+      const publishedMs = item.providerPublishTime
+        ? item.providerPublishTime * 1000
+        : now;
+      return [{
+        id: item.uuid ?? `Yahoo-${index}-${item.title.slice(0, 40)}`,
+        title: item.title,
+        link: item.link,
+        source: item.publisher ?? "Yahoo Finance",
+        publishedAt: new Date(publishedMs).toISOString(),
+        minutesAgo: Math.max(0, Math.round((now - publishedMs) / 60000)),
+        category: "market",
+      }];
+    });
+  } catch (error) {
+    console.warn("[news] Yahoo Finance request failed", error);
+    return [];
+  }
+}
+
+export function refreshAges(items: FeedItem[]): FeedItem[] {
+  const now = Date.now();
+  return items.map((item) => {
+    const published = Date.parse(item.publishedAt);
+    return {
+      ...item,
+      minutesAgo: Number.isFinite(published)
+        ? Math.max(0, Math.round((now - published) / 60000))
+        : item.minutesAgo,
+    };
+  });
+}
+
 export function dedupe(items: FeedItem[]): FeedItem[] {
   const seen = new Set<string>();
   return items.filter((i) => {
