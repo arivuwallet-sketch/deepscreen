@@ -28,7 +28,7 @@ export async function readNewsCache(queryKey: string): Promise<CachedNewsFeed | 
       .maybeSingle();
     if (error) throw error;
     if (!data || !Array.isArray(data.items)) return null;
-    const items = data.items.filter(isFeedItem);
+    const items = (data.items as unknown[]).filter(isFeedItem);
     if (items.length === 0) return null;
     return { items, fetchedAt: new Date(data.fetched_at).getTime() };
   } catch (error) {
