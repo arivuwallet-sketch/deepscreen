@@ -44,6 +44,24 @@ export type Database = {
         }
         Relationships: []
       }
+      news_feed_cache: {
+        Row: {
+          fetched_at: string
+          items: Json
+          query_key: string
+        }
+        Insert: {
+          fetched_at?: string
+          items: Json
+          query_key: string
+        }
+        Update: {
+          fetched_at?: string
+          items?: Json
+          query_key?: string
+        }
+        Relationships: []
+      }
       payment_orders: {
         Row: {
           amount: number
