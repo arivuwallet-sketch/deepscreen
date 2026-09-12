@@ -17,7 +17,8 @@ Source: uploaded 12-section spec (Sept 2026).
 - [ ] Custom competitor multi-select + best-in-class highlighting
 
 ## Phase 3 — News & calendar upgrade
-- [ ] Ticker-level Yahoo news on every stock page with sentiment + event tagging
+- [x] Resilient ticker-level news with Google, Bing and Yahoo fallbacks plus shared last-good cache
+- [ ] News sentiment + event tagging
 - [ ] Exchange-scoped market news tabs (NSE/BSE/NYSE/NASDAQ/LSE)
 - [ ] Economic calendar filtering by region/impact + manual refresh control
 

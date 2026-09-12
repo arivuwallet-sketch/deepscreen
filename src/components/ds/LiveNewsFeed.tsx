@@ -61,14 +61,18 @@ export function LiveNewsFeed({
       <header className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
         <h2 className="text-sm font-semibold uppercase tracking-wide">{title}</h2>
         <span className="num flex items-center gap-1.5 text-xs text-muted-foreground">
-          <span className="size-1.5 animate-pulse rounded-full bg-bull" />
-          {dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleTimeString() : "LIVE"}
+          <span className={cn("size-1.5 rounded-full", data?.stale ? "bg-warn" : "animate-pulse bg-bull")} />
+          {data?.stale
+            ? `LAST GOOD · ${new Date(data.fetchedAt).toLocaleTimeString()}`
+            : dataUpdatedAt
+              ? new Date(data?.fetchedAt ?? dataUpdatedAt).toLocaleTimeString()
+              : "LIVE"}
         </span>
       </header>
       {isLoading ? (
         <p className="px-4 py-6 text-sm text-muted-foreground">Loading live headlines…</p>
       ) : (
-        <FeedList items={data ?? []} empty="No headlines available right now." />
+        <FeedList items={data?.items ?? []} empty="No headlines available right now." />
       )}
     </section>
   );
