@@ -34,7 +34,7 @@ export const getLiveQuotes = createServerFn({ method: "POST" })
   .inputValidator((d: { keys: { exchange: string; symbol: string }[] }) => d)
   .handler(async ({ data }): Promise<Record<string, LiveQuote>> => {
     const { fetchChartQuote, yahooSymbol } = await import("./yahoo.server");
-    const keys = data.keys.slice(0, 40);
+    const keys = data.keys.slice(0, 100);
     const out: Record<string, LiveQuote> = {};
     const chunk = 10;
     for (let i = 0; i < keys.length; i += chunk) {
@@ -67,7 +67,7 @@ export const getLiveFundamentalsBatch = createServerFn({ method: "POST" })
   .inputValidator((d: { keys: { exchange: string; symbol: string }[] }) => d)
   .handler(async ({ data }): Promise<Record<string, LiveFundamentals>> => {
     const { fetchFundamentals, yahooSymbol } = await import("./yahoo.server");
-    const keys = data.keys.slice(0, 40);
+    const keys = data.keys.slice(0, 100);
     const out: Record<string, LiveFundamentals> = {};
     const chunk = 5;
     for (let i = 0; i < keys.length; i += chunk) {

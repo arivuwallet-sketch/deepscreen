@@ -218,9 +218,15 @@ export function mergeFundamentals(
       sources.roa = "live";
     }
     if (sources.roa !== "live") {
-      next.roa = round1(next.roe / (1 + next.debtToEquity));
+      const assetMultiplier = 1 + next.debtToEquity;
+      const derivedRoa = assetMultiplier > 0.05 ? next.roe / assetMultiplier : Number.NaN;
+      next.roa = Number.isFinite(derivedRoa) ? round1(derivedRoa) : base.roa;
       // Mark as live when both inputs (ROE, D/E) are live — valid algebraic derivation.
-      if (sources.roe === "live" && sources.debtToEquity === "live") {
+      if (
+        Number.isFinite(derivedRoa) &&
+        sources.roe === "live" &&
+        sources.debtToEquity === "live"
+      ) {
         sources.roa = "live";
       }
     }
@@ -370,6 +376,16 @@ export function mergeFundamentals(
   }
   if (sources.growth !== "live" && next.peg > 0 && next.pe > 0) {
     next.growth = round1(next.pe / next.peg);
+  }
+
+  // A malformed provider value or an unsafe derived division must never
+  // blank or inflate the shared score. Fall back field-by-field and keep the
+  // provenance honest so tables and stock pages remain deterministic.
+  for (const field of Object.keys(next) as (keyof Fundamentals)[]) {
+    if (!Number.isFinite(next[field])) {
+      next[field] = base[field];
+      sources[field] = "model";
+    }
   }
 
   return { fundamentals: next, sources };

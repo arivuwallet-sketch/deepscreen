@@ -28,6 +28,7 @@ Source: uploaded 12-section spec (Sept 2026).
 - [ ] Daily constituent verification job (zero-orphan rule)
 
 ## Phase 5 — Screener filters & alerts
+- [x] Free, consistent DeepScreen score and verdict across all five exchange screeners
 - [ ] New screener columns/filters (P/CF, quick ratio, DSI, ATR, interest coverage, Piotroski)
 - [ ] Holding-horizon dropdown + quick toggles (generational moats, unmanipulated compounders, industry leaders)
 - [ ] Alert triggers (valuation touchpoints, smart money, forensic flags, margin shifts)

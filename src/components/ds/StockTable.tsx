@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Lock } from "lucide-react";
 
 import {
   quoteKey,
@@ -8,7 +7,6 @@ import {
   useLiveQuotes,
   useScreenerRatiosBatch,
 } from "@/hooks/useLiveQuotes";
-import { useSubscription } from "@/hooks/useSubscription";
 
 import { analyze, verdictClass } from "@/lib/deepscreen/metrics";
 import { mergeLiveStock } from "@/lib/deepscreen/live-merge";
@@ -17,18 +15,6 @@ import type { Stock } from "@/lib/deepscreen/types";
 import type { LiveFundamentals, LiveQuote } from "@/lib/market/yahoo.server";
 import type { ScreenerRatios } from "@/lib/market/screener.server";
 import { cn } from "@/lib/utils";
-
-function ProLockChip() {
-  return (
-    <Link
-      to="/pricing"
-      title="Deep score & verdict are a DeepScreen Pro feature"
-      className="num inline-flex items-center gap-1 rounded border border-dashed border-border px-2 py-0.5 text-[10px] font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
-    >
-      <Lock className="size-3" /> Pro
-    </Link>
-  );
-}
 
 export function ScoreBar({ score }: { score: number }) {
   const tone = score >= 67 ? "bg-bull" : score >= 45 ? "bg-warn" : "bg-bear";
@@ -68,16 +54,12 @@ function StockRow({
   quote,
   fundamentals,
   screener,
-  isPro,
-  subLoading,
   delayMs,
 }: {
   stock: Stock;
   quote: LiveQuote | null | undefined;
   fundamentals: LiveFundamentals | null | undefined;
   screener: ScreenerRatios | null | undefined;
-  isPro: boolean;
-  subLoading: boolean;
   delayMs: number;
 }) {
   const { stock: merged, sources } = mergeLiveStock(stock, quote, fundamentals, screener);
@@ -152,30 +134,25 @@ function StockRow({
       <td className="num px-2 py-2.5 text-right text-muted-foreground">
         {formatVolume(merged.volume)}
       </td>
-      <td className="px-2 py-2.5">
-        {subLoading ? (
-          <span className="inline-block h-4 w-16 animate-pulse rounded bg-muted" />
-        ) : isPro ? (
-          <ScoreBar score={a.score} />
-        ) : (
-          <ProLockChip />
-        )}
+      <td
+        className="px-2 py-2.5"
+        title={
+          Object.values(sources).some((source) => source === "live")
+            ? "Calculated with available live fundamentals"
+            : "Calculated with modeled estimates while live fundamentals load"
+        }
+      >
+        <ScoreBar score={a.score} />
       </td>
       <td className="px-4 py-2.5">
-        {subLoading ? (
-          <span className="inline-block h-4 w-12 animate-pulse rounded bg-muted" />
-        ) : isPro ? (
-          <span
-            className={cn(
-              "num rounded border px-2 py-0.5 text-[11px] font-semibold transition-colors",
-              verdictClass(a.verdict),
-            )}
-          >
-            {a.verdict}
-          </span>
-        ) : (
-          <ProLockChip />
-        )}
+        <span
+          className={cn(
+            "num rounded border px-2 py-0.5 text-[11px] font-semibold transition-colors",
+            verdictClass(a.verdict),
+          )}
+        >
+          {a.verdict}
+        </span>
       </td>
     </tr>
   );
@@ -187,7 +164,6 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
   const { data: liveFundamentals, isFetching: fundamentalsLoading } =
     useLiveFundamentalsBatch(keys);
   const { data: screenerRatios } = useScreenerRatiosBatch(keys);
-  const { isPro, loading: subLoading } = useSubscription();
 
   if (stocks.length === 0) {
     return (
@@ -223,8 +199,6 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
               quote={live?.[quoteKey(s)]}
               fundamentals={liveFundamentals?.[quoteKey(s)]}
               screener={screenerRatios?.[quoteKey(s)]}
-              isPro={isPro}
-              subLoading={subLoading}
               delayMs={Math.min(i, 20) * 15}
             />
           ))}
@@ -235,16 +209,7 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
         refreshed every 15s. Indian ratios are fetched from Screener.in and retained in the shared
         cache; Yahoo Finance supplies other exchanges
         {fundamentalsLoading ? " (updating…)" : ""}. Hover a ratio to see its source.
-        {!subLoading && !isPro ? (
-          <>
-            {" "}
-            Score & verdict are a{" "}
-            <Link to="/pricing" className="text-primary hover:underline">
-              DeepScreen Pro
-            </Link>{" "}
-            feature.
-          </>
-        ) : null}
+        {" "}Score and verdict remain visible while live fundamentals refresh.
       </p>
     </div>
   );

@@ -30,6 +30,7 @@ function band(score: number): MetricRead["band"] {
 
 /** Lower is better between `best` and `worst`. */
 function scoreLow(value: number, best: number, worst: number): number {
+  if (!Number.isFinite(value)) return 40;
   if (value <= best) return 100;
   if (value >= worst) return 5;
   return Math.round(100 - ((value - best) / (worst - best)) * 95);
@@ -37,6 +38,7 @@ function scoreLow(value: number, best: number, worst: number): number {
 
 /** Higher is better between `worst` and `best`. */
 function scoreHigh(value: number, worst: number, best: number): number {
+  if (!Number.isFinite(value)) return 40;
   if (value >= best) return 100;
   if (value <= worst) return 5;
   return Math.round(5 + ((value - worst) / (best - worst)) * 95);

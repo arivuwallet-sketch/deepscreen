@@ -22,10 +22,10 @@ export const quoteKey = (k: QuoteKey) => `${k.exchange}:${k.symbol}`;
 
 // The chart-quote endpoint is unauthenticated and cheap, so a screener page can
 // keep prices live for a decently large visible slice.
-const QUOTE_BATCH_LIMIT = 60;
+const QUOTE_BATCH_LIMIT = 100;
 // quoteSummary (fundamentals) needs a shared session/crumb and is heavier, so
 // keep that batch smaller to stay gentle on Yahoo's free endpoint.
-const FUNDAMENTALS_BATCH_LIMIT = 30;
+const FUNDAMENTALS_BATCH_LIMIT = 100;
 // screener.in ratios are cache-served per symbol, so a wider window is fine.
 const SCREENER_BATCH_LIMIT = 200;
 
