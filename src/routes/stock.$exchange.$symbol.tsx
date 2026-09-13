@@ -232,12 +232,7 @@ function StockPage() {
           );
         })()}
 
-        <PaywallGate
-          feature="DeepScreen's 12-factor deep score & verdict"
-          className="mt-6"
-          minHeight="min-h-[280px]"
-        >
-          <section className="grid gap-4 lg:grid-cols-3">
+        <section className="mt-6 grid gap-4 lg:grid-cols-3">
             <div className="card-hover rounded-lg border border-border bg-panel p-5 lg:col-span-2">
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-semibold uppercase tracking-wide">
@@ -288,8 +283,7 @@ function StockPage() {
                 </ul>
               </div>
             </div>
-          </section>
-        </PaywallGate>
+        </section>
 
         <PaywallGate
           feature="Vision &amp; Utility score and Secret Tips badges"
