@@ -10,25 +10,38 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as IpoRouteImport } from './routes/ipo'
+import { Route as MethodologyRouteImport } from './routes/methodology'
 import { Route as OptionsRouteImport } from './routes/options'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as BestSlugRouteImport } from './routes/best.$slug'
+import { Route as CompareSlugRouteImport } from './routes/compare.$slug'
 import { Route as ExchangeCodeRouteImport } from './routes/exchange.$code'
 import { Route as LearnIndexRouteImport } from './routes/learn.index'
 import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
+import { Route as OptionsStrategySlugRouteImport } from './routes/options-strategy.$slug'
+import { Route as RatiosIndexRouteImport } from './routes/ratios.index'
+import { Route as RatiosSlugRouteImport } from './routes/ratios.$slug'
 import { Route as ApiPublicCashfreeWebhookRouteImport } from './routes/api/public/cashfree-webhook'
+import { Route as SectorExchangeSectorRouteImport } from './routes/sector.$exchange.$sector'
 import { Route as StockExchangeSymbolRouteImport } from './routes/stock.$exchange.$symbol'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -49,6 +62,11 @@ const ContactRoute = ContactRouteImport.update({
 const IpoRoute = IpoRouteImport.update({
   id: '/ipo',
   path: '/ipo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MethodologyRoute = MethodologyRouteImport.update({
+  id: '/methodology',
+  path: '/methodology',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OptionsRoute = OptionsRouteImport.update({
@@ -81,6 +99,16 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BestSlugRoute = BestSlugRouteImport.update({
+  id: '/best/$slug',
+  path: '/best/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareSlugRoute = CompareSlugRouteImport.update({
+  id: '/compare/$slug',
+  path: '/compare/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ExchangeCodeRoute = ExchangeCodeRouteImport.update({
   id: '/exchange/$code',
   path: '/exchange/$code',
@@ -96,12 +124,32 @@ const LearnSlugRoute = LearnSlugRouteImport.update({
   path: '/learn/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OptionsStrategySlugRoute = OptionsStrategySlugRouteImport.update({
+  id: '/options-strategy/$slug',
+  path: '/options-strategy/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RatiosIndexRoute = RatiosIndexRouteImport.update({
+  id: '/ratios/',
+  path: '/ratios/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RatiosSlugRoute = RatiosSlugRouteImport.update({
+  id: '/ratios/$slug',
+  path: '/ratios/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicCashfreeWebhookRoute =
   ApiPublicCashfreeWebhookRouteImport.update({
     id: '/api/public/cashfree-webhook',
     path: '/api/public/cashfree-webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const SectorExchangeSectorRoute = SectorExchangeSectorRouteImport.update({
+  id: '/sector/$exchange/$sector',
+  path: '/sector/$exchange/$sector',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StockExchangeSymbolRoute = StockExchangeSymbolRouteImport.update({
   id: '/stock/$exchange/$symbol',
   path: '/stock/$exchange/$symbol',
@@ -110,132 +158,188 @@ const StockExchangeSymbolRoute = StockExchangeSymbolRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/calendar': typeof CalendarRoute
   '/contact': typeof ContactRoute
   '/ipo': typeof IpoRoute
+  '/methodology': typeof MethodologyRoute
   '/options': typeof OptionsRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/best/$slug': typeof BestSlugRoute
+  '/compare/$slug': typeof CompareSlugRoute
   '/exchange/$code': typeof ExchangeCodeRoute
   '/learn/$slug': typeof LearnSlugRoute
+  '/options-strategy/$slug': typeof OptionsStrategySlugRoute
+  '/ratios/$slug': typeof RatiosSlugRoute
   '/learn/': typeof LearnIndexRoute
+  '/ratios/': typeof RatiosIndexRoute
   '/api/public/cashfree-webhook': typeof ApiPublicCashfreeWebhookRoute
+  '/sector/$exchange/$sector': typeof SectorExchangeSectorRoute
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/calendar': typeof CalendarRoute
   '/contact': typeof ContactRoute
   '/ipo': typeof IpoRoute
+  '/methodology': typeof MethodologyRoute
   '/options': typeof OptionsRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/best/$slug': typeof BestSlugRoute
+  '/compare/$slug': typeof CompareSlugRoute
   '/exchange/$code': typeof ExchangeCodeRoute
   '/learn/$slug': typeof LearnSlugRoute
+  '/options-strategy/$slug': typeof OptionsStrategySlugRoute
+  '/ratios/$slug': typeof RatiosSlugRoute
   '/learn': typeof LearnIndexRoute
+  '/ratios': typeof RatiosIndexRoute
   '/api/public/cashfree-webhook': typeof ApiPublicCashfreeWebhookRoute
+  '/sector/$exchange/$sector': typeof SectorExchangeSectorRoute
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/calendar': typeof CalendarRoute
   '/contact': typeof ContactRoute
   '/ipo': typeof IpoRoute
+  '/methodology': typeof MethodologyRoute
   '/options': typeof OptionsRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/best/$slug': typeof BestSlugRoute
+  '/compare/$slug': typeof CompareSlugRoute
   '/exchange/$code': typeof ExchangeCodeRoute
   '/learn/$slug': typeof LearnSlugRoute
+  '/options-strategy/$slug': typeof OptionsStrategySlugRoute
+  '/ratios/$slug': typeof RatiosSlugRoute
   '/learn/': typeof LearnIndexRoute
+  '/ratios/': typeof RatiosIndexRoute
   '/api/public/cashfree-webhook': typeof ApiPublicCashfreeWebhookRoute
+  '/sector/$exchange/$sector': typeof SectorExchangeSectorRoute
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/auth'
     | '/calendar'
     | '/contact'
     | '/ipo'
+    | '/methodology'
     | '/options'
     | '/portfolio'
     | '/pricing'
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
+    | '/best/$slug'
+    | '/compare/$slug'
     | '/exchange/$code'
     | '/learn/$slug'
+    | '/options-strategy/$slug'
+    | '/ratios/$slug'
     | '/learn/'
+    | '/ratios/'
     | '/api/public/cashfree-webhook'
+    | '/sector/$exchange/$sector'
     | '/stock/$exchange/$symbol'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/auth'
     | '/calendar'
     | '/contact'
     | '/ipo'
+    | '/methodology'
     | '/options'
     | '/portfolio'
     | '/pricing'
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
+    | '/best/$slug'
+    | '/compare/$slug'
     | '/exchange/$code'
     | '/learn/$slug'
+    | '/options-strategy/$slug'
+    | '/ratios/$slug'
     | '/learn'
+    | '/ratios'
     | '/api/public/cashfree-webhook'
+    | '/sector/$exchange/$sector'
     | '/stock/$exchange/$symbol'
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/auth'
     | '/calendar'
     | '/contact'
     | '/ipo'
+    | '/methodology'
     | '/options'
     | '/portfolio'
     | '/pricing'
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
+    | '/best/$slug'
+    | '/compare/$slug'
     | '/exchange/$code'
     | '/learn/$slug'
+    | '/options-strategy/$slug'
+    | '/ratios/$slug'
     | '/learn/'
+    | '/ratios/'
     | '/api/public/cashfree-webhook'
+    | '/sector/$exchange/$sector'
     | '/stock/$exchange/$symbol'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
   CalendarRoute: typeof CalendarRoute
   ContactRoute: typeof ContactRoute
   IpoRoute: typeof IpoRoute
+  MethodologyRoute: typeof MethodologyRoute
   OptionsRoute: typeof OptionsRoute
   PortfolioRoute: typeof PortfolioRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  BestSlugRoute: typeof BestSlugRoute
+  CompareSlugRoute: typeof CompareSlugRoute
   ExchangeCodeRoute: typeof ExchangeCodeRoute
   LearnSlugRoute: typeof LearnSlugRoute
+  OptionsStrategySlugRoute: typeof OptionsStrategySlugRoute
+  RatiosSlugRoute: typeof RatiosSlugRoute
   LearnIndexRoute: typeof LearnIndexRoute
+  RatiosIndexRoute: typeof RatiosIndexRoute
   ApiPublicCashfreeWebhookRoute: typeof ApiPublicCashfreeWebhookRoute
+  SectorExchangeSectorRoute: typeof SectorExchangeSectorRoute
   StockExchangeSymbolRoute: typeof StockExchangeSymbolRoute
 }
 
@@ -246,6 +350,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -274,6 +385,13 @@ declare module '@tanstack/react-router' {
       path: '/ipo'
       fullPath: '/ipo'
       preLoaderRoute: typeof IpoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/methodology': {
+      id: '/methodology'
+      path: '/methodology'
+      fullPath: '/methodology'
+      preLoaderRoute: typeof MethodologyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/options': {
@@ -318,6 +436,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/best/$slug': {
+      id: '/best/$slug'
+      path: '/best/$slug'
+      fullPath: '/best/$slug'
+      preLoaderRoute: typeof BestSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare/$slug': {
+      id: '/compare/$slug'
+      path: '/compare/$slug'
+      fullPath: '/compare/$slug'
+      preLoaderRoute: typeof CompareSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/exchange/$code': {
       id: '/exchange/$code'
       path: '/exchange/$code'
@@ -339,11 +471,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LearnSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/options-strategy/$slug': {
+      id: '/options-strategy/$slug'
+      path: '/options-strategy/$slug'
+      fullPath: '/options-strategy/$slug'
+      preLoaderRoute: typeof OptionsStrategySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ratios/': {
+      id: '/ratios/'
+      path: '/ratios'
+      fullPath: '/ratios/'
+      preLoaderRoute: typeof RatiosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ratios/$slug': {
+      id: '/ratios/$slug'
+      path: '/ratios/$slug'
+      fullPath: '/ratios/$slug'
+      preLoaderRoute: typeof RatiosSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/cashfree-webhook': {
       id: '/api/public/cashfree-webhook'
       path: '/api/public/cashfree-webhook'
       fullPath: '/api/public/cashfree-webhook'
       preLoaderRoute: typeof ApiPublicCashfreeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sector/$exchange/$sector': {
+      id: '/sector/$exchange/$sector'
+      path: '/sector/$exchange/$sector'
+      fullPath: '/sector/$exchange/$sector'
+      preLoaderRoute: typeof SectorExchangeSectorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/stock/$exchange/$symbol': {
@@ -358,20 +518,28 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
   CalendarRoute: CalendarRoute,
   ContactRoute: ContactRoute,
   IpoRoute: IpoRoute,
+  MethodologyRoute: MethodologyRoute,
   OptionsRoute: OptionsRoute,
   PortfolioRoute: PortfolioRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  BestSlugRoute: BestSlugRoute,
+  CompareSlugRoute: CompareSlugRoute,
   ExchangeCodeRoute: ExchangeCodeRoute,
   LearnSlugRoute: LearnSlugRoute,
+  OptionsStrategySlugRoute: OptionsStrategySlugRoute,
+  RatiosSlugRoute: RatiosSlugRoute,
   LearnIndexRoute: LearnIndexRoute,
+  RatiosIndexRoute: RatiosIndexRoute,
   ApiPublicCashfreeWebhookRoute: ApiPublicCashfreeWebhookRoute,
+  SectorExchangeSectorRoute: SectorExchangeSectorRoute,
   StockExchangeSymbolRoute: StockExchangeSymbolRoute,
 }
 export const routeTree = rootRouteImport

@@ -31,6 +31,7 @@ import {
   newsSearchQuery,
 } from "@/lib/deepscreen/format";
 import { cn } from "@/lib/utils";
+import { stockFaqs, stockSummary } from "@/lib/deepscreen/narrative";
 
 export const Route = createFileRoute("/stock/$exchange/$symbol")({
   staticData: { sitemap: true },
@@ -64,6 +65,7 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
     const s = loaderData.stock;
     const title = `${s.symbol} — ${s.name} Fundamental Analysis | DeepScreen`;
     const description = `${s.name} (${s.exchange}: ${s.symbol}) full fundamental breakdown: P/E ${s.fundamentals.pe}, PEG ${s.fundamentals.peg}, ROCE ${s.fundamentals.roce}%, plus latest news.`;
+    const faqs = stockFaqs(s);
     const url = `https://deepscreen.online/stock/${s.exchange}/${s.symbol}`;
     return {
       meta: [
@@ -106,6 +108,18 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
                 { "@type": "ListItem", position: 3, name: s.symbol, item: url },
               ],
             },
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faqs.map((faq) => ({
+              "@type": "Question",
+              name: faq.q,
+              acceptedAnswer: { "@type": "Answer", text: faq.a },
+            })),
           }),
         },
       ],
@@ -178,10 +192,9 @@ function StockPage() {
 
         <header className="mt-3 flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6">
           <div>
-            <h1 className="num text-3xl font-bold tracking-tight">
-              {stock.symbol}
-              <span className="ml-3 text-base font-normal text-muted-foreground">{stock.name}</span>
-            </h1>
+             <h1 className="num text-3xl font-bold tracking-tight">
+               {stock.symbol} — {stock.name}
+             </h1>
             <p className="num mt-2 text-xs text-muted-foreground">
               {stock.exchange} · {stock.sector} · {CAP_LABEL[stock.cap]} · Mkt cap{" "}
               {formatCap(live.marketCap, stock.exchange)} · Vol {formatVolume(live.volume)}
@@ -210,6 +223,10 @@ function StockPage() {
             ) : null}
           </div>
         </header>
+
+        <p className="mt-5 max-w-4xl text-sm leading-relaxed text-muted-foreground">
+          {stockSummary(live)}
+        </p>
 
         {(() => {
           const memberships = getIndexMemberships(stock.exchange, stock.symbol);
@@ -252,7 +269,7 @@ function StockPage() {
                 <div className="flex-1">
                   <ScoreBar score={a.score} />
                   <p className="num mt-1 text-xs text-muted-foreground">
-                    Weighted 12-factor score / 100
+                     Weighted 13-factor score / 100
                   </p>
                 </div>
               </div>
@@ -417,6 +434,17 @@ function StockPage() {
             title={`${stock.symbol} live news`}
             limit={10}
           />
+        </section>
+        <section className="mt-10 border-t border-border pt-8">
+          <h2 className="text-lg font-semibold">Frequently asked questions about {stock.symbol}</h2>
+          <dl className="mt-5 space-y-5">
+            {stockFaqs(live).map((faq) => (
+              <div key={faq.q}>
+                <dt className="text-sm font-semibold">{faq.q}</dt>
+                <dd className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{faq.a}</dd>
+              </div>
+            ))}
+          </dl>
         </section>
       </div>
       <TopicIndex ids={["stocks"]} title={"Stock research topics"} />

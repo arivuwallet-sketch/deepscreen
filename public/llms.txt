@@ -1,0 +1,24 @@
+# DeepScreen
+
+> DeepScreen is a global stock screener and research platform covering NSE, BSE, NYSE, Nasdaq and LSE with a transparent 13-factor fundamental model.
+
+Canonical site: https://deepscreen.online/
+Contact: deepscreen.online@outlook.com
+
+## Primary tools
+- [Global stock screener](https://deepscreen.online/): Cross-exchange stock discovery and rankings.
+- [Options strategy lab](https://deepscreen.online/options): Black-Scholes Greeks and multi-leg payoff analysis.
+- [IPO calendar](https://deepscreen.online/ipo): India, US and UK IPO pipeline.
+- [Market calendar](https://deepscreen.online/calendar): Earnings, dividends and economic events.
+
+## Research documentation
+- [Methodology](https://deepscreen.online/methodology): Factors, weighting, sources and limitations.
+- [Ratio glossary](https://deepscreen.online/ratios): Definitions and formulas for all 13 model factors.
+- [Learning centre](https://deepscreen.online/learn): Plain-English investing and trading guides.
+- [About](https://deepscreen.online/about): Purpose, coverage and editorial principles.
+
+## Important context
+- DeepScreen scores are analytical model outputs, not investment advice.
+- Live data is used where available; unavailable fields may show modeled estimates.
+- Indian filing ratios may be sourced from Screener.in. Other supported markets use available Yahoo Finance data.
+- Verify material figures against primary company disclosures before relying on them.

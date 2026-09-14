@@ -6,6 +6,8 @@ import { isSitemapRouteIncluded } from "@/lib/sitemap";
 import { EXCHANGES } from "@/lib/deepscreen/exchanges";
 import { STOCKS } from "@/lib/deepscreen/stocks";
 import { GUIDES } from "@/lib/deepscreen/guides";
+import { COMPARISONS, RANKINGS, RATIOS, STRATEGY_GUIDES } from "@/lib/seo/content";
+import { SECTORS, stocksByExchange } from "@/lib/deepscreen/stocks";
 
 const BASE_URL = "https://deepscreen.online";
 
@@ -57,6 +59,37 @@ export const Route = createFileRoute("/sitemap.xml")({
               });
               const path = sitemapPathForLocation(router, location, guideRouteId);
               if (path) entries.push({ path });
+            }
+          }
+
+          const dynamicCollections = [
+            { routeId: "/ratios/$slug", to: "/ratios/$slug", values: RATIOS.map((item) => ({ slug: item.slug })) },
+            { routeId: "/best/$slug", to: "/best/$slug", values: RANKINGS.map((item) => ({ slug: item.slug })) },
+            { routeId: "/compare/$slug", to: "/compare/$slug", values: COMPARISONS.map((item) => ({ slug: item.slug })) },
+            { routeId: "/options-strategy/$slug", to: "/options-strategy/$slug", values: STRATEGY_GUIDES.map((item) => ({ slug: item.slug })) },
+          ] as const;
+          for (const collection of dynamicCollections) {
+            if (!isSitemapRouteIncluded(router.routesById[collection.routeId])) continue;
+            for (const params of collection.values) {
+              const location = router.buildLocation({ to: collection.to, params, search: () => ({}), hash: "" });
+              const path = sitemapPathForLocation(router, location, collection.routeId);
+              if (path) entries.push({ path });
+            }
+          }
+
+          const sectorRouteId = "/sector/$exchange/$sector";
+          if (isSitemapRouteIncluded(router.routesById[sectorRouteId])) {
+            for (const exchange of EXCHANGES) {
+              for (const sector of SECTORS) {
+                if (!stocksByExchange(exchange.code).some((stock) => stock.sector === sector)) continue;
+                const location = router.buildLocation({
+                  to: "/sector/$exchange/$sector",
+                  params: { exchange: exchange.code, sector: sector.toLowerCase().replaceAll(" ", "-") },
+                  search: () => ({}), hash: "",
+                });
+                const path = sitemapPathForLocation(router, location, sectorRouteId);
+                if (path) entries.push({ path });
+              }
             }
           }
 

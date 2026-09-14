@@ -22,7 +22,7 @@ export const Route = createFileRoute("/pricing")({
       {
         name: "description",
         content:
-          "Unlock DeepScreen Pro: 12-factor deep scores, DCF & Graham valuation, Vision score, Secret Tips, forensic breakdowns, sell alerts and portfolio X-ray.",
+          "Unlock DeepScreen Pro: 13-factor deep scores, DCF & Graham valuation, Vision score, Secret Tips, forensic breakdowns, sell alerts and portfolio X-ray.",
       },
       { name: "keywords", content: metaKeywords(screenerKeywords, stocksKeywords) },
       { property: "og:title", content: "DeepScreen Pro Pricing" },
@@ -45,7 +45,7 @@ export const Route = createFileRoute("/pricing")({
           name: "DeepScreen Pro",
           url: "https://deepscreen.online/pricing",
           description:
-            "Full DeepScreen analysis engine: twelve-factor verdict, DCF and Graham valuation, forensic breakdowns, alerts and portfolio X-Ray.",
+            "Full DeepScreen analysis engine: 13-factor verdict, DCF and Graham valuation, forensic breakdowns, alerts and portfolio X-Ray.",
           brand: { "@type": "Brand", name: "DeepScreen" },
           offers: [
             {
@@ -100,7 +100,7 @@ const FREE = [
 ];
 
 const PRO = [
-  "DeepScreen Verdict — 12-factor weighted score",
+  "DeepScreen Verdict — 13-factor weighted score",
   "Holding period, target price, trim level & stop-loss",
   "Automated DCF and Graham intrinsic-value models",
   "Vision & Utility score (10–40 year hold horizon)",

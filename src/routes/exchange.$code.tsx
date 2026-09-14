@@ -34,8 +34,9 @@ export const Route = createFileRoute("/exchange/$code")({
     const code = loaderData?.exchange.code ?? "";
     const country = loaderData?.exchange.country ?? "";
     const currency = loaderData?.exchange.currency ?? "";
-    const title = `${code} Stock Screener — ${name}${country ? `, ${country}` : ""} | DeepScreen`;
-    const description = `Screen ${name} (${code}) listings in ${country || "this market"} by large, mid and small cap with twelve-factor fundamental scoring, ${currency} prices and the latest market news.`;
+    const count = code ? stocksByExchange(code).length : 0;
+    const title = `${code} Stock Screener — Screen All ${count} ${code} Companies by 13 Fundamental Ratios`;
+    const description = `Screen ${count} ${name} (${code}) companies in ${country || "this market"} by market cap, sector, P/E, PEG, ROCE and a transparent 13-factor score with ${currency} prices.`;
     const url = `https://deepscreen.online/exchange/${code}`;
     return {
       meta: [
@@ -140,6 +141,11 @@ function ExchangePage() {
             {exchange.flag} {exchange.code} Screener
           </h1>
           <p className="mt-1 text-muted-foreground">{exchange.name}</p>
+          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+            Compare every available {exchange.code} company by market capitalisation, sector,
+            valuation, growth, capital efficiency and leverage. DeepScreen combines 13 fundamental
+            ratios into one research score while keeping each underlying figure visible.
+          </p>
         </header>
 
         <div className="mt-6 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-panel p-3">
@@ -212,6 +218,17 @@ function ExchangePage() {
         <div className="mt-6">
           <StockTable stocks={filtered.slice(0, limit)} />
         </div>
+
+        <section className="mt-8">
+          <h2 className="text-sm font-semibold uppercase tracking-wide">Browse {exchange.code} sectors</h2>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {sectorsHere.map((item) => (
+              <a key={item} href={`/sector/${exchange.code}/${item.toLowerCase().replaceAll(" ", "-")}`} className="rounded border border-border px-3 py-2 text-xs text-muted-foreground hover:border-primary hover:text-foreground">
+                {item} stocks
+              </a>
+            ))}
+          </div>
+        </section>
 
         {filtered.length > limit && (
           <div className="mt-4 flex items-center justify-center gap-3">

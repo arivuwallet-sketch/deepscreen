@@ -83,7 +83,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Advanced multi-exchange stock screener and fundamental analysis for India, US and UK markets." },
       { name: "author", content: "DeepScreen" },
       { property: "og:title", content: "DeepScreen — Global Stock Screener" },
-      { property: "og:description", content: "Screen every listed company across NSE, BSE, NYSE, Nasdaq and LSE with a 12-factor fundamental model." },
+      { property: "og:description", content: "Screen companies across NSE, BSE, NYSE, Nasdaq and LSE with a transparent 13-factor fundamental model." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "index, follow" },

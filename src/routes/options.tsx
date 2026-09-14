@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
   Area,
@@ -20,6 +20,7 @@ import { searchStocks, findStock } from "@/lib/deepscreen/stocks";
 import { buildStrategies, type StrategyResult } from "@/lib/options/greeks";
 import { cn } from "@/lib/utils";
 import type { Stock } from "@/lib/deepscreen/types";
+import { STRATEGY_GUIDES } from "@/lib/seo/content";
 
 export const Route = createFileRoute("/options")({
   staticData: { sitemap: true },
@@ -161,6 +162,17 @@ function OptionsPage() {
             <StrategyCard key={s.key} s={s} exchange={picked.exchange} spot={spot} />
           ))}
         </div>
+        <section className="mt-10 border-t border-border pt-8">
+          <h2 className="text-lg font-semibold">Options strategy guides</h2>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {STRATEGY_GUIDES.map((strategy) => (
+              <Link key={strategy.slug} to="/options-strategy/$slug" params={{ slug: strategy.slug }} className="rounded-lg border border-border bg-panel p-4 hover:border-primary">
+                <h3 className="font-semibold">{strategy.name}</h3>
+                <p className="mt-2 text-xs text-muted-foreground">{strategy.outlook} · {strategy.risk}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
       </div>
       <TopicIndex ids={["options"]} title={"Options, futures and derivatives topics"} />
     </Shell>

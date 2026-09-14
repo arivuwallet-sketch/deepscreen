@@ -39,6 +39,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 ["/options", "Options"],
                 ["/ipo", "IPO"],
                 ["/learn", "Learn"],
+                ["/ratios", "Ratios"],
                 ["/pricing", "Pricing"],
               ] as const
             ).map(([to, label]) => (
@@ -64,6 +65,12 @@ export function Shell({ children }: { children: ReactNode }) {
         <nav className="mb-3 flex flex-wrap justify-center gap-4">
           <Link to="/contact" className="hover:text-foreground">
             Contact Us
+          </Link>
+          <Link to="/about" className="hover:text-foreground">
+            About
+          </Link>
+          <Link to="/methodology" className="hover:text-foreground">
+            Methodology
           </Link>
           <Link to="/terms" className="hover:text-foreground">
             Terms of Service

@@ -27,7 +27,7 @@ export const Route = createFileRoute("/")({
       {
         property: "og:description",
         content:
-          "Cap-based screening, 12-factor fundamental scoring, stock-level news and a live economic calendar for India, US and UK markets.",
+          "Cap-based screening, 13-factor fundamental scoring, stock-level news and a live economic calendar for India, US and UK markets.",
       },
       { property: "og:url", content: "https://deepscreen.online/" },
       { property: "og:type", content: "website" },
@@ -36,7 +36,7 @@ export const Route = createFileRoute("/")({
       {
         name: "twitter:description",
         content:
-          "Screen NSE, BSE, NYSE, Nasdaq and LSE listings with 12-factor fundamental scoring, live news and an economic calendar.",
+          "Screen NSE, BSE, NYSE, Nasdaq and LSE listings with 13-factor fundamental scoring, live news and an economic calendar.",
       },
       { name: "keywords", content: metaKeywords(screenerKeywords, stocksKeywords, learnKeywords) },
     ],
@@ -99,7 +99,7 @@ function Home() {
               <LineChart className="size-4 text-primary" /> {STOCKS.length.toLocaleString()} companies scored
             </span>
             <span className="flex items-center gap-2">
-              <ShieldCheck className="size-4 text-primary" /> 12-factor model
+             <ShieldCheck className="size-4 text-primary" /> 13-factor model
             </span>
           </div>
         </div>
@@ -157,7 +157,7 @@ function Home() {
               <h3 className="text-sm font-semibold">What is DeepScreen?</h3>
               <p className="mt-2 text-sm text-muted-foreground">
                 DeepScreen is a stock screener that scores listed companies on {EXCHANGES.length}{" "}
-                exchanges — NSE, BSE, NYSE, Nasdaq and LSE — using a twelve-factor valuation and
+                 exchanges — NSE, BSE, NYSE, Nasdaq and LSE — using a 13-factor valuation and
                 quality model covering P/E, PEG, P/S, P/B, EV/Revenue, EV/EBITDA, ROE, ROA, ROCE,
                 leverage, payout and operating leverage.
               </p>
