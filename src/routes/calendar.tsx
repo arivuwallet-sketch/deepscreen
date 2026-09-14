@@ -29,6 +29,8 @@ export const Route = createFileRoute("/calendar")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "https://deepscreen.online/calendar" },
+      { name: "twitter:title", content: "Earnings & Dividend Calendar — DeepScreen" },
+      { name: "twitter:description", content: "Upcoming earnings dates, estimates, dividend ex-dates and payouts across five exchanges." },
       { name: "keywords", content: metaKeywords(calendarKeywords, screenerKeywords) },
     ],
     links: [{ rel: "canonical", href: "https://deepscreen.online/calendar" }],

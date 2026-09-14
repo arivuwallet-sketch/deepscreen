@@ -41,6 +41,8 @@ export const Route = createFileRoute("/options")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "https://deepscreen.online/options" },
+      { name: "twitter:title", content: "Options Strategy Lab — Greeks & 12 Strategies | DeepScreen" },
+      { name: "twitter:description", content: "Compare options Greeks, breakevens and multi-leg strategy payoffs." },
       { name: "keywords", content: metaKeywords(optionsKeywords, screenerKeywords) },
     ],
     links: [{ rel: "canonical", href: "https://deepscreen.online/options" }],
@@ -166,7 +168,7 @@ function OptionsPage() {
           <h2 className="text-lg font-semibold">Options strategy guides</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {STRATEGY_GUIDES.map((strategy) => (
-              <Link key={strategy.slug} to="/options-strategy/$slug" params={{ slug: strategy.slug }} className="rounded-lg border border-border bg-panel p-4 hover:border-primary">
+              <Link key={strategy.slug} to="/options/$slug" params={{ slug: strategy.slug }} className="rounded-lg border border-border bg-panel p-4 hover:border-primary">
                 <h3 className="font-semibold">{strategy.name}</h3>
                 <p className="mt-2 text-xs text-muted-foreground">{strategy.outlook} · {strategy.risk}</p>
               </Link>

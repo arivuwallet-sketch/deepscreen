@@ -41,6 +41,8 @@ export const Route = createFileRoute("/ipo")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "https://deepscreen.online/ipo" },
+      { name: "twitter:title", content: "IPO Calendar — NSE, BSE, NYSE, NASDAQ, LSE — DeepScreen" },
+      { name: "twitter:description", content: "Track open, upcoming, closed and listed IPOs across India, the US and the UK." },
       { name: "keywords", content: metaKeywords(ipoKeywords, screenerKeywords) },
     ],
     links: [{ rel: "canonical", href: "https://deepscreen.online/ipo" }],

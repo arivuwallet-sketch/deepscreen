@@ -178,17 +178,17 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
       <table className="w-full min-w-[900px] text-sm">
         <thead>
           <tr className="num border-b border-border text-left text-[11px] uppercase text-muted-foreground">
-            <th className="px-4 py-2.5 font-medium">Symbol</th>
-            <th className="px-2 py-2.5 font-medium">Company</th>
-            <th className="px-2 py-2.5 text-right font-medium">Price</th>
-            <th className="px-2 py-2.5 text-right font-medium">Chg %</th>
-            <th className="px-2 py-2.5 text-right font-medium">Mkt Cap</th>
-            <th className="px-2 py-2.5 text-right font-medium">P/E</th>
-            <th className="px-2 py-2.5 text-right font-medium">PEG</th>
-            <th className="px-2 py-2.5 text-right font-medium">ROCE</th>
-            <th className="px-2 py-2.5 text-right font-medium">Vol</th>
-            <th className="px-2 py-2.5 font-medium">Score</th>
-            <th className="px-4 py-2.5 font-medium">Verdict</th>
+            <th scope="col" className="px-4 py-2.5 font-medium">Symbol</th>
+            <th scope="col" className="px-2 py-2.5 font-medium">Company</th>
+            <th scope="col" className="px-2 py-2.5 text-right font-medium">Price</th>
+            <th scope="col" className="px-2 py-2.5 text-right font-medium">Chg %</th>
+            <th scope="col" className="px-2 py-2.5 text-right font-medium">Mkt Cap</th>
+            <th scope="col" className="px-2 py-2.5 text-right font-medium">P/E</th>
+            <th scope="col" className="px-2 py-2.5 text-right font-medium">PEG</th>
+            <th scope="col" className="px-2 py-2.5 text-right font-medium">ROCE</th>
+            <th scope="col" className="px-2 py-2.5 text-right font-medium">Vol</th>
+            <th scope="col" className="px-2 py-2.5 font-medium">Score</th>
+            <th scope="col" className="px-4 py-2.5 font-medium">Verdict</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-border">

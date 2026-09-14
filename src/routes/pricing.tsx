@@ -28,6 +28,8 @@ export const Route = createFileRoute("/pricing")({
       { property: "og:title", content: "DeepScreen Pro Pricing" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "DeepScreen Pro Pricing — ₹25 Weekly, ₹75 Monthly, ₹800 Yearly" },
+      { name: "twitter:description", content: "Compare weekly, monthly and yearly DeepScreen Pro plans." },
       {
         property: "og:description",
         content:

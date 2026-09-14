@@ -13,12 +13,13 @@ Contact: deepscreen.online@outlook.com
 
 ## Research documentation
 - [Methodology](https://deepscreen.online/methodology): Factors, weighting, sources and limitations.
-- [Ratio glossary](https://deepscreen.online/ratios): Definitions and formulas for all 13 model factors.
+- [Ratio glossary](https://deepscreen.online/learn): Definitions and formulas for all 13 model factors, Piotroski F-Score, Altman Z-Score and Beneish M-Score.
 - [Learning centre](https://deepscreen.online/learn): Plain-English investing and trading guides.
 - [About](https://deepscreen.online/about): Purpose, coverage and editorial principles.
 
 ## Important context
 - DeepScreen scores are analytical model outputs, not investment advice.
-- Live data is used where available; unavailable fields may show modeled estimates.
+- Core ratios, scores and verdicts are open and crawlable. Pro gates interpretation tools, not the underlying numbers.
+- When a required source field is unavailable, DeepScreen prefers “Insufficient data” over inventing a value.
 - Indian filing ratios may be sourced from Screener.in. Other supported markets use available Yahoo Finance data.
 - Verify material figures against primary company disclosures before relying on them.

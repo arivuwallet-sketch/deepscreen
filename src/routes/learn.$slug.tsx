@@ -4,6 +4,7 @@ import { Shell } from "@/components/ds/Shell";
 import { TopicIndex } from "@/components/ds/TopicIndex";
 import { GUIDES, findGuide } from "@/lib/deepscreen/guides";
 import { metaKeywords, keywordGroups } from "@/lib/seo/keywords";
+import { findRatio } from "@/lib/seo/content";
 
 const BASE = "https://deepscreen.online";
 
@@ -15,13 +16,25 @@ export const Route = createFileRoute("/learn/$slug")({
   staticData: { sitemap: true },
   loader: ({ params }) => {
     const guide = findGuide(params.slug);
-    if (!guide) throw notFound();
-    return { guide };
+    const ratio = findRatio(params.slug);
+    if (!guide && !ratio) throw notFound();
+    return { guide, ratio };
   },
   head: ({ params }) => {
     const guide = findGuide(params.slug);
+    const ratio = findRatio(params.slug);
+    if (!guide && !ratio) return {};
+    const url = `${BASE}/learn/${params.slug}`;
+    if (ratio) {
+      const title = `${ratio.shortName} (${ratio.name}) Explained | DeepScreen`;
+      const faq = [
+        { q: `What is ${ratio.shortName}?`, a: ratio.answer },
+        { q: `How is ${ratio.shortName} calculated?`, a: ratio.formula },
+        { q: `What should investors watch for with ${ratio.shortName}?`, a: ratio.cautions.join(" ") },
+      ];
+      return { meta: [{ title }, { name: "description", content: ratio.answer }, { property: "og:title", content: title }, { property: "og:description", content: ratio.answer }, { property: "og:type", content: "article" }, { property: "og:url", content: url }, { name: "twitter:card", content: "summary_large_image" }, { name: "twitter:title", content: title }, { name: "twitter:description", content: ratio.answer }], links: [{ rel: "canonical", href: url }], scripts: [{ type: "application/ld+json", children: JSON.stringify({ "@context": "https://schema.org", "@graph": [{ "@type": "Article", headline: title, description: ratio.answer, datePublished: "2026-09-14", dateModified: "2026-09-14", mainEntityOfPage: url, author: { "@type": "Organization", name: "DeepScreen" } }, { "@type": "FAQPage", mainEntity: faq.map(item => ({ "@type": "Question", name: item.q, acceptedAnswer: { "@type": "Answer", text: item.a } })) }, { "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Home", item: `${BASE}/` }, { "@type": "ListItem", position: 2, name: "Learn", item: `${BASE}/learn` }, { "@type": "ListItem", position: 3, name: ratio.name, item: url }] }] }) }] };
+    }
     if (!guide) return {};
-    const url = `${BASE}/learn/${guide.slug}`;
     return {
       meta: [
         { title: `${guide.title} — DeepScreen` },
@@ -45,6 +58,7 @@ export const Route = createFileRoute("/learn/$slug")({
             "@type": "Article",
             headline: guide.h1,
             description: guide.description,
+            datePublished: guide.updated,
             dateModified: guide.updated,
             mainEntityOfPage: url,
             author: { "@type": "Organization", name: "DeepScreen" },
@@ -83,7 +97,9 @@ export const Route = createFileRoute("/learn/$slug")({
 });
 
 function GuidePage() {
-  const { guide } = Route.useLoaderData();
+  const { guide, ratio } = Route.useLoaderData();
+  if (ratio) return <RatioGuide ratio={ratio} />;
+  if (!guide) return null;
   const related = GUIDES.filter((g) => g.slug !== guide.slug).slice(0, 4);
 
   return (
@@ -152,4 +168,9 @@ function GuidePage() {
       </article>
     </Shell>
   );
+}
+
+function RatioGuide({ ratio }: { ratio: NonNullable<ReturnType<typeof findRatio>> }) {
+  const faq = [{ q: `What is ${ratio.shortName}?`, a: ratio.answer }, { q: `How is it calculated?`, a: ratio.formula }, { q: "What are its limitations?", a: ratio.cautions.join(" ") }];
+  return <Shell><article className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8"><nav className="text-xs text-muted-foreground"><Link to="/">Home</Link> {" / "}<Link to="/learn">Learn</Link> {" / "}{ratio.shortName}</nav><h1 className="mt-4 text-3xl font-bold">{ratio.shortName} — {ratio.name}</h1><p className="mt-5 rounded-lg border border-border bg-panel p-5 leading-relaxed">DeepScreen explains {ratio.shortName} as follows: {ratio.answer}</p><section className="mt-8"><h2 className="text-lg font-semibold">Formula</h2><p className="num mt-3 rounded-lg border border-border bg-card p-4">{ratio.formula}</p></section><section className="mt-8"><h2 className="text-lg font-semibold">How to interpret it</h2><ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-muted-foreground">{ratio.interpretation.map(item => <li key={item}>{item}</li>)}</ul></section><section className="mt-8"><h2 className="text-lg font-semibold">Limitations</h2><ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-muted-foreground">{ratio.cautions.map(item => <li key={item}>{item}</li>)}</ul></section><section className="mt-8"><h2 className="text-lg font-semibold">Frequently asked questions</h2><dl className="mt-4 space-y-5">{faq.map(item => <div key={item.q}><dt className="font-semibold">{item.q}</dt><dd className="mt-1 text-sm text-muted-foreground">{item.a}</dd></div>)}</dl></section><p className="mt-10 text-xs text-muted-foreground"><time dateTime="2026-09-14">Last updated September 14, 2026</time>. Educational analytical content, not investment advice.</p></article></Shell>;
 }

@@ -32,6 +32,7 @@ import {
 } from "@/lib/deepscreen/format";
 import { cn } from "@/lib/utils";
 import { stockFaqs, stockSummary } from "@/lib/deepscreen/narrative";
+import { StockSignupPrompt } from "@/components/ds/StockSignupPrompt";
 
 export const Route = createFileRoute("/stock/$exchange/$symbol")({
   staticData: { sitemap: true },
@@ -62,9 +63,16 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
         meta: [{ title: "Stock not found | DeepScreen" }, { name: "robots", content: "noindex" }],
       };
     }
-    const s = loaderData.stock;
+    const base = loaderData.stock;
+    const s = mergeLiveStock(
+      base,
+      loaderData.snapshot.quote,
+      loaderData.snapshot.fundamentals,
+      loaderData.snapshot.screener,
+    ).stock;
+    const analysis = analyze(s);
     const title = `${s.symbol} — ${s.name} Fundamental Analysis | DeepScreen`;
-    const description = `${s.name} (${s.exchange}: ${s.symbol}) full fundamental breakdown: P/E ${s.fundamentals.pe}, PEG ${s.fundamentals.peg}, ROCE ${s.fundamentals.roce}%, plus latest news.`;
+    const description = `${s.symbol} scores ${analysis.score}/100 with a ${analysis.verdict} verdict. Analyze ${s.name} P/E ${s.fundamentals.pe.toFixed(1)}, PEG ${s.fundamentals.peg.toFixed(2)} and ROCE ${s.fundamentals.roce.toFixed(1)}%.`;
     const faqs = stockFaqs(s);
     const url = `https://deepscreen.online/stock/${s.exchange}/${s.symbol}`;
     return {
@@ -77,6 +85,8 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
         { property: "og:url", content: url },
         { property: "og:type", content: "article" },
         { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
       ],
       links: [{ rel: "canonical", href: url }],
       scripts: [
@@ -446,6 +456,7 @@ function StockPage() {
             ))}
           </dl>
         </section>
+        <StockSignupPrompt />
       </div>
       <TopicIndex ids={["stocks"]} title={"Stock research topics"} />
     </Shell>

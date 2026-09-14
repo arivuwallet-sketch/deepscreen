@@ -12,6 +12,7 @@ import { StockTable } from "@/components/ds/StockTable";
 import { EXCHANGES } from "@/lib/deepscreen/exchanges";
 import { STOCKS } from "@/lib/deepscreen/stocks";
 import { analyze } from "@/lib/deepscreen/metrics";
+import { NewsletterForm } from "@/components/ds/NewsletterForm";
 
 export const Route = createFileRoute("/")({
   staticData: { sitemap: true },
@@ -52,9 +53,9 @@ export const Route = createFileRoute("/")({
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web browser",
           description:
-            "Multi-exchange stock screener with a twelve-factor fundamental model for Indian, US and UK listings.",
+            "Multi-exchange stock screener with a 13-factor fundamental model for Indian, US and UK listings.",
           featureList: [
-            "Twelve-factor fundamental scoring",
+            "13-factor fundamental scoring",
             "Cap-based screening across NSE, BSE, NYSE, Nasdaq and LSE",
             "DCF and Graham intrinsic-value models",
             "Live IPO calendar",
@@ -84,7 +85,7 @@ function Home() {
             Every listed company. Five exchanges. One verdict.
           </h1>
           <p className="mt-4 max-w-2xl text-muted-foreground">
-            DeepScreen runs a twelve-factor valuation and quality model — P/E, PEG, P/S, P/B,
+            DeepScreen is a stock screener and fundamental analysis platform. Its 13-factor valuation and quality model covers P/E, PEG, P/S, P/B,
             EV/Revenue, EV/EBITDA, ROE, ROA, ROCE, leverage, payout and operating leverage — across
             Indian, US and UK markets, then pairs it with live news and macro events.
           </p>
@@ -211,6 +212,11 @@ function Home() {
               </p>
             </div>
           </div>
+        </section>
+        <section className="rounded-lg border border-border bg-panel p-6 sm:p-8">
+          <h2 className="text-lg font-semibold">DeepScreen research updates</h2>
+          <p className="mb-4 mt-2 max-w-2xl text-sm text-muted-foreground">Get occasional market guides, methodology updates and new screener tools. No trading tips or spam.</p>
+          <NewsletterForm />
         </section>
       </div>
       <section aria-labelledby="guides" className="mt-14 border-t border-border">

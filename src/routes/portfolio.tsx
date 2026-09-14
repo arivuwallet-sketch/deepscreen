@@ -126,13 +126,13 @@ function PortfolioPage() {
                 <table className="w-full min-w-[720px] text-sm">
                   <thead className="bg-panel text-xs uppercase text-muted-foreground">
                     <tr>
-                      <th className="px-3 py-2 text-left">Stock</th>
-                      <th className="px-3 py-2 text-right">Price</th>
-                      <th className="px-3 py-2 text-right">P/E</th>
-                      <th className="px-3 py-2 text-right">PEG</th>
-                      <th className="px-3 py-2 text-right">D/E</th>
-                      <th className="px-3 py-2 text-right">Score</th>
-                      <th className="px-3 py-2 text-left">Action</th>
+                      <th scope="col" className="px-3 py-2 text-left">Stock</th>
+                      <th scope="col" className="px-3 py-2 text-right">Price</th>
+                      <th scope="col" className="px-3 py-2 text-right">P/E</th>
+                      <th scope="col" className="px-3 py-2 text-right">PEG</th>
+                      <th scope="col" className="px-3 py-2 text-right">D/E</th>
+                      <th scope="col" className="px-3 py-2 text-right">Score</th>
+                      <th scope="col" className="px-3 py-2 text-left">Action</th>
                     </tr>
                   </thead>
                   <tbody>

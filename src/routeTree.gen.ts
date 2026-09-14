@@ -16,7 +16,6 @@ import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as IpoRouteImport } from './routes/ipo'
 import { Route as MethodologyRouteImport } from './routes/methodology'
-import { Route as OptionsRouteImport } from './routes/options'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -27,7 +26,8 @@ import { Route as CompareSlugRouteImport } from './routes/compare.$slug'
 import { Route as ExchangeCodeRouteImport } from './routes/exchange.$code'
 import { Route as LearnIndexRouteImport } from './routes/learn.index'
 import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
-import { Route as OptionsStrategySlugRouteImport } from './routes/options-strategy.$slug'
+import { Route as OptionsIndexRouteImport } from './routes/options.index'
+import { Route as OptionsSlugRouteImport } from './routes/options.$slug'
 import { Route as RatiosIndexRouteImport } from './routes/ratios.index'
 import { Route as RatiosSlugRouteImport } from './routes/ratios.$slug'
 import { Route as ApiPublicCashfreeWebhookRouteImport } from './routes/api/public/cashfree-webhook'
@@ -67,11 +67,6 @@ const IpoRoute = IpoRouteImport.update({
 const MethodologyRoute = MethodologyRouteImport.update({
   id: '/methodology',
   path: '/methodology',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OptionsRoute = OptionsRouteImport.update({
-  id: '/options',
-  path: '/options',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PortfolioRoute = PortfolioRouteImport.update({
@@ -124,9 +119,14 @@ const LearnSlugRoute = LearnSlugRouteImport.update({
   path: '/learn/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const OptionsStrategySlugRoute = OptionsStrategySlugRouteImport.update({
-  id: '/options-strategy/$slug',
-  path: '/options-strategy/$slug',
+const OptionsIndexRoute = OptionsIndexRouteImport.update({
+  id: '/options/',
+  path: '/options/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OptionsSlugRoute = OptionsSlugRouteImport.update({
+  id: '/options/$slug',
+  path: '/options/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RatiosIndexRoute = RatiosIndexRouteImport.update({
@@ -164,7 +164,6 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/ipo': typeof IpoRoute
   '/methodology': typeof MethodologyRoute
-  '/options': typeof OptionsRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -174,9 +173,10 @@ export interface FileRoutesByFullPath {
   '/compare/$slug': typeof CompareSlugRoute
   '/exchange/$code': typeof ExchangeCodeRoute
   '/learn/$slug': typeof LearnSlugRoute
-  '/options-strategy/$slug': typeof OptionsStrategySlugRoute
+  '/options/$slug': typeof OptionsSlugRoute
   '/ratios/$slug': typeof RatiosSlugRoute
   '/learn/': typeof LearnIndexRoute
+  '/options/': typeof OptionsIndexRoute
   '/ratios/': typeof RatiosIndexRoute
   '/api/public/cashfree-webhook': typeof ApiPublicCashfreeWebhookRoute
   '/sector/$exchange/$sector': typeof SectorExchangeSectorRoute
@@ -190,7 +190,6 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/ipo': typeof IpoRoute
   '/methodology': typeof MethodologyRoute
-  '/options': typeof OptionsRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -200,9 +199,10 @@ export interface FileRoutesByTo {
   '/compare/$slug': typeof CompareSlugRoute
   '/exchange/$code': typeof ExchangeCodeRoute
   '/learn/$slug': typeof LearnSlugRoute
-  '/options-strategy/$slug': typeof OptionsStrategySlugRoute
+  '/options/$slug': typeof OptionsSlugRoute
   '/ratios/$slug': typeof RatiosSlugRoute
   '/learn': typeof LearnIndexRoute
+  '/options': typeof OptionsIndexRoute
   '/ratios': typeof RatiosIndexRoute
   '/api/public/cashfree-webhook': typeof ApiPublicCashfreeWebhookRoute
   '/sector/$exchange/$sector': typeof SectorExchangeSectorRoute
@@ -217,7 +217,6 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/ipo': typeof IpoRoute
   '/methodology': typeof MethodologyRoute
-  '/options': typeof OptionsRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -227,9 +226,10 @@ export interface FileRoutesById {
   '/compare/$slug': typeof CompareSlugRoute
   '/exchange/$code': typeof ExchangeCodeRoute
   '/learn/$slug': typeof LearnSlugRoute
-  '/options-strategy/$slug': typeof OptionsStrategySlugRoute
+  '/options/$slug': typeof OptionsSlugRoute
   '/ratios/$slug': typeof RatiosSlugRoute
   '/learn/': typeof LearnIndexRoute
+  '/options/': typeof OptionsIndexRoute
   '/ratios/': typeof RatiosIndexRoute
   '/api/public/cashfree-webhook': typeof ApiPublicCashfreeWebhookRoute
   '/sector/$exchange/$sector': typeof SectorExchangeSectorRoute
@@ -245,7 +245,6 @@ export interface FileRouteTypes {
     | '/contact'
     | '/ipo'
     | '/methodology'
-    | '/options'
     | '/portfolio'
     | '/pricing'
     | '/privacy'
@@ -255,9 +254,10 @@ export interface FileRouteTypes {
     | '/compare/$slug'
     | '/exchange/$code'
     | '/learn/$slug'
-    | '/options-strategy/$slug'
+    | '/options/$slug'
     | '/ratios/$slug'
     | '/learn/'
+    | '/options/'
     | '/ratios/'
     | '/api/public/cashfree-webhook'
     | '/sector/$exchange/$sector'
@@ -271,7 +271,6 @@ export interface FileRouteTypes {
     | '/contact'
     | '/ipo'
     | '/methodology'
-    | '/options'
     | '/portfolio'
     | '/pricing'
     | '/privacy'
@@ -281,9 +280,10 @@ export interface FileRouteTypes {
     | '/compare/$slug'
     | '/exchange/$code'
     | '/learn/$slug'
-    | '/options-strategy/$slug'
+    | '/options/$slug'
     | '/ratios/$slug'
     | '/learn'
+    | '/options'
     | '/ratios'
     | '/api/public/cashfree-webhook'
     | '/sector/$exchange/$sector'
@@ -297,7 +297,6 @@ export interface FileRouteTypes {
     | '/contact'
     | '/ipo'
     | '/methodology'
-    | '/options'
     | '/portfolio'
     | '/pricing'
     | '/privacy'
@@ -307,9 +306,10 @@ export interface FileRouteTypes {
     | '/compare/$slug'
     | '/exchange/$code'
     | '/learn/$slug'
-    | '/options-strategy/$slug'
+    | '/options/$slug'
     | '/ratios/$slug'
     | '/learn/'
+    | '/options/'
     | '/ratios/'
     | '/api/public/cashfree-webhook'
     | '/sector/$exchange/$sector'
@@ -324,7 +324,6 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   IpoRoute: typeof IpoRoute
   MethodologyRoute: typeof MethodologyRoute
-  OptionsRoute: typeof OptionsRoute
   PortfolioRoute: typeof PortfolioRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -334,9 +333,10 @@ export interface RootRouteChildren {
   CompareSlugRoute: typeof CompareSlugRoute
   ExchangeCodeRoute: typeof ExchangeCodeRoute
   LearnSlugRoute: typeof LearnSlugRoute
-  OptionsStrategySlugRoute: typeof OptionsStrategySlugRoute
+  OptionsSlugRoute: typeof OptionsSlugRoute
   RatiosSlugRoute: typeof RatiosSlugRoute
   LearnIndexRoute: typeof LearnIndexRoute
+  OptionsIndexRoute: typeof OptionsIndexRoute
   RatiosIndexRoute: typeof RatiosIndexRoute
   ApiPublicCashfreeWebhookRoute: typeof ApiPublicCashfreeWebhookRoute
   SectorExchangeSectorRoute: typeof SectorExchangeSectorRoute
@@ -392,13 +392,6 @@ declare module '@tanstack/react-router' {
       path: '/methodology'
       fullPath: '/methodology'
       preLoaderRoute: typeof MethodologyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/options': {
-      id: '/options'
-      path: '/options'
-      fullPath: '/options'
-      preLoaderRoute: typeof OptionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/portfolio': {
@@ -471,11 +464,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LearnSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/options-strategy/$slug': {
-      id: '/options-strategy/$slug'
-      path: '/options-strategy/$slug'
-      fullPath: '/options-strategy/$slug'
-      preLoaderRoute: typeof OptionsStrategySlugRouteImport
+    '/options/': {
+      id: '/options/'
+      path: '/options'
+      fullPath: '/options/'
+      preLoaderRoute: typeof OptionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/options/$slug': {
+      id: '/options/$slug'
+      path: '/options/$slug'
+      fullPath: '/options/$slug'
+      preLoaderRoute: typeof OptionsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ratios/': {
@@ -524,7 +524,6 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   IpoRoute: IpoRoute,
   MethodologyRoute: MethodologyRoute,
-  OptionsRoute: OptionsRoute,
   PortfolioRoute: PortfolioRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
@@ -534,9 +533,10 @@ const rootRouteChildren: RootRouteChildren = {
   CompareSlugRoute: CompareSlugRoute,
   ExchangeCodeRoute: ExchangeCodeRoute,
   LearnSlugRoute: LearnSlugRoute,
-  OptionsStrategySlugRoute: OptionsStrategySlugRoute,
+  OptionsSlugRoute: OptionsSlugRoute,
   RatiosSlugRoute: RatiosSlugRoute,
   LearnIndexRoute: LearnIndexRoute,
+  OptionsIndexRoute: OptionsIndexRoute,
   RatiosIndexRoute: RatiosIndexRoute,
   ApiPublicCashfreeWebhookRoute: ApiPublicCashfreeWebhookRoute,
   SectorExchangeSectorRoute: SectorExchangeSectorRoute,

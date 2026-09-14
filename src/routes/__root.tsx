@@ -100,6 +100,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           url: "https://deepscreen.online",
           description:
             "Global stock screener and fundamental analysis for NSE, BSE, NYSE, Nasdaq and LSE.",
+          potentialAction: {
+            "@type": "SearchAction",
+            target: "https://deepscreen.online/?q={search_term_string}",
+            "query-input": "required name=search_term_string",
+          },
         }),
       },
       {

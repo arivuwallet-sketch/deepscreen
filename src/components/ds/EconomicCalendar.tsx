@@ -77,13 +77,13 @@ export function EconomicCalendar() {
           <table className="w-full min-w-[640px] text-sm">
             <thead>
               <tr className="num border-b border-border text-left text-[11px] uppercase text-muted-foreground">
-                <th className="px-4 py-2 font-medium">Time</th>
-                <th className="px-2 py-2 font-medium">Cur</th>
-                <th className="px-2 py-2 font-medium">Impact</th>
-                <th className="px-2 py-2 font-medium">Event</th>
-                <th className="px-2 py-2 text-right font-medium">Actual</th>
-                <th className="px-2 py-2 text-right font-medium">Forecast</th>
-                <th className="px-4 py-2 text-right font-medium">Previous</th>
+                <th scope="col" className="px-4 py-2 font-medium">Time</th>
+                <th scope="col" className="px-2 py-2 font-medium">Cur</th>
+                <th scope="col" className="px-2 py-2 font-medium">Impact</th>
+                <th scope="col" className="px-2 py-2 font-medium">Event</th>
+                <th scope="col" className="px-2 py-2 text-right font-medium">Actual</th>
+                <th scope="col" className="px-2 py-2 text-right font-medium">Forecast</th>
+                <th scope="col" className="px-4 py-2 text-right font-medium">Previous</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
