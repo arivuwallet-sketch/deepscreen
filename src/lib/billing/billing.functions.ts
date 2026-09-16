@@ -93,7 +93,7 @@ export const confirmCheckout = createServerFn({ method: "POST" })
 
       const { data: order } = await admin
         .from("payment_orders")
-        .select("user_id, tier, status")
+        .select("user_id, tier, status, amount, currency")
         .eq("link_id", data.linkId)
         .maybeSingle();
 
@@ -108,6 +108,13 @@ export const confirmCheckout = createServerFn({ method: "POST" })
         return { ok: true, paid: false, status: link.status };
       }
       if (order.status === "paid") return { ok: true, paid: true, status: "PAID" };
+      if (order.currency !== "INR" || link.amountPaid + 0.01 < Number(order.amount)) {
+        await admin
+          .from("payment_orders")
+          .update({ status: "underpaid" })
+          .eq("link_id", data.linkId);
+        return { ok: true, paid: false, status: "PARTIALLY_PAID" };
+      }
 
       const granted = await grantSubscription(admin, order.user_id, order.tier as Tier);
       if (!granted.ok) return granted;
