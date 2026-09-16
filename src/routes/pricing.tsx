@@ -158,6 +158,7 @@ function PricingPage() {
 
   const start = async (plan: Plan) => {
     if (!user) {
+      window.localStorage.setItem("deepscreen_auth_redirect", "/pricing");
       window.location.assign("/auth?redirect=%2Fpricing");
       return;
     }
