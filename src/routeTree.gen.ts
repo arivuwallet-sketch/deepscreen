@@ -26,6 +26,7 @@ import { Route as CompareSlugRouteImport } from './routes/compare.$slug'
 import { Route as ExchangeCodeRouteImport } from './routes/exchange.$code'
 import { Route as LearnIndexRouteImport } from './routes/learn.index'
 import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
+import { Route as OptionsStrategySlugRouteImport } from './routes/options-strategy.$slug'
 import { Route as OptionsIndexRouteImport } from './routes/options.index'
 import { Route as OptionsSlugRouteImport } from './routes/options.$slug'
 import { Route as RatiosIndexRouteImport } from './routes/ratios.index'
@@ -119,6 +120,11 @@ const LearnSlugRoute = LearnSlugRouteImport.update({
   path: '/learn/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OptionsStrategySlugRoute = OptionsStrategySlugRouteImport.update({
+  id: '/options-strategy/$slug',
+  path: '/options-strategy/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OptionsIndexRoute = OptionsIndexRouteImport.update({
   id: '/options/',
   path: '/options/',
@@ -173,6 +179,7 @@ export interface FileRoutesByFullPath {
   '/compare/$slug': typeof CompareSlugRoute
   '/exchange/$code': typeof ExchangeCodeRoute
   '/learn/$slug': typeof LearnSlugRoute
+  '/options-strategy/$slug': typeof OptionsStrategySlugRoute
   '/options/$slug': typeof OptionsSlugRoute
   '/ratios/$slug': typeof RatiosSlugRoute
   '/learn/': typeof LearnIndexRoute
@@ -199,6 +206,7 @@ export interface FileRoutesByTo {
   '/compare/$slug': typeof CompareSlugRoute
   '/exchange/$code': typeof ExchangeCodeRoute
   '/learn/$slug': typeof LearnSlugRoute
+  '/options-strategy/$slug': typeof OptionsStrategySlugRoute
   '/options/$slug': typeof OptionsSlugRoute
   '/ratios/$slug': typeof RatiosSlugRoute
   '/learn': typeof LearnIndexRoute
@@ -226,6 +234,7 @@ export interface FileRoutesById {
   '/compare/$slug': typeof CompareSlugRoute
   '/exchange/$code': typeof ExchangeCodeRoute
   '/learn/$slug': typeof LearnSlugRoute
+  '/options-strategy/$slug': typeof OptionsStrategySlugRoute
   '/options/$slug': typeof OptionsSlugRoute
   '/ratios/$slug': typeof RatiosSlugRoute
   '/learn/': typeof LearnIndexRoute
@@ -254,6 +263,7 @@ export interface FileRouteTypes {
     | '/compare/$slug'
     | '/exchange/$code'
     | '/learn/$slug'
+    | '/options-strategy/$slug'
     | '/options/$slug'
     | '/ratios/$slug'
     | '/learn/'
@@ -280,6 +290,7 @@ export interface FileRouteTypes {
     | '/compare/$slug'
     | '/exchange/$code'
     | '/learn/$slug'
+    | '/options-strategy/$slug'
     | '/options/$slug'
     | '/ratios/$slug'
     | '/learn'
@@ -306,6 +317,7 @@ export interface FileRouteTypes {
     | '/compare/$slug'
     | '/exchange/$code'
     | '/learn/$slug'
+    | '/options-strategy/$slug'
     | '/options/$slug'
     | '/ratios/$slug'
     | '/learn/'
@@ -333,6 +345,7 @@ export interface RootRouteChildren {
   CompareSlugRoute: typeof CompareSlugRoute
   ExchangeCodeRoute: typeof ExchangeCodeRoute
   LearnSlugRoute: typeof LearnSlugRoute
+  OptionsStrategySlugRoute: typeof OptionsStrategySlugRoute
   OptionsSlugRoute: typeof OptionsSlugRoute
   RatiosSlugRoute: typeof RatiosSlugRoute
   LearnIndexRoute: typeof LearnIndexRoute
@@ -464,6 +477,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LearnSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/options-strategy/$slug': {
+      id: '/options-strategy/$slug'
+      path: '/options-strategy/$slug'
+      fullPath: '/options-strategy/$slug'
+      preLoaderRoute: typeof OptionsStrategySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/options/': {
       id: '/options/'
       path: '/options'
@@ -533,6 +553,7 @@ const rootRouteChildren: RootRouteChildren = {
   CompareSlugRoute: CompareSlugRoute,
   ExchangeCodeRoute: ExchangeCodeRoute,
   LearnSlugRoute: LearnSlugRoute,
+  OptionsStrategySlugRoute: OptionsStrategySlugRoute,
   OptionsSlugRoute: OptionsSlugRoute,
   RatiosSlugRoute: RatiosSlugRoute,
   LearnIndexRoute: LearnIndexRoute,

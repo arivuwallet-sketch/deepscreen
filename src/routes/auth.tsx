@@ -3,6 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 import { Shell } from "@/components/ds/Shell";
+import { metaKeywords, portfolioKeywords, screenerKeywords } from "@/lib/seo/keywords";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/auth")({
       meta: [
         { title },
         { name: "description", content: description },
+        { name: "keywords", content: metaKeywords(["DeepScreen sign in", "stock watchlist account", "stock alerts account", "portfolio tracker account"], portfolioKeywords, screenerKeywords) },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:type", content: "website" },

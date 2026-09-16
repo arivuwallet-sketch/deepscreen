@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
 import { RATIOS } from "@/lib/seo/content";
+import { learnKeywords, metaKeywords, stocksKeywords } from "@/lib/seo/keywords";
 
 const URL = "https://deepscreen.online/ratios";
 export const Route = createFileRoute("/ratios/")({
@@ -8,6 +9,7 @@ export const Route = createFileRoute("/ratios/")({
   head: () => ({ meta: [
     { title: "Stock Market Ratio Glossary | DeepScreen" },
     { name: "description", content: "Plain-English definitions, formulas and limitations for the 13 fundamental ratios used by DeepScreen." },
+    { name: "keywords", content: metaKeywords(["stock market ratios", "financial ratio glossary", "fundamental ratios", "stock valuation ratios", "13 factor stock model"], stocksKeywords, learnKeywords) },
     { property: "og:title", content: "Stock Market Ratio Glossary | DeepScreen" },
     { property: "og:description", content: "Learn P/E, PEG, P/S, P/B, EV/EBITDA, ROE, ROA, ROCE, debt ratios and more." },
     { property: "og:type", content: "website" }, { property: "og:url", content: URL }, { name: "twitter:card", content: "summary_large_image" },

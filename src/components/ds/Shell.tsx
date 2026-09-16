@@ -79,8 +79,11 @@ export function Shell({ children }: { children: ReactNode }) {
             Privacy Policy
           </Link>
         </nav>
-        DeepScreen — cross-exchange fundamental screening for India, the US and the UK. Analytical
-        model output, not investment advice.
+        <p>
+          DeepScreen — cross-exchange fundamental screening for India, the US and the UK. Analytical
+          model output, not investment advice.
+        </p>
+        <p className="mt-2 text-[11px] text-muted-foreground/80">Sooraj · Founder</p>
       </footer>
     </div>
   );

@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { Shell } from "@/components/ds/Shell";
+import { learnKeywords, metaKeywords, screenerKeywords } from "@/lib/seo/keywords";
 
 export const Route = createFileRoute("/terms")({
   staticData: { sitemap: true },
@@ -12,6 +13,7 @@ export const Route = createFileRoute("/terms")({
         content:
           "DeepScreen Terms of Service: educational use only, no financial advice, account and subscription rules, acceptable use and liability limits.",
       },
+      { name: "keywords", content: metaKeywords(["DeepScreen terms of service", "stock screener terms", "financial research disclaimer", "investment analysis terms"], screenerKeywords, learnKeywords) },
       { property: "og:title", content: "Terms of Service — DeepScreen" },
       {
         property: "og:description",

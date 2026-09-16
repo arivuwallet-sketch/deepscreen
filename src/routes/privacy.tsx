@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { Shell } from "@/components/ds/Shell";
+import { metaKeywords, portfolioKeywords, screenerKeywords } from "@/lib/seo/keywords";
 
 export const Route = createFileRoute("/privacy")({
   staticData: { sitemap: true },
@@ -12,6 +13,7 @@ export const Route = createFileRoute("/privacy")({
         content:
           "How DeepScreen collects, uses and protects your account, payment and usage data, plus your rights over your personal information.",
       },
+      { name: "keywords", content: metaKeywords(["DeepScreen privacy policy", "stock screener privacy", "financial platform data privacy", "account data protection"], screenerKeywords, portfolioKeywords) },
       { property: "og:title", content: "Privacy Policy — DeepScreen" },
       {
         property: "og:description",
