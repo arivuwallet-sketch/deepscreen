@@ -33,6 +33,13 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
+function getRedirectPath(): "/" | "/pricing" {
+  if (typeof window === "undefined") return "/";
+  return new URLSearchParams(window.location.search).get("redirect") === "/pricing"
+    ? "/pricing"
+    : "/";
+}
+
 function AuthPage() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
@@ -43,7 +50,7 @@ function AuthPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && session) void navigate({ to: "/" });
+    if (!loading && session) void navigate({ to: getRedirectPath() });
   }, [loading, session, navigate]);
 
   async function submit(e: React.FormEvent) {
@@ -61,14 +68,17 @@ function AuthPage() {
           return;
         }
         toast.success("Signed in");
-        void navigate({ to: "/" });
+        void navigate({ to: getRedirectPath() });
         return;
       }
 
+      const redirectPath = getRedirectPath();
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: { emailRedirectTo: `${window.location.origin}` },
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth?redirect=${encodeURIComponent(redirectPath)}`,
+        },
       });
       if (error) {
         toast.error(
@@ -84,7 +94,7 @@ function AuthPage() {
         return;
       }
       toast.success("Account created");
-      void navigate({ to: "/" });
+      void navigate({ to: redirectPath });
     } finally {
       setBusy(false);
     }
@@ -93,8 +103,9 @@ function AuthPage() {
   async function google() {
     setBusy(true);
     try {
+      const redirectPath = getRedirectPath();
       const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+        redirect_uri: `${window.location.origin}/auth?redirect=${encodeURIComponent(redirectPath)}`,
       });
       if (result.error) {
         toast.error("Google sign-in failed. Please try again.");
@@ -102,7 +113,7 @@ function AuthPage() {
       }
       if (result.redirected) return;
       toast.success("Signed in with Google");
-      void navigate({ to: "/" });
+      void navigate({ to: redirectPath });
     } catch {
       toast.error("Google sign-in failed. Please try again.");
     } finally {
