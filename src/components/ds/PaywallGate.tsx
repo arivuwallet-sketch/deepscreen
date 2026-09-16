@@ -40,7 +40,7 @@ export function PaywallGate({
   void loading;
 
   return (
-    <div className={cn("relative overflow-hidden rounded-lg", className)}>
+    <div className={cn("relative overflow-hidden rounded-lg", minHeight, className)}>
       <div aria-hidden className="pointer-events-none select-none blur-[6px] saturate-50">
         {children}
       </div>

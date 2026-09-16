@@ -16,11 +16,7 @@ export function getCashfreeConfig(): CashfreeConfig | null {
   const appId = process.env["CASHFREE_APP_ID"];
   const secretKey = process.env["CASHFREE_SECRET_KEY"];
   if (!appId || !secretKey) return null;
-  const env = (process.env["CASHFREE_ENV"] ?? "sandbox").toLowerCase();
-  const base = env === "production" || env === "live"
-    ? "https://api.cashfree.com/pg"
-    : "https://sandbox.cashfree.com/pg";
-  return { appId, secretKey, base };
+  return { appId, secretKey, base: "https://api.cashfree.com/pg" };
 }
 
 function headers(cfg: CashfreeConfig): Record<string, string> {

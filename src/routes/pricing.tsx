@@ -18,7 +18,7 @@ export const Route = createFileRoute("/pricing")({
   staticData: { sitemap: true },
   head: () => ({
     meta: [
-      { title: "DeepScreen Pro Pricing — ₹25 Weekly, ₹75 Monthly, ₹800 Yearly" },
+      { title: "DeepScreen Pro Pricing — ₹50 Weekly, ₹175 Monthly, ₹1800 Yearly" },
       {
         name: "description",
         content:
@@ -28,12 +28,12 @@ export const Route = createFileRoute("/pricing")({
       { property: "og:title", content: "DeepScreen Pro Pricing" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "DeepScreen Pro Pricing — ₹25 Weekly, ₹75 Monthly, ₹800 Yearly" },
+      { name: "twitter:title", content: "DeepScreen Pro Pricing — ₹50 Weekly, ₹175 Monthly, ₹1800 Yearly" },
       { name: "twitter:description", content: "Compare weekly, monthly and yearly DeepScreen Pro plans." },
       {
         property: "og:description",
         content:
-          "Weekly ₹25, monthly ₹75 or annual ₹800 access to DeepScreen's full god-mode analysis engine. Pay by UPI, card or netbanking via Cashfree.",
+          "Weekly ₹50, monthly ₹175 or annual ₹1800 access to DeepScreen's full god-mode analysis engine. Pay by UPI, card or netbanking via Cashfree.",
       },
       { property: "og:url", content: "https://deepscreen.online/pricing" },
     ],
@@ -53,7 +53,7 @@ export const Route = createFileRoute("/pricing")({
             {
               "@type": "Offer",
               name: "Weekly",
-              price: "25",
+              price: "50",
               priceCurrency: "INR",
               url: "https://deepscreen.online/pricing",
               availability: "https://schema.org/InStock",
@@ -61,7 +61,7 @@ export const Route = createFileRoute("/pricing")({
             {
               "@type": "Offer",
               name: "Monthly",
-              price: "75",
+              price: "175",
               priceCurrency: "INR",
               url: "https://deepscreen.online/pricing",
               availability: "https://schema.org/InStock",
@@ -69,7 +69,7 @@ export const Route = createFileRoute("/pricing")({
             {
               "@type": "Offer",
               name: "Yearly",
-              price: "800",
+              price: "1800",
               priceCurrency: "INR",
               url: "https://deepscreen.online/pricing",
               availability: "https://schema.org/InStock",
@@ -207,15 +207,15 @@ function PricingPage() {
             <div
               key={p.tier}
               className={cn(
-                "flex flex-col rounded-lg border bg-panel p-6",
+                "relative flex flex-col rounded-lg border bg-panel p-6",
                 p.tier === "annual"
-                  ? "border-primary/50 shadow-[0_0_0_1px_var(--primary)]"
+                  ? "border-primary/70 bg-primary/5 shadow-[0_0_24px_-8px_var(--primary)]"
                   : "border-border",
               )}
             >
               {p.badge && (
                 <span className="num mb-3 w-fit rounded bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase text-primary">
-                  {p.badge} · Most Popular
+                  {p.badge}
                 </span>
               )}
               <h2 className="text-sm font-semibold uppercase tracking-wide">{p.name}</h2>

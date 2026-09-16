@@ -260,31 +260,37 @@ function StockPage() {
         })()}
 
         <section className="mt-6 grid gap-4 lg:grid-cols-3">
-            <div className="card-hover rounded-lg border border-border bg-panel p-5 lg:col-span-2">
-              <div className="flex items-center justify-between">
-                <h2 className="text-sm font-semibold uppercase tracking-wide">
-                  DeepScreen verdict
-                </h2>
-                <span
-                  className={cn(
-                    "num rounded border px-3 py-1 text-sm font-semibold",
-                    verdictClass(a.verdict),
-                  )}
-                >
-                  {a.verdict}
-                </span>
-              </div>
-              <div className="mt-4 flex items-center gap-4">
-                <span className="num text-5xl font-bold">{a.score}</span>
-                <div className="flex-1">
-                  <ScoreBar score={a.score} />
-                  <p className="num mt-1 text-xs text-muted-foreground">
-                     Weighted 13-factor score / 100
-                  </p>
+            <PaywallGate
+              feature="DeepScreen verdict and weighted score"
+              className="lg:col-span-2"
+              minHeight="min-h-[220px]"
+            >
+              <div className="card-hover rounded-lg border border-border bg-panel p-5">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-sm font-semibold uppercase tracking-wide">
+                    DeepScreen verdict
+                  </h2>
+                  <span
+                    className={cn(
+                      "num rounded border px-3 py-1 text-sm font-semibold",
+                      verdictClass(a.verdict),
+                    )}
+                  >
+                    {a.verdict}
+                  </span>
                 </div>
+                <div className="mt-4 flex items-center gap-4">
+                  <span className="num text-5xl font-bold">{a.score}</span>
+                  <div className="flex-1">
+                    <ScoreBar score={a.score} />
+                    <p className="num mt-1 text-xs text-muted-foreground">
+                      Weighted 13-factor score / 100
+                    </p>
+                  </div>
+                </div>
+                <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{a.summary}</p>
               </div>
-              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{a.summary}</p>
-            </div>
+            </PaywallGate>
 
             <div className="grid gap-4">
               <div className="card-hover rounded-lg border border-bull/30 bg-panel p-4">
