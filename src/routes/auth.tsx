@@ -35,7 +35,9 @@ export const Route = createFileRoute("/auth")({
 
 function getRedirectPath(): "/" | "/pricing" {
   if (typeof window === "undefined") return "/";
-  return new URLSearchParams(window.location.search).get("redirect") === "/pricing"
+  const queryRedirect = new URLSearchParams(window.location.search).get("redirect");
+  const savedRedirect = window.localStorage.getItem("deepscreen_auth_redirect");
+  return queryRedirect === "/pricing" || savedRedirect === "/pricing"
     ? "/pricing"
     : "/";
 }
@@ -50,7 +52,11 @@ function AuthPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && session) void navigate({ to: getRedirectPath() });
+    if (!loading && session) {
+      const redirectPath = getRedirectPath();
+      window.localStorage.removeItem("deepscreen_auth_redirect");
+      void navigate({ to: redirectPath });
+    }
   }, [loading, session, navigate]);
 
   async function submit(e: React.FormEvent) {
@@ -73,11 +79,12 @@ function AuthPage() {
       }
 
       const redirectPath = getRedirectPath();
+      window.localStorage.setItem("deepscreen_auth_redirect", redirectPath);
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth?redirect=${encodeURIComponent(redirectPath)}`,
+          emailRedirectTo: `${window.location.origin}/auth`,
         },
       });
       if (error) {
@@ -104,8 +111,9 @@ function AuthPage() {
     setBusy(true);
     try {
       const redirectPath = getRedirectPath();
+      window.localStorage.setItem("deepscreen_auth_redirect", redirectPath);
       const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: `${window.location.origin}/auth?redirect=${encodeURIComponent(redirectPath)}`,
+        redirect_uri: `${window.location.origin}/auth`,
       });
       if (result.error) {
         toast.error("Google sign-in failed. Please try again.");
