@@ -158,7 +158,7 @@ function PricingPage() {
 
   const start = async (plan: Plan) => {
     if (!user) {
-      void navigate({ to: "/auth" });
+      window.location.assign("/auth?redirect=%2Fpricing");
       return;
     }
     setBusy(plan.tier);
