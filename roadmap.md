@@ -6,6 +6,7 @@
 - Ratio glossary, rankings, sectors, stock comparisons and options explainers
 - About, methodology, crawler policy, sitemap and `llms.txt`
 - Newsletter capture and a non-blocking repeat-visitor account prompt
+- Five-day refund policy and founder contact details
 
 ## Backlink plan (low budget)
 1. Publish one data-led exchange or sector study monthly and pitch its findings to finance newsletters and market-data journalists.

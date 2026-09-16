@@ -78,12 +78,21 @@ export function Shell({ children }: { children: ReactNode }) {
           <Link to="/privacy" className="hover:text-foreground">
             Privacy Policy
           </Link>
+          <Link to="/refund-policy" className="hover:text-foreground">
+            Refund Policy
+          </Link>
         </nav>
         <p>
           DeepScreen — cross-exchange fundamental screening for India, the US and the UK. Analytical
           model output, not investment advice.
         </p>
         <p className="mt-2 text-[11px] text-muted-foreground/80">Sooraj · Founder</p>
+        <a
+          href="tel:+917200689491"
+          className="mt-1 inline-block text-[11px] text-muted-foreground/80 hover:text-foreground"
+        >
+          +91 72006 89491
+        </a>
       </footer>
     </div>
   );
