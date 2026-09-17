@@ -64,6 +64,76 @@ export const Route = createFileRoute("/")({
           ],
         }),
       },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "DeepScreen",
+          url: "https://deepscreen.online/",
+          email: "deepscreen.online@outlook.com",
+          description:
+            "Global stock screener and fundamental research platform covering NSE, BSE, NYSE, Nasdaq and LSE.",
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "DeepScreen",
+          url: "https://deepscreen.online/",
+          potentialAction: {
+            "@type": "SearchAction",
+            target: {
+              "@type": "EntryPoint",
+              urlTemplate: "https://deepscreen.online/?q={search_term_string}",
+            },
+            "query-input": "required name=search_term_string",
+          },
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: [
+            {
+              "@type": "Question",
+              name: "What is DeepScreen?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "DeepScreen is a stock screener that scores listed companies on NSE, BSE, NYSE, Nasdaq and LSE using a 13-factor valuation and quality model covering P/E, PEG, P/S, P/B, EV/Revenue, EV/EBITDA, ROE, ROA, ROCE, leverage, payout and operating leverage.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Which markets does DeepScreen cover?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Indian markets through the NSE and BSE, US markets through the NYSE and Nasdaq, and UK markets through the LSE.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Can I use DeepScreen for free?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Yes. Search, raw fundamental ratios, the IPO pipeline, news and the economic calendar are free. The full verdict, valuation models and alerts are part of Pro, which starts at ₹50 per week.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Is DeepScreen investment advice?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "No. DeepScreen publishes analytical model output for research and education only, not investment advice.",
+              },
+            },
+          ],
+        }),
+      },
     ],
   }),
   component: Home,
