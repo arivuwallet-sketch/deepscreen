@@ -14,17 +14,17 @@
   },
   "branding": {
     "iconMode": "upload",
-    "iconUrl": "https://ibb.co/HLy4SLyF",
+    "iconUrl": "C:\\Users\\32dbo\\Downloads\\icon.png",
     "iconLibraryKey": "rocket",
     "iconBackground": "#0B0E14",
-    "adaptiveIcon": true,
+    "adaptiveIcon": false,
     "themeColor": "#0B0E14",
     "accentColor": "#22D3A5",
     "statusBarStyle": "light"
   },
   "splash": {
-    "enabled": false,
-    "logoUrl": "https://github.com/arivuwallet-sketch/deepscreen/blob/main/public/yUntitled-1-modified.png",
+    "enabled": true,
+    "logoUrl": "C:\\Users\\32dbo\\Downloads\\icon.png",
     "backgroundColor": "#0B0E14",
     "durationMs": 1600,
     "showSpinner": true,
