@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { PLANS, useSubscription, type Plan } from "@/hooks/useSubscription";
 import { confirmCheckout, createCheckout } from "@/lib/billing/billing.functions";
+import { openCashfreeCheckout } from "@/lib/billing/cashfree-sdk";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -117,7 +118,7 @@ function PricingPage() {
   const { user } = useAuth();
   const { isPro, tier, expiresAt, refresh } = useSubscription();
   const navigate = useNavigate();
-  const [linkId, setLinkId] = useState<string | null>(null);
+  const [orderId, setOrderId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
   const checkout = useServerFn(createCheckout);
@@ -125,13 +126,13 @@ function PricingPage() {
   const confirmed = useRef<string | null>(null);
 
   useEffect(() => {
-    const q = new URLSearchParams(window.location.search).get("cf_link_id");
-    if (q) setLinkId(q);
+    const q = new URLSearchParams(window.location.search).get("cf_order_id");
+    if (q) setOrderId(q);
   }, []);
 
   useEffect(() => {
-    if (!linkId || !user || confirmed.current === linkId) return;
-    confirmed.current = linkId;
+    if (!orderId || !user || confirmed.current === orderId) return;
+    confirmed.current = orderId;
     setVerifying(true);
     void (async () => {
       const { data: sessionData } = await supabase.auth.getSession();
@@ -140,7 +141,7 @@ function PricingPage() {
         setVerifying(false);
         return;
       }
-      const res = await confirm({ data: { linkId, accessToken } });
+      const res = await confirm({ data: { orderId, accessToken } });
       setVerifying(false);
       window.history.replaceState({}, "", "/pricing");
       if (!res.ok) {
@@ -154,7 +155,7 @@ function PricingPage() {
         toast.error(`Payment not completed (${res.status}). Nothing was charged.`);
       }
     })();
-  }, [linkId, user, confirm, refresh]);
+  }, [orderId, user, confirm, refresh]);
 
   const start = async (plan: Plan) => {
     if (!user) {
@@ -178,7 +179,12 @@ function PricingPage() {
       toast.error(result.error);
       return;
     }
-    window.location.href = result.url;
+    try {
+      await openCashfreeCheckout(result.paymentSessionId);
+    } catch (e) {
+      setBusy(null);
+      toast.error(e instanceof Error ? e.message : "Payment could not be started.");
+    }
   };
 
   return (
