@@ -1,0 +1,13 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "TEAMID.online.deepscreen.deepscreen",
+        "paths": [
+          "*"
+        ]
+      }
+    ]
+  }
+}

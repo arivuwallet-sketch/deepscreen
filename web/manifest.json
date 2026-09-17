@@ -1,0 +1,8 @@
+{
+  "name": "DeepScreen",
+  "short_name": "DeepScreen",
+  "start_url": "https://deepscreen.online",
+  "display": "standalone",
+  "background_color": "#0B0E14",
+  "theme_color": "#0B0E14"
+}

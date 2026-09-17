@@ -1,0 +1,42 @@
+name: Build app
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: dart run flutter_launcher_icons
+      - run: dart run flutter_native_splash:create
+      - run: flutter build apk --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter build ios --release --no-codesign
+      - run: |
+          mkdir -p build/ios-out
+          cp -r build/ios/iphoneos/Runner.app build/ios-out/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios-build
+          path: build/ios-out
