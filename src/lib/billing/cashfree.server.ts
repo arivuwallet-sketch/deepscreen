@@ -1,9 +1,9 @@
 /**
  * Cashfree Payment Gateway helpers (server-only).
  *
- * Uses hosted Payment Links (PG API 2023-08-01) so no client SDK is needed and
- * both Indian (UPI / netbanking / RuPay) and international card payments are
- * handled by Cashfree's hosted page.
+ * Uses the standard Orders API (PG API 2023-08-01). The server creates an
+ * order, the browser opens Cashfree's gateway checkout with the returned
+ * payment_session_id, and the server re-reads the order before granting Pro.
  */
 
 export interface CashfreeConfig {
@@ -28,48 +28,47 @@ function headers(cfg: CashfreeConfig): Record<string, string> {
   };
 }
 
-export interface CreatedLink {
-  linkId: string;
-  linkUrl: string;
+export interface CreatedOrder {
+  orderId: string;
+  paymentSessionId: string;
 }
 
-export async function createPaymentLink(
+export async function createOrder(
   cfg: CashfreeConfig,
   input: {
-    linkId: string;
+    orderId: string;
     amount: number;
     currency: string;
-    purpose: string;
+    note: string;
     customerId: string;
     email: string;
     phone: string;
     returnUrl: string;
-    notes: Record<string, string>;
+    notifyUrl: string;
+    tags: Record<string, string>;
     expiryMinutes?: number;
   },
-): Promise<CreatedLink> {
+): Promise<CreatedOrder> {
   const expiry = new Date(Date.now() + (input.expiryMinutes ?? 30) * 60_000);
-  const res = await fetch(`${cfg.base}/links`, {
+  const res = await fetch(`${cfg.base}/orders`, {
     method: "POST",
     headers: headers(cfg),
     body: JSON.stringify({
-      link_id: input.linkId,
-      link_amount: input.amount,
-      link_currency: input.currency,
-      link_purpose: input.purpose,
-      link_partial_payments: false,
-      link_expiry_time: expiry.toISOString(),
+      order_id: input.orderId,
+      order_amount: input.amount,
+      order_currency: input.currency,
+      order_note: input.note,
+      order_expiry_time: expiry.toISOString(),
       customer_details: {
         customer_id: input.customerId,
         customer_email: input.email,
         customer_phone: input.phone,
       },
-      link_meta: {
+      order_meta: {
         return_url: input.returnUrl,
-        notify_url: input.notes["notifyUrl"] ?? undefined,
+        notify_url: input.notifyUrl,
       },
-      link_notes: input.notes,
-      link_notify: { send_email: false, send_sms: false },
+      order_tags: input.tags,
     }),
   });
   const json = (await res.json()) as Record<string, unknown>;
@@ -77,18 +76,23 @@ export async function createPaymentLink(
     const message = typeof json["message"] === "string" ? json["message"] : `Cashfree error ${res.status}`;
     throw new Error(message);
   }
-  return { linkId: String(json["link_id"]), linkUrl: String(json["link_url"]) };
+  const sessionId = json["payment_session_id"];
+  if (typeof sessionId !== "string" || !sessionId) {
+    throw new Error("Cashfree did not return a checkout session.");
+  }
+  return { orderId: String(json["order_id"] ?? input.orderId), paymentSessionId: sessionId };
 }
 
-export interface LinkStatus {
-  linkId: string;
-  status: string; // PAID | ACTIVE | EXPIRED | CANCELLED
-  amountPaid: number;
-  notes: Record<string, string>;
+export interface OrderStatus {
+  orderId: string;
+  status: string; // PAID | ACTIVE | EXPIRED | TERMINATED
+  amount: number;
+  currency: string;
+  tags: Record<string, string>;
 }
 
-export async function fetchPaymentLink(cfg: CashfreeConfig, linkId: string): Promise<LinkStatus> {
-  const res = await fetch(`${cfg.base}/links/${encodeURIComponent(linkId)}`, {
+export async function fetchOrder(cfg: CashfreeConfig, orderId: string): Promise<OrderStatus> {
+  const res = await fetch(`${cfg.base}/orders/${encodeURIComponent(orderId)}`, {
     headers: headers(cfg),
   });
   const json = (await res.json()) as Record<string, unknown>;
@@ -97,10 +101,11 @@ export async function fetchPaymentLink(cfg: CashfreeConfig, linkId: string): Pro
     throw new Error(message);
   }
   return {
-    linkId: String(json["link_id"]),
-    status: String(json["link_status"] ?? "UNKNOWN"),
-    amountPaid: Number(json["link_amount_paid"] ?? 0),
-    notes: (json["link_notes"] as Record<string, string> | undefined) ?? {},
+    orderId: String(json["order_id"] ?? orderId),
+    status: String(json["order_status"] ?? "UNKNOWN"),
+    amount: Number(json["order_amount"] ?? 0),
+    currency: String(json["order_currency"] ?? ""),
+    tags: (json["order_tags"] as Record<string, string> | undefined) ?? {},
   };
 }
 
