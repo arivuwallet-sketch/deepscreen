@@ -37,8 +37,5 @@
                 <data android:scheme="https" android:host="deepscreen.online" />
             </intent-filter>
         </activity>
-        <meta-data
-            android:name="flutterEmbedding"
-            android:value="1" />
     </application>
 </manifest>
