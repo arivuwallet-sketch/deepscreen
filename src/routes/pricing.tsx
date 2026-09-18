@@ -1,3 +1,4 @@
+import { jsonLd } from "@/lib/seo/json-ld";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Check, Sparkles } from "lucide-react";
@@ -42,7 +43,7 @@ export const Route = createFileRoute("/pricing")({
     scripts: [
       {
         type: "application/ld+json",
-        children: JSON.stringify({
+        children: jsonLd({
           "@context": "https://schema.org",
           "@type": "Product",
           name: "DeepScreen Pro",
@@ -80,7 +81,7 @@ export const Route = createFileRoute("/pricing")({
       },
       {
         type: "application/ld+json",
-        children: JSON.stringify({
+        children: jsonLd({
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           itemListElement: [

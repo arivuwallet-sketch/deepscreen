@@ -1,3 +1,4 @@
+import { jsonLd } from "@/lib/seo/json-ld";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -49,7 +50,7 @@ export const Route = createFileRoute("/ipo")({
     scripts: [
       {
         type: "application/ld+json",
-        children: JSON.stringify({
+        children: jsonLd({
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           itemListElement: [

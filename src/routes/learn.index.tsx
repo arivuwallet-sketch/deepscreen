@@ -1,3 +1,4 @@
+import { jsonLd } from "@/lib/seo/json-ld";
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { Shell } from "@/components/ds/Shell";
@@ -33,7 +34,7 @@ export const Route = createFileRoute("/learn/")({
     scripts: [
       {
         type: "application/ld+json",
-        children: JSON.stringify({
+        children: jsonLd({
           "@context": "https://schema.org",
           "@type": "ItemList",
           name: "DeepScreen market guides",
@@ -47,7 +48,7 @@ export const Route = createFileRoute("/learn/")({
       },
       {
         type: "application/ld+json",
-        children: JSON.stringify({
+        children: jsonLd({
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           itemListElement: [

@@ -1,3 +1,4 @@
+import { jsonLd } from "@/lib/seo/json-ld";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
@@ -22,7 +23,7 @@ import { cn } from "@/lib/utils";
 import type { Stock } from "@/lib/deepscreen/types";
 import { STRATEGY_GUIDES } from "@/lib/seo/content";
 
-export const Route = createFileRoute("/options")({
+export const Route = createFileRoute("/options/")({
   staticData: { sitemap: true },
   head: () => ({
     meta: [
@@ -49,7 +50,7 @@ export const Route = createFileRoute("/options")({
     scripts: [
       {
         type: "application/ld+json",
-        children: JSON.stringify({
+        children: jsonLd({
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           itemListElement: [

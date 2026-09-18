@@ -6,10 +6,10 @@ Canonical site: https://deepscreen.online/
 Contact: deepscreen.online@outlook.com
 
 ## Primary tools
-- [Global stock screener](https://deepscreen.online/): Cross-exchange stock discovery and rankings.
+- [Global stock screener](https://deepscreen.online/): Cross-exchange company research directory.
 - [Options strategy lab](https://deepscreen.online/options): Black-Scholes Greeks and multi-leg payoff analysis.
 - [IPO calendar](https://deepscreen.online/ipo): India, US and UK IPO pipeline.
-- [Market calendar](https://deepscreen.online/calendar): Earnings, dividends and economic events.
+- [Market calendar](https://deepscreen.online/calendar): Scheduled economic events.
 
 ## Research documentation
 - [Methodology](https://deepscreen.online/methodology): Factors, weighting, sources and limitations.
@@ -19,7 +19,7 @@ Contact: deepscreen.online@outlook.com
 
 ## Important context
 - DeepScreen scores are analytical model outputs, not investment advice.
-- Core ratios, scores and verdicts are open and crawlable. Pro gates interpretation tools, not the underlying numbers.
-- When a required source field is unavailable, DeepScreen prefers “Insufficient data” over inventing a value.
+- Available raw ratios are free; access to analytical features depends on the current plan. See the pricing page.
+- Tables withhold unavailable provider values. Some analytical panels still use simulated fallback inputs; those outputs are illustrative and must not be cited as company facts.
 - Indian filing ratios may be sourced from Screener.in. Other supported markets use available Yahoo Finance data.
 - Verify material figures against primary company disclosures before relying on them.
