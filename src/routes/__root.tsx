@@ -93,6 +93,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     scripts: [
       {
+        async: true,
+        src: "https://www.googletagmanager.com/gtag/js?id=AW-18457575020",
+      },
+      {
+        children: `
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'AW-18457575020');
+`,
+      },
+      {
         type: "application/ld+json",
         children: jsonLd({
           "@context": "https://schema.org",
