@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { spawn, spawnSync } from "node:child_process";
-import Ajv from "ajv";
+import { createRequire } from "node:module";
+// ESLint already depends on Ajv. Use its compatible validator in this development-only check.
+// No additional runtime dependency or optional form-resolver peer is introduced.
+const require = createRequire(import.meta.url);
+const Ajv = createRequire(require.resolve("eslint"))("ajv");
 import { setTimeout as delay } from "node:timers/promises";
 
 const origin = process.env.SEO_TEST_ORIGIN || "http://127.0.0.1:4175";
