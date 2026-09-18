@@ -1,3 +1,4 @@
+import { jsonLd } from "@/lib/seo/json-ld";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowUpRight, Globe2, LineChart, ShieldCheck } from "lucide-react";
 
@@ -11,7 +12,6 @@ import { EconomicCalendar } from "@/components/ds/EconomicCalendar";
 import { StockTable } from "@/components/ds/StockTable";
 import { EXCHANGES } from "@/lib/deepscreen/exchanges";
 import { STOCKS } from "@/lib/deepscreen/stocks";
-import { analyze } from "@/lib/deepscreen/metrics";
 import { NewsletterForm } from "@/components/ds/NewsletterForm";
 
 export const Route = createFileRoute("/")({
@@ -22,7 +22,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Screen every listed company across NSE, BSE, NYSE, Nasdaq and LSE with deep fundamental scoring, live market news and an economic calendar.",
+          "Research supported listings across NSE, BSE, NYSE, Nasdaq and LSE with deep fundamental scoring, live market news and an economic calendar.",
       },
       { property: "og:title", content: "DeepScreen — Global Stock Screener & Fundamental Analysis" },
       {
@@ -45,7 +45,7 @@ export const Route = createFileRoute("/")({
     scripts: [
       {
         type: "application/ld+json",
-        children: JSON.stringify({
+        children: jsonLd({
           "@context": "https://schema.org",
           "@type": "WebApplication",
           name: "DeepScreen",
@@ -66,7 +66,7 @@ export const Route = createFileRoute("/")({
       },
       {
         type: "application/ld+json",
-        children: JSON.stringify({
+        children: jsonLd({
           "@context": "https://schema.org",
           "@type": "Organization",
           name: "DeepScreen",
@@ -78,24 +78,16 @@ export const Route = createFileRoute("/")({
       },
       {
         type: "application/ld+json",
-        children: JSON.stringify({
+        children: jsonLd({
           "@context": "https://schema.org",
           "@type": "WebSite",
           name: "DeepScreen",
           url: "https://deepscreen.online/",
-          potentialAction: {
-            "@type": "SearchAction",
-            target: {
-              "@type": "EntryPoint",
-              urlTemplate: "https://deepscreen.online/?q={search_term_string}",
-            },
-            "query-input": "required name=search_term_string",
-          },
         }),
       },
       {
         type: "application/ld+json",
-        children: JSON.stringify({
+        children: jsonLd({
           "@context": "https://schema.org",
           "@type": "FAQPage",
           mainEntity: [
@@ -120,7 +112,7 @@ export const Route = createFileRoute("/")({
               name: "Can I use DeepScreen for free?",
               acceptedAnswer: {
                 "@type": "Answer",
-                text: "Yes. Search, raw fundamental ratios, the IPO pipeline, news and the economic calendar are free. The full verdict, valuation models and alerts are part of Pro, which starts at ₹50 per week.",
+                text: "Yes. Search, raw fundamental ratios, the IPO pipeline, news and the economic calendar are free. The full verdict, valuation models and alerts are part of Pro, see the pricing page for current plans.",
               },
             },
             {
@@ -140,11 +132,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const top = [...STOCKS]
-    .map((s) => ({ s, a: analyze(s) }))
-    .sort((x, y) => y.a.score - x.a.score)
-    .slice(0, 10)
-    .map((x) => x.s);
+  const top = [...STOCKS].sort((a, b) => a.name.localeCompare(b.name)).slice(0, 10);
 
   return (
     <Shell>
@@ -152,7 +140,7 @@ function Home() {
         <div className="mx-auto max-w-7xl px-4 py-14">
           <p className="num text-xs uppercase tracking-[0.25em] text-primary">God-mode screening</p>
           <h1 className="mt-3 max-w-3xl text-4xl font-bold leading-tight tracking-tight md:text-5xl">
-            Every listed company. Five exchanges. One verdict.
+            Global stock screening across five exchanges.
           </h1>
           <p className="mt-4 max-w-2xl text-muted-foreground">
             DeepScreen is a stock screener and fundamental analysis platform. Its 13-factor valuation and quality model covers P/E, PEG, P/S, P/B,
@@ -167,7 +155,7 @@ function Home() {
               <Globe2 className="size-4 text-primary" /> {EXCHANGES.length} exchanges
             </span>
             <span className="flex items-center gap-2">
-              <LineChart className="size-4 text-primary" /> {STOCKS.length.toLocaleString()} companies scored
+              <LineChart className="size-4 text-primary" /> {STOCKS.length.toLocaleString()} listings in the directory
             </span>
             <span className="flex items-center gap-2">
              <ShieldCheck className="size-4 text-primary" /> 13-factor model
@@ -214,7 +202,7 @@ function Home() {
 
         <section>
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide">
-            Highest-scoring companies globally
+            Explore company research
           </h2>
           <StockTable stocks={top} />
         </section>
@@ -320,8 +308,8 @@ function Home() {
         </div>
       </section>
       <TopicIndex
-        title="Every stock-market topic DeepScreen covers"
-        intro="Browse the search topics DeepScreen answers, from screening filters and stock fundamentals to IPOs, options, dividends and market-by-market coverage."
+        title="Explore stock research tools and guides"
+        intro="Explore market screeners, valuation guides, options tools and economic events."
       />
     </Shell>
   );

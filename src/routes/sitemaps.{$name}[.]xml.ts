@@ -6,7 +6,7 @@ import { buildSitemapSections } from "@/lib/deepscreen/sitemap-sections";
 
 const BASE_URL = "https://deepscreen.online";
 
-export const Route = createFileRoute("/sitemaps/$name.xml")({
+export const Route = createFileRoute("/sitemaps/{$name}.xml")({
   staticData: { sitemap: false },
   server: {
     handlers: {

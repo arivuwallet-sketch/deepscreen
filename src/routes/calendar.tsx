@@ -1,3 +1,4 @@
+import { jsonLd } from "@/lib/seo/json-ld";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CalendarDays, Coins } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -37,7 +38,7 @@ export const Route = createFileRoute("/calendar")({
     scripts: [
       {
         type: "application/ld+json",
-        children: JSON.stringify({
+        children: jsonLd({
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           itemListElement: [

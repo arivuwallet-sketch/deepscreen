@@ -1,4 +1,5 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { jsonLd } from "@/lib/seo/json-ld";
+import { createFileRoute, notFound, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 
 import { Shell } from "@/components/ds/Shell";
@@ -24,10 +25,17 @@ const TOPIC_BY_EXCHANGE: Record<string, string> = {
 
 export const Route = createFileRoute("/exchange/$code")({
   staticData: { sitemap: true },
-  loader: ({ params }) => {
+  validateSearch: (search: Record<string, unknown>): { page?: number } => ({
+    page: typeof search["page"] === "string" || typeof search["page"] === "number"
+      ? Math.max(1, Math.min(1000, Math.floor(Number(search["page"])) || 1)) : 1,
+  }),
+  loaderDeps: ({ search }) => ({ page: search.page ?? 1 }),
+  loader: ({ params, deps }) => {
     const exchange = getExchange(params.code);
     if (!exchange) throw notFound();
-    return { exchange };
+    const pageCount = Math.max(1, Math.ceil(stocksByExchange(exchange.code).length / 100));
+    if (deps.page > pageCount) throw notFound();
+    return { exchange, page: deps.page };
   },
   head: ({ loaderData }) => {
     const name = loaderData?.exchange.name ?? "Exchange";
@@ -35,9 +43,10 @@ export const Route = createFileRoute("/exchange/$code")({
     const country = loaderData?.exchange.country ?? "";
     const currency = loaderData?.exchange.currency ?? "";
     const count = code ? stocksByExchange(code).length : 0;
-    const title = `${code} Stock Screener — Screen All ${count} ${code} Companies by 13 Fundamental Ratios`;
+    const page = loaderData?.page ?? 1;
+    const title = `${code} Stock Screener${page > 1 ? ` — Page ${page}` : " & Fundamental Analysis"} | DeepScreen`;
     const description = `Screen ${count} ${name} (${code}) companies in ${country || "this market"} by market cap, sector, P/E, PEG, ROCE and a transparent 13-factor score with ${currency} prices.`;
-    const url = `https://deepscreen.online/exchange/${code}`;
+    const url = `https://deepscreen.online/exchange/${code}${page > 1 ? `?page=${page}` : ""}`;
     return {
       meta: [
         { title },
@@ -58,7 +67,7 @@ export const Route = createFileRoute("/exchange/$code")({
       scripts: [
         {
           type: "application/ld+json",
-          children: JSON.stringify({
+          children: jsonLd({
             "@context": "https://schema.org",
             "@type": "CollectionPage",
             name: title,
@@ -83,15 +92,16 @@ export const Route = createFileRoute("/exchange/$code")({
   component: ExchangePage,
 });
 
-type SortKey = "score" | "marketCap" | "pe" | "peg" | "roce" | "changePct";
+type SortKey = "name" | "score" | "marketCap" | "pe" | "peg" | "roce" | "changePct";
 
 function ExchangePage() {
-  const { exchange } = Route.useLoaderData();
+  const { exchange, page } = Route.useLoaderData();
   const [caps, setCaps] = useState<CapTier[]>([]);
   const [sector, setSector] = useState("all");
   const [indexIds, setIndexIds] = useState<string[]>([]);
-  const [sort, setSort] = useState<SortKey>("score");
+  const [sort, setSort] = useState<SortKey>("name");
   const [limit, setLimit] = useState(100);
+  const filtersActive = caps.length > 0 || sector !== "all" || indexIds.length > 0 || sort !== "name";
 
 
   const all = useMemo(() => stocksByExchange(exchange.code), [exchange.code]);
@@ -108,6 +118,8 @@ function ExchangePage() {
       );
     return rows.sort((a, b) => {
       switch (sort) {
+        case "name":
+          return a.name.localeCompare(b.name) || a.symbol.localeCompare(b.symbol);
         case "marketCap":
           return b.marketCap - a.marketCap;
         case "pe":
@@ -187,6 +199,7 @@ function ExchangePage() {
             onChange={(e) => setSort(e.target.value as SortKey)}
             className="rounded border border-border bg-background px-2 py-1.5 text-xs"
           >
+            <option value="name">Company name</option>
             <option value="score">DeepScreen score</option>
             <option value="marketCap">Market cap</option>
             <option value="pe">Lowest P/E</option>
@@ -218,7 +231,7 @@ function ExchangePage() {
         </div>
 
         <div className="mt-6">
-          <StockTable stocks={filtered.slice(0, limit)} />
+          <StockTable stocks={filtersActive ? filtered.slice(0, limit) : filtered.slice((page - 1) * 100, page * 100)} />
         </div>
 
         <section className="mt-8">
@@ -232,7 +245,12 @@ function ExchangePage() {
           </div>
         </section>
 
-        {filtered.length > limit && (
+        {!filtersActive && <nav aria-label="Stock directory pages" className="mt-5 flex items-center justify-center gap-5 text-sm">
+          {page > 1 && <a href={`/exchange/${exchange.code}${page > 2 ? `?page=${page - 1}` : ""}`} rel="prev" className="text-primary hover:underline">Previous page</a>}
+          <span>Page {page} of {Math.ceil(all.length / 100)}</span>
+          {page * 100 < all.length && <a href={`/exchange/${exchange.code}?page=${page + 1}`} rel="next" className="text-primary hover:underline">Next page</a>}
+        </nav>}
+        {filtersActive && filtered.length > limit && (
           <div className="mt-4 flex items-center justify-center gap-3">
             <button
               onClick={() => setLimit((n) => n + 200)}
@@ -259,9 +277,9 @@ function ExchangePage() {
             <ul className="mt-3 space-y-2 text-sm">
               {EXCHANGES.filter((e) => e.code !== exchange.code).map((e) => (
                 <li key={e.code} className="num flex justify-between border-b border-border pb-2">
-                  <span>
+                  <Link to="/exchange/$code" params={{ code: e.code }} search={{ page: 1 }} className="hover:underline">
                     {e.flag} {e.code} — {e.name}
-                  </span>
+                  </Link>
                   <span className="text-muted-foreground">{e.currency}</span>
                 </li>
               ))}
@@ -271,7 +289,7 @@ function ExchangePage() {
       </div>
       <TopicIndex
         ids={[TOPIC_BY_EXCHANGE[exchange.code] ?? "screener", "screener"]}
-        title={`${exchange.code} search topics covered on DeepScreen`}
+        title={`${exchange.code} research tools and guides`}
       />
     </Shell>
   );

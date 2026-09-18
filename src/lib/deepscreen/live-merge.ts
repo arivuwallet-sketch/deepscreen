@@ -221,14 +221,7 @@ export function mergeFundamentals(
       const assetMultiplier = 1 + next.debtToEquity;
       const derivedRoa = assetMultiplier > 0.05 ? next.roe / assetMultiplier : Number.NaN;
       next.roa = Number.isFinite(derivedRoa) ? round1(derivedRoa) : base.roa;
-      // Mark as live when both inputs (ROE, D/E) are live — valid algebraic derivation.
-      if (
-        Number.isFinite(derivedRoa) &&
-        sources.roe === "live" &&
-        sources.debtToEquity === "live"
-      ) {
-        sources.roa = "live";
-      }
+      // Debt/equity omits non-debt liabilities, so this remains an estimate.
     }
   }
 
@@ -259,8 +252,7 @@ export function mergeFundamentals(
       } else {
         next.roce = derivedFromRoa;
       }
-      // Mark as live since both inputs (ROA/ROE) are live.
-      sources.roce = "live";
+      // A blend of heuristic multipliers remains an estimate, even with reported inputs.
     }
   }
 
@@ -359,9 +351,9 @@ export function mergeFundamentals(
     if (
       screener &&
       typeof screener.earningsGrowth3YPct === "number" &&
-      screener.earningsGrowth3YPct !== 0
+      screener.earningsGrowth3YPct > 0
     ) {
-      earningsGrowthForPeg = Math.abs(screener.earningsGrowth3YPct);
+      earningsGrowthForPeg = screener.earningsGrowth3YPct;
     } else if (sources.peg !== "live") {
       if (typeof live?.earningsGrowth === "number" && live.earningsGrowth > 0) {
         earningsGrowthForPeg = live.earningsGrowth;

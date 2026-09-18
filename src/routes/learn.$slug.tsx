@@ -1,3 +1,4 @@
+import { jsonLd } from "@/lib/seo/json-ld";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 
 import { Shell } from "@/components/ds/Shell";
@@ -32,7 +33,7 @@ export const Route = createFileRoute("/learn/$slug")({
         { q: `How is ${ratio.shortName} calculated?`, a: ratio.formula },
         { q: `What should investors watch for with ${ratio.shortName}?`, a: ratio.cautions.join(" ") },
       ];
-      return { meta: [{ title }, { name: "description", content: ratio.answer }, { property: "og:title", content: title }, { property: "og:description", content: ratio.answer }, { property: "og:type", content: "article" }, { property: "og:url", content: url }, { name: "twitter:card", content: "summary_large_image" }, { name: "twitter:title", content: title }, { name: "twitter:description", content: ratio.answer }], links: [{ rel: "canonical", href: url }], scripts: [{ type: "application/ld+json", children: JSON.stringify({ "@context": "https://schema.org", "@graph": [{ "@type": "Article", headline: title, description: ratio.answer, datePublished: "2026-09-14", dateModified: "2026-09-14", mainEntityOfPage: url, author: { "@type": "Organization", name: "DeepScreen" } }, { "@type": "FAQPage", mainEntity: faq.map(item => ({ "@type": "Question", name: item.q, acceptedAnswer: { "@type": "Answer", text: item.a } })) }, { "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Home", item: `${BASE}/` }, { "@type": "ListItem", position: 2, name: "Learn", item: `${BASE}/learn` }, { "@type": "ListItem", position: 3, name: ratio.name, item: url }] }] }) }] };
+      return { meta: [{ title }, { name: "description", content: ratio.answer }, { property: "og:title", content: title }, { property: "og:description", content: ratio.answer }, { property: "og:type", content: "article" }, { property: "og:url", content: url }, { name: "twitter:card", content: "summary_large_image" }, { name: "twitter:title", content: title }, { name: "twitter:description", content: ratio.answer }], links: [{ rel: "canonical", href: url }], scripts: [{ type: "application/ld+json", children: jsonLd({ "@context": "https://schema.org", "@graph": [{ "@type": "Article", headline: title, description: ratio.answer, datePublished: "2026-09-14", dateModified: "2026-09-14", mainEntityOfPage: url, author: { "@type": "Organization", name: "DeepScreen" } }, { "@type": "FAQPage", mainEntity: faq.map(item => ({ "@type": "Question", name: item.q, acceptedAnswer: { "@type": "Answer", text: item.a } })) }, { "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Home", item: `${BASE}/` }, { "@type": "ListItem", position: 2, name: "Learn", item: `${BASE}/learn` }, { "@type": "ListItem", position: 3, name: ratio.name, item: url }] }] }) }] };
     }
     if (!guide) return {};
     return {
@@ -53,7 +54,7 @@ export const Route = createFileRoute("/learn/$slug")({
       scripts: [
         {
           type: "application/ld+json",
-          children: JSON.stringify({
+          children: jsonLd({
             "@context": "https://schema.org",
             "@type": "Article",
             headline: guide.h1,
@@ -68,7 +69,7 @@ export const Route = createFileRoute("/learn/$slug")({
         },
         {
           type: "application/ld+json",
-          children: JSON.stringify({
+          children: jsonLd({
             "@context": "https://schema.org",
             "@type": "FAQPage",
             mainEntity: guide.faqs.map((f) => ({
@@ -80,7 +81,7 @@ export const Route = createFileRoute("/learn/$slug")({
         },
         {
           type: "application/ld+json",
-          children: JSON.stringify({
+          children: jsonLd({
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             itemListElement: [

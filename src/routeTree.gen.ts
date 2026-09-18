@@ -32,6 +32,7 @@ import { Route as OptionsIndexRouteImport } from './routes/options.index'
 import { Route as OptionsSlugRouteImport } from './routes/options.$slug'
 import { Route as RatiosIndexRouteImport } from './routes/ratios.index'
 import { Route as RatiosSlugRouteImport } from './routes/ratios.$slug'
+import { Route as SitemapsChar123nameChar125DotxmlRouteImport } from './routes/sitemaps.{$name}[.]xml'
 import { Route as ApiPublicCashfreeWebhookRouteImport } from './routes/api/public/cashfree-webhook'
 import { Route as SectorExchangeSectorRouteImport } from './routes/sector.$exchange.$sector'
 import { Route as StockExchangeSymbolRouteImport } from './routes/stock.$exchange.$symbol'
@@ -151,6 +152,12 @@ const RatiosSlugRoute = RatiosSlugRouteImport.update({
   path: '/ratios/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapsChar123nameChar125DotxmlRoute =
+  SitemapsChar123nameChar125DotxmlRouteImport.update({
+    id: '/sitemaps/{$name}.xml',
+    path: '/sitemaps/{$name}.xml',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicCashfreeWebhookRoute =
   ApiPublicCashfreeWebhookRouteImport.update({
     id: '/api/public/cashfree-webhook',
@@ -189,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/options-strategy/$slug': typeof OptionsStrategySlugRoute
   '/options/$slug': typeof OptionsSlugRoute
   '/ratios/$slug': typeof RatiosSlugRoute
+  '/sitemaps/{$name}.xml': typeof SitemapsChar123nameChar125DotxmlRoute
   '/learn/': typeof LearnIndexRoute
   '/options/': typeof OptionsIndexRoute
   '/ratios/': typeof RatiosIndexRoute
@@ -217,6 +225,7 @@ export interface FileRoutesByTo {
   '/options-strategy/$slug': typeof OptionsStrategySlugRoute
   '/options/$slug': typeof OptionsSlugRoute
   '/ratios/$slug': typeof RatiosSlugRoute
+  '/sitemaps/{$name}.xml': typeof SitemapsChar123nameChar125DotxmlRoute
   '/learn': typeof LearnIndexRoute
   '/options': typeof OptionsIndexRoute
   '/ratios': typeof RatiosIndexRoute
@@ -246,6 +255,7 @@ export interface FileRoutesById {
   '/options-strategy/$slug': typeof OptionsStrategySlugRoute
   '/options/$slug': typeof OptionsSlugRoute
   '/ratios/$slug': typeof RatiosSlugRoute
+  '/sitemaps/{$name}.xml': typeof SitemapsChar123nameChar125DotxmlRoute
   '/learn/': typeof LearnIndexRoute
   '/options/': typeof OptionsIndexRoute
   '/ratios/': typeof RatiosIndexRoute
@@ -276,6 +286,7 @@ export interface FileRouteTypes {
     | '/options-strategy/$slug'
     | '/options/$slug'
     | '/ratios/$slug'
+    | '/sitemaps/{$name}.xml'
     | '/learn/'
     | '/options/'
     | '/ratios/'
@@ -304,6 +315,7 @@ export interface FileRouteTypes {
     | '/options-strategy/$slug'
     | '/options/$slug'
     | '/ratios/$slug'
+    | '/sitemaps/{$name}.xml'
     | '/learn'
     | '/options'
     | '/ratios'
@@ -332,6 +344,7 @@ export interface FileRouteTypes {
     | '/options-strategy/$slug'
     | '/options/$slug'
     | '/ratios/$slug'
+    | '/sitemaps/{$name}.xml'
     | '/learn/'
     | '/options/'
     | '/ratios/'
@@ -361,6 +374,7 @@ export interface RootRouteChildren {
   OptionsStrategySlugRoute: typeof OptionsStrategySlugRoute
   OptionsSlugRoute: typeof OptionsSlugRoute
   RatiosSlugRoute: typeof RatiosSlugRoute
+  SitemapsChar123nameChar125DotxmlRoute: typeof SitemapsChar123nameChar125DotxmlRoute
   LearnIndexRoute: typeof LearnIndexRoute
   OptionsIndexRoute: typeof OptionsIndexRoute
   RatiosIndexRoute: typeof RatiosIndexRoute
@@ -532,6 +546,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RatiosSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemaps/{$name}.xml': {
+      id: '/sitemaps/{$name}.xml'
+      path: '/sitemaps/{$name}.xml'
+      fullPath: '/sitemaps/{$name}.xml'
+      preLoaderRoute: typeof SitemapsChar123nameChar125DotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/cashfree-webhook': {
       id: '/api/public/cashfree-webhook'
       path: '/api/public/cashfree-webhook'
@@ -577,6 +598,7 @@ const rootRouteChildren: RootRouteChildren = {
   OptionsStrategySlugRoute: OptionsStrategySlugRoute,
   OptionsSlugRoute: OptionsSlugRoute,
   RatiosSlugRoute: RatiosSlugRoute,
+  SitemapsChar123nameChar125DotxmlRoute: SitemapsChar123nameChar125DotxmlRoute,
   LearnIndexRoute: LearnIndexRoute,
   OptionsIndexRoute: OptionsIndexRoute,
   RatiosIndexRoute: RatiosIndexRoute,

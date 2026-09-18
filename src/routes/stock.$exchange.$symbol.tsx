@@ -1,3 +1,4 @@
+import { jsonLd } from "@/lib/seo/json-ld";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 
 import { Shell } from "@/components/ds/Shell";
@@ -64,16 +65,15 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
       };
     }
     const base = loaderData.stock;
-    const s = mergeLiveStock(
+    const { stock: s, sources } = mergeLiveStock(
       base,
       loaderData.snapshot.quote,
       loaderData.snapshot.fundamentals,
       loaderData.snapshot.screener,
-    ).stock;
-    const analysis = analyze(s);
+    );
     const title = `${s.symbol} — ${s.name} Fundamental Analysis | DeepScreen`;
-    const description = `${s.symbol} scores ${analysis.score}/100 with a ${analysis.verdict} verdict. Analyze ${s.name} P/E ${s.fundamentals.pe.toFixed(1)}, PEG ${s.fundamentals.peg.toFixed(2)} and ROCE ${s.fundamentals.roce.toFixed(1)}%.`;
-    const faqs = stockFaqs(s);
+    const description = `Research ${s.name} (${s.exchange}: ${s.symbol}): available financial ratios, valuation, company news and data limitations on DeepScreen.`;
+    const faqs = stockFaqs(s, sources);
     const url = `https://deepscreen.online/stock/${s.exchange}/${s.symbol}`;
     return {
       meta: [
@@ -92,7 +92,7 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
       scripts: [
         {
           type: "application/ld+json",
-          children: JSON.stringify({
+          children: jsonLd({
             "@context": "https://schema.org",
             "@type": "WebPage",
             name: title,
@@ -122,7 +122,7 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
         },
         {
           type: "application/ld+json",
-          children: JSON.stringify({
+          children: jsonLd({
             "@context": "https://schema.org",
             "@type": "FAQPage",
             mainEntity: faqs.map((faq) => ({
@@ -182,6 +182,22 @@ function StockPage() {
     quote: quote ?? null,
   });
 
+  if (!hasLiveFundamentals) {
+    return <Shell><article className="mx-auto max-w-4xl px-4 py-10">
+      <nav aria-label="Breadcrumb"><Link to="/">Home</Link> / <Link to="/exchange/$code" params={{ code: stock.exchange }}>{stock.exchange}</Link> / {stock.symbol}</nav>
+      <h1 className="mt-6 text-3xl font-bold">{stock.symbol} — {stock.name}</h1>
+      <p className="mt-5 text-muted-foreground">{stockSummary(stock)}</p>
+      {quote && <p className="mt-5 text-xl">Latest available price: {formatPrice(quote.price, stock.exchange)}</p>}
+      <section className="mt-6 rounded-lg border border-border p-5">
+        <h2 className="font-semibold">Financial data currently unavailable</h2>
+        <p className="mt-3 text-sm text-muted-foreground">Provider fundamentals have not loaded. Scores, valuation targets and financial ratios are withheld here rather than filled with simulated values. Try again later and check company filings.</p>
+        <Link to="/methodology" className="mt-3 inline-block text-primary">How the research model works</Link>
+      </section>
+      <section className="mt-8"><h2 className="text-lg font-semibold">Research questions</h2><dl className="mt-4 space-y-4">{stockFaqs(live, sources).map(faq => <div key={faq.q}><dt className="font-medium">{faq.q}</dt><dd className="mt-1 text-sm text-muted-foreground">{faq.a}</dd></div>)}</dl></section>
+      <TopicIndex ids={["stocks", "learn"]} inContainer />
+    </article></Shell>;
+  }
+
   return (
     <Shell>
       <div className="mx-auto max-w-7xl px-4 py-8">
@@ -211,12 +227,11 @@ function StockPage() {
             </p>
           </div>
           <div className="text-right">
-            <p className="num text-3xl font-bold">{formatPrice(price, stock.exchange)}</p>
+            <p className="num text-3xl font-bold">{quote ? formatPrice(price, stock.exchange) : "Price unavailable"}</p>
             <p
               className={cn("num text-sm font-medium", changePct >= 0 ? "text-bull" : "text-bear")}
             >
-              {changePct >= 0 ? "▲ +" : "▼ "}
-              {changePct.toFixed(2)}% today
+              {quote ? `${changePct >= 0 ? "▲ +" : "▼ "}${changePct.toFixed(2)}% today` : ""}
             </p>
             <p className="num mt-1 text-[11px] text-muted-foreground">
               {quote
@@ -234,6 +249,9 @@ function StockPage() {
           </div>
         </header>
 
+        {Object.values(sources).some(source => source === "model") && <aside className="mt-5 rounded-lg border border-warn/40 bg-warn/5 p-4 text-sm" data-nosnippet="">
+          <strong>Incomplete financial inputs.</strong> Some figures below use simulated fallback values. Scores, targets and holding periods that depend on them are illustrative, not reliable company assessments. Verify provider-backed figures against filings.
+        </aside>}
         <p className="mt-5 max-w-4xl text-sm leading-relaxed text-muted-foreground">
           {stockSummary(live)}
         </p>
@@ -454,7 +472,7 @@ function StockPage() {
         <section className="mt-10 border-t border-border pt-8">
           <h2 className="text-lg font-semibold">Frequently asked questions about {stock.symbol}</h2>
           <dl className="mt-5 space-y-5">
-            {stockFaqs(live).map((faq) => (
+            {stockFaqs(live, sources).map((faq) => (
               <div key={faq.q}>
                 <dt className="text-sm font-semibold">{faq.q}</dt>
                 <dd className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{faq.a}</dd>
