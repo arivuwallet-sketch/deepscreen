@@ -28,81 +28,14 @@ export const findRatio = (slug: string) => RATIOS.find((ratio) => ratio.slug ===
 
 export type Ranking = { slug: string; title: string; description: string; answer: string; sort: "score" | "roce" | "pe" | "dividendYield" | "growth"; exchange?: string };
 export const RANKINGS: Ranking[] = [
-  {
-    slug: "best-fundamental-stocks",
-    title: "Fundamental Stock Screening",
-    description:
-      "Learn how to evaluate stock fundamentals using valuation, profitability, growth and leverage together.",
-    answer:
-      "A fundamental screen is a starting point for research. Review available valuation, growth, capital returns and leverage inputs together, then verify the underlying statements. A complete model score requires complete, comparable inputs.",
-    sort: "score",
-  },
-  {
-    slug: "high-roce-stocks",
-    title: "High ROCE Stock Screening",
-    description:
-      "How to research companies with strong return on capital employed and verify capital efficiency.",
-    answer:
-      "To research high ROCE, compare operating returns on capital over consistent periods within a sector. Check whether one-off profit, a small capital base or accounting differences explain the result. A single high ratio does not establish durable quality.",
-    sort: "roce",
-  },
-  {
-    slug: "low-pe-stocks",
-    title: "Low P/E Stock Screening",
-    description:
-      "Learn how to research low price-to-earnings ratios and distinguish cheap earnings from value traps.",
-    answer:
-      "A low positive P/E can identify a valuation question, not an automatic bargain. Check the earnings period, cyclicality, exceptional items, debt and expectations before comparing close sector peers.",
-    sort: "pe",
-  },
-  {
-    slug: "high-dividend-stocks",
-    title: "Dividend Stock Screening",
-    description:
-      "Research dividend yield alongside cash generation, payout ratios and balance-sheet strength.",
-    answer:
-      "Dividend yield relates annual dividends to share price. A high yield can reflect a falling price or an unsustainable payout. Verify the dividend period, cash generation and debt obligations before interpreting the ratio.",
-    sort: "dividendYield",
-  },
-  {
-    slug: "fast-growing-stocks",
-    title: "Growth Stock Screening",
-    description:
-      "Evaluate earnings growth using comparable periods, business drivers, cash flow and valuation.",
-    answer:
-      "Growth screening starts with a consistent earnings definition and reporting period. Separate recurring operating progress from acquisitions, one-off items and a low comparison base. Compare the growth assumptions with the valuation being paid.",
-    sort: "growth",
-  },
-  {
-    slug: "high-roce-stocks-nse",
-    title: "NSE High ROCE Screening Guide",
-    description:
-      "Research return on capital employed among NSE companies using consistent filing periods and accounting definitions.",
-    answer:
-      "For NSE company research, establish whether the inputs are consolidated or standalone and use the same basis across peers. Review multi-period operating profit and capital employed before treating a high ROCE reading as persistent.",
-    sort: "roce",
-    exchange: "NSE",
-  },
-  {
-    slug: "undervalued-largecap-us",
-    title: "US Large-Cap Valuation Research",
-    description:
-      "A guide to researching US large-cap valuation using filings, comparable earnings and financial risks.",
-    answer:
-      "To research potentially undervalued US large caps, first verify market capitalization and reporting currency. Review current SEC filings and compare valuation with growth, cash flow and leverage. A low multiple alone does not establish undervaluation.",
-    sort: "pe",
-    exchange: "US",
-  },
-  {
-    slug: "highest-dividend-yield-lse",
-    title: "LSE Dividend Research Guide",
-    description:
-      "Research LSE dividends using consistent quote units, payment currencies and payout periods.",
-    answer:
-      "When researching LSE dividends, check whether the quote is in pence or pounds and whether the dividend uses the same currency and unit. Verify the payment period, special dividends and cash coverage before comparing yields.",
-    sort: "dividendYield",
-    exchange: "LSE",
-  },
+  { slug: "best-fundamental-stocks", title: "Best Fundamental Stocks", description: "Compare the highest DeepScreen fundamental scores across NSE, BSE, NYSE, Nasdaq and LSE.", answer: "These companies rank highest in DeepScreen's 13-factor model, balancing valuation, growth, returns and leverage. Rankings are a research shortlist, not a recommendation.", sort: "score" },
+  { slug: "high-roce-stocks", title: "High ROCE Stocks", description: "Find companies with the highest return on capital employed across five exchanges.", answer: "High ROCE stocks generate more operating profit from the capital committed to the business. Check whether returns persist across a full cycle.", sort: "roce" },
+  { slug: "low-pe-stocks", title: "Low P/E Stocks", description: "Compare lower price-to-earnings companies across India, US and UK markets.", answer: "Low P/E stocks trade at smaller multiples of trailing earnings. Cheap is not automatically good: falling profit, leverage or cyclicality can create value traps.", sort: "pe" },
+  { slug: "high-dividend-stocks", title: "High Dividend Yield Stocks", description: "Screen higher dividend-yield companies and review payout sustainability.", answer: "High-yield stocks offer more income per unit of price, but yield can rise because the share price fell. Review payout ratios and balance-sheet strength.", sort: "dividendYield" },
+  { slug: "fast-growing-stocks", title: "Fast-Growing Stocks", description: "Compare companies with the strongest modeled earnings growth across supported exchanges.", answer: "Fast-growing stocks show the highest current earnings growth in DeepScreen's dataset. Valuation determines how much of that growth investors already pay for.", sort: "growth" },
+  { slug: "high-roce-stocks-nse", title: "High ROCE Stocks on NSE", description: "Rank NSE companies by return on capital employed with open valuation and quality data.", answer: "These NSE companies currently report the highest ROCE in DeepScreen's coverage. Persistent returns matter more than one period, so verify the trend in company filings.", sort: "roce", exchange: "NSE" },
+  { slug: "undervalued-largecap-us", title: "Undervalued Large-Cap US Stocks", description: "Compare lower-P/E US large-cap shares listed on NYSE and Nasdaq.", answer: "These established US companies rank by lower positive P/E. A low multiple can reflect value or business risk, so compare growth, leverage and capital returns before drawing conclusions.", sort: "pe", exchange: "US" },
+  { slug: "highest-dividend-yield-lse", title: "Highest Dividend Yield Stocks on LSE", description: "Rank LSE shares by modeled dividend yield and inspect payout sustainability.", answer: "These LSE shares currently have the highest modeled dividend yields in DeepScreen's coverage. High yield alone is not safety; review payout ratios and balance-sheet strength.", sort: "dividendYield", exchange: "LSE" },
 ];
 export const findRanking = (slug: string) => RANKINGS.find((ranking) => ranking.slug === slug);
 

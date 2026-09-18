@@ -78,3 +78,7 @@ DeepScreen
 - SSML 1.1 is a speech synthesis interchange format, not a ranking signal: https://www.w3.org/TR/speech-synthesis11/
 
 No markup can guarantee Google positions, AI citations, SERP features, voice assistant selection or dominance over established competitors. Durable growth also requires reliable original research, product quality, distribution and earned editorial references.
+
+## User-requested restoration — 18 September 2026
+
+The owner subsequently requested the eight ranking pages be restored exactly to their pre-PR-2 behavior. Restored their original titles, descriptions, answers, keyword metadata, CollectionPage markup, 25-company sorting, displayed date and original modeled-data disclaimer from commit 86baa8509c079c5a125d5b783b0ab8b77e79b559. The earlier entry about replacing rankings with alphabetical screening guides is superseded by this restoration. This restores the original implementation; it does not independently verify the financial rankings. The other search, reference API and newsletter improvements remain in place.

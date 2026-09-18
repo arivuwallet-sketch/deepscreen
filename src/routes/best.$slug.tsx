@@ -1,76 +1,12 @@
+import { jsonLd } from "@/lib/seo/json-ld";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
 import { StockTable } from "@/components/ds/StockTable";
 import { STOCKS } from "@/lib/deepscreen/stocks";
+import { analyze } from "@/lib/deepscreen/metrics";
 import { findRanking } from "@/lib/seo/content";
-import { resourceHead } from "@/lib/seo/discovery";
-export const Route = createFileRoute("/best/$slug")({
-  staticData: { sitemap: true },
-  loader: ({ params }) => {
-    const ranking = findRanking(params.slug);
-    if (!ranking) throw notFound();
-    return { ranking };
-  },
-  head: ({ loaderData }) =>
-    loaderData
-      ? resourceHead(
-          `/best/${loaderData.ranking.slug}`,
-          `${loaderData.ranking.title} | DeepScreen`,
-          loaderData.ranking.description,
-          [loaderData.ranking.title, "fundamental research guide"],
-        )
-      : {},
-  component: RankingPage,
-});
-function RankingPage() {
-  const { ranking } = Route.useLoaderData();
-  const universe =
-    ranking.exchange === "US"
-      ? STOCKS.filter((s) => s.exchange === "NYSE" || s.exchange === "NASDAQ")
-      : ranking.exchange
-        ? STOCKS.filter((s) => s.exchange === ranking.exchange)
-        : STOCKS;
-  const stocks = [...universe].sort((a, b) => a.name.localeCompare(b.name)).slice(0, 25);
-  return (
-    <Shell>
-      <div className="mx-auto max-w-7xl space-y-6 px-4 py-10 sm:px-6 lg:px-8">
-        <nav className="text-xs text-muted-foreground">
-          <Link to="/">Home</Link> / Screening guides
-        </nav>
-        <h1 className="text-3xl font-bold">{ranking.title}</h1>
-        <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">{ranking.answer}</p>
-        <section className="max-w-3xl rounded-lg border border-border bg-panel p-5">
-          <h2 className="font-semibold">Build an evidence-based shortlist</h2>
-          <p className="mt-3 text-sm text-muted-foreground">
-            Record the source, period, currency and definition of every input. Confirm that selected
-            companies satisfy your criteria using their filings. DeepScreen does not have complete
-            comparable provider data to publish a verified ranking for this screen.
-          </p>
-          <a
-            href="/research-checklist"
-            className="mt-3 inline-block text-sm text-primary underline"
-          >
-            Use the fundamental research checklist
-          </a>
-        </section>
-        <section>
-          <h2 className="text-lg font-semibold">Explore the directory</h2>
-          <p className="mb-4 mt-2 text-sm text-muted-foreground">
-            An alphabetical sample of supported listings for further research. These companies have
-            not been verified as matching this screen and are not ranked by the metric above.
-          </p>
-          <StockTable stocks={stocks} />
-        </section>
-        <p className="text-sm">
-          <a href="/data-sources" className="text-primary underline">
-            Data sources and limitations
-          </a>{" "}
-          ·{" "}
-          <a href="/methodology" className="text-primary underline">
-            Scoring methodology
-          </a>
-        </p>
-      </div>
-    </Shell>
-  );
-}
+import { metaKeywords } from "@/lib/seo/ranking-keywords";
+import { exchangeKeywords, screenerKeywords, stocksKeywords } from "@/lib/seo/keywords";
+const BASE = "https://deepscreen.online";
+export const Route = createFileRoute("/best/$slug")({ staticData: { sitemap: true }, loader: ({ params }) => { const ranking = findRanking(params.slug); if (!ranking) throw notFound(); return { ranking }; }, head: ({ loaderData }) => { if (!loaderData) return {}; const r = loaderData.ranking; const url = `${BASE}/best/${r.slug}`; return { meta: [{ title: `${r.title} Across Global Markets | DeepScreen` }, { name: "description", content: r.description }, { name: "keywords", content: metaKeywords([r.title, `${r.title} ranking`, "best stocks by fundamentals", "fundamental stock rankings"], r.exchange ? (exchangeKeywords[r.exchange] ?? []) : [], stocksKeywords, screenerKeywords) }, { property: "og:title", content: r.title }, { property: "og:description", content: r.description }, { property: "og:type", content: "website" }, { property: "og:url", content: url }, { name: "twitter:card", content: "summary_large_image" }], links: [{ rel: "canonical", href: url }], scripts: [{ type: "application/ld+json", children: jsonLd({ "@context": "https://schema.org", "@type": "CollectionPage", name: r.title, description: r.description, url }) }] }; }, component: RankingPage });
+function RankingPage() { const { ranking } = Route.useLoaderData(); const universe = ranking.exchange === "US" ? STOCKS.filter(s => s.exchange === "NYSE" || s.exchange === "NASDAQ") : ranking.exchange ? STOCKS.filter(s => s.exchange === ranking.exchange) : STOCKS; const stocks = [...universe].sort((a,b) => ranking.sort === "score" ? analyze(b).score-analyze(a).score : ranking.sort === "pe" ? a.fundamentals.pe-b.fundamentals.pe : b.fundamentals[ranking.sort]-a.fundamentals[ranking.sort]).slice(0,25); return <Shell><main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8"><nav className="text-xs text-muted-foreground"><Link to="/">Home</Link> {" / "}Best stocks</nav><h1 className="mt-4 text-3xl font-bold">{ranking.title}</h1><p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground">{ranking.answer}</p><p className="mt-3 text-xs text-muted-foreground"><time dateTime="2026-09-14">Last updated September 14, 2026</time></p><div className="mt-8"><StockTable stocks={stocks}/></div><p className="mt-5 text-xs text-muted-foreground">Rankings use available live data where possible and modeled estimates otherwise. They are not investment advice.</p></main></Shell>; }
