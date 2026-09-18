@@ -32,7 +32,9 @@ if [[ "$requested" == "android" || "$requested" == "both" ]]; then
   fi
   gradle_file="android/app/build.gradle.kts"
   if [ -f "$gradle_file" ]; then
-    sed -i.bak 's/minSdk = flutter.minSdkVersion/minSdk = 23/' "$gradle_file" && rm -f "$gradle_file.bak"
+    sed -i.bak 's/minSdk = flutter.minSdkVersion/minSdk = 23/' "$gradle_file"
+    sed -i.bak 's/compileSdk = flutter.compileSdkVersion/compileSdk = 37/' "$gradle_file"
+    rm -f "$gradle_file.bak"
   fi
 fi
 
