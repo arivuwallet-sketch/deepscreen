@@ -52,6 +52,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 {label}
               </Link>
             ))}
+
           </nav>
           <div className="ml-auto w-full md:w-80">
             <SearchBar />
@@ -71,17 +72,6 @@ export function Shell({ children }: { children: ReactNode }) {
           <Link to="/methodology" className="hover:text-foreground">
             Methodology
           </Link>
-          {[
-            ["/answers", "Answers"],
-            ["/research-checklist", "Research checklist"],
-            ["/data-sources", "Data sources"],
-            ["/developers", "Developers"],
-            ["/press", "Press"],
-          ].map(([href, label]) => (
-            <a key={href} href={href} className="hover:text-foreground">
-              {label}
-            </a>
-          ))}
           <Link to="/terms" className="hover:text-foreground">
             Terms of Service
           </Link>

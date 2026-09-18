@@ -1,4 +1,3 @@
-import { SITE_GRAPH } from "@/lib/seo/discovery";
 import { jsonLd } from "@/lib/seo/json-ld";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
@@ -82,31 +81,55 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "DeepScreen — Global Stock Screener" },
-      {
-        name: "description",
-        content:
-          "Advanced multi-exchange stock screener and fundamental analysis for India, US and UK markets.",
-      },
+      { name: "description", content: "Advanced multi-exchange stock screener and fundamental analysis for India, US and UK markets." },
       { name: "author", content: "DeepScreen" },
       { property: "og:title", content: "DeepScreen — Global Stock Screener" },
-      {
-        property: "og:description",
-        content:
-          "Screen companies across NSE, BSE, NYSE, Nasdaq and LSE with a transparent 13-factor fundamental model.",
-      },
+      { property: "og:description", content: "Screen companies across NSE, BSE, NYSE, Nasdaq and LSE with a transparent 13-factor fundamental model." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      {
-        name: "robots",
-        content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
-      },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "robots", content: "index, follow" },
       { property: "og:site_name", content: "DeepScreen" },
       { property: "og:locale", content: "en_IN" },
     ],
-    scripts: [{ type: "application/ld+json", children: jsonLd(SITE_GRAPH) }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: jsonLd({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "DeepScreen",
+          url: "https://deepscreen.online",
+          description:
+            "Global stock screener and fundamental analysis for NSE, BSE, NYSE, Nasdaq and LSE.",
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: jsonLd({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "DeepScreen",
+          url: "https://deepscreen.online",
+          email: "deepscreen.online@outlook.com",
+          areaServed: ["IN", "US", "GB"],
+          contactPoint: [
+            {
+              "@type": "ContactPoint",
+              contactType: "customer support",
+              email: "deepscreen.online@outlook.com",
+              availableLanguage: ["en"],
+              hoursAvailable: {
+                "@type": "OpeningHoursSpecification",
+                dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                opens: "09:00",
+                closes: "18:00",
+              },
+            },
+          ],
+        }),
+      },
+    ],
     links: [
-      { rel: "service-desc", href: "/openapi.json", type: "application/json" },
-      { rel: "service-doc", href: "/developers", type: "text/html" },
       {
         rel: "stylesheet",
         href: appCss,

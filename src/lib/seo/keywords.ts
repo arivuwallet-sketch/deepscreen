@@ -372,11 +372,7 @@ export const keywordGroups: { id: string; title: string; keywords: string[] }[] 
   { id: "options", title: "Options, futures & derivatives", keywords: optionsKeywords },
   { id: "calendar", title: "Earnings, dividends & market calendar", keywords: calendarKeywords },
   { id: "ipo", title: "IPOs & new listings", keywords: ipoKeywords },
-  {
-    id: "portfolio",
-    title: "Portfolio, watchlists & diversification",
-    keywords: portfolioKeywords,
-  },
+  { id: "portfolio", title: "Portfolio, watchlists & diversification", keywords: portfolioKeywords },
   { id: "india", title: "India: NSE, BSE, Nifty & Sensex", keywords: indiaKeywords },
   { id: "us", title: "US: NYSE, Nasdaq, Dow & S&P 500", keywords: usKeywords },
   { id: "uk", title: "UK: LSE & FTSE 100", keywords: ukKeywords },
@@ -390,7 +386,7 @@ export const exchangeKeywords: Record<string, string[]> = {
   LSE: ukKeywords,
 };
 
-/** Comma-joined keyword meta string, limited to a few relevant labels; Google does not use this tag for ranking. */
+/** Comma-joined keyword meta string, capped so the tag stays a sane length. */
 export function metaKeywords(...lists: string[][]): string {
   const seen = new Set<string>();
   const picked: string[] = [];
@@ -400,7 +396,7 @@ export function metaKeywords(...lists: string[][]): string {
       if (seen.has(key)) continue;
       seen.add(key);
       picked.push(k);
-      if (picked.length >= 10) return picked.join(", ");
+      if (picked.length >= 45) return picked.join(", ");
     }
   }
   return picked.join(", ");

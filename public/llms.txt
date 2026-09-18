@@ -1,45 +1,25 @@
 # DeepScreen
 
-> Stock screening and fundamental research for supported listings on NSE, BSE, NYSE, Nasdaq and LSE in India, the United States and the United Kingdom.
+> DeepScreen is a global stock screener and research platform covering NSE, BSE, NYSE, Nasdaq and LSE with a transparent 13-factor fundamental model.
 
-Canonical website: https://deepscreen.online/
-Publisher: DeepScreen
+Canonical site: https://deepscreen.online/
 Contact: deepscreen.online@outlook.com
 
-## Product and markets
-- [Global stock screener](https://deepscreen.online/): Exchange directories and company search.
-- [NSE directory](https://deepscreen.online/exchange/NSE): Supported Indian NSE listings.
-- [BSE directory](https://deepscreen.online/exchange/BSE): Supported Indian BSE listings.
-- [NYSE directory](https://deepscreen.online/exchange/NYSE): Supported US NYSE listings.
-- [Nasdaq directory](https://deepscreen.online/exchange/NASDAQ): Supported US Nasdaq listings.
-- [LSE directory](https://deepscreen.online/exchange/LSE): Supported UK LSE listings.
-- [Pricing](https://deepscreen.online/pricing): Current plan terms; consult this page rather than assuming prices.
+## Primary tools
+- [Global stock screener](https://deepscreen.online/): Cross-exchange company research directory.
+- [Options strategy lab](https://deepscreen.online/options): Black-Scholes Greeks and multi-leg payoff analysis.
+- [IPO calendar](https://deepscreen.online/ipo): India, US and UK IPO pipeline.
+- [Market calendar](https://deepscreen.online/calendar): Scheduled economic events.
 
-## Research and evidence
-- [Questions and answers](https://deepscreen.online/answers): What the platform does, coverage, data limits and common research questions.
-- [Research checklist](https://deepscreen.online/research-checklist): Eight-step workflow for verifying filings, cash flow, debt and valuation assumptions.
-- [Methodology](https://deepscreen.online/methodology): 13-factor scoring approach and limitations.
-- [Data sources and corrections](https://deepscreen.online/data-sources): Provider inputs, illustrative models, primary disclosures and correction contact.
-- [Ratio glossary](https://deepscreen.online/ratios): Definitions, formulas and cautions.
-- [Learning guides](https://deepscreen.online/learn): Educational stock research guides.
-- [Press resources](https://deepscreen.online/press): Factual product overview and media enquiries.
+## Research documentation
+- [Methodology](https://deepscreen.online/methodology): Factors, weighting, sources and limitations.
+- [Ratio glossary](https://deepscreen.online/learn): Definitions and formulas for all 13 model factors, Piotroski F-Score, Altman Z-Score and Beneish M-Score.
+- [Learning centre](https://deepscreen.online/learn): Plain-English investing and trading guides.
+- [About](https://deepscreen.online/about): Purpose, coverage and editorial principles.
 
-## Public machine-readable resources
-- [Developer documentation](https://deepscreen.online/developers): Read-only educational reference API; no authentication.
-- [OpenAPI 3.1](https://deepscreen.online/openapi.json): Actual supported GET endpoints and response schemas.
-- [Exchange metadata](https://deepscreen.online/api/v1/exchanges): Names, codes, countries, currencies and directory URLs.
-- [Metric definitions](https://deepscreen.online/api/v1/metrics): Educational definitions, formulas and cautions; no company financials.
-- [Answers JSON](https://deepscreen.online/api/v1/answers): Questions, answers and references.
-- [Answers SSML](https://deepscreen.online/answers.ssml): The same answers for compatible speech synthesis tools.
-- [Sitemap](https://deepscreen.online/sitemap.xml): Canonical public page discovery.
-
-## Interpretation and limits
-DeepScreen is a research tool, not personalized investment advice or a guarantee of returns.
-Directory coverage does not mean every company has complete financial data.
-Provider availability, reporting dates and retrieval times differ. Do not describe all data as real time.
-Company tables withhold unavailable inputs and complete scores when required data is missing.
-Some supplementary panels use illustrative model data. Those values must not be cited as reported company facts.
-Indian filing ratios may come through Screener.in; other supported exchange inputs may come through Yahoo Finance. This does not imply affiliation or endorsement.
-Verify material values in the company's primary disclosures, including period, currency, units and accounting basis.
-The public API supplies reference content only: no live quotes, trading, account data or private portfolios.
-When referencing a definition or answer, link to its public source page and retain its limitations.
+## Important context
+- DeepScreen scores are analytical model outputs, not investment advice.
+- Available raw ratios are free; access to analytical features depends on the current plan. See the pricing page.
+- Tables withhold unavailable provider values. Some analytical panels still use simulated fallback inputs; those outputs are illustrative and must not be cited as company facts.
+- Indian filing ratios may be sourced from Screener.in. Other supported markets use available Yahoo Finance data.
+- Verify material figures against primary company disclosures before relying on them.

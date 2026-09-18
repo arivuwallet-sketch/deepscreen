@@ -1,6 +1,3 @@
-import { HOME_ANSWERS } from "@/lib/discovery/answers";
-import { AnswerList } from "@/components/ds/AnswerList";
-import { faqNode, ORGANIZATION_ID } from "@/lib/seo/discovery";
 import { jsonLd } from "@/lib/seo/json-ld";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowUpRight, Globe2, LineChart, ShieldCheck } from "lucide-react";
@@ -8,7 +5,7 @@ import { ArrowUpRight, Globe2, LineChart, ShieldCheck } from "lucide-react";
 import { Shell } from "@/components/ds/Shell";
 import { TopicIndex } from "@/components/ds/TopicIndex";
 import { GUIDES } from "@/lib/deepscreen/guides";
-
+import { learnKeywords, metaKeywords, screenerKeywords, stocksKeywords } from "@/lib/seo/keywords";
 import { SearchBar } from "@/components/ds/SearchBar";
 import { LiveNewsFeed } from "@/components/ds/LiveNewsFeed";
 import { EconomicCalendar } from "@/components/ds/EconomicCalendar";
@@ -25,34 +22,24 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Screen stocks across NSE, BSE, NYSE, Nasdaq and LSE. Explore company fundamentals, valuation ratios, market news and a transparent scoring methodology.",
+          "Research supported listings across NSE, BSE, NYSE, Nasdaq and LSE with deep fundamental scoring, live market news and an economic calendar.",
       },
-      {
-        property: "og:title",
-        content: "DeepScreen — Global Stock Screener & Fundamental Analysis",
-      },
+      { property: "og:title", content: "DeepScreen — Global Stock Screener & Fundamental Analysis" },
       {
         property: "og:description",
         content:
-          "Explore supported Indian, US and UK stocks, available fundamental ratios and a transparent 13-factor methodology.",
+          "Cap-based screening, 13-factor fundamental scoring, stock-level news and a live economic calendar for India, US and UK markets.",
       },
       { property: "og:url", content: "https://deepscreen.online/" },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      {
-        name: "twitter:title",
-        content: "DeepScreen — Global Stock Screener & Fundamental Analysis",
-      },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "DeepScreen — Global Stock Screener & Fundamental Analysis" },
       {
         name: "twitter:description",
         content:
-          "Research Indian, US and UK stocks with exchange directories, fundamental ratios and valuation guides.",
+          "Screen NSE, BSE, NYSE, Nasdaq and LSE listings with 13-factor fundamental scoring, live news and an economic calendar.",
       },
-      {
-        name: "keywords",
-        content:
-          "global stock screener, fundamental analysis, Indian stock screener, US stock screener, UK stock screener, NSE, BSE, NYSE, Nasdaq, LSE",
-      },
+      { name: "keywords", content: metaKeywords(screenerKeywords, stocksKeywords, learnKeywords) },
     ],
     links: [{ rel: "canonical", href: "https://deepscreen.online/" }],
     scripts: [
@@ -60,18 +47,81 @@ export const Route = createFileRoute("/")({
         type: "application/ld+json",
         children: jsonLd({
           "@context": "https://schema.org",
-          "@graph": [
-            faqNode("/", HOME_ANSWERS),
+          "@type": "WebApplication",
+          name: "DeepScreen",
+          url: "https://deepscreen.online/",
+          applicationCategory: "FinanceApplication",
+          operatingSystem: "Web browser",
+          description:
+            "Multi-exchange stock screener with a 13-factor fundamental model for Indian, US and UK listings.",
+          featureList: [
+            "13-factor fundamental scoring",
+            "Cap-based screening across NSE, BSE, NYSE, Nasdaq and LSE",
+            "DCF and Graham intrinsic-value models",
+            "Live IPO calendar",
+            "Earnings and dividend calendar",
+            "Options Greeks and strategy payoffs",
+          ],
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: jsonLd({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "DeepScreen",
+          url: "https://deepscreen.online/",
+          email: "deepscreen.online@outlook.com",
+          description:
+            "Global stock screener and fundamental research platform covering NSE, BSE, NYSE, Nasdaq and LSE.",
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: jsonLd({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "DeepScreen",
+          url: "https://deepscreen.online/",
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: jsonLd({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: [
             {
-              "@type": "WebApplication",
-              "@id": "https://deepscreen.online/#application",
-              name: "DeepScreen",
-              url: "https://deepscreen.online/",
-              applicationCategory: "FinanceApplication",
-              operatingSystem: "Web browser",
-              publisher: { "@id": ORGANIZATION_ID },
-              description:
-                "Stock screening and fundamental research across supported NSE, BSE, NYSE, Nasdaq and LSE listings.",
+              "@type": "Question",
+              name: "What is DeepScreen?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "DeepScreen is a stock screener that scores listed companies on NSE, BSE, NYSE, Nasdaq and LSE using a 13-factor valuation and quality model covering P/E, PEG, P/S, P/B, EV/Revenue, EV/EBITDA, ROE, ROA, ROCE, leverage, payout and operating leverage.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Which markets does DeepScreen cover?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Indian markets through the NSE and BSE, US markets through the NYSE and Nasdaq, and UK markets through the LSE.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Can I use DeepScreen for free?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Yes. Search, raw fundamental ratios, the IPO pipeline, news and the economic calendar are free. The full verdict, valuation models and alerts are part of Pro, see the pricing page for current plans.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Is DeepScreen investment advice?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "No. DeepScreen publishes analytical model output for research and education only, not investment advice.",
+              },
             },
           ],
         }),
@@ -88,17 +138,14 @@ function Home() {
     <Shell>
       <section className="border-b border-border bg-[radial-gradient(ellipse_at_top,color-mix(in_oklch,var(--primary)_14%,transparent),transparent_60%)]">
         <div className="mx-auto max-w-7xl px-4 py-14">
-          <p className="num text-xs uppercase tracking-[0.25em] text-primary">
-            Research across India, the US and the UK
-          </p>
+          <p className="num text-xs uppercase tracking-[0.25em] text-primary">God-mode screening</p>
           <h1 className="mt-3 max-w-3xl text-4xl font-bold leading-tight tracking-tight md:text-5xl">
             Global stock screening across five exchanges.
           </h1>
           <p className="mt-4 max-w-2xl text-muted-foreground">
-            DeepScreen is a stock screener and fundamental analysis platform. Its 13-factor
-            valuation and quality model covers P/E, PEG, P/S, P/B, EV/Revenue, EV/EBITDA, ROE, ROA,
-            ROCE, leverage, payout and operating leverage — across Indian, US and UK markets, then
-            pairs it with live news and macro events.
+            DeepScreen is a stock screener and fundamental analysis platform. Its 13-factor valuation and quality model covers P/E, PEG, P/S, P/B,
+            EV/Revenue, EV/EBITDA, ROE, ROA, ROCE, leverage, payout and operating leverage — across
+            Indian, US and UK markets, then pairs it with live news and macro events.
           </p>
           <div className="mt-6 max-w-xl">
             <SearchBar />
@@ -108,11 +155,10 @@ function Home() {
               <Globe2 className="size-4 text-primary" /> {EXCHANGES.length} exchanges
             </span>
             <span className="flex items-center gap-2">
-              <LineChart className="size-4 text-primary" /> {STOCKS.length.toLocaleString()}{" "}
-              listings in the directory
+              <LineChart className="size-4 text-primary" /> {STOCKS.length.toLocaleString()} listings in the directory
             </span>
             <span className="flex items-center gap-2">
-              <ShieldCheck className="size-4 text-primary" /> 13-factor model
+             <ShieldCheck className="size-4 text-primary" /> 13-factor model
             </span>
           </div>
         </div>
@@ -165,23 +211,69 @@ function Home() {
           <h2 id="answers-heading" className="mb-3 text-sm font-semibold uppercase tracking-wide">
             Common questions about DeepScreen
           </h2>
-          <AnswerList answers={HOME_ANSWERS} />
-          <a href="/answers" className="mt-4 inline-block text-sm text-primary hover:underline">
-            More stock screening answers →
-          </a>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-lg border border-border bg-panel p-4">
+              <h3 className="text-sm font-semibold">What is DeepScreen?</h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                DeepScreen is a stock screener that scores listed companies on {EXCHANGES.length}{" "}
+                 exchanges — NSE, BSE, NYSE, Nasdaq and LSE — using a 13-factor valuation and
+                quality model covering P/E, PEG, P/S, P/B, EV/Revenue, EV/EBITDA, ROE, ROA, ROCE,
+                leverage, payout and operating leverage.
+              </p>
+            </div>
+            <div className="rounded-lg border border-border bg-panel p-4">
+              <h3 className="text-sm font-semibold">Which markets does it cover?</h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Indian markets through the{" "}
+                <Link to="/exchange/$code" params={{ code: "NSE" }} className="text-primary hover:underline">
+                  NSE
+                </Link>{" "}
+                and{" "}
+                <Link to="/exchange/$code" params={{ code: "BSE" }} className="text-primary hover:underline">
+                  BSE
+                </Link>
+                , US markets through the{" "}
+                <Link to="/exchange/$code" params={{ code: "NYSE" }} className="text-primary hover:underline">
+                  NYSE
+                </Link>{" "}
+                and{" "}
+                <Link to="/exchange/$code" params={{ code: "NASDAQ" }} className="text-primary hover:underline">
+                  Nasdaq
+                </Link>
+                , and UK markets through the{" "}
+                <Link to="/exchange/$code" params={{ code: "LSE" }} className="text-primary hover:underline">
+                  LSE
+                </Link>
+                .
+              </p>
+            </div>
+            <div className="rounded-lg border border-border bg-panel p-4">
+              <h3 className="text-sm font-semibold">Can I use it free?</h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Yes. Search, raw fundamental ratios, the IPO pipeline, news and the economic calendar
+                are free. The full verdict, valuation models and alerts are part of Pro — see{" "}
+                <Link to="/pricing" className="text-primary hover:underline">
+                  pricing
+                </Link>
+                .
+              </p>
+            </div>
+            <div className="rounded-lg border border-border bg-panel p-4">
+              <h3 className="text-sm font-semibold">Is this investment advice?</h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                No. DeepScreen publishes analytical model output for research and education only, not
+                investment advice. Questions? Reach the team on the{" "}
+                <Link to="/contact" className="text-primary hover:underline">
+                  contact page
+                </Link>
+                .
+              </p>
+            </div>
+          </div>
         </section>
         <section className="rounded-lg border border-border bg-panel p-6 sm:p-8">
           <h2 className="text-lg font-semibold">DeepScreen research updates</h2>
-          <p className="mb-4 mt-2 max-w-2xl text-sm text-muted-foreground">
-            Get occasional market guides, methodology updates and new screener tools. No trading
-            tips or spam.
-          </p>
-          <a
-            href="/research-checklist"
-            className="mb-4 inline-block text-sm text-primary hover:underline"
-          >
-            Start with the free stock research checklist →
-          </a>
+          <p className="mb-4 mt-2 max-w-2xl text-sm text-muted-foreground">Get occasional market guides, methodology updates and new screener tools. No trading tips or spam.</p>
           <NewsletterForm />
         </section>
       </div>
