@@ -191,12 +191,12 @@ try {
   assert.match(html, /type="checkbox"[^>]*required/);
   assert.ok(!html.includes("usually within 24"));
   console.log("PASS crawler discovery and explicit newsletter consent");
-  const screeningGuide = await (await get("/best/high-roce-stocks")).text();
-  assert.ok(
-    screeningGuide.includes("These companies have not been verified as matching this screen"),
-  );
-  assert.ok(!screeningGuide.includes("These companies rank highest"));
-  console.log("PASS screening guides disclose that samples are not verified rankings");
+  const rankingPage = await (await get("/best/high-roce-stocks")).text();
+  assert.ok(rankingPage.includes("High ROCE Stocks Across Global Markets | DeepScreen"));
+  assert.ok(rankingPage.includes("Find companies with the highest return on capital employed across five exchanges."));
+  assert.ok(rankingPage.includes("Rankings use available live data where possible and modeled estimates otherwise. They are not investment advice."));
+  assert.ok(!rankingPage.includes("These companies have not been verified as matching this screen"));
+  console.log("PASS restored ranking wording, metadata and original disclaimer");
 } finally {
   server?.kill("SIGTERM");
 }
