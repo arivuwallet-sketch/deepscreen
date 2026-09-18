@@ -173,3 +173,22 @@
     font-variant-numeric: tabular-nums;
   }
 }
+
+@media print {
+  body:has(.research-checklist) {
+    background: white;
+  }
+  body:has(.research-checklist) .sticky,
+  body:has(.research-checklist) footer {
+    display: none;
+  }
+  .research-checklist,
+  .research-checklist * {
+    color: black !important;
+    background: white !important;
+  }
+  .research-checklist {
+    max-width: none;
+    padding: 0;
+  }
+}

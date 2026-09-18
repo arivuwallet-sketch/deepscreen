@@ -13,7 +13,19 @@ export const Route = createFileRoute("/privacy")({
         content:
           "How DeepScreen collects, uses and protects your account, payment and usage data, plus your rights over your personal information.",
       },
-      { name: "keywords", content: metaKeywords(["DeepScreen privacy policy", "stock screener privacy", "financial platform data privacy", "account data protection"], screenerKeywords, portfolioKeywords) },
+      {
+        name: "keywords",
+        content: metaKeywords(
+          [
+            "DeepScreen privacy policy",
+            "stock screener privacy",
+            "financial platform data privacy",
+            "account data protection",
+          ],
+          screenerKeywords,
+          portfolioKeywords,
+        ),
+      },
       { property: "og:title", content: "Privacy Policy — DeepScreen" },
       {
         property: "og:description",
@@ -51,7 +63,9 @@ function PrivacyPage() {
           </p>
 
           <Section title="1. Information We Collect">
-            <p>We only collect information that is necessary to provide and improve our services:</p>
+            <p>
+              We only collect information that is necessary to provide and improve our services:
+            </p>
             <ul className="list-disc space-y-2 pl-5">
               <li>
                 <span className="font-medium text-foreground">Account Information:</span> When you
@@ -103,6 +117,19 @@ function PrivacyPage() {
             <p>
               You have the right to access, update, or delete your personal information at any time.
               To request data deletion or a copy of your data, please reach out to our support team.
+            </p>
+          </Section>
+
+          <Section title="Newsletter subscriptions">
+            <p>
+              If you opt in to research updates, we store your email address, the website
+              subscription source and the subscription timestamp. We use the address for DeepScreen
+              research and product updates. The public signup form cannot read the subscriber list.
+            </p>
+            <p>
+              To unsubscribe or request deletion of your subscription, email
+              deepscreen.online@outlook.com from the subscribed address. A newsletter subscription
+              is optional and is not required to read the research checklist.
             </p>
           </Section>
 
