@@ -1,8 +1,11 @@
+import { analyze } from "./metrics.ts";
 import type { Stock } from "./types";
 import type { FundamentalSources } from "./live-merge";
 
 export function stockSummary(stock: Stock): string {
-  return `Research ${stock.name} (${stock.exchange}: ${stock.symbol}) using available valuation, profitability and leverage data. Check each figure's source and compare reporting periods before drawing conclusions. Missing provider data must not be treated as a reported company fact.`;
+  const a = analyze(stock);
+  const f = stock.fundamentals;
+  return `${stock.name} (${stock.exchange}: ${stock.symbol}) has a DeepScreen score of ${a.score}/100 and a ${a.verdict} model verdict. Its P/E is ${f.pe.toFixed(1)}x, PEG is ${f.peg.toFixed(2)}, ROCE is ${f.roce.toFixed(1)}%, and debt-to-equity is ${f.debtToEquity.toFixed(2)}x. Compare these figures with close ${stock.sector} peers and review current filings before making an investment decision.`;
 }
 
 export function stockFaqs(stock: Stock, sources?: FundamentalSources) {

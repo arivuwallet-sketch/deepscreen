@@ -83,3 +83,7 @@ Sources:
 ## Release process
 
 The repository's AGENTS.md says commits on its connected branch sync to Lovable. Keep this work on its review branch until release is approved. After merge, verify the actual hosting deployment and run the smoke script against the public origin. Then submit/inspect URLs through authenticated search-console accounts. Revert the single change commit if release validation reveals a regression; do not force-push published history.
+
+## Subsequent owner-directed product restoration
+
+On 18 September 2026, the owner requested that the original product UI and scoring behavior be restored while keeping SEO/GEO/AEO/AAO work. The descriptions above of hidden table scores and the stock unavailable-data screen are historical and are superseded by PR #3. The original fallback model, top-score table, verdicts and analysis panels were restored; search metadata, source-aware FAQs, canonical/crawl fixes and structured-data escaping remain.

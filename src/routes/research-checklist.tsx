@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
-import { NewsletterForm } from "@/components/ds/NewsletterForm";
 import { resourceHead } from "@/lib/seo/discovery";
 const STEPS = [
   [
@@ -101,14 +100,7 @@ function Checklist() {
             .
           </p>
         </section>
-        <section className="rounded-lg border border-border p-6 print:hidden">
-          <h2 className="text-lg font-semibold">Get future research updates</h2>
-          <p className="my-3 text-sm text-muted-foreground">
-            The checklist is free to use now. You can optionally subscribe for future DeepScreen
-            guides and product updates.
-          </p>
-          <NewsletterForm />
-        </section>
+
       </article>
     </Shell>
   );

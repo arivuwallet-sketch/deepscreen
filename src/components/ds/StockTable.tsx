@@ -9,7 +9,7 @@ import {
 } from "@/hooks/useLiveQuotes";
 
 import { analyze, verdictClass } from "@/lib/deepscreen/metrics";
-import { METRIC_KEY_TO_FIELD, mergeLiveStock } from "@/lib/deepscreen/live-merge";
+import { mergeLiveStock } from "@/lib/deepscreen/live-merge";
 import { formatCap, formatPrice, formatVolume } from "@/lib/deepscreen/format";
 import type { Stock } from "@/lib/deepscreen/types";
 import type { LiveFundamentals, LiveQuote } from "@/lib/market/yahoo.server";
@@ -65,7 +65,6 @@ function StockRow({
   const { stock: merged, sources } = mergeLiveStock(stock, quote, fundamentals, screener);
   const a = analyze(merged);
   const isLive = sources.pe === "live";
-  const scoreReady = Object.values(METRIC_KEY_TO_FIELD).every(field => sources[field] === "live");
   const priceFlash = usePriceFlash(merged.price);
 
   return (
@@ -97,7 +96,7 @@ function StockRow({
           priceFlash === "down" && "animate-flash-bear",
         )}
       >
-        {quote ? formatPrice(merged.price, stock.exchange) : "—"}
+        {formatPrice(merged.price, stock.exchange)}
         {quote ? (
           <span
             className="ml-1 inline-block size-1.5 rounded-full bg-bull align-middle"
@@ -111,28 +110,29 @@ function StockRow({
           merged.changePct >= 0 ? "text-bull" : "text-bear",
         )}
       >
-        {quote ? `${merged.changePct >= 0 ? "+" : ""}${merged.changePct.toFixed(2)}%` : "—"}
+        {merged.changePct >= 0 ? "+" : ""}
+        {merged.changePct.toFixed(2)}%
       </td>
-      <td className="num px-2 py-2.5 text-right">{fundamentals?.marketCap != null ? formatCap(merged.marketCap, stock.exchange) : "—"}</td>
-      <td className="num px-2 py-2.5 text-right" title={isLive ? "Live" : "Provider data unavailable"}>
-        {isLive ? merged.fundamentals.pe.toFixed(1) : "—"}
+      <td className="num px-2 py-2.5 text-right">{formatCap(merged.marketCap, stock.exchange)}</td>
+      <td className="num px-2 py-2.5 text-right" title={isLive ? "Live" : "Modeled estimate"}>
+        {merged.fundamentals.pe.toFixed(1)}
       </td>
       <td
         className="num px-2 py-2.5 text-right"
-        title={sources.peg === "live" ? "Live" : "Provider data unavailable"}
+        title={sources.peg === "live" ? "Live" : "Modeled estimate"}
       >
-        {sources.peg === "live" ? merged.fundamentals.peg.toFixed(2) : "—"}
+        {merged.fundamentals.peg.toFixed(2)}
       </td>
       <td
         className="num px-2 py-2.5 text-right"
         title={
-          sources.roce === "live" ? "Available provider data" : "Provider data unavailable"
+          sources.roce === "live" ? "Live — screener.in" : "Modeled estimate"
         }
       >
-        {sources.roce === "live" ? `${merged.fundamentals.roce.toFixed(1)}%` : "—"}
+        {merged.fundamentals.roce.toFixed(1)}%
       </td>
       <td className="num px-2 py-2.5 text-right text-muted-foreground">
-        {quote?.volume != null ? formatVolume(quote.volume) : "—"}
+        {formatVolume(merged.volume)}
       </td>
       <td
         className="px-2 py-2.5"
@@ -142,16 +142,16 @@ function StockRow({
             : "Calculated with modeled estimates while live fundamentals load"
         }
       >
-        {scoreReady ? <ScoreBar score={a.score} /> : <span className="text-xs text-muted-foreground">Incomplete</span>}
+        <ScoreBar score={a.score} />
       </td>
       <td className="px-4 py-2.5">
         <span
           className={cn(
             "num rounded border px-2 py-0.5 text-[11px] font-semibold transition-colors",
-            scoreReady ? verdictClass(a.verdict) : "text-muted-foreground",
+            verdictClass(a.verdict),
           )}
         >
-          {scoreReady ? a.verdict : "Insufficient data"}
+          {a.verdict}
         </span>
       </td>
     </tr>
@@ -209,7 +209,7 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
         refreshed every 15s. Indian ratios are fetched from Screener.in and retained in the shared
         cache; Yahoo Finance supplies other exchanges
         {fundamentalsLoading ? " (updating…)" : ""}. Hover a ratio to see its source.
-        {" "}A dash means provider data is unavailable. Scores require provider-backed inputs for every scoring factor.
+        {" "}Score and verdict remain visible while live fundamentals refresh.
       </p>
     </div>
   );

@@ -15,6 +15,7 @@ import { EconomicCalendar } from "@/components/ds/EconomicCalendar";
 import { StockTable } from "@/components/ds/StockTable";
 import { EXCHANGES } from "@/lib/deepscreen/exchanges";
 import { STOCKS } from "@/lib/deepscreen/stocks";
+import { analyze } from "@/lib/deepscreen/metrics";
 import { NewsletterForm } from "@/components/ds/NewsletterForm";
 
 export const Route = createFileRoute("/")({
@@ -82,14 +83,18 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const top = [...STOCKS].sort((a, b) => a.name.localeCompare(b.name)).slice(0, 10);
+  const top = [...STOCKS]
+    .map((s) => ({ s, a: analyze(s) }))
+    .sort((x, y) => y.a.score - x.a.score)
+    .slice(0, 10)
+    .map((x) => x.s);
 
   return (
     <Shell>
       <section className="border-b border-border bg-[radial-gradient(ellipse_at_top,color-mix(in_oklch,var(--primary)_14%,transparent),transparent_60%)]">
         <div className="mx-auto max-w-7xl px-4 py-14">
           <p className="num text-xs uppercase tracking-[0.25em] text-primary">
-            Research across India, the US and the UK
+            God-mode screening
           </p>
           <h1 className="mt-3 max-w-3xl text-4xl font-bold leading-tight tracking-tight md:text-5xl">
             Global stock screening across five exchanges.
@@ -156,7 +161,7 @@ function Home() {
 
         <section>
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide">
-            Explore company research
+            Highest-scoring companies globally
           </h2>
           <StockTable stocks={top} />
         </section>
@@ -176,12 +181,7 @@ function Home() {
             Get occasional market guides, methodology updates and new screener tools. No trading
             tips or spam.
           </p>
-          <a
-            href="/research-checklist"
-            className="mb-4 inline-block text-sm text-primary hover:underline"
-          >
-            Start with the free stock research checklist →
-          </a>
+
           <NewsletterForm />
         </section>
       </div>

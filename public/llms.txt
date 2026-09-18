@@ -37,7 +37,7 @@ Contact: deepscreen.online@outlook.com
 DeepScreen is a research tool, not personalized investment advice or a guarantee of returns.
 Directory coverage does not mean every company has complete financial data.
 Provider availability, reporting dates and retrieval times differ. Do not describe all data as real time.
-Company tables withhold unavailable inputs and complete scores when required data is missing.
+Company tables and analysis panels can retain scores and verdicts using modeled fallback inputs while provider data loads. Displayed scores are model output, not proof that all inputs are reported company facts.
 Some supplementary panels use illustrative model data. Those values must not be cited as reported company facts.
 Indian filing ratios may come through Screener.in; other supported exchange inputs may come through Yahoo Finance. This does not imply affiliation or endorsement.
 Verify material values in the company's primary disclosures, including period, currency, units and accounting basis.

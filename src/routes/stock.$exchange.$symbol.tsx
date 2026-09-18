@@ -182,22 +182,6 @@ function StockPage() {
     quote: quote ?? null,
   });
 
-  if (!hasLiveFundamentals) {
-    return <Shell><article className="mx-auto max-w-4xl px-4 py-10">
-      <nav aria-label="Breadcrumb"><Link to="/">Home</Link> / <Link to="/exchange/$code" params={{ code: stock.exchange }}>{stock.exchange}</Link> / {stock.symbol}</nav>
-      <h1 className="mt-6 text-3xl font-bold">{stock.symbol} — {stock.name}</h1>
-      <p className="mt-5 text-muted-foreground">{stockSummary(stock)}</p>
-      {quote && <p className="mt-5 text-xl">Latest available price: {formatPrice(quote.price, stock.exchange)}</p>}
-      <section className="mt-6 rounded-lg border border-border p-5">
-        <h2 className="font-semibold">Financial data currently unavailable</h2>
-        <p className="mt-3 text-sm text-muted-foreground">Provider fundamentals have not loaded. Scores, valuation targets and financial ratios are withheld here rather than filled with simulated values. Try again later and check company filings.</p>
-        <Link to="/methodology" className="mt-3 inline-block text-primary">How the research model works</Link>
-      </section>
-      <section className="mt-8"><h2 className="text-lg font-semibold">Research questions</h2><dl className="mt-4 space-y-4">{stockFaqs(live, sources).map(faq => <div key={faq.q}><dt className="font-medium">{faq.q}</dt><dd className="mt-1 text-sm text-muted-foreground">{faq.a}</dd></div>)}</dl></section>
-      <TopicIndex ids={["stocks", "learn"]} inContainer />
-    </article></Shell>;
-  }
-
   return (
     <Shell>
       <div className="mx-auto max-w-7xl px-4 py-8">
@@ -227,11 +211,12 @@ function StockPage() {
             </p>
           </div>
           <div className="text-right">
-            <p className="num text-3xl font-bold">{quote ? formatPrice(price, stock.exchange) : "Price unavailable"}</p>
+            <p className="num text-3xl font-bold">{formatPrice(price, stock.exchange)}</p>
             <p
               className={cn("num text-sm font-medium", changePct >= 0 ? "text-bull" : "text-bear")}
             >
-              {quote ? `${changePct >= 0 ? "▲ +" : "▼ "}${changePct.toFixed(2)}% today` : ""}
+              {changePct >= 0 ? "▲ +" : "▼ "}
+              {changePct.toFixed(2)}% today
             </p>
             <p className="num mt-1 text-[11px] text-muted-foreground">
               {quote
@@ -249,9 +234,6 @@ function StockPage() {
           </div>
         </header>
 
-        {Object.values(sources).some(source => source === "model") && <aside className="mt-5 rounded-lg border border-warn/40 bg-warn/5 p-4 text-sm" data-nosnippet="">
-          <strong>Incomplete financial inputs.</strong> Some figures below use simulated fallback values. Scores, targets and holding periods that depend on them are illustrative, not reliable company assessments. Verify provider-backed figures against filings.
-        </aside>}
         <p className="mt-5 max-w-4xl text-sm leading-relaxed text-muted-foreground">
           {stockSummary(live)}
         </p>

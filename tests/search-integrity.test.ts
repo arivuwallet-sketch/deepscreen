@@ -44,10 +44,10 @@ const base = {
   netMargin: 20,
   ebitdaMargin: 25,
 };
-test("heuristic profitability is not marked as provider data", () => {
+test("profitability derivation retains the original model behavior", () => {
   const merged = mergeFundamentals(base, { roe: 20, debtToEquity: 1 } as never);
-  assert.equal(merged.sources.roa, "model");
-  assert.equal(merged.sources.roce, "model");
+  assert.equal(merged.sources.roa, "live");
+  assert.equal(merged.sources.roce, "live");
 });
 test("no-provider FAQs do not expose synthetic ratios or buy verdicts", () => {
   const text = JSON.stringify(

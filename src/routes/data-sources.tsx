@@ -55,9 +55,9 @@ function Sources() {
             <div>
               <dt className="font-semibold">Unavailable or insufficient data</dt>
               <dd className="mt-1 text-muted-foreground">
-                Required inputs are missing or incomplete. Company tables withhold unavailable
-                numbers and do not present a complete score when required inputs are missing.
-                Missing data is not a zero value.
+                Provider inputs may be missing or incomplete. Tables and analysis panels can keep
+                scores and verdicts visible using modeled fallback inputs while data loads. A displayed
+                score does not establish that every input is a reported company fact.
               </dd>
             </div>
           </dl>

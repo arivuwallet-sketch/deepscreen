@@ -99,9 +99,9 @@ function ExchangePage() {
   const [caps, setCaps] = useState<CapTier[]>([]);
   const [sector, setSector] = useState("all");
   const [indexIds, setIndexIds] = useState<string[]>([]);
-  const [sort, setSort] = useState<SortKey>("name");
+  const [sort, setSort] = useState<SortKey>("score");
   const [limit, setLimit] = useState(100);
-  const filtersActive = caps.length > 0 || sector !== "all" || indexIds.length > 0 || sort !== "name";
+  const filtersActive = caps.length > 0 || sector !== "all" || indexIds.length > 0 || sort !== "score";
 
 
   const all = useMemo(() => stocksByExchange(exchange.code), [exchange.code]);

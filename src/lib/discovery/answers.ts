@@ -50,9 +50,9 @@ export const ANSWERS = [
   },
   {
     id: "incomplete-data",
-    question: "Why does a stock show insufficient data?",
+    question: "How does DeepScreen handle missing financial data?",
     answer:
-      "A complete DeepScreen score needs all required model inputs from supported provider data. Missing inputs or values derived from fallback assumptions cannot establish a complete score. An unavailable metric is not zero and does not imply that a company is weak.",
+      "DeepScreen can keep scores and verdicts visible using modeled fallback inputs while provider fundamentals load. Model-dependent outputs are research estimates, and availability varies by input. Check source tooltips and verify material values in company filings.",
     href: "/data-sources",
     label: "Understand data availability",
   },

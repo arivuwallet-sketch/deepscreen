@@ -42,7 +42,7 @@ try {
   const html = await home.text();
   assert.match(html, /Global stock screening across five exchanges/);
   assert.ok(!html.includes("SearchAction"));
-  assert.ok(!html.includes("Highest-scoring companies globally"));
+  assert.ok(html.includes("Highest-scoring companies globally"));
   const jsonScripts = [
     ...html.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g),
   ];
@@ -188,15 +188,22 @@ try {
   assert.ok(robots.includes("Disallow: /api/"));
   const llms = await (await get("/llms.txt")).text();
   assert.ok(llms.includes("https://deepscreen.online/openapi.json"));
-  assert.match(html, /type="checkbox"[^>]*required/);
+  assert.ok(html.includes("Score and verdict remain visible while live fundamentals refresh."));
   assert.ok(!html.includes("usually within 24"));
-  console.log("PASS crawler discovery and explicit newsletter consent");
+  console.log("PASS crawler discovery and restored score display");
   const rankingPage = await (await get("/best/high-roce-stocks")).text();
   assert.ok(rankingPage.includes("High ROCE Stocks Across Global Markets | DeepScreen"));
   assert.ok(rankingPage.includes("Find companies with the highest return on capital employed across five exchanges."));
   assert.ok(rankingPage.includes("Rankings use available live data where possible and modeled estimates otherwise. They are not investment advice."));
   assert.ok(!rankingPage.includes("These companies have not been verified as matching this screen"));
   console.log("PASS restored ranking wording, metadata and original disclaimer");
+  const stockPage = await (await get("/stock/NSE/DIGIDRIVE")).text();
+  assert.ok(stockPage.includes("DeepScreen verdict"));
+  assert.ok(stockPage.includes("Weighted 13-factor score"));
+  assert.ok(stockPage.includes("Strengths"));
+  assert.ok(stockPage.includes("Risks"));
+  assert.ok(!stockPage.includes("Financial data currently unavailable"));
+  console.log("PASS restored company verdict, score, strengths and risks panels");
 } finally {
   server?.kill("SIGTERM");
 }
