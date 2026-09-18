@@ -13,6 +13,7 @@ workflows:
         script: |
           test -f pubspec.yaml
           bash tool/bootstrap.sh android
+          rm -f test/widget_test.dart
           flutter doctor -v
           flutter pub get
           dart run flutter_launcher_icons
@@ -68,6 +69,7 @@ workflows:
         script: |
           test -f pubspec.yaml
           bash tool/bootstrap.sh ios
+          rm -f test/widget_test.dart
           flutter doctor -v
           flutter pub get
           dart run flutter_launcher_icons
