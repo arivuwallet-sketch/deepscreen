@@ -291,7 +291,7 @@ class _WebHomeState extends State<WebHome> with WidgetsBindingObserver {
         ),
         floatingActionButton: FloatingActionButton.small(
           backgroundColor: Live.accentColor,
-          onPressed: () => SharePlus.instance.share(ShareParams(text: Live.startUrl)),
+          onPressed: () => Share.share(Live.startUrl),
           child: const Icon(Icons.share),
         ),
         bottomNavigationBar: Live.bottomNav && Live.bottomNavItems.isNotEmpty
