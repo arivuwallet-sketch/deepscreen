@@ -13,7 +13,7 @@
     "iosDeploymentTarget": "13.0"
   },
   "branding": {
-    "iconMode": "library",
+    "iconMode": "upload",
     "iconUrl": "",
     "iconLibraryKey": "rocket",
     "iconBackground": "#0B0E14",
@@ -23,7 +23,7 @@
     "statusBarStyle": "light"
   },
   "splash": {
-    "enabled": true,
+    "enabled": false,
     "logoUrl": "",
     "backgroundColor": "#0B0E14",
     "durationMs": 1600,

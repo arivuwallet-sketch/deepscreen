@@ -10,7 +10,7 @@ class AppConfig {
 
   // Live sync: the app pulls the latest settings from this endpoint on launch
   // and every time it returns to the foreground.
-  static const String liveConfigUrl = 'http://localhost:8080/api/public/app-config/8ca9e10f-9b8e-41c3-8094-0cbef35d048b';
+  static const String liveConfigUrl = 'https://flutter-web-convert.lovable.app/api/public/app-config/8ca9e10f-9b8e-41c3-8094-0cbef35d048b';
   static const bool liveSync = true;
 
 
@@ -20,7 +20,7 @@ class AppConfig {
   static const bool lightStatusBarIcons = true;
 
   // Splash
-  static const bool splashEnabled = true;
+  static const bool splashEnabled = false;
   static const Color splashBackground = Color(0xFF0B0E14);
   static const Color splashSpinnerColor = Color(0xFF22D3A5);
   static const int splashDurationMs = 1600;
