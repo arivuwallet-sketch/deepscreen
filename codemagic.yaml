@@ -22,13 +22,27 @@ workflows:
         script: |
           if [ -n "${CM_KEYSTORE:-}" ]; then
             echo "$CM_KEYSTORE" | base64 --decode > "$CM_BUILD_DIR/android/app/keystore.jks"
-            cat > "$CM_BUILD_DIR/android/key.properties" <<EOF
+            cat > "$CM_BUILD_DIR/android/key.properties" <<EOF2
           storePassword=$CM_KEYSTORE_PASSWORD
           keyPassword=$CM_KEY_PASSWORD
           keyAlias=$CM_KEY_ALIAS
           storeFile=keystore.jks
-          EOF
+          EOF2
           fi
+      - name: Debug embedding state
+        script: |
+          echo "--- flutter --version ---"
+          flutter --version
+          echo "--- AndroidManifest.xml on disk ---"
+          cat android/app/src/main/AndroidManifest.xml
+          echo "--- MainActivity files found ---"
+          find android -iname "MainActivity*"
+          echo "--- Contents of each MainActivity file ---"
+          find android -iname "MainActivity*" -exec echo {} \; -exec cat {} \;
+          echo "--- Any custom Application class? ---"
+          find android -iname "*Application.kt" -o -iname "*Application.java"
+          echo "--- git commit being built ---"
+          git log -1
       - name: Build Android release files
         script: |
           flutter build apk --release
