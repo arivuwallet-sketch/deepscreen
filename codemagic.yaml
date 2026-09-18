@@ -1,32 +1,35 @@
 workflows:
   android-release:
     name: DeepScreen Android
-    working_directory: .
     instance_type: linux_x2
     max_build_duration: 60
     environment:
       flutter: stable
       java: 17
+      groups:
+        - android_signing
     scripts:
-      - name: Prepare current Flutter Android project
+      - name: Keystore (optional, from the android_signing group)
         script: |
-          test -f pubspec.yaml
-          bash tool/bootstrap.sh android
-          flutter doctor -v
-          flutter pub get
-          dart run flutter_launcher_icons
-          dart run flutter_native_splash:create
-          flutter analyze
-      - name: Build Android release files
-        script: |
-          flutter build apk --release
-          flutter build appbundle --release
+          if [ -n "$CM_KEYSTORE" ]; then
+            echo $CM_KEYSTORE | base64 --decode > "$CM_BUILD_DIR/android/app/keystore.jks"
+            cat >> "$CM_BUILD_DIR/android/key.properties" <<EOF
+          storePassword=$CM_KEYSTORE_PASSWORD
+          keyPassword=$CM_KEY_PASSWORD
+          keyAlias=$CM_KEY_ALIAS
+          storeFile=keystore.jks
+          EOF
+          fi
+      - flutter pub get
+      - dart run flutter_launcher_icons
+      - dart run flutter_native_splash:create
+      - flutter build apk --release
+      - flutter build appbundle --release
     artifacts:
       - build/**/outputs/**/*.apk
       - build/**/outputs/**/*.aab
   ios-release:
     name: DeepScreen iOS
-    working_directory: .
     instance_type: mac_mini_m2
     max_build_duration: 90
     integrations:
@@ -39,25 +42,17 @@ workflows:
         distribution_type: app_store
         bundle_identifier: online.deepscreen.deepscreen
     scripts:
-      - name: Prepare current Flutter iOS project
-        script: |
-          test -f pubspec.yaml
-          bash tool/bootstrap.sh ios
-          flutter doctor -v
-          flutter pub get
-          dart run flutter_launcher_icons
-          dart run flutter_native_splash:create
-          flutter analyze
+      - flutter pub get
+      - dart run flutter_launcher_icons
+      - dart run flutter_native_splash:create
       - name: Set up signing
         script: |
           keychain initialize
           app-store-connect fetch-signing-files "online.deepscreen.deepscreen" --type IOS_APP_STORE --create
           keychain add-certificates
           xcode-project use-profiles
-      - name: Install iOS dependencies and build
-        script: |
-          cd ios && pod install && cd ..
-          flutter build ipa --release --export-options-plist=/Users/builder/export_options.plist
+      - find . -name "Podfile" -execdir pod install \;
+      - flutter build ipa --release --export-options-plist=/Users/builder/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
       - build/ios/archive/*.xcarchive

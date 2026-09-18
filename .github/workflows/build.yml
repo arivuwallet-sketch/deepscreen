@@ -15,13 +15,9 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-          cache: true
-      - run: test -f pubspec.yaml
-      - run: bash tool/bootstrap.sh android
       - run: flutter pub get
       - run: dart run flutter_launcher_icons
       - run: dart run flutter_native_splash:create
-      - run: flutter analyze
       - run: flutter build apk --release
       - uses: actions/upload-artifact@v4
         with:
@@ -35,13 +31,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-          cache: true
-      - run: test -f pubspec.yaml
-      - run: bash tool/bootstrap.sh ios
       - run: flutter pub get
-      - run: dart run flutter_launcher_icons
-      - run: dart run flutter_native_splash:create
-      - run: flutter analyze
       - run: flutter build ios --release --no-codesign
       - run: |
           mkdir -p build/ios-out
