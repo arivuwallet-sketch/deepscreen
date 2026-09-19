@@ -80,7 +80,7 @@ export function SearchBar({ className, placeholder }: { className?: string; plac
                 }}
                 onMouseEnter={() => setActive(i)}
                 className={cn(
-                  "flex w-full items-center gap-3 rounded px-3 py-2 text-left text-sm hover:bg-accent",
+                  "grid w-full min-w-0 grid-cols-[4.5rem_minmax(0,1fr)_7rem] items-center gap-3 rounded px-3 py-2 text-left text-sm hover:bg-accent",
                   i === active && "bg-accent",
                 )}
               >
