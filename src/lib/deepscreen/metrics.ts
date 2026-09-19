@@ -44,6 +44,22 @@ function scoreHigh(value: number, worst: number, best: number): number {
   return Math.round(5 + ((value - worst) / (best - worst)) * 95);
 }
 
+export const ANALYSIS_WEIGHTS: Record<string, number> = {
+  pe: 1,
+  peg: 1.6,
+  ps: 0.7,
+  pb: 0.7,
+  evRevenue: 0.8,
+  evEbitda: 1.2,
+  roe: 1.3,
+  roa: 0.9,
+  roce: 1.6,
+  de: 1.1,
+  ltde: 0.8,
+  payout: 0.5,
+  oplev: 0.6,
+};
+
 const analysisCache = new WeakMap<Stock, Analysis>();
 
 export function analyze(stock: Stock): Analysis {
@@ -297,21 +313,7 @@ function computeAnalysis(stock: Stock): Analysis {
     },
   ].map((m) => ({ ...m, band: band(m.score) }));
 
-export const ANALYSIS_WEIGHTS: Record<string, number> = {
-  pe: 1,
-  peg: 1.6,
-  ps: 0.7,
-  pb: 0.7,
-  evRevenue: 0.8,
-  evEbitda: 1.2,
-  roe: 1.3,
-  roa: 0.9,
-  roce: 1.6,
-  de: 1.1,
-  ltde: 0.8,
-  payout: 0.5,
-  oplev: 0.6,
-};
+
 
   const totalWeight = metrics.reduce((a, m) => a + (ANALYSIS_WEIGHTS[m.key] ?? 1), 0);
   const score = Math.round(
