@@ -125,6 +125,19 @@ export interface BreadcrumbItem {
   url: string;
 }
 
+export function buildWebApplicationSchema(app: WebApplicationFacts): JsonLdNode {
+  return {
+    "@type": "WebApplication",
+    name: app.name,
+    url: app.url,
+    applicationCategory: "FinanceApplication",
+    operatingSystem: "Web browser",
+    publisher: { "@id": `${SITE_URL}/#organization` },
+    description: app.description,
+    ...(app.featureList?.length ? { featureList: app.featureList } : {}),
+  };
+}
+
 export function buildBreadcrumbSchema(items: BreadcrumbItem[]): JsonLdNode {
   return {
     "@type": "BreadcrumbList",
@@ -298,6 +311,13 @@ export interface WebPageFacts {
   url: string;
 }
 
+export interface WebApplicationFacts {
+  name: string;
+  url: string;
+  description: string;
+  featureList?: string[];
+}
+
 export function buildWebPageSchema(page: WebPageFacts): JsonLdNode {
   return {
     "@type": "WebPage",
@@ -329,6 +349,9 @@ export function buildGraph(...nodes: JsonLdNode[]): JsonLdNode {
 export function toJsonLdString(data: unknown): string {
   return JSON.stringify(data).replace(/</g, "\\u003c");
 }
+
+/** Backward-compatible alias used by existing routes. */
+export const jsonLd = toJsonLdString;
 
 // ---------------------------------------------------------------------------
 // React wiring — adapt to however you already manage <head>. This file
