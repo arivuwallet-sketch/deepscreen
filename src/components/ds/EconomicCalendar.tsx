@@ -11,6 +11,16 @@ const impactDot: Record<string, string> = {
   low: "bg-muted-foreground",
 };
 
+function hasReleaseValues(e: LiveEvent) {
+  return [e.actual, e.forecast, e.previous].some(
+    (value) => value && value !== "—" && value !== "-",
+  );
+}
+
+function displayReleaseValue(value: string, hasRelease: boolean) {
+  return hasRelease ? value : "N/A";
+}
+
 function dayKeyOf(d: Date) {
   const year = d.getFullYear();
   const month = String(d.getMonth() + 1).padStart(2, "0");
@@ -90,7 +100,9 @@ export function EconomicCalendar() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {events.map((e) => (
+              {events.map((e) => {
+                const hasRelease = hasReleaseValues(e);
+                return (
                 <tr key={e.id} className="hover:bg-accent/40">
                   <td className="num px-4 py-2.5 whitespace-nowrap text-muted-foreground">
                     {new Date(e.dateIso).toLocaleTimeString(undefined, {
@@ -105,11 +117,12 @@ export function EconomicCalendar() {
                     <span className={cn("inline-block size-2 rounded-full", impactDot[e.impact])} />
                   </td>
                   <td className="px-2 py-2.5">{e.title}</td>
-                  <td className="num px-2 py-2.5 text-right font-semibold">{e.actual}</td>
-                  <td className="num px-2 py-2.5 text-right text-muted-foreground">{e.forecast}</td>
-                  <td className="num px-4 py-2.5 text-right text-muted-foreground">{e.previous}</td>
+                  <td className="num px-2 py-2.5 text-right font-semibold">{displayReleaseValue(e.actual, hasRelease)}</td>
+                  <td className="num px-2 py-2.5 text-right text-muted-foreground">{displayReleaseValue(e.forecast, hasRelease)}</td>
+                  <td className="num px-4 py-2.5 text-right text-muted-foreground">{displayReleaseValue(e.previous, hasRelease)}</td>
                 </tr>
-              ))}
+              );
+              })}
             </tbody>
           </table>
         </div>
