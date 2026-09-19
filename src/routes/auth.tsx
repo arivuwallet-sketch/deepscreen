@@ -11,6 +11,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
 
+const AUTH_REDIRECT_URI = "https://deepscreen.online/auth";
+
 export const Route = createFileRoute("/auth")({
   staticData: { sitemap: false },
   head: () => {
@@ -67,9 +69,7 @@ function AuthPage() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) {
           toast.error(
-            error.message.toLowerCase().includes("invalid login")
-              ? "Wrong email or password."
-              : error.message,
+            "Wrong email or password.",
           );
           return;
         }
@@ -84,14 +84,12 @@ function AuthPage() {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth`,
+          emailRedirectTo: AUTH_REDIRECT_URI,
         },
       });
       if (error) {
         toast.error(
-          error.message.toLowerCase().includes("already registered")
-            ? "That email already has an account — sign in instead."
-            : error.message,
+          "Could not create the account. Check the details and try again.",
         );
         return;
       }
@@ -113,7 +111,7 @@ function AuthPage() {
       const redirectPath = getRedirectPath();
       window.localStorage.setItem("deepscreen_auth_redirect", redirectPath);
       const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: `${window.location.origin}/auth`,
+        redirect_uri: AUTH_REDIRECT_URI,
       });
       if (result.error) {
         toast.error("Google sign-in failed. Please try again.");
