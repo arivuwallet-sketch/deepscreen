@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">DeepScreen logo</title>
+  <desc id="desc">DeepScreen DS monogram in the site's dark navy and gold palette.</desc>
+  <rect width="512" height="512" rx="92" fill="#171b2a"/>
+  <rect x="36" y="36" width="440" height="440" rx="70" fill="#202638" stroke="#e7c24d" stroke-width="8"/>
+  <text x="256" y="300" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="188" font-weight="700" letter-spacing="-12" fill="#f1cb54">DS</text>
+  <path d="M108 390 L166 350 L220 372 L278 320 L330 342 L404 276" fill="none" stroke="#f1cb54" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="108" cy="390" r="10" fill="#f1cb54"/>
+  <circle cx="166" cy="350" r="10" fill="#f1cb54"/>
+  <circle cx="220" cy="372" r="10" fill="#f1cb54"/>
+  <circle cx="278" cy="320" r="10" fill="#f1cb54"/>
+  <circle cx="330" cy="342" r="10" fill="#f1cb54"/>
+  <circle cx="404" cy="276" r="10" fill="#f1cb54"/>
+</svg>

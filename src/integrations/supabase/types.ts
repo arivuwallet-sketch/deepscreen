@@ -70,6 +70,7 @@ export type Database = {
       }
       payment_orders: {
         Row: {
+          activated_at: string | null
           amount: number
           created_at: string
           currency: string
@@ -80,6 +81,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          activated_at?: string | null
           amount: number
           created_at?: string
           currency?: string
@@ -90,6 +92,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          activated_at?: string | null
           amount?: number
           created_at?: string
           currency?: string
@@ -223,7 +226,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      activate_payment_order: {
+        Args: { p_link_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
