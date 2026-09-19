@@ -278,11 +278,11 @@ async function fetchLse(): Promise<LiveIpo[]> {
     if (start < 0 || end <= start) return [];
 
     const section = html.slice(start, end);
-    const rows = section.match(/<tr[\\s\\S]*?<\\/tr>/gi) ?? [];
+    const rows = section.match(/<tr[\s\S]*?<\/tr>/gi) ?? [];
     const out: LiveIpo[] = [];
 
     for (const row of rows) {
-      const cells = (row.match(/<t[dh][^>]*>[\\s\\S]*?<\\/t[dh]>/gi) ?? []).map(decodeHtml);
+      const cells = (row.match(/<t[dh][^>]*>[\s\S]*?<\/t[dh]>/gi) ?? []).map(decodeHtml);
       if (cells.length < 7) continue;
       if (/^name$/i.test(cells[0] ?? "")) continue;
       const type = cells[6] ?? "";
