@@ -460,6 +460,22 @@ function StockPage() {
             </div>
         </section>
 
+        <section className="mt-6 grid items-stretch gap-4 lg:grid-cols-2">
+          <PaywallGate
+            feature="Vision &amp; Utility score and Secret Tips badges"
+            minHeight="min-h-[260px]"
+          >
+            <VisionCard intel={intel} />
+          </PaywallGate>
+
+          <PaywallGate
+            feature="Target price, trim level & stop-loss"
+            minHeight="min-h-[220px]"
+          >
+            <HoldingPlanCard stock={live} />
+          </PaywallGate>
+        </section>
+
         <ScoreExplanationPanel analysis={a} />
 
         <ScoreChangePanel
@@ -491,14 +507,6 @@ function StockPage() {
         />
 
         <PaywallGate
-          feature="Vision &amp; Utility score and Secret Tips badges"
-          className="mt-6"
-          minHeight="min-h-[260px]"
-        >
-          <VisionCard intel={intel} />
-        </PaywallGate>
-
-        <PaywallGate
           feature="DeepScreen Secret Tips, traps & X-Ray analysis"
           className="mt-4"
           minHeight="min-h-[420px]"
@@ -509,14 +517,6 @@ function StockPage() {
         <section className="mt-6 space-y-3">
           <ForensicPanel intel={intel} locked={!isPro} />
         </section>
-
-        <PaywallGate
-          feature="Target price, trim level & stop-loss"
-          className="mt-6"
-          minHeight="min-h-[220px]"
-        >
-          <HoldingPlanCard stock={live} />
-        </PaywallGate>
 
         <section className="mt-8">
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide">
