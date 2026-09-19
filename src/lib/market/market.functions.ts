@@ -3,6 +3,7 @@ import { getRequest } from "@tanstack/react-start/server";
 
 import type { LiveFundamentals, LiveQuote } from "./yahoo.server";
 import type { FeedItem } from "@/lib/rss.server";
+import { z } from "zod";
 import { getExchange } from "@/lib/deepscreen/exchanges";
 import { consumeRateLimit, normalizeCompanyName, normalizeSymbol, requestClientKey } from "@/lib/security";
 
@@ -28,6 +29,29 @@ export interface CompanyIntel {
 
 const isAllowedExchange = (exchange: string): boolean => Boolean(getExchange(exchange.trim().toUpperCase()));
 
+const marketKeyInput = z.object({
+  exchange: z.string().trim().min(1).max(16),
+  symbol: z.string().trim().min(1).max(32),
+}).strict();
+
+const marketKeysInput = z.object({
+  keys: z.array(marketKeyInput).max(100),
+}).strict();
+
+const companyIntelInput = z.object({
+  exchange: z.string().trim().min(1).max(16),
+  symbol: z.string().trim().min(1).max(32),
+  name: z.string().max(160),
+}).strict();
+
+const newsInput = z.object({
+  query: z.string().trim().min(1).max(240),
+  limit: z.number().int().min(1).max(30).optional(),
+}).strict();
+
+const screenerKeyInput = marketKeyInput.extend({ name: z.string().max(160).optional() });
+const screenerKeysInput = z.object({ keys: z.array(screenerKeyInput).max(100) }).strict();
+
 const safeMarketKey = (exchange: string, symbol: string): { exchange: string; symbol: string } | null => {
   const normalizedExchange = exchange.trim().toUpperCase();
   const normalizedSymbol = normalizeSymbol(symbol);
@@ -37,7 +61,7 @@ const safeMarketKey = (exchange: string, symbol: string): { exchange: string; sy
 };
 
 export const getLiveQuote = createServerFn({ method: "GET" })
-  .inputValidator((d: { exchange: string; symbol: string }) => d)
+  .inputValidator(marketKeyInput)
   .handler(async ({ data }): Promise<LiveQuote | null> => {
     const request = getRequest();
     const rate = consumeRateLimit("quote:ip:" + requestClientKey(request), 120, 60_000);
@@ -49,7 +73,7 @@ export const getLiveQuote = createServerFn({ method: "GET" })
   });
 
 export const getLiveQuotes = createServerFn({ method: "POST" })
-  .inputValidator((d: { keys: { exchange: string; symbol: string }[] }) => d)
+  .inputValidator(marketKeysInput)
   .handler(async ({ data }): Promise<Record<string, LiveQuote>> => {
     const request = getRequest();
     const rate = consumeRateLimit("quotes-batch:ip:" + requestClientKey(request), 30, 60_000);
@@ -119,8 +143,10 @@ export const getLiveFundamentalsBatch = createServerFn({ method: "POST" })
   });
 
 export const getCompanyIntel = createServerFn({ method: "GET" })
-  .inputValidator((d: { exchange: string; symbol: string; name: string }) => d)
+  .inputValidator(companyIntelInput)
   .handler(async ({ data }): Promise<CompanyIntel> => {
+    const rate = consumeRateLimit("company-intel:ip:" + requestClientKey(getRequest()), 10, 60_000);
+    if (!rate.allowed) return { fundamentals: null, wiki: null, news: [], workplaceNews: [] };
     const key = safeMarketKey(data.exchange, data.symbol);
     const safeName = normalizeCompanyName(data.name);
     if (!key || !safeName) return { fundamentals: null, wiki: null, news: [], workplaceNews: [] };
@@ -514,14 +540,15 @@ function newsKey(query: string): string {
 }
 
 export const getNewsFeed = createServerFn({ method: "GET" })
-  .inputValidator((d: { query: string; limit?: number }) => d)
+  .inputValidator(newsInput)
   .handler(async ({ data }): Promise<LiveNewsResult> => {
     const request = getRequest();
     const rate = consumeRateLimit("news:ip:" + requestClientKey(request), 20, 60_000);
     if (!rate.allowed) return { items: [], fetchedAt: Date.now(), stale: true, providerCount: 0 };
     const { dedupe, refreshAges } = await import("@/lib/rss.server");
     const limit = Math.min(Math.max(data.limit ?? 14, 1), 30);
-    const key = newsKey(data.query);
+    const safeQuery = data.query.trim().replace(/\s+/g, " ").slice(0, 240);
+    const key = newsKey(safeQuery);
     if (!key) return { items: [], fetchedAt: Date.now(), stale: false, providerCount: 0 };
 
     const memory = newsMemoryCache.get(key);
@@ -548,9 +575,9 @@ export const getNewsFeed = createServerFn({ method: "GET" })
       }
 
       const [google, bing, yahoo] = await Promise.all([
-        fetchFeed(googleNewsFeed(data.query), "Google News", "market", limit),
-        fetchFeed(bingNewsFeed(data.query), "Bing News", "market", limit),
-        fetchYahooNews(data.query, limit),
+        fetchFeed(googleNewsFeed(safeQuery), "Google News", "market", limit),
+        fetchFeed(bingNewsFeed(safeQuery), "Bing News", "market", limit),
+        fetchYahooNews(safeQuery, limit),
       ]);
       const providers = [google, bing, yahoo].filter((items) => items.length > 0).length;
       const items = dedupe([...google, ...bing, ...yahoo])
@@ -665,7 +692,7 @@ async function warmScreener(
 }
 
 export const getScreenerRatios = createServerFn({ method: "GET" })
-  .inputValidator((d: { exchange: string; symbol: string; name?: string }) => d)
+  .inputValidator(screenerKeyInput)
   .handler(async ({ data }): Promise<Ratios | null> => {
     const request = getRequest();
     const rate = consumeRateLimit("screener:ip:" + requestClientKey(request), 30, 60_000);
@@ -713,8 +740,10 @@ export const getScreenerRatios = createServerFn({ method: "GET" })
  * back so subsequent views — for every user — are served straight from cache.
  */
 export const getScreenerRatiosBatch = createServerFn({ method: "POST" })
-  .inputValidator((d: { keys: { exchange: string; symbol: string; name?: string }[] }) => d)
+  .inputValidator(screenerKeysInput)
   .handler(async ({ data }): Promise<Record<string, Ratios | null>> => {
+    const rate = consumeRateLimit("screener-batch:ip:" + requestClientKey(getRequest()), 10, 60_000);
+    if (!rate.allowed) return {};
     const indian = data.keys
       .map((k) => {
         const safe = safeMarketKey(k.exchange, k.symbol);
