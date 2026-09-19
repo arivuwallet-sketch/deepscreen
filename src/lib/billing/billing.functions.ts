@@ -1,9 +1,11 @@
 import { createClient } from "@supabase/supabase-js";
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 
 import type { Database } from "@/integrations/supabase/types";
 import { PLANS, type Tier } from "@/hooks/useSubscription";
 import { getPhoneCountry, validatePhoneNumber } from "@/lib/billing/phone";
+import { consumeRateLimit, isValidOrderId, PUBLIC_APP_ORIGIN } from "@/lib/security";
 
 type Fail = { ok: false; error: string };
 
@@ -23,14 +25,21 @@ async function verifyUser(accessToken: string) {
  * only granted once Cashfree confirms the payment (webhook or confirmCheckout).
  */
 export const createCheckout = createServerFn({ method: "POST" })
-  .inputValidator((d: { tier: Tier; accessToken: string; origin: string; countryIso2: string; phone: string }) => d)
+  .inputValidator((d: { tier: Tier; accessToken: string; countryIso2: string; phone: string }) => d)
   .handler(
     async ({
       data,
     }): Promise<{ ok: true; orderId: string; paymentSessionId: string } | Fail> => {
       const plan = PLANS.find((p) => p.tier === data.tier);
       if (!plan) return { ok: false, error: "Unknown plan." };
-      if (!/^https?:\/\//.test(data.origin)) return { ok: false, error: "Bad origin." };
+
+      const request = getRequest();
+      const userRate = consumeRateLimit(
+        "checkout:ip:" + request.headers.get("cf-connecting-ip")?.trim().slice(0, 128),
+        8,
+        10 * 60_000,
+      );
+      if (!userRate.allowed) return { ok: false, error: "Too many checkout attempts. Please try again later." };
       const country = getPhoneCountry(data.countryIso2);
       if (!country) {
         return { ok: false, error: "Select a valid country calling code." };
@@ -52,7 +61,24 @@ export const createCheckout = createServerFn({ method: "POST" })
         };
       }
 
-      const orderId = `ds_${data.tier}_${user.id.slice(0, 8)}_${Date.now()}`;
+      const orderId = `ds_${data.tier}_${user.id.slice(0, 8)}_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
+      if (!isValidOrderId(orderId)) return { ok: false, error: "Could not create a secure order." };
+
+      const { getAdmin } = await import("./activate.server");
+      const admin = await getAdmin();
+      const localInsert = await admin.from("payment_orders").insert({
+        link_id: orderId,
+        user_id: user.id,
+        tier: plan.tier,
+        amount: plan.price,
+        currency: "INR",
+        status: "created",
+      });
+      if (localInsert.error) {
+        console.error("[payment] local order insert failed", localInsert.error);
+        return { ok: false, error: "Could not start checkout. Please try again." };
+      }
+
       try {
         const order = await createOrder(cfg, {
           orderId,
@@ -60,26 +86,22 @@ export const createCheckout = createServerFn({ method: "POST" })
           currency: "INR",
           note: `DeepScreen Pro — ${plan.name}`,
           customerId: user.id,
-          email: user.email ?? "customer@deepscreen.app",
+          email: user.email ?? "",
           phone: phoneValidation.e164,
-          returnUrl: `${data.origin}/pricing?cf_order_id=${orderId}`,
-          notifyUrl: `${data.origin}/api/public/cashfree-webhook`,
+          returnUrl: `${PUBLIC_APP_ORIGIN}/pricing?cf_order_id=${orderId}`,
+          notifyUrl: `${PUBLIC_APP_ORIGIN}/api/public/cashfree-webhook`,
           tags: { user_id: user.id, tier: plan.tier },
         });
 
-        const { getAdmin } = await import("./activate.server");
-        const admin = await getAdmin();
-        await admin.from("payment_orders").insert({
-          link_id: order.orderId,
-          user_id: user.id,
-          tier: plan.tier,
-          amount: plan.price,
-          currency: "INR",
-          status: "created",
-        });
+        if (order.orderId !== orderId) {
+          await admin.from("payment_orders").update({ status: "failed" }).eq("link_id", orderId);
+          console.error("[payment] Cashfree returned unexpected order id");
+          return { ok: false, error: "Payment order verification failed." };
+        }
 
         return { ok: true, orderId: order.orderId, paymentSessionId: order.paymentSessionId };
       } catch (e) {
+        await admin.from("payment_orders").update({ status: "failed" }).eq("link_id", orderId);
         return { ok: false, error: e instanceof Error ? e.message : "Could not start checkout." };
       }
     },
@@ -89,8 +111,32 @@ export const createCheckout = createServerFn({ method: "POST" })
 export const confirmCheckout = createServerFn({ method: "POST" })
   .inputValidator((d: { orderId: string; accessToken: string }) => d)
   .handler(async ({ data }): Promise<{ ok: true; paid: boolean; status: string } | Fail> => {
+    if (!isValidOrderId(data.orderId)) return { ok: false, error: "Invalid order." };
+    const request = getRequest();
+    const rate = consumeRateLimit(
+      "confirm:ip:" + request.headers.get("cf-connecting-ip")?.trim().slice(0, 128),
+      20,
+      10 * 60_000,
+    );
+    if (!rate.allowed) return { ok: false, error: "Too many verification attempts. Please try again later." };
+
     const user = await verifyUser(data.accessToken);
     if (!user) return { ok: false, error: "Not signed in — please sign in again." };
+
+    const { getAdmin, activatePaymentOrder } = await import("./activate.server");
+    const admin = await getAdmin();
+    const { data: order, error: orderError } = await admin
+      .from("payment_orders")
+      .select("user_id, tier, status, amount, currency")
+      .eq("link_id", data.orderId)
+      .maybeSingle();
+
+    if (orderError) return { ok: false, error: "Could not verify the order." };
+    if (!order || order.user_id !== user.id) {
+      return { ok: false, error: "Order not found for this account." };
+    }
+    if (order.status === "paid") return { ok: true, paid: true, status: "PAID" };
+    if (order.status !== "created") return { ok: true, paid: false, status: order.status.toUpperCase() };
 
     const { getCashfreeConfig, fetchOrder } = await import("./cashfree.server");
     const cfg = getCashfreeConfig();
@@ -98,41 +144,20 @@ export const confirmCheckout = createServerFn({ method: "POST" })
 
     try {
       const remote = await fetchOrder(cfg, data.orderId);
-      const { getAdmin, grantSubscription } = await import("./activate.server");
-      const admin = await getAdmin();
-
-      const { data: order } = await admin
-        .from("payment_orders")
-        .select("user_id, tier, status, amount, currency")
-        .eq("link_id", data.orderId)
-        .maybeSingle();
-
-      if (!order || order.user_id !== user.id) {
-        return { ok: false, error: "Order not found for this account." };
-      }
+      if (remote.orderId !== data.orderId) return { ok: false, error: "Payment order verification failed." };
       if (remote.status !== "PAID") {
-        await admin
-          .from("payment_orders")
-          .update({ status: remote.status.toLowerCase() })
-          .eq("link_id", data.orderId);
+        await admin.from("payment_orders").update({ status: remote.status === "EXPIRED" ? "expired" : "failed" }).eq("link_id", data.orderId).eq("status", "created");
         return { ok: true, paid: false, status: remote.status };
       }
-      if (order.status === "paid") return { ok: true, paid: true, status: "PAID" };
-      if (
-        order.currency !== "INR" ||
-        remote.currency !== "INR" ||
-        remote.amount + 0.01 < Number(order.amount)
-      ) {
-        await admin
-          .from("payment_orders")
-          .update({ status: "underpaid" })
-          .eq("link_id", data.orderId);
+      const remoteAmountCents = Math.round(remote.amount * 100);
+      const localAmountCents = Math.round(Number(order.amount) * 100);
+      if (order.currency !== "INR" || remote.currency !== "INR" || !Number.isFinite(remoteAmountCents) || remoteAmountCents < localAmountCents) {
+        await admin.from("payment_orders").update({ status: "underpaid" }).eq("link_id", data.orderId).eq("status", "created");
         return { ok: true, paid: false, status: "PARTIALLY_PAID" };
       }
 
-      const granted = await grantSubscription(admin, order.user_id, order.tier as Tier);
-      if (!granted.ok) return granted;
-      await admin.from("payment_orders").update({ status: "paid" }).eq("link_id", data.orderId);
+      const activated = await activatePaymentOrder(admin, data.orderId);
+      if (!activated.ok) return activated;
       return { ok: true, paid: true, status: "PAID" };
     } catch (e) {
       return { ok: false, error: e instanceof Error ? e.message : "Could not verify payment." };
