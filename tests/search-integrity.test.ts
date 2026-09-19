@@ -32,3 +32,28 @@ test('no-provider FAQs do not expose synthetic ratios or buy verdicts', () => {
   assert.ok(!text.includes('10.0x'));
   assert.ok(!text.includes('Strong Buy'));
 });
+
+test('every stock page FAQ includes the complete company-research question set', () => {
+  const text = JSON.stringify(stockFaqs({ name: 'Example', symbol: 'EXAMPLE', fundamentals: base } as never));
+  const questions = [
+    'How does the company make money?',
+    "What is the company's competitive advantage (economic moat)?",
+    'Who are the main competitors, and how does the company differ from them?',
+    'Are its products or services in long-term demand?',
+    'Who are its primary customers (individuals, businesses, or government)?',
+    'Is the company consistently profitable, and is its revenue growing year-over-year?',
+    'Does the company generate positive, healthy free cash flow?',
+    "How high are the company's debt levels compared to its cash holdings and earnings?",
+    'How will the company finance its future growth or expansion projects?',
+    "What is the company's historical Return on Equity (ROE) and Return on Capital Employed (ROCE)?",
+    "Who are the promoters or top executives running the company, and what is their track record?",
+    "Is a high percentage of the promoter's stake pledged as collateral for loans?",
+    'Does management have a transparent and honest history of communication with shareholders?',
+    'Has the firm ever faced corporate governance issues, legal troubles, or accounting scandals?',
+    'Is the current stock valuation (such as the P/E or P/S ratio) reasonable or overpriced?',
+    "How does the company's valuation compare to its direct industry peers?",
+    'What is the margin of safety if market conditions or the economy worsens?',
+    'Does the company pay a reliable dividend, or does it aggressively buy back its own shares?',
+  ];
+  for (const question of questions) assert.ok(text.includes(question), question);
+});
