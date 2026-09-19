@@ -206,8 +206,8 @@ export function stockFaqs(
     {
       q: "How does the company's valuation compare to its direct industry peers?",
       a: peerNames.length
-        ? `A practical peer set for ${stock.name} starts with ${peerNames.join(", ")}. Compare the same reporting-period P/E, P/S and EV/EBITDA, then adjust for growth, margin quality, leverage and business mix; a lower multiple is not automatically cheaper on an economic-value basis.`
-        : `Build a direct peer set from companies with similar products, customers and geography. Then compare like-for-like valuation multiples, growth, margins, capital efficiency and leverage using the same reporting period.`,
+        ? `A practical peer set for ${stock.name} starts with ${peerNames.join(", ")}. Compare the same reporting-period P/E, P/S and positive EV/EBITDA only when EBITDA supports a meaningful multiple, then adjust for growth, margin quality, leverage and business mix; a lower positive multiple is not automatically cheaper on an economic-value basis.`
+        : `Build a direct peer set from companies with similar products, customers and geography. Then compare like-for-like valuation multiples, using EV/EBITDA only when EBITDA and enterprise value support a positive ratio, alongside growth, margins, capital efficiency and leverage using the same reporting period.`,
     },
     {
       q: "What is the margin of safety if market conditions or the economy worsens?",
