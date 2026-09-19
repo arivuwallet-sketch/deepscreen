@@ -42,6 +42,7 @@ User-agent: meta-externalagent
 Disallow: /
 
 User-agent: *
+Allow: /
 Disallow: /admin/
 Disallow: /api/
 Disallow: /account/
