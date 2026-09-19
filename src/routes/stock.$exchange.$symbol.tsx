@@ -363,7 +363,7 @@ function StockPage() {
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide">
               Fundamental breakdown{" "}
               <span className="font-normal normal-case text-muted-foreground">
-                — core ratios are free · EV/Revenue, PEG and EV/EBITDA are Pro-only{" "}
+                — core ratios are free · EV/Revenue, PEG, EV/EBITDA and LT D/E are Pro-only{" "}
                 {hasLiveFundamentals
                   ? isIndianExchange && screenerRatios
                     ? `Screener.in filing ratios + live market data, updated ${new Date(Math.max(fundUpdatedAt, screenerUpdatedAt)).toLocaleTimeString()}`
@@ -400,7 +400,7 @@ function StockPage() {
                       </span>
                     </div>
                     <p className="num mt-1 text-2xl font-bold">
-                      ${["peg", "evRevenue", "evEbitda", "ltde"].includes(m.key) ? (
+                      {["peg", "evRevenue", "evEbitda", "ltde"].includes(m.key) ? (
                         <ProMetricValue value={m.display} />
                       ) : (
                         m.display
@@ -417,7 +417,7 @@ function StockPage() {
                       />
                     </div>
                     <p className="mt-2 text-[11px] leading-snug text-muted-foreground">
-                      ${["peg", "evRevenue", "evEbitda", "ltde"].includes(m.key) ? (
+                      {["peg", "evRevenue", "evEbitda", "ltde"].includes(m.key) ? (
                         <ProMetricValue value={<span>Advanced ratio — unlock with Pro</span>} />
                       ) : (
                         m.tooltip
