@@ -60,13 +60,11 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
-      const schemaAnalysis = Object.values(sources).some((value) => value === "live")
-      ? analyze(s)
-      : undefined;
-    return {
+      return {
         meta: [{ title: "Stock not found | DeepScreen" }, { name: "robots", content: "noindex" }],
       };
     }
+
     const base = loaderData.stock;
     const { stock: s, sources } = mergeLiveStock(
       base,
@@ -78,11 +76,15 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
     const description = `Research ${s.name} (${s.exchange}: ${s.symbol}): available financial ratios, valuation, company news and data limitations on DeepScreen.`;
     const faqs = stockFaqs(s, sources);
     const url = `https://deepscreen.online/stock/${s.exchange}/${s.symbol}`;
+    const schemaAnalysis = Object.values(sources).some((value) => value === "live")
+      ? analyze(s)
+      : undefined;
+
     return {
       meta: [
         { title },
         { name: "description", content: description },
-      {
+        {
           name: "keywords",
           content: metaKeywords(
             [
@@ -104,7 +106,11 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
         { property: "og:url", content: url },
         { property: "og:type", content: "article" },
         { name: "twitter:card", content: "summary_large_image" },
-        { name: "twitter:title", content: title }      scripts: [
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
         {
           type: "application/ld+json",
           children: jsonLd(
@@ -138,11 +144,6 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
               ),
             ),
           ),
-        },
-      ],aq.q,
-              acceptedAnswer: { "@type": "Answer", text: faq.a },
-            })),
-          }),
         },
       ],
     };
