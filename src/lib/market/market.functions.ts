@@ -2,6 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 
 import type { LiveFundamentals, LiveQuote } from "./yahoo.server";
 import type { FeedItem } from "@/lib/rss.server";
+import { getExchange } from "@/lib/deepscreen/exchanges";
+import { normalizeCompanyName, normalizeSymbol } from "@/lib/security";
 
 export interface LiveEvent {
   id: string;
@@ -23,18 +25,33 @@ export interface CompanyIntel {
   workplaceNews: FeedItem[];
 }
 
+const isAllowedExchange = (exchange: string): boolean => Boolean(getExchange(exchange.trim().toUpperCase()));
+
+const safeMarketKey = (exchange: string, symbol: string): { exchange: string; symbol: string } | null => {
+  const normalizedExchange = exchange.trim().toUpperCase();
+  const normalizedSymbol = normalizeSymbol(symbol);
+  return isAllowedExchange(normalizedExchange) && normalizedSymbol
+    ? { exchange: normalizedExchange, symbol: normalizedSymbol }
+    : null;
+};
+
 export const getLiveQuote = createServerFn({ method: "GET" })
   .inputValidator((d: { exchange: string; symbol: string }) => d)
   .handler(async ({ data }): Promise<LiveQuote | null> => {
+    const key = safeMarketKey(data.exchange, data.symbol);
+    if (!key) return null;
     const { fetchChartQuote, yahooSymbol } = await import("./yahoo.server");
-    return fetchChartQuote(yahooSymbol(data.exchange, data.symbol));
+    return fetchChartQuote(yahooSymbol(key.exchange, key.symbol));
   });
 
 export const getLiveQuotes = createServerFn({ method: "POST" })
   .inputValidator((d: { keys: { exchange: string; symbol: string }[] }) => d)
   .handler(async ({ data }): Promise<Record<string, LiveQuote>> => {
     const { fetchChartQuote, yahooSymbol } = await import("./yahoo.server");
-    const keys = data.keys.slice(0, 100);
+    const keys = data.keys
+      .map((key) => safeMarketKey(key.exchange, key.symbol))
+      .filter((key): key is { exchange: string; symbol: string } => Boolean(key))
+      .slice(0, 100);
     const out: Record<string, LiveQuote> = {};
     const chunk = 10;
     for (let i = 0; i < keys.length; i += chunk) {
@@ -53,8 +70,10 @@ export const getLiveQuotes = createServerFn({ method: "POST" })
 export const getLiveFundamentals = createServerFn({ method: "GET" })
   .inputValidator((d: { exchange: string; symbol: string }) => d)
   .handler(async ({ data }): Promise<LiveFundamentals | null> => {
+    const key = safeMarketKey(data.exchange, data.symbol);
+    if (!key) return null;
     const { fetchFundamentals, yahooSymbol } = await import("./yahoo.server");
-    return fetchFundamentals(yahooSymbol(data.exchange, data.symbol));
+    return fetchFundamentals(yahooSymbol(key.exchange, key.symbol));
   });
 
 /**
@@ -67,7 +86,10 @@ export const getLiveFundamentalsBatch = createServerFn({ method: "POST" })
   .inputValidator((d: { keys: { exchange: string; symbol: string }[] }) => d)
   .handler(async ({ data }): Promise<Record<string, LiveFundamentals>> => {
     const { fetchFundamentals, yahooSymbol } = await import("./yahoo.server");
-    const keys = data.keys.slice(0, 100);
+    const keys = data.keys
+      .map((key) => safeMarketKey(key.exchange, key.symbol))
+      .filter((key): key is { exchange: string; symbol: string } => Boolean(key))
+      .slice(0, 100);
     const out: Record<string, LiveFundamentals> = {};
     const chunk = 5;
     for (let i = 0; i < keys.length; i += chunk) {
@@ -86,15 +108,18 @@ export const getLiveFundamentalsBatch = createServerFn({ method: "POST" })
 export const getCompanyIntel = createServerFn({ method: "GET" })
   .inputValidator((d: { exchange: string; symbol: string; name: string }) => d)
   .handler(async ({ data }): Promise<CompanyIntel> => {
+    const key = safeMarketKey(data.exchange, data.symbol);
+    const safeName = normalizeCompanyName(data.name);
+    if (!key || !safeName) return { fundamentals: null, wiki: null, news: [], workplaceNews: [] };
     const { fetchFundamentals, fetchWikiSummary, yahooSymbol } = await import("./yahoo.server");
     const { fetchFeed, googleNewsFeed, dedupe } = await import("@/lib/rss.server");
     const { cleanCompanyName } = await import("@/lib/deepscreen/format");
-    const y = yahooSymbol(data.exchange, data.symbol);
-    const cleanName = cleanCompanyName(data.name);
+    const y = yahooSymbol(key.exchange, key.symbol);
+    const cleanName = cleanCompanyName(safeName);
     const [fundamentals, wiki, news, workplaceNews] = await Promise.all([
       fetchFundamentals(y),
-      fetchWikiSummary(data.name),
-      fetchFeed(googleNewsFeed(`"${cleanName}" OR "${data.symbol}"`), "Google News", "company", 12),
+      fetchWikiSummary(safeName),
+      fetchFeed(googleNewsFeed(`"${cleanName}" OR "${key.symbol}"`), "Google News", "company", 12),
       fetchFeed(
         googleNewsFeed(
           `"${cleanName}" hiring OR layoffs OR employees OR workplace OR salary OR attrition`,
