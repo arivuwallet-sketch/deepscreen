@@ -10,7 +10,7 @@ export const Route = createFileRoute("/answers")({
     "/answers",
     "Stock Research Questions & Answers | DeepScreen",
     "Clear answers about stock research, fundamental analysis and DeepScreen market coverage.",
-    ["stock research questions", "fundamental analysis answers", "DeepScreen FAQ"],
+    ["stock research questions", "stock research", "fundamental analysis", "fundamental analysis answers", "how to research a stock", "stock analysis explained", "financial ratios explained", "stock screener", "DeepScreen FAQ"],
     ANSWERS,
   ),
   component: Answers,
