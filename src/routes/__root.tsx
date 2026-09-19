@@ -116,6 +116,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
       { rel: "shortcut icon", href: "/favicon.ico", type: "image/x-icon" },
       { rel: "apple-touch-icon", href: "/favicon.ico" },
+      { rel: "describedby", href: "https://deepscreen.online/llms.txt" },
+      { rel: "help", href: "https://deepscreen.online/answers" },
     ],
   }),
   shellComponent: RootShell,
