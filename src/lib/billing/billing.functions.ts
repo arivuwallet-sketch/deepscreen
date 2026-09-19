@@ -5,16 +5,20 @@ import { getRequest } from "@tanstack/react-start/server";
 import type { Database } from "@/integrations/supabase/types";
 import { PLANS, type Tier } from "@/hooks/useSubscription";
 import { getPhoneCountry, validatePhoneNumber } from "@/lib/billing/phone";
-import { consumeRateLimit, isValidOrderId, PUBLIC_APP_ORIGIN } from "@/lib/security";
+import { consumeRateLimit, isValidOrderId, PUBLIC_APP_ORIGIN, requestClientKey } from "@/lib/security";
 
 type Fail = { ok: false; error: string };
 
-async function verifyUser(accessToken: string) {
+async function verifyRequestUser(request: Request) {
+  const auth = request.headers.get("authorization");
+  if (!auth?.startsWith("Bearer ") || auth.length > 8_000) return null;
+  const token = auth.slice(7).trim();
+  if (!token || token.split(".").length !== 3) return null;
   const url = process.env["SUPABASE_URL"];
   const anonKey = process.env["SUPABASE_PUBLISHABLE_KEY"];
   if (!url || !anonKey) return null;
   const verifier = createClient<Database>(url, anonKey);
-  const { data, error } = await verifier.auth.getUser(accessToken);
+  const { data, error } = await verifier.auth.getUser(token);
   if (error || !data.user) return null;
   return data.user;
 }
@@ -25,7 +29,7 @@ async function verifyUser(accessToken: string) {
  * only granted once Cashfree confirms the payment (webhook or confirmCheckout).
  */
 export const createCheckout = createServerFn({ method: "POST" })
-  .inputValidator((d: { tier: Tier; accessToken: string; countryIso2: string; phone: string }) => d)
+  .inputValidator((d: { tier: Tier; countryIso2: string; phone: string }) => d)
   .handler(
     async ({
       data,
@@ -34,11 +38,7 @@ export const createCheckout = createServerFn({ method: "POST" })
       if (!plan) return { ok: false, error: "Unknown plan." };
 
       const request = getRequest();
-      const userRate = consumeRateLimit(
-        "checkout:ip:" + request.headers.get("cf-connecting-ip")?.trim().slice(0, 128),
-        8,
-        10 * 60_000,
-      );
+      const userRate = consumeRateLimit("checkout:ip:" + requestClientKey(request), 20, 10 * 60_000);
       if (!userRate.allowed) return { ok: false, error: "Too many checkout attempts. Please try again later." };
       const country = getPhoneCountry(data.countryIso2);
       if (!country) {
@@ -49,7 +49,7 @@ export const createCheckout = createServerFn({ method: "POST" })
         return { ok: false, error: phoneValidation.error };
       }
 
-      const user = await verifyUser(data.accessToken);
+      const user = await verifyRequestUser(request);
       if (!user) return { ok: false, error: "Not signed in — please sign in again." };
 
       const { getCashfreeConfig, createOrder } = await import("./cashfree.server");
@@ -61,6 +61,7 @@ export const createCheckout = createServerFn({ method: "POST" })
         };
       }
 
+      if (!user.email) return { ok: false, error: "Your account has no verified email address." };
       const orderId = `ds_${data.tier}_${user.id.slice(0, 8)}_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
       if (!isValidOrderId(orderId)) return { ok: false, error: "Could not create a secure order." };
 
@@ -86,7 +87,7 @@ export const createCheckout = createServerFn({ method: "POST" })
           currency: "INR",
           note: `DeepScreen Pro — ${plan.name}`,
           customerId: user.id,
-          email: user.email ?? "",
+          email: user.email,
           phone: phoneValidation.e164,
           returnUrl: `${PUBLIC_APP_ORIGIN}/pricing?cf_order_id=${orderId}`,
           notifyUrl: `${PUBLIC_APP_ORIGIN}/api/public/cashfree-webhook`,
@@ -109,7 +110,7 @@ export const createCheckout = createServerFn({ method: "POST" })
 
 /** Called when the user returns from Cashfree: re-checks the order server-side. */
 export const confirmCheckout = createServerFn({ method: "POST" })
-  .inputValidator((d: { orderId: string; accessToken: string }) => d)
+  .inputValidator((d: { orderId: string }) => d)
   .handler(async ({ data }): Promise<{ ok: true; paid: boolean; status: string } | Fail> => {
     if (!isValidOrderId(data.orderId)) return { ok: false, error: "Invalid order." };
     const request = getRequest();
@@ -120,7 +121,7 @@ export const confirmCheckout = createServerFn({ method: "POST" })
     );
     if (!rate.allowed) return { ok: false, error: "Too many verification attempts. Please try again later." };
 
-    const user = await verifyUser(data.accessToken);
+    const user = await verifyRequestUser(request);
     if (!user) return { ok: false, error: "Not signed in — please sign in again." };
 
     const { getAdmin, activatePaymentOrder } = await import("./activate.server");
