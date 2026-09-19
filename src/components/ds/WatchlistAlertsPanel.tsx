@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { LiveFundamentals } from "@/lib/market/yahoo.server";
 import type { Stock } from "@/lib/deepscreen/types";
 import type { Analysis } from "@/lib/deepscreen/metrics";
+import type { FundamentalSources } from "@/lib/deepscreen/live-merge";
 import { buildWatchlistAlerts, readAlertHistory } from "@/lib/deepscreen/watchlist-alerts";
 import { Button } from "@/components/ui/button";
 import { Bell, BellOff } from "lucide-react";
@@ -11,6 +12,7 @@ type Row = {
   stock: Stock;
   analysis: Analysis;
   fundamentals?: LiveFundamentals | null;
+  sources?: FundamentalSources;
 };
 
 export function WatchlistAlertsPanel({ rows }: { rows: Row[] }) {
