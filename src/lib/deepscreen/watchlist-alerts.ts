@@ -107,15 +107,16 @@ export function buildWatchlistAlerts(
     stock: Stock;
     analysis: Analysis;
     fundamentals?: LiveFundamentals | null;
+    sources?: FundamentalSources;
   }>,
   now = Date.now(),
 ): WatchlistAlert[] {
   const alerts: WatchlistAlert[] = [];
 
   for (const row of rows) {
-    const { stock, analysis, fundamentals } = row;
+    const { stock, analysis, fundamentals, sources } = row;
     const history = readAlertHistory(stock.exchange, stock.symbol);
-    const current = snapshotFrom(stock, analysis, fundamentals, now);
+    const current = snapshotFrom(stock, analysis, fundamentals, sources, now);
     const previous = history.filter((item) => item.quarter !== current.quarter).at(-1);
 
     // Store one baseline per quarter. Alerts are generated only when a new
