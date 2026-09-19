@@ -13,6 +13,7 @@ import { StockTable } from "@/components/ds/StockTable";
 import { EXCHANGES } from "@/lib/deepscreen/exchanges";
 import { STOCKS } from "@/lib/deepscreen/stocks";
 import { NewsletterForm } from "@/components/ds/NewsletterForm";
+import { MarketMovers } from "@/components/ds/MarketMovers";
 
 export const Route = createFileRoute("/")({
   staticData: { sitemap: true },
@@ -133,6 +134,12 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const top = [...STOCKS].sort((a, b) => a.name.localeCompare(b.name)).slice(0, 10);
+  const liveMoverUniverse = EXCHANGES.flatMap((exchange) =>
+    STOCKS
+      .filter((stock) => stock.exchange === exchange.code)
+      .sort((a, b) => b.marketCap - a.marketCap)
+      .slice(0, 20),
+  );
 
   return (
     <Shell>
@@ -199,6 +206,8 @@ function Home() {
           <EconomicCalendar />
           <LiveNewsFeed query="stock market" title="Market-moving news" limit={12} />
         </div>
+
+        <MarketMovers stocks={liveMoverUniverse} title="Live global market movers" />
 
         <section>
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide">
