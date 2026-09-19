@@ -49,12 +49,12 @@ export function consumeRateLimit(
 export function requestClientKey(request: Request): string {
   // Prefer infrastructure-populated headers. Never treat this value as an
   // authentication credential; it is only an abuse/rate-limit partition key.
-  return (
+  const raw =
     request.headers.get("cf-connecting-ip")?.trim() ||
     request.headers.get("x-real-ip")?.trim() ||
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    "unknown"
-  );
+    "unknown";
+  return raw.replace(/[^\x21-\x7e]/g, "").slice(0, 128) || "unknown";
 }
 
 export function isValidOrderId(orderId: string): boolean {
