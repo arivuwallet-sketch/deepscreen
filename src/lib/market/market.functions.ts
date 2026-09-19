@@ -55,7 +55,7 @@ export const getLiveQuotes = createServerFn({ method: "POST" })
     const rate = consumeRateLimit("quotes-batch:ip:" + requestClientKey(request), 30, 60_000);
     if (!rate.allowed) return {};
     const { fetchChartQuote, yahooSymbol } = await import("./yahoo.server");
-    const keys = data.keys
+    const keys = data.keys.slice(0, 100)
       .map((key) => safeMarketKey(key.exchange, key.symbol))
       .filter((key): key is { exchange: string; symbol: string } => Boolean(key))
       .slice(0, 100);
@@ -721,7 +721,7 @@ export const getScreenerRatiosBatch = createServerFn({ method: "POST" })
         const name = k.name ? normalizeCompanyName(k.name) : null;
         return safe && (!k.name || name) ? { ...safe, name: name ?? undefined } : null;
       })
-      .filter((k): k is { exchange: string; symbol: string; name?: string } => Boolean(k) && isIndian(k.exchange))
+      .filter((k): k is { exchange: string; symbol: string; name?: string } => k !== null && isIndian(k.exchange))
       .slice(0, 100);
     const out: Record<string, Ratios | null> = {};
     if (indian.length === 0) return out;
