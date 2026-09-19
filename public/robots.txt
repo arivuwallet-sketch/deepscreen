@@ -1,5 +1,4 @@
-# Shared rules for search and AI crawlers. Account pages can be crawled
-# so their noindex directive is visible. Private data still requires auth.
+# Shared rules for search and AI crawlers.
 User-agent: *
 Allow: /
 Disallow: /api/
