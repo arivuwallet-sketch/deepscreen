@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { Analysis } from "@/lib/deepscreen/metrics";
+import { ANALYSIS_WEIGHTS, type Analysis } from "@/lib/deepscreen/metrics";
 import type { LiveFundamentals } from "@/lib/market/yahoo.server";
 
 interface Snapshot {
@@ -30,7 +30,7 @@ interface Category {
 
 const CATEGORIES: Category[] = [
   { id: "growth", label: "Growth", weightKeys: ["peg", "oplev"] },
-  { id: "profitability", label: "Profitability", weightKeys: ["roe", "roa", "roce"] },
+  { id: "profitability", label: "Profitability", weightKeys: ["roe", "roa", "roce", "payout"] },
   { id: "balance", label: "Balance Sheet", weightKeys: ["de", "ltde"] },
   {
     id: "valuation",
@@ -93,19 +93,7 @@ function categoryDelta(
     const currentScore = current.metrics[key];
     const previousScore = previous.metrics[key];
     if (!Number.isFinite(currentScore) || !Number.isFinite(previousScore)) return sum;
-    const weight = key === "peg" ? 1.6
-      : key === "oplev" ? 0.6
-      : key === "roe" ? 1.3
-      : key === "roa" ? 0.9
-      : key === "roce" ? 1.6
-      : key === "de" ? 1.1
-      : key === "ltde" ? 0.8
-      : key === "pe" ? 1
-      : key === "ps" ? 0.7
-      : key === "pb" ? 0.7
-      : key === "evRevenue" ? 0.8
-      : key === "evEbitda" ? 1.2
-      : 1;
+    const weight = ANALYSIS_WEIGHTS[key] ?? 1;
     return sum + ((currentScore - previousScore) * weight) / totalWeight;
   }, 0);
 }
@@ -227,7 +215,7 @@ export function ScoreChangePanel({
     );
   }
 
-  const totalWeight = 13.7;
+  const totalWeight = Object.values(ANALYSIS_WEIGHTS).reduce((sum, weight) => sum + weight, 0);
   const scoreDelta = current.score - previous.score;
   const rawDeltas = CATEGORIES.map((category) => ({
     ...category,
