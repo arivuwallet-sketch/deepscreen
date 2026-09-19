@@ -1,9 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 
 import type { LiveFundamentals, LiveQuote } from "./yahoo.server";
 import type { FeedItem } from "@/lib/rss.server";
 import { getExchange } from "@/lib/deepscreen/exchanges";
-import { normalizeCompanyName, normalizeSymbol } from "@/lib/security";
+import { consumeRateLimit, normalizeCompanyName, normalizeSymbol, requestClientKey } from "@/lib/security";
 
 export interface LiveEvent {
   id: string;
@@ -38,6 +39,9 @@ const safeMarketKey = (exchange: string, symbol: string): { exchange: string; sy
 export const getLiveQuote = createServerFn({ method: "GET" })
   .inputValidator((d: { exchange: string; symbol: string }) => d)
   .handler(async ({ data }): Promise<LiveQuote | null> => {
+    const request = getRequest();
+    const rate = consumeRateLimit("quote:ip:" + requestClientKey(request), 120, 60_000);
+    if (!rate.allowed) return null;
     const key = safeMarketKey(data.exchange, data.symbol);
     if (!key) return null;
     const { fetchChartQuote, yahooSymbol } = await import("./yahoo.server");
@@ -47,6 +51,9 @@ export const getLiveQuote = createServerFn({ method: "GET" })
 export const getLiveQuotes = createServerFn({ method: "POST" })
   .inputValidator((d: { keys: { exchange: string; symbol: string }[] }) => d)
   .handler(async ({ data }): Promise<Record<string, LiveQuote>> => {
+    const request = getRequest();
+    const rate = consumeRateLimit("quotes-batch:ip:" + requestClientKey(request), 30, 60_000);
+    if (!rate.allowed) return {};
     const { fetchChartQuote, yahooSymbol } = await import("./yahoo.server");
     const keys = data.keys
       .map((key) => safeMarketKey(key.exchange, key.symbol))
@@ -70,6 +77,9 @@ export const getLiveQuotes = createServerFn({ method: "POST" })
 export const getLiveFundamentals = createServerFn({ method: "GET" })
   .inputValidator((d: { exchange: string; symbol: string }) => d)
   .handler(async ({ data }): Promise<LiveFundamentals | null> => {
+    const request = getRequest();
+    const rate = consumeRateLimit("fundamentals:ip:" + requestClientKey(request), 60, 60_000);
+    if (!rate.allowed) return null;
     const key = safeMarketKey(data.exchange, data.symbol);
     if (!key) return null;
     const { fetchFundamentals, yahooSymbol } = await import("./yahoo.server");
@@ -85,6 +95,9 @@ export const getLiveFundamentals = createServerFn({ method: "GET" })
 export const getLiveFundamentalsBatch = createServerFn({ method: "POST" })
   .inputValidator((d: { keys: { exchange: string; symbol: string }[] }) => d)
   .handler(async ({ data }): Promise<Record<string, LiveFundamentals>> => {
+    const request = getRequest();
+    const rate = consumeRateLimit("fundamentals-batch:ip:" + requestClientKey(request), 20, 60_000);
+    if (!rate.allowed) return {};
     const { fetchFundamentals, yahooSymbol } = await import("./yahoo.server");
     const keys = data.keys
       .map((key) => safeMarketKey(key.exchange, key.symbol))
@@ -501,6 +514,9 @@ function newsKey(query: string): string {
 export const getNewsFeed = createServerFn({ method: "GET" })
   .inputValidator((d: { query: string; limit?: number }) => d)
   .handler(async ({ data }): Promise<LiveNewsResult> => {
+    const request = getRequest();
+    const rate = consumeRateLimit("news:ip:" + requestClientKey(request), 20, 60_000);
+    if (!rate.allowed) return { items: [], fetchedAt: Date.now(), stale: true, providerCount: 0 };
     const { dedupe, refreshAges } = await import("@/lib/rss.server");
     const limit = Math.min(Math.max(data.limit ?? 14, 1), 30);
     const key = newsKey(data.query);
