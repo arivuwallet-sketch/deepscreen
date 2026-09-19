@@ -9,7 +9,7 @@ import { TopicIndex } from "@/components/ds/TopicIndex";
 import { ipoKeywords, metaKeywords, screenerKeywords } from "@/lib/seo/keywords";
 import { EXCHANGES } from "@/lib/deepscreen/exchanges";
 import { formatPrice } from "@/lib/deepscreen/format";
-import { IPOS, daysAway, ipoStatus, type IpoStatus } from "@/lib/deepscreen/ipos";
+import { daysAway, type IpoStatus } from "@/lib/deepscreen/ipos";
 import { findStock } from "@/lib/deepscreen/stocks";
 import { getLiveIpos } from "@/lib/market/market.functions";
 import type { LiveIpo } from "@/lib/market/ipo.server";
@@ -71,23 +71,6 @@ const STATUS_STYLE: Record<IpoStatus, string> = {
   listed: "bg-accent text-foreground",
 };
 
-/** LSE has no public new-issues feed, so those stay curated. */
-const CURATED_LSE: LiveIpo[] = IPOS.filter((i) => i.exchange === "LSE").map((i) => ({
-  symbol: i.symbol,
-  name: i.name,
-  exchange: i.exchange,
-  segment: "mainboard",
-  bandLow: i.bandLow,
-  bandHigh: i.bandHigh,
-  sharesOffered: null,
-  issueSize: i.issueSize,
-  openDate: i.openDate,
-  closeDate: i.closeDate,
-  listingDate: i.listingDate,
-  status: ipoStatus(i),
-  note: `${i.note} Registrar: ${i.registrar}.`,
-}));
-
 const SEGMENTS = [
   { key: "ALL", label: "All segments" },
   { key: "mainboard", label: "Mainboard" },
@@ -122,12 +105,12 @@ function timing(ipo: LiveIpo): string {
 function IpoPage() {
   const { initialIpos } = Route.useLoaderData();
   const fetchIpos = useServerFn(getLiveIpos);
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, dataUpdatedAt } = useQuery({
     queryKey: ["live-ipos"],
     queryFn: () => fetchIpos(),
     ...(initialIpos.length > 0 ? { initialData: initialIpos } : {}),
-    refetchInterval: 10 * 60_000,
-    staleTime: 5 * 60_000,
+    refetchInterval: 5 * 60_000,
+    staleTime: 2 * 60_000,
   });
 
   const [exchange, setExchange] = useState<string>("ALL");
@@ -137,7 +120,7 @@ function IpoPage() {
 
   const all = useMemo<LiveIpo[]>(() => {
     const live = (data as LiveIpo[] | undefined) ?? [];
-    return [...live, ...CURATED_LSE].sort((a, b) =>
+    return [...live].sort((a, b) =>
       (b.openDate ?? "").localeCompare(a.openDate ?? ""),
     );
   }, [data]);
@@ -164,9 +147,9 @@ function IpoPage() {
       <div className="mx-auto max-w-6xl px-4 py-8">
         <h1 className="text-2xl font-bold tracking-tight md:text-3xl">IPO Calendar</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Every live primary-market issue: NSE and BSE mainboard plus SME, and the complete US
-          calendar (upcoming, priced and filed) for NYSE and NASDAQ. Listed issues are matched
-          against the screener universe so you can jump straight to the analysis page.
+          Live IPO and new-issue data across all five DeepScreen exchanges: NSE, BSE, NYSE,
+          NASDAQ and LSE. India uses exchange issue feeds, the US uses the Nasdaq IPO calendar,
+          and London uses the LSE New Issues feed. The page refreshes automatically every 5 minutes.
         </p>
 
         <div className="num mt-3 flex flex-wrap gap-4 text-xs text-muted-foreground">
@@ -175,6 +158,16 @@ function IpoPage() {
           <span className="text-primary">{counts["upcoming"]} upcoming</span>
           <span>{counts["closed"]} closed</span>
           <span>{counts["listed"]} listed</span>
+        </div>
+        <div className="num mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
+          {(["NSE", "BSE", "NYSE", "NASDAQ", "LSE"] as const).map((code) => (
+            <span key={code}>
+              {code}: {all.filter((i) => i.exchange === code).length}
+            </span>
+          ))}
+          <span>
+            Feed refresh: {dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleString() : "pending"}
+          </span>
         </div>
 
         <input
@@ -253,6 +246,9 @@ function IpoPage() {
                         <span className="text-sm font-semibold">{ipo.symbol}</span>
                         <span className="num rounded bg-accent px-1.5 py-0.5 text-[10px] text-muted-foreground">
                           {ipo.exchange}
+                        </span>
+                        <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                          {ipo.source}
                         </span>
                         {ipo.segment === "sme" ? (
                           <span className="rounded bg-accent px-1.5 py-0.5 text-[10px] uppercase text-muted-foreground">
