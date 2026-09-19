@@ -19,7 +19,7 @@ export const Route = createFileRoute("/research-checklist")({
     "/research-checklist",
     "Fundamental Research Checklist | DeepScreen",
     "An eight-step checklist for documenting sources, cash flow, debt, valuation and assumptions during company research.",
-    ["stock research checklist", "fundamental analysis checklist", "company research workflow"],
+    ["stock research checklist", "fundamental analysis checklist", "fundamental stock analysis checklist", "company research checklist", "company analysis checklist", "financial statement checklist", "stock valuation checklist", "investment research process", "company research workflow", "how to research a stock"],
   ),
   component: Checklist,
 });
