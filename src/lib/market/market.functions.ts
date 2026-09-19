@@ -516,6 +516,56 @@ function newsQueryVariants(query: string): string[] {
   return [...new Set(variants)].slice(0, 4);
 }
 
+
+const YAHOO_NEWS_CACHE_TTL_MS = 2 * 60_000;
+const yahooNewsMemoryCache = new Map<string, { data: LiveNewsResult; fetchedAt: number }>();
+const yahooNewsInFlight = new Map<string, Promise<LiveNewsResult>>();
+
+export const getYahooNewsFeed = createServerFn({ method: "GET" })
+  .inputValidator((d: { query: string; limit?: number }) => d)
+  .handler(async ({ data }): Promise<LiveNewsResult> => {
+    const { fetchYahooNews, refreshAges } = await import("@/lib/rss.server");
+    const limit = Math.min(Math.max(data.limit ?? 12, 1), 20);
+    const key = newsKey(data.query);
+    if (!key) return { items: [], fetchedAt: Date.now(), stale: false, providerCount: 0 };
+
+    const memory = yahooNewsMemoryCache.get(key);
+    if (memory && Date.now() - memory.fetchedAt < YAHOO_NEWS_CACHE_TTL_MS) {
+      return { ...memory.data, items: refreshAges(memory.data.items).slice(0, limit) };
+    }
+
+    const existing = yahooNewsInFlight.get(key);
+    if (existing) return existing;
+
+    const requestPromise = (async (): Promise<LiveNewsResult> => {
+      try {
+        const items = filterRecentNews(await fetchYahooNews(data.query, limit))
+          .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
+          .slice(0, limit);
+        const fetchedAt = Date.now();
+        const result = {
+          items: refreshAges(items),
+          fetchedAt,
+          stale: false,
+          providerCount: items.length > 0 ? 1 : 0,
+        };
+        yahooNewsMemoryCache.set(key, { data: result, fetchedAt });
+        return result;
+      } catch (error) {
+        console.warn("[news] Yahoo Finance feed failed", error);
+        return {
+          items: [],
+          fetchedAt: Date.now(),
+          stale: true,
+          providerCount: 0,
+        };
+      }
+    })().finally(() => yahooNewsInFlight.delete(key));
+
+    yahooNewsInFlight.set(key, requestPromise);
+    return requestPromise;
+  });
+
 export const getNewsFeed = createServerFn({ method: "GET" })
   .inputValidator((d: { query: string; limit?: number }) => d)
   .handler(async ({ data }): Promise<LiveNewsResult> => {
