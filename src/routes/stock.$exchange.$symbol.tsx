@@ -7,7 +7,7 @@ import { learnKeywords, metaKeywords, stocksKeywords } from "@/lib/seo/keywords"
 import { LiveNewsFeed } from "@/components/ds/LiveNewsFeed";
 import { DcfCalculator } from "@/components/ds/DcfCalculator";
 import { GrahamCalculator } from "@/components/ds/GrahamCalculator";
-import { PaywallGate } from "@/components/ds/PaywallGate";
+import { PaywallGate, ProInsight } from "@/components/ds/PaywallGate";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useLiveFundamentals, useLiveQuote, useScreenerRatios } from "@/hooks/useLiveQuotes";
 import { HoldingPlanCard } from "@/components/ds/HoldingPlanCard";
@@ -416,7 +416,7 @@ function StockPage() {
                       />
                     </div>
                     <p className="mt-2 text-[11px] leading-snug text-muted-foreground">
-                      {isPro ? m.tooltip : "Contextual insight — DeepScreen Pro"}
+                      <ProInsight>{m.tooltip}</ProInsight>
                     </p>
                   </div>
                 );
