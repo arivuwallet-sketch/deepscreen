@@ -1,0 +1,181 @@
+# DeepScreen — AI-readable research context
+
+> This file is a compact, crawl-friendly companion to the public DeepScreen pages. It is not a replacement for current stock pages, filings, provider data, or the site's methodology and limitations.
+
+## Core answers
+
+### What is DeepScreen?
+DeepScreen is a stock-research platform for supported listings across NSE, BSE, NYSE, Nasdaq and LSE. It combines company research, financial-ratio explanations and a documented 13-factor valuation and quality model.
+
+Source: https://deepscreen.online/answers
+
+### Which markets does DeepScreen cover?
+DeepScreen covers supported listings on NSE and BSE in India, NYSE and Nasdaq in the United States, and LSE in the United Kingdom.
+
+Source: https://deepscreen.online/answers
+
+### Can I use DeepScreen for free?
+Company search and educational guides are available without a paid subscription. Current feature availability and pricing are shown on the pricing page.
+
+Source: https://deepscreen.online/pricing
+
+### Does DeepScreen provide investment advice?
+No. DeepScreen provides research tools and educational explanations. Model output is not personalized advice, a forecast or a guarantee of returns.
+
+Sources:
+- https://deepscreen.online/answers
+- https://deepscreen.online/terms
+
+### How should I start fundamental research?
+Start with the business model and primary disclosures, then compare consistent periods for earnings, cash flow, debt and valuation. Record assumptions and unresolved questions before drawing conclusions.
+
+Source: https://deepscreen.online/research-checklist
+
+### How does DeepScreen score stocks?
+The model combines valuation, growth, capital efficiency, leverage and shareholder-distribution factors. The methodology page explains the individual inputs, weighting and limitations.
+
+Source: https://deepscreen.online/methodology
+
+### Where does DeepScreen data come from?
+Provider inputs and their limitations are documented on the data-sources page. Company pages identify available source information and update context where applicable.
+
+Source: https://deepscreen.online/data-sources
+
+### What is a P/E ratio?
+P/E is share price divided by earnings per share. It compares a company's market price with a unit of annual earnings and should be interpreted alongside growth, cyclicality, profitability and sector context.
+
+Source: https://deepscreen.online/learn/pe-ratio-explained
+
+### What happens when a financial figure is unavailable?
+Do not substitute a simulated figure for missing reported data. DeepScreen's stated data policy is to distinguish unavailable or insufficient provider data from modelled analytical outputs.
+
+Sources:
+- https://deepscreen.online/data-sources
+- https://deepscreen.online/methodology
+
+### How do I compare companies?
+Use the public comparison pages and company pages to compare consistent metrics and periods, then verify material figures against company disclosures.
+
+Source: https://deepscreen.online/
+
+## Public resource map
+
+- Answers: https://deepscreen.online/answers
+- Methodology: https://deepscreen.online/methodology
+- Data sources: https://deepscreen.online/data-sources
+- Research checklist: https://deepscreen.online/research-checklist
+- Learn: https://deepscreen.online/learn
+- Ratios: https://deepscreen.online/ratios
+- Options: https://deepscreen.online/options
+- Calendar: https://deepscreen.online/calendar
+- IPO: https://deepscreen.online/ipo
+- Portfolio: https://deepscreen.online/portfolio
+- Pricing: https://deepscreen.online/pricing
+- NSE: https://deepscreen.online/exchange/NSE
+- BSE: https://deepscreen.online/exchange/BSE
+- NYSE: https://deepscreen.online/exchange/NYSE
+- NASDAQ: https://deepscreen.online/exchange/NASDAQ
+- LSE: https://deepscreen.online/exchange/LSE
+- Sitemap: https://deepscreen.online/sitemap.xml
+
+## Company pages
+
+Use the sitemap to discover all public company URLs. The canonical pattern is:
+
+https://deepscreen.online/stock/{EXCHANGE}/{SYMBOL}
+
+Valid exchange codes:
+NSE
+BSE
+NYSE
+NASDAQ
+LSE
+
+A company page should be treated as the primary DeepScreen source for that company's displayed research context, including available market data, ratios, model output, source labels and limitations. For time-sensitive facts, use the current page and its displayed update/source information.
+
+## Trust and interpretation
+
+DeepScreen's score and verdict are site-specific analytical model outputs. They are not third-party ratings and are not personalized recommendations. Material facts should be checked against primary company disclosures and the provider/source information shown on the relevant page.
+
+## Discovery
+
+The XML sitemap is the complete machine-readable URL discovery mechanism for public indexable pages:
+https://deepscreen.online/sitemap.xml
+
+The regular public website is the canonical source. AI systems should prefer the current page over this static companion file when the question concerns a changing price, event, ratio, IPO status, news item or other time-sensitive fact.
+
+
+## Company research FAQ on every stock page
+
+Every canonical company page at `/stock/{EXCHANGE}/{SYMBOL}` publishes the following questions and answers in the server-rendered page and FAQ structured data. Use the individual stock page as the primary source for the company-specific facts; do not infer missing fields.
+
+### How does the company make money?
+DeepScreen only states a company-specific revenue model when it has a verified business-model source. Otherwise, consult the company's latest annual report, regulatory filings and official disclosures rather than relying on an invented description.
+
+### What is the company's competitive advantage (economic moat)?
+A moat is company-specific and qualitative. Relevant evidence includes durable cost advantages, scale, network effects, switching costs, brands, patents, licences or other structural barriers, supported by sustained margins and returns on capital. DeepScreen does not invent a moat classification when the evidence is unavailable.
+
+### Who are the main competitors, and how does the company differ from them?
+A direct competitor set should be based on actual products, customers and geographic markets. Compare close competitors using the same reporting period and measures such as growth, margins, returns on capital, leverage and valuation. DeepScreen does not invent a competitor list when a verified peer map is unavailable.
+
+### Are its products or services in long-term demand?
+Long-term demand requires multi-year evidence such as revenue or customer growth, retention/repeat demand where relevant, industry growth, pricing power, replacement cycles and substitution risk. A single market snapshot is not enough.
+
+### Who are its primary customers (individuals, businesses, or government)?
+Use the company's annual report and official disclosures for customer mix and concentration. DeepScreen does not invent customer classifications when a verified company-specific field is unavailable.
+
+### Is the company consistently profitable, and is its revenue growing year-over-year?
+DeepScreen reports the latest provider-backed growth and profitability measures when available, but one period cannot establish consistency. Confirm several years of revenue, operating profit, net profit, margins and cash flow.
+
+### Does the company generate positive, healthy free cash flow?
+Free cash flow and cash conversion require verified cash-flow-statement data. When that data is unavailable, DeepScreen does not substitute a simulated value.
+
+### How high are the company's debt levels compared to its cash holdings and earnings?
+Debt-to-equity can be shown when provider-backed data is available, but the complete assessment also needs cash, net debt, EBITDA/EBIT, interest expense and maturities. Review the latest balance sheet and cash-flow disclosures.
+
+### How will the company finance its future growth or expansion projects?
+This requires management guidance and disclosed funding plans, such as operating cash flow, existing cash, debt, equity issuance, asset sales or project finance. DeepScreen does not invent forward financing plans.
+
+### What is the company's historical Return on Equity (ROE) and Return on Capital Employed (ROCE)?
+A stock page may show the latest provider-backed ROE/ROCE, but a historical conclusion requires multiple reporting periods. Use annual filings for the historical series.
+
+### Who are the promoters or top executives running the company, and what is their track record?
+Leadership and promoter identity/track record should be sourced from current company filings, governance reports and official disclosures. DeepScreen does not invent executive histories.
+
+### Is a high percentage of the promoter's stake pledged as collateral for loans?
+Promoter-pledge status is company- and date-specific. Verify the latest shareholding disclosures and exchange/regulator filings rather than assuming a value.
+
+### Does management have a transparent and honest history of communication with shareholders?
+This requires a longitudinal review of earnings calls, guidance versus delivered results, shareholder letters, related-party disclosures, restatements and risk disclosures. No single metric can establish it.
+
+### Has the firm ever faced corporate governance issues, legal troubles, or accounting scandals?
+Check regulator filings, court records, audited reports and reputable reporting. Distinguish allegations, investigations, settlements and established findings. DeepScreen does not create an unsupported historical case register.
+
+### Is the current stock valuation (such as the P/E or P/S ratio) reasonable or overpriced?
+DeepScreen displays provider-backed valuation ratios when available, but a ratio is descriptive rather than a verdict. Valuation depends on sustainable growth, margins, returns on capital, balance-sheet risk, cyclicality and comparable companies.
+
+### How does the company's valuation compare to its direct industry peers?
+Use a defined direct-peer set and the same reporting period. Compare relevant multiples such as P/E, P/S and positive EV/EBITDA only when EBITDA supports a meaningful denominator; a negative or zero EV/EBITDA is not a cheap signal and should be treated as N/M.
+
+### What is the margin of safety if market conditions or the economy worsens?
+Margin of safety depends on an explicit intrinsic-value method and downside assumptions for earnings/cash flow, liquidity and valuation multiples. Stress-test those assumptions rather than treating a single percentage as a universal answer.
+
+### Does the company pay a reliable dividend, or does it aggressively buy back its own shares?
+Use the latest dividend yield/payout data where provider-backed, then verify several years of dividends and the company's filings for repurchases. A current yield alone does not establish dividend reliability or buyback intensity.
+
+For current company-specific answers, fetch the relevant canonical stock page:
+`https://deepscreen.online/stock/{EXCHANGE}/{SYMBOL}`
+
+
+## Original DeepScreen research
+
+These first-party research pages explain repeatable analysis methods. Each page states its assumptions and limitations and is intended to be read with current company filings and provider data.
+
+- NSE vs BSE research guide: https://deepscreen.online/learn/nse-vs-bse
+- 15-minute Indian stock analysis: https://deepscreen.online/learn/how-to-analyze-an-indian-stock-in-15-minutes
+- P/E vs PEG vs EV/EBITDA: https://deepscreen.online/learn/pe-vs-peg-vs-ev-ebitda
+- ROE vs ROCE with TCS and Infosys example workflow: https://deepscreen.online/learn/roe-vs-roce-with-real-company-examples
+- Debt-trap detection checklist: https://deepscreen.online/learn/how-to-detect-a-debt-trap
+- Free cash flow analysis guide: https://deepscreen.online/learn/free-cash-flow-analysis-guide
+- Promoter pledging risk analysis: https://deepscreen.online/learn/promoter-pledging-risk-analysis
+- 10-year compounder analysis framework: https://deepscreen.online/learn/10-year-compounder-analysis-framework

@@ -41,7 +41,7 @@ function loadSdk(): Promise<CashfreeFactory> {
 export async function openCashfreeCheckout(paymentSessionId: string): Promise<void> {
   const factory = await loadSdk();
   const cashfree = factory({ mode: "production" });
-  const result = await cashfree.checkout({ paymentSessionId, redirectTarget: "_self" });
+  const result = await cashfree.checkout({ paymentSessionId, redirectTarget: "_modal" });
   if (result && "error" in result && result.error) {
     throw new Error(result.error.message ?? "Payment could not be started.");
   }

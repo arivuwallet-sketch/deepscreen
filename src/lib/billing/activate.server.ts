@@ -1,42 +1,36 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { Database } from "@/integrations/supabase/types";
-import { PLANS, type Tier } from "@/hooks/useSubscription";
 
 export async function getAdmin(): Promise<SupabaseClient<Database>> {
   const { createAdminClient } = await import("@/integrations/supabase/admin.server");
   return createAdminClient();
 }
 
-/** Grants (or extends) a paid plan. Only ever called after a verified payment. */
-export async function grantSubscription(
+/**
+ * Atomically activates a locally recorded payment order. The database
+ * function locks the order row and subscription row so repeated Cashfree
+ * webhook deliveries or browser confirmations cannot extend the same payment
+ * more than once.
+ */
+export async function activatePaymentOrder(
   admin: SupabaseClient<Database>,
-  userId: string,
-  tier: Tier,
+  orderId: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
-  const plan = PLANS.find((p) => p.tier === tier);
-  if (!plan) return { ok: false, error: "Unknown plan." };
+  if (!/^ds_(weekly|monthly|annual)_[a-f0-9]{8}_\d{13}(?:_[a-f0-9]{8})?$/.test(orderId)) {
+    return { ok: false, error: "Invalid order." };
+  }
 
-  const { data: existing } = await admin
-    .from("subscriptions")
-    .select("expires_at, status")
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  const now = new Date();
-  const base =
-    existing && existing.status === "active" && new Date(existing.expires_at) > now
-      ? new Date(existing.expires_at)
-      : now;
-  const expiresAt = new Date(base.getTime() + plan.days * 86_400_000);
-
-  const { error } = await admin.from("subscriptions").upsert({
-    user_id: userId,
-    tier: plan.tier,
-    status: "active",
-    started_at: now.toISOString(),
-    expires_at: expiresAt.toISOString(),
+  const { data, error } = await admin.rpc("activate_payment_order", {
+    p_link_id: orderId,
   });
-  if (error) return { ok: false, error: error.message };
+
+  if (error) {
+    console.error("[payment] atomic activation failed", error);
+    return { ok: false, error: "Could not activate the payment." };
+  }
+  if (data !== true) {
+    return { ok: false, error: "Payment order is not eligible for activation." };
+  }
   return { ok: true };
 }
