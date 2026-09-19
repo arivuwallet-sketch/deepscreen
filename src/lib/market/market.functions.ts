@@ -257,7 +257,8 @@ async function fetchTradingViewCalendar(): Promise<LiveEvent[] | null> {
 
     return rows.map((e) => {
       const d = new Date(e.date);
-      const currency = e.currency || CURRENCY_BY_COUNTRY[e.country] || e.country;      return {
+      const currency = e.currency || CURRENCY_BY_COUNTRY[e.country] || e.country;
+      return {
         id: `tv-${e.id}`,
         title: e.period ? `${e.title} (${e.period})` : e.title,
         currency,
