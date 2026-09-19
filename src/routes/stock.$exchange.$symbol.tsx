@@ -1,4 +1,4 @@
-import { jsonLd } from "@/lib/seo/json-ld";
+import { buildArticleSchema, buildBreadcrumbSchema, buildCorporationSchema, buildFAQSchema, buildGraph, jsonLd } from "@/lib/seo/json-ld";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 
 import { Shell } from "@/components/ds/Shell";
@@ -60,7 +60,10 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
-      return {
+      const schemaAnalysis = Object.values(sources).some((value) => value === "live")
+      ? analyze(s)
+      : undefined;
+    return {
         meta: [{ title: "Stock not found | DeepScreen" }, { name: "robots", content: "noindex" }],
       };
     }
@@ -101,49 +104,42 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
         { property: "og:url", content: url },
         { property: "og:type", content: "article" },
         { name: "twitter:card", content: "summary_large_image" },
-        { name: "twitter:title", content: title },
-        { name: "twitter:description", content: description },
-      ],
-      links: [{ rel: "canonical", href: url }],
-      scripts: [
+        { name: "twitter:title", content: title }      scripts: [
         {
           type: "application/ld+json",
-          children: jsonLd({
-            "@context": "https://schema.org",
-            "@type": "WebPage",
-            name: title,
-            description,
-            url,
-            about: {
-              "@type": "Corporation",
-              name: s.name,
-              tickerSymbol: `${s.exchange}:${s.symbol}`,
-            },
-            isPartOf: { "@type": "WebSite", name: "DeepScreen", url: "https://deepscreen.online" },
-            breadcrumb: {
-              "@context": "https://schema.org",
-              "@type": "BreadcrumbList",
-              itemListElement: [
-                { "@type": "ListItem", position: 1, name: "Home", item: "https://deepscreen.online/" },
+          children: jsonLd(
+            buildGraph(
+              buildBreadcrumbSchema([
+                { name: "Home", url: "https://deepscreen.online/" },
                 {
-                  "@type": "ListItem",
-                  position: 2,
                   name: s.exchange,
-                  item: `https://deepscreen.online/exchange/${s.exchange}`,
+                  url: `https://deepscreen.online/exchange/${s.exchange}`,
                 },
-                { "@type": "ListItem", position: 3, name: s.symbol, item: url },
-              ],
-            },
-          }),
+                { name: s.symbol, url },
+              ]),
+              buildArticleSchema({
+                headline: title,
+                description,
+                url,
+                about: buildCorporationSchema({
+                  symbol: s.symbol,
+                  exchange: s.exchange,
+                  companyName: s.name,
+                  sector: s.sector,
+                  score: schemaAnalysis?.score,
+                  verdict: schemaAnalysis?.verdict,
+                }),
+              }),
+              buildFAQSchema(
+                faqs.map((faq) => ({
+                  question: faq.q,
+                  answer: faq.a,
+                })),
+              ),
+            ),
+          ),
         },
-        {
-          type: "application/ld+json",
-          children: jsonLd({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            mainEntity: faqs.map((faq) => ({
-              "@type": "Question",
-              name: faq.q,
+      ],aq.q,
               acceptedAnswer: { "@type": "Answer", text: faq.a },
             })),
           }),
