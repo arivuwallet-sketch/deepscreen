@@ -537,7 +537,9 @@ export function buildIntel(input: IntelInput): Intel {
     altman: computeAltman(input, ratios),
     beneish: computeBeneish(input, ratios),
   };
-  const badges = computeBadges(input, ratios, vision);\n  const xray = computeXRay(input, ratios);\n  return { ratios, dupont, forensics, vision, badges, xray };
+  const badges = computeBadges(input, ratios, vision);
+  const xray = computeXRay(input, ratios);
+  return { ratios, dupont, forensics, vision, badges, xray };
 }
 
 export const toneClass: Record<Tone, string> = {
