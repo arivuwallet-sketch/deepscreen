@@ -17,6 +17,7 @@ import { mergeLiveStock } from "@/lib/deepscreen/live-merge";
 import { analyze, verdictClass } from "@/lib/deepscreen/metrics";
 import { holdingPlan } from "@/lib/deepscreen/horizon";
 import { cn } from "@/lib/utils";
+import { WatchlistAlertsPanel } from "@/components/ds/WatchlistAlertsPanel";
 
 export const Route = createFileRoute("/portfolio")({
   staticData: { sitemap: false },
@@ -55,7 +56,12 @@ function PortfolioPage() {
       stocks.map((s) => {
         const k = quoteKey(s);
         const { stock } = mergeLiveStock(s, quotes?.[k], funds?.[k], screener?.[k]);
-        return { stock, analysis: analyze(stock), plan: holdingPlan(stock) };
+        return {
+          stock,
+          analysis: analyze(stock),
+          plan: holdingPlan(stock),
+          fundamentals: funds?.[k] ?? null,
+        };
       }),
     [stocks, quotes, funds, screener],
   );
@@ -87,11 +93,12 @@ function PortfolioPage() {
   return (
     <Shell>
       <div className="mx-auto max-w-7xl px-4 py-8">
-        <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Portfolio health & risk matrix</h1>
+        <h1 className="text-2xl font-bold tracking-tight md:text-3xl">My Stocks</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Cap-weighted valuation, leverage and sector concentration across every company in your wishlist,
-          recomputed from live prices and fundamentals.
+          Your saved stocks, live fundamental changes, research alerts and portfolio health in one place.
         </p>
+
+        <WatchlistAlertsPanel rows={rows.map(({ stock, analysis, fundamentals }) => ({ stock, analysis, fundamentals }))} />
 
         <PaywallGate feature="Portfolio X-Ray" className="mt-6" minHeight="min-h-[420px]">
         <div>
