@@ -48,7 +48,6 @@
   - https://deepscreen.online/learn/10-year-compounder-analysis-framework
 - [P/E ratio explained](https://deepscreen.online/learn/pe-ratio-explained)
 - [What is a stock screener?](https://deepscreen.online/learn/what-is-a-stock-screener)
-- [NSE vs BSE](https://deepscreen.online/learn/nse-vs-bse)
 - [Market capitalisation explained](https://deepscreen.online/learn/market-cap-explained)
 - [Options strategy lab](https://deepscreen.online/options)
 - [Options strategy guides](https://deepscreen.online/options): individual strategy pages explain construction, payoff, risk and breakeven.
