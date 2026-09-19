@@ -280,10 +280,11 @@ function digitCount(format: string): number | null {
 }
 
 function cleanCountryName(name: string): string {
-  const cleaned = name.replace(/ \([^)]*\)/g, "").trim();
-  if (cleaned === "Macedonia") return "North Macedonia";
+  const cleaned = name.replace(/ \([^)]*\)$/g, "").trim();
+  if (cleaned === "Macedonia (FYROM)") return "North Macedonia";
   if (cleaned === "Swaziland") return "Eswatini";
   if (cleaned === "Czech Republic") return "Czechia";
+  if (cleaned === "AmericanSamoa") return "American Samoa";
   return cleaned;
 }
 
