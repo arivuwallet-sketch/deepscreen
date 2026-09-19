@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 
-import { getNewsFeed, getYahooNewsFeed } from "@/lib/market/market.functions";
+import { getNewsFeed } from "@/lib/market/market.functions";
 import type { FeedItem } from "@/lib/rss.server";
 import { cn } from "@/lib/utils";
 
@@ -78,49 +78,3 @@ export function LiveNewsFeed({
   );
 }
 
-export function YahooNewsFeed({
-  query,
-  title = "Yahoo Finance News",
-  limit = 10,
-  className,
-}: {
-  query: string;
-  title?: string;
-  limit?: number;
-  className?: string;
-}) {
-  const fetchNews = useServerFn(getYahooNewsFeed);
-  const { data, isLoading, dataUpdatedAt } = useQuery({
-    queryKey: ["yahoo-news-feed", query, limit],
-    queryFn: () => fetchNews({ data: { query, limit } }),
-    refetchInterval: 120_000,
-    staleTime: 60_000,
-  });
-
-  return (
-    <section className={cn("rounded-lg border border-border bg-panel", className)}>
-      <header className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
-        <div>
-          <h2 className="text-sm font-semibold uppercase tracking-wide">{title}</h2>
-          <p className="mt-0.5 text-[10px] text-muted-foreground">
-            Yahoo Finance search feed · external publisher links
-          </p>
-        </div>
-        <span className="num text-xs text-muted-foreground">
-          {data?.stale
-            ? "UNAVAILABLE"
-            : data?.fetchedAt
-              ? new Date(data.fetchedAt).toLocaleTimeString()
-              : dataUpdatedAt
-                ? new Date(dataUpdatedAt).toLocaleTimeString()
-                : "LIVE"}
-        </span>
-      </header>
-      {isLoading ? (
-        <p className="px-4 py-6 text-sm text-muted-foreground">Loading Yahoo Finance headlines…</p>
-      ) : (
-        <FeedList items={data?.items ?? []} empty="No Yahoo Finance headlines available right now." />
-      )}
-    </section>
-  );
-}
