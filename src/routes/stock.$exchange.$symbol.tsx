@@ -249,9 +249,7 @@ function StockPage() {
           </div>
         </header>
 
-        {Object.values(sources).some(source => source === "model") && <aside className="mt-5 rounded-lg border border-warn/40 bg-warn/5 p-4 text-sm" data-nosnippet="">
-          <strong>Incomplete financial inputs.</strong> Some figures below use simulated fallback values. Scores, targets and holding periods that depend on them are illustrative, not reliable company assessments. Verify provider-backed figures against filings.
-        </aside>}
+        
         <p className="mt-5 max-w-4xl text-sm leading-relaxed text-muted-foreground">
           {stockSummary(live)}
         </p>
