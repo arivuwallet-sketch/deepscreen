@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { jsonLd } from '../src/lib/seo/json-ld.ts';
 import { canonicalRedirect } from '../src/lib/seo/canonical.ts';
 import { mergeFundamentals } from '../src/lib/deepscreen/live-merge.ts';
+import { analyze } from '../src/lib/deepscreen/metrics.ts';
 import { stockFaqs } from '../src/lib/deepscreen/narrative.ts';
 
 test('JSON-LD cannot close its script element and preserves the source text', () => {
@@ -25,6 +26,22 @@ test('heuristic profitability is not marked as provider data', () => {
   const merged = mergeFundamentals(base, { roe: 20, debtToEquity: 1 } as never);
   assert.equal(merged.sources.roa, 'model');
   assert.equal(merged.sources.roce, 'model');
+});
+test('negative EV/EBITDA is normalized to N/M and does not receive a cheapness score', () => {
+  const merged = mergeFundamentals(base, { evEbitda: -300 } as never);
+  assert.equal(merged.fundamentals.evEbitda, 0);
+  assert.equal(merged.sources.evEbitda, 'live');
+
+  const stock = {
+    name: 'Example',
+    symbol: 'EXAMPLE',
+    sector: 'Industrials',
+    fundamentals: { ...base, evEbitda: -300 },
+  } as never;
+  const metric = analyze(stock).metrics.find((m) => m.key === 'evEbitda');
+  assert.equal(metric?.display, 'N/M');
+  assert.equal(metric?.score, 40);
+  assert.match(metric?.reading ?? '', /Not meaningful/i);
 });
 test('no-provider FAQs do not expose synthetic ratios or buy verdicts', () => {
   const text = JSON.stringify(stockFaqs({ name: 'Example', symbol: 'EXAMPLE', fundamentals: base } as never));
