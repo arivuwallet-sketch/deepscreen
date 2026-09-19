@@ -663,8 +663,16 @@ async function warmScreener(
 export const getScreenerRatios = createServerFn({ method: "GET" })
   .inputValidator((d: { exchange: string; symbol: string; name?: string }) => d)
   .handler(async ({ data }): Promise<Ratios | null> => {
-    if (!isIndian(data.exchange)) return null;
-    const key = ck(data.exchange, data.symbol);
+    const request = getRequest();
+    const rate = consumeRateLimit("screener:ip:" + requestClientKey(request), 30, 60_000);
+    if (!rate.allowed) return null;
+    const keyData = safeMarketKey(data.exchange, data.symbol);
+    if (!keyData || !isIndian(keyData.exchange)) return null;
+    const symbol = keyData.symbol;
+    const exchange = keyData.exchange;
+    const safeName = data.name ? normalizeCompanyName(data.name) : null;
+    if (data.name && !safeName) return null;
+    const key = ck(exchange, symbol);
 
     const mem = screenerCache.get(key);
     if (mem && Date.now() - mem.fetchedAt < SCREENER_CACHE_TTL_MS) return mem.data;
@@ -677,12 +685,12 @@ export const getScreenerRatios = createServerFn({ method: "GET" })
     }
 
     const slug = db?.resolvedSlug ?? mem?.slug ?? null;
-    const fresh = await warmScreener(data, slug);
+    const fresh = await warmScreener({ exchange, symbol, name: safeName ?? undefined }, slug);
     if (fresh) {
       await writeScreenerCache([
         {
-          exchange: data.exchange as "NSE" | "BSE",
-          symbol: data.symbol,
+          exchange: exchange as "NSE" | "BSE",
+          symbol,
           resolvedSlug: fresh.resolvedSlug ?? slug,
           data: fresh,
           fetchedAt: Date.now(),
@@ -703,7 +711,14 @@ export const getScreenerRatios = createServerFn({ method: "GET" })
 export const getScreenerRatiosBatch = createServerFn({ method: "POST" })
   .inputValidator((d: { keys: { exchange: string; symbol: string; name?: string }[] }) => d)
   .handler(async ({ data }): Promise<Record<string, Ratios | null>> => {
-    const indian = data.keys.filter((k) => isIndian(k.exchange));
+    const indian = data.keys
+      .map((k) => {
+        const safe = safeMarketKey(k.exchange, k.symbol);
+        const name = k.name ? normalizeCompanyName(k.name) : null;
+        return safe && (!k.name || name) ? { ...safe, name: name ?? undefined } : null;
+      })
+      .filter((k): k is { exchange: string; symbol: string; name?: string } => Boolean(k) && isIndian(k.exchange))
+      .slice(0, 100);
     const out: Record<string, Ratios | null> = {};
     if (indian.length === 0) return out;
 
