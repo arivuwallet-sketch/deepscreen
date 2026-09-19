@@ -275,7 +275,9 @@ export function mergeFundamentals(
 
   if (sources.evEbitda !== "live" && (liveEbitdaNonPositive || liveEbitdaMarginNonPositive)) {
     next.evEbitda = 0;
-    sources.evEbitda = "model";
+    // Keep provenance live: the provider data itself established that the
+    // conventional multiple is not meaningful for this period.
+    sources.evEbitda = "live";
   } else if (sources.evEbitda !== "live" && sources.pe === "live") {
     if (
       sources.netMargin === "live" &&
