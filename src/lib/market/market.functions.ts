@@ -534,9 +534,7 @@ export const getNewsFeed = createServerFn({ method: "GET" })
       const allItems = [];
       const providerNames = new Set<string>();
 
-      // Try the exact search first. Only when every provider is empty do we
-      // fan out to conservative company-name/ticker fallbacks.
-      for (const query of queries) {
+      const fetchVariant = async (query: string) => {
         const [google, bing, yahoo] = await Promise.all([
           fetchFeed(googleNewsFeed(query), "Google News", "market", limit),
           fetchFeed(bingNewsFeed(query), "Bing News", "market", limit),
@@ -545,12 +543,18 @@ export const getNewsFeed = createServerFn({ method: "GET" })
         if (google.length > 0) providerNames.add("Google News");
         if (bing.length > 0) providerNames.add("Bing News");
         if (yahoo.length > 0) providerNames.add("Yahoo Finance");
-        allItems.push(...google, ...bing, ...yahoo);
+        return [...google, ...bing, ...yahoo];
+      };
 
-        const current = dedupe(allItems)
-          .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
-          .slice(0, limit);
-        if (current.length >= limit || (query === queries[0] && current.length > 0)) break;
+      // Try the exact query first. Only when every provider is empty do we
+      // fan out to conservative company-name/ticker fallbacks. This keeps the
+      // normal path fast while making provider-specific misses much harder.
+      const exactItems = queries.length > 0 ? await fetchVariant(queries[0]!) : [];
+      allItems.push(...exactItems);
+
+      if (exactItems.length === 0 && queries.length > 1) {
+        const fallbackItems = await Promise.all(queries.slice(1).map(fetchVariant));
+        fallbackItems.forEach((items) => allItems.push(...items));
       }
 
       const items = dedupe(allItems)
