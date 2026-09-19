@@ -217,7 +217,6 @@ function PricingPage() {
       data: {
         tier: selectedPlan.tier,
         accessToken,
-        origin: window.location.origin,
         countryIso2: country.iso2,
         phone: validation.digits,
       },
