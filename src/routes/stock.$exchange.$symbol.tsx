@@ -22,7 +22,6 @@ import {
 import { HoldingPlanCard } from "@/components/ds/HoldingPlanCard";
 import { PeerAnalysisPanel, type PeerRow } from "@/components/ds/PeerAnalysisPanel";
 import {
-  ExtendedRatiosPanel,
   ForensicPanel,
   SecretTipsPanel,
   VisionCard,
@@ -509,7 +508,6 @@ function StockPage() {
 
         <section className="mt-6 space-y-3">
           <ForensicPanel intel={intel} locked={!isPro} />
-          <ExtendedRatiosPanel intel={intel} />
         </section>
 
         <PaywallGate
