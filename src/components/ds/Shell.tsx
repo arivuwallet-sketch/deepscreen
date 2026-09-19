@@ -20,7 +20,7 @@ export function Shell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen min-w-0 overflow-x-clip bg-background text-foreground">
       <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85">
-        <div className="safe-area-x mx-auto grid w-full max-w-7xl min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-3 py-3 lg:flex lg:flex-wrap lg:gap-3">
+        <div className="safe-area-x mx-auto grid w-full max-w-7xl min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-3 py-3 xl:flex xl:flex-wrap xl:gap-3">
           <Link to="/" className="flex min-w-0 shrink items-center gap-2">
             <span className="flex size-8 shrink-0 items-center justify-center rounded bg-primary text-primary-foreground">
               <Activity className="size-4" />
@@ -30,13 +30,13 @@ export function Shell({ children }: { children: ReactNode }) {
             </span>
           </Link>
 
-          <div className="col-start-1 row-start-2 w-full min-w-0 lg:order-2 lg:col-auto lg:row-auto lg:ml-auto lg:w-[clamp(16rem,26vw,22rem)]">
+          <div className="col-start-1 row-start-2 w-full min-w-0 xl:order-2 xl:col-auto xl:row-auto xl:ml-auto xl:w-[clamp(16rem,26vw,22rem)]">
             <SearchBar />
           </div>
 
           <nav
             aria-label="Primary navigation"
-            className="col-span-2 row-start-3 flex w-full min-w-0 gap-1 overflow-x-auto overscroll-x-contain pb-0.5 text-xs [scrollbar-width:thin] lg:order-3 lg:col-auto lg:row-auto lg:w-auto lg:max-w-[min(52vw,56rem)]"
+            className="col-span-2 row-start-3 flex w-full min-w-0 gap-1 overflow-x-auto overscroll-x-contain pb-0.5 text-xs [scrollbar-width:thin] xl:order-3 xl:col-auto xl:row-auto xl:w-auto xl:max-w-[min(52vw,56rem)]"
           >
             <div className="flex min-w-max items-center gap-1">
               {EXCHANGES.map((e) => (
@@ -64,7 +64,7 @@ export function Shell({ children }: { children: ReactNode }) {
             </div>
           </nav>
 
-          <div className="col-start-2 row-start-1 shrink-0 lg:order-4 lg:col-auto lg:row-auto">
+          <div className="col-start-2 row-start-1 shrink-0 xl:order-4 xl:col-auto xl:row-auto">
             <AuthButton />
           </div>
         </div>
