@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import type { LiveFundamentals } from "@/lib/market/yahoo.server";
 import type { Stock } from "@/lib/deepscreen/types";
 import type { Analysis } from "@/lib/deepscreen/metrics";
@@ -15,12 +15,24 @@ type Row = {
 
 export function WatchlistAlertsPanel({ rows }: { rows: Row[] }) {
   const [notification, setNotification] = useState<"default" | "granted" | "denied">("default");
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [alerts, setAlerts] = useState<ReturnType<typeof buildWatchlistAlerts>>([]);
+  const [historyCount, setHistoryCount] = useState(0);
+  const [hasFiveYearMedian, setHasFiveYearMedian] = useState(false);
 
-  const alerts = useMemo(() => {
-    void refreshKey;
-    return buildWatchlistAlerts(rows);
-  }, [rows, refreshKey]);
+  useEffect(() => {
+    const nextAlerts = buildWatchlistAlerts(rows);
+    setAlerts(nextAlerts);
+
+    const totalHistory = rows.reduce(
+      (sum, row) => sum + readAlertHistory(row.stock.exchange, row.stock.symbol).length,
+      0,
+    );
+    const fiveYear = rows.some(
+      (row) => readAlertHistory(row.stock.exchange, row.stock.symbol).length >= 20,
+    );
+    setHistoryCount(totalHistory);
+    setHasFiveYearMedian(fiveYear);
+  }, [rows]);
 
   useEffect(() => {
     if (typeof Notification === "undefined") return;
@@ -48,16 +60,6 @@ export function WatchlistAlertsPanel({ rows }: { rows: Row[] }) {
     setNotification(result);
   }
 
-  const historyCount = Math.max(
-    0,
-    rows.reduce(
-      (sum, row) => sum + readAlertHistory(row.stock.exchange, row.stock.symbol).length,
-      0,
-    ),
-  );
-  const hasFiveYearMedian = rows.some(
-    (row) => readAlertHistory(row.stock.exchange, row.stock.symbol).length >= 20,
-  );
   const indianRows = rows.filter((row) => row.stock.exchange === "NSE" || row.stock.exchange === "BSE").length;
 
   return (
