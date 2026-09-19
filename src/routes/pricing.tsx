@@ -257,11 +257,10 @@ function PricingPage() {
   const phoneHelperText = () => {
     const country = getPhoneCountry(phoneCountry);
     if (!country) return "Select a country and enter your phone number.";
-    const lengthText =
-      country.minLength === country.maxLength
-        ? country.minLength + " digits"
-        : country.minLength + "–" + country.maxLength + " digits";
-    return lengthText + " for " + country.name + ". The country code is added automatically.";
+    if (country.minLength === country.maxLength) {
+      return country.minLength + " digits for " + country.name + ". Spaces and hyphens are optional.";
+    }
+    return "Enter your national phone number for " + country.name + ". Spaces and hyphens are optional.";
   };
 
   return (
@@ -366,39 +365,44 @@ function PricingPage() {
         </p>
       </div>
       <Dialog open={checkoutPlan !== null} onOpenChange={(open) => !open && busy === null && setCheckoutPlan(null)}>
-        <DialogContent className="overflow-hidden border-border/80 bg-background p-0 sm:max-w-md">
-          <div className="border-b border-border bg-gradient-to-br from-primary/10 via-background to-background px-6 pb-5 pt-6">
+        <DialogContent className="max-h-[92vh] overflow-y-auto overflow-x-hidden border-border/80 bg-background p-0 shadow-2xl sm:max-w-lg">
+          <div className="border-b border-border bg-gradient-to-br from-primary/10 via-background to-background px-4 pb-4 pt-5 sm:px-6 sm:pb-5 sm:pt-6">
             <DialogHeader className="text-left">
-              <div className="mb-3 flex size-11 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-primary">
-                <Smartphone className="size-5" />
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex min-w-0 items-start gap-3">
+                  <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-primary">
+                    <Smartphone className="size-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <DialogTitle className="text-lg sm:text-xl">Secure checkout</DialogTitle>
+                    <DialogDescription className="mt-1.5 max-w-xl text-xs leading-relaxed sm:text-sm">
+                      Confirm your country and phone number before opening Cashfree's secure payment window.
+                    </DialogDescription>
+                  </div>
+                </div>
               </div>
-              <DialogTitle className="text-xl">Secure checkout details</DialogTitle>
-              <DialogDescription className="mt-2 max-w-sm leading-relaxed">
-                Enter the mobile number you want to use for Cashfree checkout. This replaces the
-                placeholder number and must be a valid Indian mobile number.
-              </DialogDescription>
             </DialogHeader>
           </div>
 
-          <div className="space-y-5 px-6 py-6">
+          <div className="space-y-4 px-4 py-4 sm:space-y-5 sm:px-6 sm:py-6">
             {checkoutPlan && (
-              <div className="flex items-center justify-between rounded-xl border border-border bg-panel px-4 py-3">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Selected plan</p>
-                  <p className="mt-1 font-semibold">{checkoutPlan.name}</p>
+              <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-panel px-4 py-3">
+                <div className="min-w-0">
+                  <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">Selected plan</p>
+                  <p className="mt-1 truncate text-sm font-semibold">{checkoutPlan.name}</p>
                 </div>
-                <p className="num text-xl font-bold">₹{checkoutPlan.price}</p>
+                <p className="num shrink-0 text-lg font-bold sm:text-xl">₹{checkoutPlan.price}</p>
               </div>
             )}
 
-            <div className="space-y-3">
-              <div>
-                <Label htmlFor="checkout-country" className="text-sm">Country / calling code</Label>
-                <div className={cn(
-                  "relative mt-2 flex h-11 overflow-hidden rounded-lg border bg-background transition-colors",
-                  phoneError ? "border-destructive ring-1 ring-destructive/20" : "border-input focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20",
-                )}>
-                  <span className="flex items-center border-r border-border bg-muted/40 px-3 text-lg" aria-hidden="true">
+            <div>
+              <Label htmlFor="checkout-country" className="text-sm font-medium">Phone number</Label>
+              <div className={cn(
+                "mt-2 grid min-w-0 grid-cols-[minmax(118px,42%)_minmax(0,1fr)] overflow-hidden rounded-xl border bg-background transition-colors",
+                phoneError ? "border-destructive ring-1 ring-destructive/20" : "border-input focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20",
+              )}>
+                <div className="relative min-w-0 border-r border-border bg-muted/30">
+                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-base" aria-hidden="true">
                     {countryFlag(phoneCountry)}
                   </span>
                   <select
@@ -409,98 +413,100 @@ function PricingPage() {
                       setPhone("");
                       setPhoneError("");
                     }}
-                    className="h-full min-w-0 flex-1 appearance-none bg-transparent px-3 pr-9 text-sm outline-none"
-                    aria-label="Country calling code"
+                    className="h-12 w-full min-w-0 appearance-none bg-transparent px-3 pl-10 pr-8 text-xs font-medium outline-none sm:text-sm"
+                    aria-label="Country and calling code"
                   >
                     {PHONE_COUNTRIES.map((country) => (
                       <option key={country.iso2} value={country.iso2}>
-                        {country.name} ({country.dialCode})
+                        {country.name} {country.dialCode}
                       </option>
                     ))}
                   </select>
-                  <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">⌄</span>
+                  <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground" aria-hidden="true">
+                    ▾
+                  </span>
                 </div>
+
+                <Input
+                  id="checkout-phone"
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="tel-national"
+                  maxLength={getPhoneCountry(phoneCountry)?.maxLength ?? 15}
+                  value={phone}
+                  onChange={(e) => {
+                    const country = getPhoneCountry(phoneCountry);
+                    if (!country) return;
+                    setPhone(normalizeNationalPhone(e.target.value, country));
+                    if (phoneError) setPhoneError("");
+                  }}
+                  onBlur={() => {
+                    const country = getPhoneCountry(phoneCountry);
+                    if (!country || !phone) return;
+                    const validation = validatePhoneNumber(country.iso2, phone);
+                    setPhoneError(validation.valid ? "" : validation.error);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      void submitCheckout();
+                    }
+                  }}
+                  placeholder="Enter phone number"
+                  aria-invalid={phoneError ? true : undefined}
+                  aria-describedby="checkout-phone-help"
+                  className="h-12 min-w-0 rounded-none border-0 bg-transparent px-3 text-base shadow-none focus-visible:ring-0 sm:px-4"
+                />
               </div>
 
-              <div>
-                <Label htmlFor="checkout-phone" className="text-sm">Phone number</Label>
-                <div className={cn(
-                  "mt-2 flex h-11 overflow-hidden rounded-lg border bg-background transition-colors",
-                  phoneError ? "border-destructive ring-1 ring-destructive/20" : "border-input focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20",
-                )}>
-                  <span className="flex items-center border-r border-border bg-muted/40 px-3 text-sm font-medium text-muted-foreground">
-                    {getPhoneCountry(phoneCountry)?.dialCode ?? "+"}
-                  </span>
-                  <Input
-                    id="checkout-phone"
-                    type="tel"
-                    inputMode="tel"
-                    autoComplete="tel-national"
-                    maxLength={getPhoneCountry(phoneCountry)?.maxLength ?? 15}
-                    value={phone}
-                    onChange={(e) => {
-                      const country = getPhoneCountry(phoneCountry);
-                      if (!country) return;
-                      setPhone(normalizeNationalPhone(e.target.value, country));
-                      if (phoneError) setPhoneError("");
-                    }}
-                    onBlur={() => {
-                      const country = getPhoneCountry(phoneCountry);
-                      if (!country || !phone) return;
-                      const validation = validatePhoneNumber(country.iso2, phone);
-                      setPhoneError(validation.valid ? "" : validation.error);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        void submitCheckout();
-                      }
-                    }}
-                    placeholder="Enter your number"
-                    aria-invalid={phoneError ? true : undefined}
-                    aria-describedby="checkout-phone-help"
-                    className="h-full rounded-none border-0 bg-transparent text-base shadow-none focus-visible:ring-0"
-                  />
-                </div>
-                <div id="checkout-phone-help" className="mt-2 flex items-start gap-2">
-                  <ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
-                  <p className={cn("text-xs leading-relaxed", phoneError ? "text-destructive" : "text-muted-foreground")}>
-                    {phoneError || phoneHelperText()}
-                  </p>
-                </div>
+              <div id="checkout-phone-help" className="mt-2 flex items-start gap-2">
+                <ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
+                <p className={cn("text-xs leading-relaxed", phoneError ? "text-destructive" : "text-muted-foreground")}>
+                  {phoneError || phoneHelperText()}
+                </p>
               </div>
             </div>
 
-            <div className="rounded-xl border border-primary/15 bg-primary/5 p-4">
-              <p className="text-xs font-semibold text-foreground">What happens next?</p>
-              <div className="mt-3 grid gap-2 text-xs text-muted-foreground">
-                <div className="flex items-center gap-2"><span className="flex size-5 items-center justify-center rounded-full bg-background font-semibold text-foreground">1</span> We create your Cashfree payment session.</div>
-                <div className="flex items-center gap-2"><span className="flex size-5 items-center justify-center rounded-full bg-background font-semibold text-foreground">2</span> Cashfree opens the secure payment page.</div>
-                <div className="flex items-center gap-2"><span className="flex size-5 items-center justify-center rounded-full bg-background font-semibold text-foreground">3</span> You return to DeepScreen after payment.</div>
+            <div className="rounded-xl border border-border/80 bg-muted/20 p-3.5 sm:p-4">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="size-4 shrink-0 text-primary" />
+                <p className="text-xs font-semibold">Secure payment flow</p>
               </div>
+              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                Your phone number is used to create the Cashfree payment order. Cashfree handles the payment details in its secure checkout.
+              </p>
             </div>
           </div>
 
-          <DialogFooter className="border-t border-border bg-muted/20 px-6 py-4 sm:flex-row">
-            <Button type="button" variant="outline" onClick={() => setCheckoutPlan(null)} disabled={busy !== null}>
-              Cancel checkout
+          <DialogFooter className="flex-col gap-2 border-t border-border bg-muted/20 px-4 py-3 sm:flex-row sm:justify-end sm:px-6 sm:py-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setCheckoutPlan(null)}
+              disabled={busy !== null}
+              className="w-full sm:w-auto"
+            >
+              Cancel
             </Button>
             <Button
               type="button"
               onClick={() => void submitCheckout()}
               disabled={busy !== null || verifying || !checkoutPlan}
-              className="sm:min-w-40"
+              className="w-full sm:w-auto sm:min-w-44"
             >
               {busy ? (
                 "Opening secure checkout…"
               ) : (
-                <span className="flex items-center gap-2">Continue to payment <ChevronRight className="size-4" /></span>
+                <span className="flex items-center justify-center gap-2">
+                  Continue to payment
+                  <ChevronRight className="size-4" />
+                </span>
               )}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-            <TopicIndex ids={["screener"]} title={"What you can screen for on any DeepScreen plan"} />
+      <TopicIndex ids={["screener"]} title={"What you can screen for on any DeepScreen plan"} />
     </Shell>
   );
 }
