@@ -14,6 +14,7 @@ import { CAP_LABEL } from "@/lib/deepscreen/format";
 import type { CapTier } from "@/lib/deepscreen/types";
 import { cn } from "@/lib/utils";
 import { exchangeKeywords, metaKeywords, screenerKeywords } from "@/lib/seo/keywords";
+import { MarketMovers } from "@/components/ds/MarketMovers";
 
 const TOPIC_BY_EXCHANGE: Record<string, string> = {
   NSE: "india",
@@ -233,6 +234,12 @@ function ExchangePage() {
         <div className="mt-6">
           <StockTable stocks={filtersActive ? filtered.slice(0, limit) : filtered.slice((page - 1) * 100, page * 100)} />
         </div>
+
+        <MarketMovers
+          stocks={all}
+          title={`${exchange.code} live market movers`}
+          exchangeLabel={`${exchange.flag} ${exchange.name}`}
+        />
 
         <section className="mt-8">
           <h2 className="text-sm font-semibold uppercase tracking-wide">Browse {exchange.code} sectors</h2>
