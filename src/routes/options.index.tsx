@@ -252,8 +252,15 @@ function StrategyCard({ s, exchange, spot }: { s: StrategyResult; exchange: stri
               contentStyle={{ fontSize: 12 }}
             />
             <ReferenceLine y={0} stroke="currentColor" opacity={0.4} />
-            <ReferenceLine x={spot} stroke="hsl(var(--primary))" strokeDasharray="4 4" />
-            <Area type="monotone" dataKey="pnl" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.18} />
+            <ReferenceLine x={spot} stroke="var(--primary)" strokeDasharray="4 4" strokeWidth={1.5} />
+            <Area
+              type="monotone"
+              dataKey="pnl"
+              stroke="var(--primary)"
+              strokeWidth={2}
+              fill="var(--primary)"
+              fillOpacity={0.18}
+            />
           </AreaChart>
         </ResponsiveContainer>
       </div>

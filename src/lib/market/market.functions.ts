@@ -140,9 +140,12 @@ const FLAGS: Record<string, string> = {
 // when TV is unreachable, but FF alone can never fill the "Actual" column.
 // A short 60s cache keeps releases appearing within a minute of publication
 // while still collapsing every visitor onto one upstream request.
-const CACHE_TTL_MS = 60_000;
+const CACHE_TTL_MS = 30_000;
+const FF_FALLBACK_CACHE_TTL_MS = 5 * 60_000;
 let calendarCache: { data: LiveEvent[]; fetchedAt: number } | null = null;
+let forexFactoryCache: { data: LiveEvent[]; fetchedAt: number } | null = null;
 let inFlight: Promise<LiveEvent[]> | null = null;
+let forexFactoryInFlight: Promise<LiveEvent[]> | null = null;
 
 const CURRENCY_BY_COUNTRY: Record<string, string> = {
   US: "USD",
@@ -190,16 +193,24 @@ const COUNTRY_FLAGS: Record<string, string> = {
 
 /** Renders a TradingView numeric release with its unit/scale, e.g. 2.5% or $1.2B. */
 function formatEventValue(
-  value: number | null | undefined,
+  value: number | string | null | undefined,
   unit: string | null | undefined,
   scale: string | null | undefined,
 ): string {
-  if (typeof value !== "number" || !Number.isFinite(value)) return "—";
-  const n = Math.abs(value) >= 1000 ? value.toLocaleString("en-US") : String(Number(value.toFixed(2)));
+  if (value === null || value === undefined || value === "") return "—";
+
+  const numeric = typeof value === "number" ? value : Number(String(value).replace(/,/g, ""));
+  if (!Number.isFinite(numeric)) {
+    return String(value).trim() || "—";
+  }
+
+  const n =
+    Math.abs(numeric) >= 1000
+      ? numeric.toLocaleString("en-US")
+      : String(Number(numeric.toFixed(2)));
   const tail = `${n}${scale ?? ""}`;
   if (!unit) return tail;
   if (unit === "%") return `${tail}%`;
-  // Currency symbols read as prefixes ($1.2B), everything else as a suffix.
   return /^[$€¥£]$/.test(unit) ? `${unit}${tail}` : `${tail} ${unit}`;
 }
 
@@ -213,9 +224,9 @@ interface TvEvent {
   date: string;
   unit?: string | null;
   scale?: string | null;
-  actual?: number | null;
-  forecast?: number | null;
-  previous?: number | null;
+  actual?: number | string | null;
+  forecast?: number | string | null;
+  previous?: number | string | null;
 }
 
 /** TradingView economic calendar — the only free source here that carries actuals. */
@@ -265,10 +276,97 @@ async function fetchTradingViewCalendar(): Promise<LiveEvent[] | null> {
   }
 }
 
+function normalizeEventTitle(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/\([^)]*\)/g, " ")
+    .replace(/&/g, "and")
+    .replace(/\byoy\b/g, "y/y")
+    .replace(/\byear over year\b/g, "y/y")
+    .replace(/\byear\/year\b/g, "y/y")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function isMissingValue(value: string): boolean {
+  return !value || value.trim() === "—" || value.trim() === "-" || value.trim().toLowerCase() === "null";
+}
+
+function needsActualFallback(event: LiveEvent): boolean {
+  return (
+    isMissingValue(event.actual) &&
+    new Date(event.dateIso).getTime() <= Date.now() + 10 * 60_000
+  );
+}
+
+function mergeCalendarActuals(tv: LiveEvent[], fallback: LiveEvent[]): LiveEvent[] {
+  if (fallback.length === 0) return tv;
+
+  const fallbackRows = fallback.filter((e) => !isMissingValue(e.actual));
+  return tv.map((event) => {
+    if (!needsActualFallback(event)) return event;
+
+    const eventTs = Date.parse(event.dateIso);
+    const title = normalizeEventTitle(event.title);
+
+    let best: LiveEvent | null = null;
+    let bestDiff = Number.POSITIVE_INFINITY;
+
+    for (const candidate of fallbackRows) {
+      if (candidate.currency !== event.currency) continue;
+      if (normalizeEventTitle(candidate.title) !== title) continue;
+
+      const diff = Math.abs(Date.parse(candidate.dateIso) - eventTs);
+      if (diff <= 45 * 60_000 && diff < bestDiff) {
+        best = candidate;
+        bestDiff = diff;
+      }
+    }
+
+    if (!best) return event;
+    return {
+      ...event,
+      actual: best.actual,
+      forecast: isMissingValue(event.forecast) ? best.forecast : event.forecast,
+      previous: isMissingValue(event.previous) ? best.previous : event.previous,
+    };
+  });
+}
+
+async function getCachedForexFactoryCalendar(): Promise<LiveEvent[]> {
+  const fresh =
+    forexFactoryCache &&
+    Date.now() - forexFactoryCache.fetchedAt < FF_FALLBACK_CACHE_TTL_MS;
+  if (fresh) return forexFactoryCache!.data;
+
+  if (!forexFactoryInFlight) {
+    forexFactoryInFlight = fetchForexFactoryCalendar()
+      .then((data) => {
+        forexFactoryCache = { data, fetchedAt: Date.now() };
+        return data;
+      })
+      .catch(() => forexFactoryCache?.data ?? [])
+      .finally(() => {
+        forexFactoryInFlight = null;
+      });
+  }
+
+  return forexFactoryInFlight;
+}
+
 async function fetchAndBuildCalendar(): Promise<LiveEvent[]> {
   const tv = await fetchTradingViewCalendar();
-  if (tv && tv.length > 0) return tv;
-  return fetchForexFactoryCalendar();
+
+  if (tv && tv.length > 0) {
+    const needsFallback = tv.some(needsActualFallback);
+    if (needsFallback) {
+      const fallback = await getCachedForexFactoryCalendar();
+      return mergeCalendarActuals(tv, fallback);
+    }
+    return tv;
+  }
+
+  return getCachedForexFactoryCalendar();
 }
 
 async function fetchForexFactoryCalendar(): Promise<LiveEvent[]> {
@@ -420,8 +518,7 @@ export const getNewsFeed = createServerFn({ method: "GET" })
         const fetchedAt = Date.now();
         const result = { items: refreshAges(items), fetchedAt, stale: false, providerCount: providers };
         newsMemoryCache.set(key, { data: result, fetchedAt });
-        await writeNewsCache(key, items, fetchedAt);
-        return result;
+        await writeNewsCache(key, items, fetchedAt);        return result;
       }
 
       if (persisted) {
@@ -517,8 +614,7 @@ async function warmScreener(
   if (!ratios) return null;
   screenerCache.set(ck(key.exchange, key.symbol), {
     data: ratios,
-    fetchedAt: Date.now(),
-    slug: ratios.resolvedSlug ?? knownSlug ?? null,
+    fetchedAt: Date.now(),    slug: ratios.resolvedSlug ?? knownSlug ?? null,
   });
   return ratios;
 }
@@ -632,7 +728,7 @@ export const getScreenerRatiosBatch = createServerFn({ method: "POST" })
     return out;
   });
 
-/** Full live IPO pipeline across NSE, BSE, NYSE and NASDAQ. */
+/** Live IPO pipeline across NSE, BSE, NYSE, NASDAQ and LSE. */
 export const getLiveIpos = createServerFn({ method: "GET" }).handler(async () => {
   const { fetchLiveIpos } = await import("./ipo.server");
   return fetchLiveIpos();

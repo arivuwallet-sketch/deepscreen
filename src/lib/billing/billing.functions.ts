@@ -3,6 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 
 import type { Database } from "@/integrations/supabase/types";
 import { PLANS, type Tier } from "@/hooks/useSubscription";
+import { getPhoneCountry, validatePhoneNumber } from "@/lib/billing/phone";
 
 type Fail = { ok: false; error: string };
 
@@ -22,7 +23,7 @@ async function verifyUser(accessToken: string) {
  * only granted once Cashfree confirms the payment (webhook or confirmCheckout).
  */
 export const createCheckout = createServerFn({ method: "POST" })
-  .inputValidator((d: { tier: Tier; accessToken: string; origin: string; phone?: string }) => d)
+  .inputValidator((d: { tier: Tier; accessToken: string; origin: string; countryIso2: string; phone: string }) => d)
   .handler(
     async ({
       data,
@@ -30,6 +31,14 @@ export const createCheckout = createServerFn({ method: "POST" })
       const plan = PLANS.find((p) => p.tier === data.tier);
       if (!plan) return { ok: false, error: "Unknown plan." };
       if (!/^https?:\/\//.test(data.origin)) return { ok: false, error: "Bad origin." };
+      const country = getPhoneCountry(data.countryIso2);
+      if (!country) {
+        return { ok: false, error: "Select a valid country calling code." };
+      }
+      const phoneValidation = validatePhoneNumber(country.iso2, data.phone);
+      if (!phoneValidation.valid) {
+        return { ok: false, error: phoneValidation.error };
+      }
 
       const user = await verifyUser(data.accessToken);
       if (!user) return { ok: false, error: "Not signed in — please sign in again." };
@@ -52,7 +61,7 @@ export const createCheckout = createServerFn({ method: "POST" })
           note: `DeepScreen Pro — ${plan.name}`,
           customerId: user.id,
           email: user.email ?? "customer@deepscreen.app",
-          phone: data.phone && /^\d{8,15}$/.test(data.phone) ? data.phone : "9999999999",
+          phone: phoneValidation.e164,
           returnUrl: `${data.origin}/pricing?cf_order_id=${orderId}`,
           notifyUrl: `${data.origin}/api/public/cashfree-webhook`,
           tags: { user_id: user.id, tier: plan.tier },
