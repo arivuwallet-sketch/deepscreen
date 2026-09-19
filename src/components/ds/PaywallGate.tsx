@@ -36,7 +36,7 @@ export function PaywallGate({
   // While the session is resolving (and during SSR, which is what crawlers
   // read) render the locked variant: the real content is present in the HTML,
   // visually blurred, so search and AI crawlers index the substance.
-  if (isPro) return <>{children}</>;
+  if (isPro) return className ? <div className={className}>{children}</div> : <>{children}</>;
   void loading;
 
   return (
