@@ -1,5 +1,6 @@
-import { jsonLd } from "@/lib/seo/json-ld";
+import { buildArticleSchema, buildBreadcrumbSchema, buildCorporationSchema, buildFAQSchema, buildGraph, jsonLd } from "@/lib/seo/json-ld";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useMemo } from "react";
 
 import { Shell } from "@/components/ds/Shell";
 import { TopicIndex } from "@/components/ds/TopicIndex";
@@ -7,10 +8,19 @@ import { learnKeywords, metaKeywords, stocksKeywords } from "@/lib/seo/keywords"
 import { LiveNewsFeed } from "@/components/ds/LiveNewsFeed";
 import { DcfCalculator } from "@/components/ds/DcfCalculator";
 import { GrahamCalculator } from "@/components/ds/GrahamCalculator";
-import { PaywallGate } from "@/components/ds/PaywallGate";
+import { PaywallGate, ProMetricValue } from "@/components/ds/PaywallGate";
 import { useSubscription } from "@/hooks/useSubscription";
-import { useLiveFundamentals, useLiveQuote, useScreenerRatios } from "@/hooks/useLiveQuotes";
+import {
+  quoteKey,
+  useLiveFundamentals,
+  useLiveFundamentalsBatch,
+  useLiveQuote,
+  useLiveQuotes,
+  useScreenerRatios,
+  useScreenerRatiosBatch,
+} from "@/hooks/useLiveQuotes";
 import { HoldingPlanCard } from "@/components/ds/HoldingPlanCard";
+import { PeerAnalysisPanel, type PeerRow } from "@/components/ds/PeerAnalysisPanel";
 import {
   ExtendedRatiosPanel,
   ForensicPanel,
@@ -20,7 +30,7 @@ import {
 import { buildIntel } from "@/lib/deepscreen/intel";
 import { getIndexMemberships } from "@/lib/deepscreen/indices";
 import { ScoreBar } from "@/components/ds/StockTable";
-import { findStock } from "@/lib/deepscreen/stocks";
+import { findStock, stocksByExchange } from "@/lib/deepscreen/stocks";
 import { getStockSnapshot, type StockSnapshot } from "@/lib/market/snapshot.functions";
 import { analyze, verdictClass } from "@/lib/deepscreen/metrics";
 import { METRIC_KEY_TO_FIELD, mergeLiveStock } from "@/lib/deepscreen/live-merge";
@@ -34,6 +44,18 @@ import {
 import { cn } from "@/lib/utils";
 import { stockFaqs, stockSummary } from "@/lib/deepscreen/narrative";
 import { StockSignupPrompt } from "@/components/ds/StockSignupPrompt";
+import { WatchlistButton } from "@/components/ds/WatchlistButton";
+import { FundamentalSnapshotPanel } from "@/components/ds/FundamentalSnapshotPanel";
+import { ScoreExplanationPanel } from "@/components/ds/ScoreExplanationPanel";
+import { ResearchAlertsPanel } from "@/components/ds/ResearchAlertsPanel";
+import { ScoreChangePanel } from "@/components/ds/ScoreChangePanel";
+
+
+function peerExchangeCodesFor(exchange: string): string[] {
+  if (exchange === "NSE" || exchange === "BSE") return ["NSE", "BSE"];
+  if (exchange === "NYSE" || exchange === "NASDAQ") return ["NYSE", "NASDAQ"];
+  return ["LSE"];
+}
 
 export const Route = createFileRoute("/stock/$exchange/$symbol")({
   staticData: { sitemap: true },
@@ -64,6 +86,7 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
         meta: [{ title: "Stock not found | DeepScreen" }, { name: "robots", content: "noindex" }],
       };
     }
+
     const base = loaderData.stock;
     const { stock: s, sources } = mergeLiveStock(
       base,
@@ -73,13 +96,39 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
     );
     const title = `${s.symbol} — ${s.name} Fundamental Analysis | DeepScreen`;
     const description = `Research ${s.name} (${s.exchange}: ${s.symbol}): available financial ratios, valuation, company news and data limitations on DeepScreen.`;
-    const faqs = stockFaqs(s, sources);
+    const peerNames = peerExchangeCodesFor(s.exchange)
+      .flatMap((exchange) => stocksByExchange(exchange))
+      .filter((peer) => peer.symbol !== s.symbol && peer.sector === s.sector)
+      .sort((a, b) => Math.abs(Math.log(Math.max(a.marketCap, 0.001) / Math.max(s.marketCap, 0.001))) - Math.abs(Math.log(Math.max(b.marketCap, 0.001) / Math.max(s.marketCap, 0.001))))
+      .slice(0, 5)
+      .map((peer) => peer.symbol + " (" + peer.name + ")");
+    const faqs = stockFaqs(s, sources, loaderData.snapshot.fundamentals, peerNames);
     const url = `https://deepscreen.online/stock/${s.exchange}/${s.symbol}`;
+    const schemaAnalysis = Object.values(sources).some((value) => value === "live")
+      ? analyze(s)
+      : undefined;
+
     return {
       meta: [
         { title },
         { name: "description", content: description },
-      { name: "keywords", content: metaKeywords(stocksKeywords, learnKeywords) },
+        {
+          name: "keywords",
+          content: metaKeywords(
+            [
+              `${s.name} stock`,
+              `${s.symbol} share price`,
+              `${s.symbol} stock analysis`,
+              `${s.symbol} fundamentals`,
+              `${s.symbol} valuation`,
+              `${s.symbol} financials`,
+              `${s.symbol} news`,
+              `${s.exchange} ${s.symbol}`,
+            ],
+            stocksKeywords,
+            learnKeywords,
+          ),
+        },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:url", content: url },
@@ -92,45 +141,37 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
       scripts: [
         {
           type: "application/ld+json",
-          children: jsonLd({
-            "@context": "https://schema.org",
-            "@type": "WebPage",
-            name: title,
-            description,
-            url,
-            about: {
-              "@type": "Corporation",
-              name: s.name,
-              tickerSymbol: `${s.exchange}:${s.symbol}`,
-            },
-            isPartOf: { "@type": "WebSite", name: "DeepScreen", url: "https://deepscreen.online" },
-            breadcrumb: {
-              "@context": "https://schema.org",
-              "@type": "BreadcrumbList",
-              itemListElement: [
-                { "@type": "ListItem", position: 1, name: "Home", item: "https://deepscreen.online/" },
+          children: jsonLd(
+            buildGraph(
+              buildBreadcrumbSchema([
+                { name: "Home", url: "https://deepscreen.online/" },
                 {
-                  "@type": "ListItem",
-                  position: 2,
                   name: s.exchange,
-                  item: `https://deepscreen.online/exchange/${s.exchange}`,
+                  url: `https://deepscreen.online/exchange/${s.exchange}`,
                 },
-                { "@type": "ListItem", position: 3, name: s.symbol, item: url },
-              ],
-            },
-          }),
-        },
-        {
-          type: "application/ld+json",
-          children: jsonLd({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            mainEntity: faqs.map((faq) => ({
-              "@type": "Question",
-              name: faq.q,
-              acceptedAnswer: { "@type": "Answer", text: faq.a },
-            })),
-          }),
+                { name: s.symbol, url },
+              ]),
+              buildArticleSchema({
+                headline: title,
+                description,
+                url,
+                about: buildCorporationSchema({
+                  symbol: s.symbol,
+                  exchange: s.exchange,
+                  companyName: s.name,
+                  sector: s.sector,
+                  score: schemaAnalysis?.score,
+                  verdict: schemaAnalysis?.verdict,
+                }),
+              }),
+              buildFAQSchema(
+                faqs.map((faq) => ({
+                  question: faq.q,
+                  answer: faq.a,
+                })),
+              ),
+            ),
+          ),
         },
       ],
     };
@@ -182,10 +223,87 @@ function StockPage() {
     quote: quote ?? null,
   });
 
+  const peerExchangeCodes = peerExchangeCodesFor(stock.exchange);
+
+  const peerPool = useMemo(
+    () =>
+      peerExchangeCodes
+        .flatMap((exchange) => stocksByExchange(exchange))
+        .filter((candidate) => candidate.symbol !== stock.symbol && candidate.sector === live.sector)
+      .sort((a, b) =>
+        Math.abs(Math.log(Math.max(a.marketCap, 0.001) / Math.max(live.marketCap, 0.001))) -
+        Math.abs(Math.log(Math.max(b.marketCap, 0.001) / Math.max(live.marketCap, 0.001))),
+      )
+      .slice(0, 40),
+    [stock.symbol, live.sector],
+  );
+  const peerKeys = useMemo(
+    () => peerPool.map((candidate) => ({ exchange: candidate.exchange, symbol: candidate.symbol, name: candidate.name })),
+    [peerPool],
+  );
+  const { data: peerQuotes } = useLiveQuotes(peerKeys);
+  const { data: peerFundamentals, dataUpdatedAt: peerFundamentalsUpdatedAt } = useLiveFundamentalsBatch(peerKeys);
+  const { data: peerScreener, dataUpdatedAt: peerScreenerUpdatedAt } = useScreenerRatiosBatch(peerKeys);
+  const peerIndustry = liveFundamentals?.industry?.trim() || null;
+
+  const peerRows = useMemo<PeerRow[]>(() => {
+    const targetCap = Math.max(live.marketCap, 0.001);
+    const mapped = peerPool
+      .map((candidate) => {
+        const key = quoteKey(candidate);
+        const candidateFundamentals = peerFundamentals?.[key];
+        const candidateScreener = peerScreener?.[key];
+        const candidateQuote = peerQuotes?.[key];
+        const hasLiveData = Boolean(candidateFundamentals || candidateScreener);
+        if (!hasLiveData) return null;
+
+        const merged = mergeLiveStock(
+          candidate,
+          candidateQuote,
+          candidateFundamentals,
+          candidateScreener,
+        );
+        const industry = candidateFundamentals?.industry?.trim() || null;
+        const exactIndustry = Boolean(
+          peerIndustry &&
+            industry &&
+            industry.toLocaleLowerCase() === peerIndustry.toLocaleLowerCase(),
+        );
+        const cap = Math.max(merged.stock.marketCap, 0.001);
+        const capDistance = Math.abs(Math.log(cap / targetCap));
+        const sameExchange = merged.stock.exchange === stock.exchange ? 0 : 1;
+        return {
+          stock: merged.stock,
+          analysis: analyze(merged.stock),
+          industry,
+          exactIndustry,
+          sortKey: (exactIndustry ? 0 : 1) * 100 + capDistance * 10 + sameExchange,
+        };
+      })
+      .filter((row): row is PeerRow & { sortKey: number } => Boolean(row))
+      .sort((a, b) => a.sortKey - b.sortKey);
+
+    const exact = mapped.filter((row) => row.exactIndustry).slice(0, 5);
+    return (exact.length >= 3 ? exact : mapped.slice(0, 5)).map(({ sortKey: _sortKey, ...row }) => row);
+  }, [
+    peerPool,
+    peerFundamentals,
+    peerQuotes,
+    peerScreener,
+    peerIndustry,
+    peerFundamentalsUpdatedAt,
+    peerScreenerUpdatedAt,
+    live.marketCap,
+    stock.exchange,
+  ]);
+
   if (!hasLiveFundamentals) {
     return <Shell><article className="mx-auto max-w-4xl px-4 py-10">
       <nav aria-label="Breadcrumb"><Link to="/">Home</Link> / <Link to="/exchange/$code" params={{ code: stock.exchange }}>{stock.exchange}</Link> / {stock.symbol}</nav>
-      <h1 className="mt-6 text-3xl font-bold">{stock.symbol} — {stock.name}</h1>
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-3xl font-bold">{stock.symbol} — {stock.name}</h1>
+        <WatchlistButton stock={live} />
+      </div>
       <p className="mt-5 text-muted-foreground">{stockSummary(stock)}</p>
       {quote && <p className="mt-5 text-xl">Latest available price: {formatPrice(quote.price, stock.exchange)}</p>}
       <section className="mt-6 rounded-lg border border-border p-5">
@@ -193,14 +311,24 @@ function StockPage() {
         <p className="mt-3 text-sm text-muted-foreground">Provider fundamentals have not loaded. Scores, valuation targets and financial ratios are withheld here rather than filled with simulated values. Try again later and check company filings.</p>
         <Link to="/methodology" className="mt-3 inline-block text-primary">How the research model works</Link>
       </section>
-      <section className="mt-8"><h2 className="text-lg font-semibold">Research questions</h2><dl className="mt-4 space-y-4">{stockFaqs(live, sources).map(faq => <div key={faq.q}><dt className="font-medium">{faq.q}</dt><dd className="mt-1 text-sm text-muted-foreground">{faq.a}</dd></div>)}</dl></section>
+      <section className="mt-6"><h2 className="text-lg font-semibold">Research questions</h2><dl className="mt-4 space-y-4">{stockFaqs(
+        live,
+        sources,
+        liveFundamentals,
+        peerExchangeCodesFor(live.exchange)
+          .flatMap((exchange) => stocksByExchange(exchange))
+          .filter((peer) => peer.symbol !== live.symbol && peer.sector === live.sector)
+          .sort((a, b) => Math.abs(Math.log(Math.max(a.marketCap, 0.001) / Math.max(live.marketCap, 0.001))) - Math.abs(Math.log(Math.max(b.marketCap, 0.001) / Math.max(live.marketCap, 0.001))))
+          .slice(0, 5)
+          .map((peer) => peer.symbol + " (" + peer.name + ")"),
+      ).map(faq => <div key={faq.q}><dt className="font-medium">{faq.q}</dt><dd className="mt-1 text-sm text-muted-foreground">{faq.a}</dd></div>)}</dl></section>
       <TopicIndex ids={["stocks", "learn"]} inContainer />
     </article></Shell>;
   }
 
   return (
     <Shell>
-      <div className="mx-auto max-w-7xl px-4 py-8">
+      <div className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 lg:px-8">
         <nav className="num text-xs text-muted-foreground">
           <Link to="/" className="hover:text-foreground">
             Home
@@ -216,7 +344,7 @@ function StockPage() {
           / {stock.symbol}
         </nav>
 
-        <header className="mt-3 flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6">
+        <header className="mt-3 flex flex-wrap items-end justify-between gap-4 border-b border-border pb-5">
           <div>
              <h1 className="num text-3xl font-bold tracking-tight">
                {stock.symbol} — {stock.name}
@@ -238,6 +366,9 @@ function StockPage() {
                 ? `Live · ${quote.marketState || "market"} · updated ${new Date(dataUpdatedAt).toLocaleTimeString()}`
                 : "Fetching live price…"}
             </p>
+            <div className="mt-3 flex justify-end">
+              <WatchlistButton stock={live} />
+            </div>
             {quote ? (
               <p className="num mt-0.5 text-[11px] text-muted-foreground">
                 Day {formatPrice(quote.dayLow, stock.exchange)}–
@@ -249,10 +380,8 @@ function StockPage() {
           </div>
         </header>
 
-        {Object.values(sources).some(source => source === "model") && <aside className="mt-5 rounded-lg border border-warn/40 bg-warn/5 p-4 text-sm" data-nosnippet="">
-          <strong>Incomplete financial inputs.</strong> Some figures below use simulated fallback values. Scores, targets and holding periods that depend on them are illustrative, not reliable company assessments. Verify provider-backed figures against filings.
-        </aside>}
-        <p className="mt-5 max-w-4xl text-sm leading-relaxed text-muted-foreground">
+        
+        <p className="mt-4 max-w-5xl text-sm leading-relaxed text-muted-foreground">
           {stockSummary(live)}
         </p>
 
@@ -277,13 +406,9 @@ function StockPage() {
           );
         })()}
 
-        <section className="mt-6 grid gap-4 lg:grid-cols-3">
-            <PaywallGate
-              feature="DeepScreen verdict and weighted score"
-              className="lg:col-span-2"
-              minHeight="min-h-[220px]"
-            >
-              <div className="card-hover rounded-lg border border-border bg-panel p-5">
+        <section className="mt-5 grid items-stretch gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(300px,1fr)]">
+            <div className="min-w-0">
+              <div className="card-hover h-full rounded-lg border border-border bg-panel p-5">
                 <div className="flex items-center justify-between">
                   <h2 className="text-sm font-semibold uppercase tracking-wide">
                     DeepScreen verdict
@@ -308,9 +433,9 @@ function StockPage() {
                 </div>
                 <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{a.summary}</p>
               </div>
-            </PaywallGate>
+            </div>
 
-            <div className="grid gap-4">
+            <div className="grid min-w-0 gap-4">
               <div className="card-hover rounded-lg border border-bull/30 bg-panel p-4">
                 <h3 className="text-xs font-semibold uppercase tracking-wide text-bull">
                   Strengths
@@ -336,30 +461,60 @@ function StockPage() {
             </div>
         </section>
 
+        <ScoreExplanationPanel analysis={a} />
+
+        <ScoreChangePanel
+          exchange={stock.exchange}
+          symbol={stock.symbol}
+          analysis={a}
+          liveFundamentals={liveFundamentals}
+        />
+
+        <FundamentalSnapshotPanel
+          stock={live}
+          liveFundamentals={liveFundamentals}
+          sources={sources}
+          updatedAt={Math.max(fundUpdatedAt, screenerUpdatedAt)}
+        />
+
+        <ResearchAlertsPanel
+          stock={live}
+          analysis={a}
+          liveFundamentals={liveFundamentals}
+        />
+
+                <PeerAnalysisPanel
+          stock={live}
+          analysis={a}
+          peers={peerRows}
+          targetIndustry={peerIndustry}
+          dataUpdatedAt={Math.max(peerFundamentalsUpdatedAt, peerScreenerUpdatedAt)}
+        />
+
         <PaywallGate
           feature="Vision &amp; Utility score and Secret Tips badges"
-          className="mt-8"
+          className="mt-6"
           minHeight="min-h-[260px]"
         >
-          <section className="grid gap-4 lg:grid-cols-2">
-            <VisionCard intel={intel} />
-            <SecretTipsPanel intel={intel} />
-          </section>
+          <VisionCard intel={intel} />
         </PaywallGate>
 
-        <section className="mt-8 space-y-4">
+        <PaywallGate
+          feature="DeepScreen Secret Tips, traps & X-Ray analysis"
+          className="mt-4"
+          minHeight="min-h-[420px]"
+        >
+          <SecretTipsPanel intel={intel} />
+        </PaywallGate>
+
+        <section className="mt-6 space-y-3">
           <ForensicPanel intel={intel} locked={!isPro} />
-          <PaywallGate
-            feature="Advanced ratios — margins, cash flow, EV/EBITDA, turnover & DuPont"
-            minHeight="min-h-[280px]"
-          >
-            <ExtendedRatiosPanel intel={intel} />
-          </PaywallGate>
+          <ExtendedRatiosPanel intel={intel} />
         </section>
 
         <PaywallGate
           feature="Target price, trim level & stop-loss"
-          className="mt-8"
+          className="mt-6"
           minHeight="min-h-[220px]"
         >
           <HoldingPlanCard stock={live} />
@@ -369,7 +524,7 @@ function StockPage() {
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide">
               Fundamental breakdown{" "}
               <span className="font-normal normal-case text-muted-foreground">
-                — raw ratios are free{isPro ? ", hover any card for context" : ""} ·{" "}
+                — core ratios are free · EV/Revenue, PEG, EV/EBITDA and LT D/E are Pro-only{" "}
                 {hasLiveFundamentals
                   ? isIndianExchange && screenerRatios
                     ? `Screener.in filing ratios + live market data, updated ${new Date(Math.max(fundUpdatedAt, screenerUpdatedAt)).toLocaleTimeString()}`
@@ -405,8 +560,16 @@ function StockPage() {
                           : "Modeled"}
                       </span>
                     </div>
-                    <p className="num mt-1 text-2xl font-bold">{m.display}</p>
-                    <p className={cn("mt-1 text-xs", bandText[m.band])}>{m.reading}</p>
+                    <p className="num mt-1 text-2xl font-bold">
+                      {["peg", "evRevenue", "evEbitda", "ltde"].includes(m.key) ? (
+                        <ProMetricValue value={m.display} />
+                      ) : (
+                        m.display
+                      )}
+                    </p>
+                    <p className={cn("mt-1 text-xs", bandText[m.band])}>
+                      {["peg", "evRevenue", "evEbitda", "ltde"].includes(m.key) ? "Advanced ratio · DeepScreen Pro" : m.reading}
+                    </p>
                     <div className="mt-2 h-1 overflow-hidden rounded-full bg-muted">
                       <div
                         className={cn(
@@ -417,7 +580,11 @@ function StockPage() {
                       />
                     </div>
                     <p className="mt-2 text-[11px] leading-snug text-muted-foreground">
-                      {isPro ? m.tooltip : "Contextual insight — DeepScreen Pro"}
+                      {["peg", "evRevenue", "evEbitda", "ltde"].includes(m.key) ? (
+                        <ProMetricValue value={<span>Advanced ratio — unlock with Pro</span>} />
+                      ) : (
+                        m.tooltip
+                      )}
                     </p>
                   </div>
                 );
@@ -436,7 +603,7 @@ function StockPage() {
           </section>
         </PaywallGate>
 
-        <section className="mt-8 grid gap-6 lg:grid-cols-2">
+        <section className="mt-6 grid gap-4 lg:grid-cols-2">
           <div className="rounded-lg border border-border bg-panel p-5">
             <h2 className="text-sm font-semibold uppercase tracking-wide">Company financials</h2>
             <dl className="num mt-3 grid grid-cols-2 gap-y-2 text-sm">
@@ -469,7 +636,7 @@ function StockPage() {
             limit={10}
           />
         </section>
-        <section className="mt-10 border-t border-border pt-8">
+        <section className="mt-8 border-t border-border pt-6">
           <h2 className="text-lg font-semibold">Frequently asked questions about {stock.symbol}</h2>
           <dl className="mt-5 space-y-5">
             {stockFaqs(live, sources).map((faq) => (
