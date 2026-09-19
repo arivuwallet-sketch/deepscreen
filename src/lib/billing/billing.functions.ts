@@ -30,7 +30,10 @@ export const createCheckout = createServerFn({ method: "POST" })
       const plan = PLANS.find((p) => p.tier === data.tier);
       if (!plan) return { ok: false, error: "Unknown plan." };
       if (!/^https?:\/\//.test(data.origin)) return { ok: false, error: "Bad origin." };
-      if (!/^[6-9]\d{9}$/.test(data.phone)) {
+      if (
+        !/^[6-9]\d{9}$/.test(data.phone) ||
+        /^([0-9])\1{9}$/.test(data.phone)
+      ) {
         return { ok: false, error: "Enter a valid 10-digit Indian mobile number." };
       }
 
