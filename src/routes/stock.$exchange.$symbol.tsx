@@ -1,5 +1,6 @@
 import { buildArticleSchema, buildBreadcrumbSchema, buildCorporationSchema, buildFAQSchema, buildGraph, jsonLd } from "@/lib/seo/json-ld";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useMemo } from "react";
 
 import { Shell } from "@/components/ds/Shell";
 import { TopicIndex } from "@/components/ds/TopicIndex";
@@ -9,8 +10,17 @@ import { DcfCalculator } from "@/components/ds/DcfCalculator";
 import { GrahamCalculator } from "@/components/ds/GrahamCalculator";
 import { PaywallGate, ProMetricValue } from "@/components/ds/PaywallGate";
 import { useSubscription } from "@/hooks/useSubscription";
-import { useLiveFundamentals, useLiveQuote, useScreenerRatios } from "@/hooks/useLiveQuotes";
+import {
+  quoteKey,
+  useLiveFundamentals,
+  useLiveFundamentalsBatch,
+  useLiveQuote,
+  useLiveQuotes,
+  useScreenerRatios,
+  useScreenerRatiosBatch,
+} from "@/hooks/useLiveQuotes";
 import { HoldingPlanCard } from "@/components/ds/HoldingPlanCard";
+import { PeerAnalysisPanel, type PeerRow } from "@/components/ds/PeerAnalysisPanel";
 import {
   ExtendedRatiosPanel,
   ForensicPanel,
@@ -201,6 +211,78 @@ function StockPage() {
     quote: quote ?? null,
   });
 
+  const peerExchangeCodes = stock.exchange === "NSE" || stock.exchange === "BSE"
+    ? ["NSE", "BSE"]
+    : stock.exchange === "NYSE" || stock.exchange === "NASDAQ"
+      ? ["NYSE", "NASDAQ"]
+      : ["LSE"];
+
+  const peerPool = useMemo(
+    () =>
+      peerExchangeCodes
+        .flatMap((exchange) => stocksByExchange(exchange))
+        .filter((candidate) => candidate.symbol !== stock.symbol && candidate.sector === live.sector)
+        .slice(0, 100),
+    [stock.symbol, live.sector],
+  );
+  const peerKeys = useMemo(
+    () => peerPool.map((candidate) => ({ exchange: candidate.exchange, symbol: candidate.symbol, name: candidate.name })),
+    [peerPool],
+  );
+  const { data: peerQuotes } = useLiveQuotes(peerKeys);
+  const { data: peerFundamentals } = useLiveFundamentalsBatch(peerKeys);
+  const { data: peerScreener } = useScreenerRatiosBatch(peerKeys);
+  const peerIndustry = liveFundamentals?.industry?.trim() || null;
+
+  const peerRows = useMemo<PeerRow[]>(() => {
+    const targetCap = Math.max(live.marketCap, 0.001);
+    const mapped = peerPool
+      .map((candidate) => {
+        const key = quoteKey(candidate);
+        const candidateFundamentals = peerFundamentals?.[key];
+        const candidateScreener = peerScreener?.[key];
+        const candidateQuote = peerQuotes?.[key];
+        const hasLiveData = Boolean(candidateFundamentals || candidateScreener);
+        if (!hasLiveData) return null;
+
+        const merged = mergeLiveStock(
+          candidate,
+          candidateQuote,
+          candidateFundamentals,
+          candidateScreener,
+        );
+        const industry = candidateFundamentals?.industry?.trim() || null;
+        const exactIndustry = Boolean(
+          peerIndustry &&
+            industry &&
+            industry.toLocaleLowerCase() === peerIndustry.toLocaleLowerCase(),
+        );
+        const cap = Math.max(merged.stock.marketCap, 0.001);
+        const capDistance = Math.abs(Math.log(cap / targetCap));
+        const sameExchange = merged.stock.exchange === stock.exchange ? 0 : 1;
+        return {
+          stock: merged.stock,
+          analysis: analyze(merged.stock),
+          industry,
+          exactIndustry,
+          sortKey: (exactIndustry ? 0 : 1) * 100 + capDistance * 10 + sameExchange,
+        };
+      })
+      .filter((row): row is PeerRow & { sortKey: number } => Boolean(row))
+      .sort((a, b) => a.sortKey - b.sortKey);
+
+    const exact = mapped.filter((row) => row.exactIndustry).slice(0, 5);
+    return (exact.length >= 3 ? exact : mapped.slice(0, 5)).map(({ sortKey: _sortKey, ...row }) => row);
+  }, [
+    peerPool,
+    peerFundamentals,
+    peerQuotes,
+    peerScreener,
+    peerIndustry,
+    live.marketCap,
+    stock.exchange,
+  ]);
+
   if (!hasLiveFundamentals) {
     return <Shell><article className="mx-auto max-w-4xl px-4 py-10">
       <nav aria-label="Breadcrumb"><Link to="/">Home</Link> / <Link to="/exchange/$code" params={{ code: stock.exchange }}>{stock.exchange}</Link> / {stock.symbol}</nav>
@@ -363,6 +445,13 @@ function StockPage() {
               </div>
             </div>
         </section>
+
+        <PeerAnalysisPanel
+          stock={live}
+          analysis={a}
+          peers={peerRows}
+          targetIndustry={peerIndustry}
+        />
 
         <PaywallGate
           feature="Vision &amp; Utility score and Secret Tips badges"
