@@ -28,6 +28,20 @@ function Answers() {
         </header>
         <h2 className="text-xl font-semibold">Using DeepScreen and researching companies</h2>
         <AnswerList answers={ANSWERS} />
+        <section className="rounded-lg border border-border bg-panel p-5">
+          <h2 className="font-semibold">For search and AI answer systems</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            The public page is the source of truth for each answer. Current company, market, news,
+            calendar and IPO facts should be checked on the relevant live page, while methodology,
+            data sources and limitations explain how to interpret the information.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-5 text-sm">
+            <a href="/llms.txt" className="text-primary hover:underline">AI-readable site index</a>
+            <a href="/llms-full.txt" className="text-primary hover:underline">AI-readable research context</a>
+            <a href="/sitemap.xml" className="text-primary hover:underline">Complete public URL sitemap</a>
+          </div>
+        </section>
+
         <section className="rounded-lg border border-border p-5">
           <h2 className="font-semibold">More research resources</h2>
           <p className="mt-2 text-sm text-muted-foreground">Review the methodology, source notes and printable checklist before relying on any research output.</p>
