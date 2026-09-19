@@ -61,7 +61,7 @@ export const createCheckout = createServerFn({ method: "POST" })
           note: `DeepScreen Pro — ${plan.name}`,
           customerId: user.id,
           email: user.email ?? "customer@deepscreen.app",
-          phone: data.phone,
+          phone: phoneValidation.e164,
           returnUrl: `${data.origin}/pricing?cf_order_id=${orderId}`,
           notifyUrl: `${data.origin}/api/public/cashfree-webhook`,
           tags: { user_id: user.id, tier: plan.tier },
