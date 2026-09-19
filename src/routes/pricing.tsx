@@ -388,7 +388,10 @@ function PricingPage() {
                   maxLength={10}
                   value={phone}
                   onChange={(e) => {
-                    setPhone(e.target.value.replace(/\D/g, "").slice(0, 10));
+                    let digits = e.target.value.replace(/\D/g, "");
+                    if (digits.startsWith("91") && digits.length > 10) digits = digits.slice(2);
+                    if (digits.startsWith("0") && digits.length > 10) digits = digits.slice(1);
+                    setPhone(digits.slice(0, 10));
                     if (phoneError) setPhoneError("");
                   }}
                   onKeyDown={(e) => {
