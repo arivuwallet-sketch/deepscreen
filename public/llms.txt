@@ -36,6 +36,16 @@
 ## Research and education
 
 - [Learn library](https://deepscreen.online/learn): plain-English guides for stock screening, valuation, exchanges, charts, IPOs, options and portfolios.
+
+- Original DeepScreen research
+  - https://deepscreen.online/learn/nse-vs-bse
+  - https://deepscreen.online/learn/how-to-analyze-an-indian-stock-in-15-minutes
+  - https://deepscreen.online/learn/pe-vs-peg-vs-ev-ebitda
+  - https://deepscreen.online/learn/roe-vs-roce-with-real-company-examples
+  - https://deepscreen.online/learn/how-to-detect-a-debt-trap
+  - https://deepscreen.online/learn/free-cash-flow-analysis-guide
+  - https://deepscreen.online/learn/promoter-pledging-risk-analysis
+  - https://deepscreen.online/learn/10-year-compounder-analysis-framework
 - [P/E ratio explained](https://deepscreen.online/learn/pe-ratio-explained)
 - [What is a stock screener?](https://deepscreen.online/learn/what-is-a-stock-screener)
 - [NSE vs BSE](https://deepscreen.online/learn/nse-vs-bse)
