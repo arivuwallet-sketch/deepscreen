@@ -49,11 +49,13 @@ export function PeerAnalysisPanel({
   analysis,
   peers,
   targetIndustry,
+  dataUpdatedAt,
 }: {
   stock: Stock;
   analysis: Analysis;
   peers: PeerRow[];
   targetIndustry: string | null;
+  dataUpdatedAt?: number;
 }) {
   const targetRow: PeerRow = { stock, analysis, industry: targetIndustry, exactIndustry: true };
   const metrics: { key: MetricKey; label: string }[] = [
@@ -94,9 +96,16 @@ export function PeerAnalysisPanel({
               : "Peers use the same regional market universe, same sector and market-cap proximity until a provider-reported industry is available."}
           </p>
         </div>
-        <span className="rounded border border-border px-2.5 py-1 text-[10px] uppercase tracking-wide text-muted-foreground">
-          {peers.length ? peers.length + " peers" : "Loading"}
-        </span>
+        <div className="text-right">
+          <span className="rounded border border-border px-2.5 py-1 text-[10px] uppercase tracking-wide text-muted-foreground">
+            {peers.length ? peers.length + " peers" : "Loading"}
+          </span>
+          {dataUpdatedAt ? (
+            <div className="mt-1 text-[9px] text-muted-foreground">
+              Updated {new Date(dataUpdatedAt).toLocaleTimeString()}
+            </div>
+          ) : null}
+        </div>
       </div>
 
       <p className="mt-4 rounded border border-border bg-card px-3 py-2 text-xs leading-relaxed text-muted-foreground">
