@@ -17,6 +17,7 @@ export interface Fundamentals {
   ps: number;
   pb: number;
   evRevenue: number;
+  /** Positive conventional multiple; 0 is the internal N/M sentinel. */
   evEbitda: number;
   roe: number;
   roa: number;

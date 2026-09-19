@@ -8,6 +8,52 @@ export interface FeedItem {
   category: string;
 }
 
+export function safeExternalHttpUrl(value: string): string | null {
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "https:" && url.protocol !== "http:") return null;
+    if (url.username || url.password) return null;
+    if (url.hostname.length > 253) return null;
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+async function readTextWithLimit(response: Response, maxBytes: number): Promise<string | null> {
+  const declared = Number(response.headers.get("content-length") ?? "");
+  if (Number.isFinite(declared) && declared > maxBytes) return null;
+  if (!response.body) {
+    const text = await response.text();
+    return new TextEncoder().encode(text).byteLength <= maxBytes ? text : null;
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let total = 0;
+  let out = "";
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > maxBytes) {
+        await reader.cancel();
+        return null;
+      }
+      out += decoder.decode(value, { stream: true });
+    }
+    return out + decoder.decode();
+  } finally {
+    reader.releaseLock();
+  }
+}
+
+const MAX_FEED_BYTES = 1_000_000;
+const MAX_TITLE_LENGTH = 500;
+const MAX_SOURCE_LENGTH = 160;
+const MAX_LINK_LENGTH = 2048;
+
 function decode(s: string): string {
   return s
     .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
@@ -46,21 +92,23 @@ export async function fetchFeed(
       signal: AbortSignal.timeout(8000),
     });
     if (!res.ok) return [];
-    const xml = await res.text();
+    const xml = await readTextWithLimit(res, MAX_FEED_BYTES);
+    if (xml === null) return [];
     const blocks = xml.match(/<(item|entry)[\s>][\s\S]*?<\/(item|entry)>/gi) ?? [];
     const now = Date.now();
     const items: FeedItem[] = [];
     for (const [i, block] of blocks.slice(0, limit).entries()) {
-      const title = tag(block, "title");
+      const title = tag(block, "title").slice(0, MAX_TITLE_LENGTH);
       if (!title) continue;
-      const link = tag(block, "link");
+      const link = tag(block, "link").slice(0, MAX_LINK_LENGTH);
+      const safeLink = safeExternalHttpUrl(link);
       const dateStr = tag(block, "pubDate") || tag(block, "updated") || tag(block, "published");
       const ts = dateStr ? Date.parse(dateStr) : NaN;
       items.push({
         id: `${source}-${i}-${title.slice(0, 40)}`,
         title,
-        link,
-        source: tag(block, "source") || source,
+        link: safeLink ?? "",
+        source: (tag(block, "source") || source).slice(0, MAX_SOURCE_LENGTH),
         publishedAt: Number.isFinite(ts) ? new Date(ts).toISOString() : new Date().toISOString(),
         minutesAgo: Number.isFinite(ts) ? Math.max(0, Math.round((now - ts) / 60000)) : 0,
         category,
@@ -108,17 +156,21 @@ export async function fetchYahooNews(query: string, limit = 12): Promise<FeedIte
       signal: AbortSignal.timeout(8000),
     });
     if (!res.ok) return [];
-    const body = (await res.json()) as { news?: YahooNewsResult[] };
+    const textBody = await readTextWithLimit(res, MAX_FEED_BYTES);
+    if (textBody === null) return [];
+    const body = JSON.parse(textBody) as { news?: YahooNewsResult[] };
     const now = Date.now();
     return (body.news ?? []).flatMap((item, index) => {
       if (!item.title || !item.link) return [];
+      const safeLink = safeExternalHttpUrl(item.link);
+      if (!safeLink) return [];
       const publishedMs = item.providerPublishTime
         ? item.providerPublishTime * 1000
         : now;
       return [{
         id: item.uuid ?? `Yahoo-${index}-${item.title.slice(0, 40)}`,
-        title: item.title,
-        link: item.link,
+        title: item.title.slice(0, MAX_TITLE_LENGTH),
+        link: safeLink,
         source: item.publisher ?? "Yahoo Finance",
         publishedAt: new Date(publishedMs).toISOString(),
         minutesAgo: Math.max(0, Math.round((now - publishedMs) / 60000)),
