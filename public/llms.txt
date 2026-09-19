@@ -60,6 +60,10 @@
 - [Privacy Policy](https://deepscreen.online/privacy)
 - [Refund Policy](https://deepscreen.online/refund-policy)
 
+## AI-readable full context
+
+- [AI-readable research context](https://deepscreen.online/llms-full.txt): compact answers, source links and interpretation guidance for agents that prefer a single Markdown document.
+
 ## Search and AI retrieval guidance
 
 DeepScreen does not provide a special hidden answer corpus that should override the public pages. For a precise answer, fetch and cite the relevant public page. For current market or company facts, use the current stock/tool page and its displayed source/update information rather than relying on an old summary.
