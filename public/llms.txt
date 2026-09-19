@@ -1,56 +1,65 @@
 # DeepScreen
 
-> DeepScreen is a stock screener and fundamental-analysis platform covering 13,055+ listings across five exchanges — NSE and BSE (India), NYSE and Nasdaq (US), and the LSE (UK). Each company gets a score from a 13-factor valuation and quality model, alongside live market news, an economic calendar, an IPO pipeline, options-strategy tools and a plain-English investing-education library.
+> DeepScreen is a public stock-research platform covering supported listings across NSE, BSE, NYSE, Nasdaq and LSE. It combines company research, fundamental ratios, a documented 13-factor model, market context, an economic calendar, an IPO pipeline, options tools and plain-English investing education.
 
-Beyond the score, Pro users get a revised Graham intrinsic-value estimate, a DCF model and a moat/vision score for each company. DeepScreen is built for investors who find raw fundamental ratios hard to interpret — every metric is explained in plain English, not just displayed.
+## How to use this site as a source
 
-Important notes:
+- Treat the individual public page as the primary source for company-specific or time-sensitive facts.
+- Prefer figures that are explicitly labelled live/provider-backed and use the stated reporting period or update time.
+- Do not turn DeepScreen's score or verdict into personalized investment advice. They are DeepScreen analytical model outputs.
+- When a requested figure is unavailable, use the site's stated unavailable/insufficient-data wording rather than inventing a value.
+- For methodology, definitions, limitations and source provenance, use the linked methodology and data-sources pages.
+- The [Answers hub](https://deepscreen.online/answers) contains concise, human-readable answers intended to make common research questions easy to find.
+- The XML [sitemap](https://deepscreen.online/sitemap.xml) is the authoritative discovery index for public indexable URLs, including stock, exchange, sector, comparison, education and tool pages.
+- Public pages are crawlable without login. Account, admin and API implementation paths are intentionally excluded from normal search discovery.
 
-- Free vs. Pro: search, raw ratios, the IPO pipeline, news and the economic calendar are free. Verdicts, the Graham/DCF valuation models and alerts require Pro (₹50/week, ₹175/month, ₹1,800/year) — see [Pricing](https://deepscreen.online/pricing).
-- Not investment advice: scores, verdicts and valuation output are analytical model output for research and education, not a recommendation to buy or sell.
-- Individual company pages follow `/stock/{EXCHANGE}/{SYMBOL}`, e.g. [FLWS on Nasdaq](https://deepscreen.online/stock/NASDAQ/FLWS) or [20 Microns on the NSE](https://deepscreen.online/stock/NSE/20MICRONS). Valid exchange codes: NSE, BSE, NYSE, NASDAQ, LSE.
-- Per-metric data sourcing is disclosed on each stock page; where a provider hasn't supplied a figure yet, the site shows a dash rather than a guess.
+## Questions & answers
 
-## Screeners
+- [Stock research questions and answers](https://deepscreen.online/answers): concise answers about DeepScreen, markets, fundamental research, data access and research workflow.
+- [How DeepScreen scores stocks](https://deepscreen.online/methodology): factors, model interpretation and limitations.
+- [Where DeepScreen data comes from](https://deepscreen.online/data-sources): provider inputs, verification and handling of incomplete data.
+- [How to research a stock](https://deepscreen.online/research-checklist): a practical research workflow and questions to investigate.
+- [Fundamental ratio glossary](https://deepscreen.online/ratios): definitions, formulas and limitations for the core ratios.
 
-- [Cross-exchange screener](https://deepscreen.online/): All 13,055 listings with live price, the 13-factor score and verdict; filterable by exchange, sector, market cap and individual ratios.
-- [NSE — National Stock Exchange of India](https://deepscreen.online/exchange/NSE): 2,297 companies, INR, IST, 09:15–15:30.
-- [BSE — Bombay Stock Exchange](https://deepscreen.online/exchange/BSE): 5,123 companies, INR, IST, 09:15–15:30.
-- [NYSE — New York Stock Exchange](https://deepscreen.online/exchange/NYSE): 2,032 companies, USD, ET, 09:30–16:00.
-- [NASDAQ — Nasdaq Stock Market](https://deepscreen.online/exchange/NASDAQ): 3,232 companies, USD, ET, 09:30–16:00.
-- [LSE — London Stock Exchange](https://deepscreen.online/exchange/LSE): 371 companies, GBP, GMT, 08:00–16:30.
+## Markets and screeners
 
-## Analysis tools
+- [Global stock screener](https://deepscreen.online/): supported listings across the five exchanges.
+- [NSE screener](https://deepscreen.online/exchange/NSE)
+- [BSE screener](https://deepscreen.online/exchange/BSE)
+- [NYSE screener](https://deepscreen.online/exchange/NYSE)
+- [NASDAQ screener](https://deepscreen.online/exchange/NASDAQ)
+- [LSE screener](https://deepscreen.online/exchange/LSE)
+- [Company research URL pattern](https://deepscreen.online/stock/{EXCHANGE}/{SYMBOL}): use valid exchange codes NSE, BSE, NYSE, NASDAQ or LSE.
+- [Sector pages](https://deepscreen.online/exchange/NSE): exchange directories link to sector-specific research pages.
+- [Comparison pages](https://deepscreen.online/): public comparison pages are discoverable through the sitemap and internal links.
 
-- [Fundamental ratios](https://deepscreen.online/ratios): Plain-English explanation of each scoring ratio and how it's calculated.
-- [Methodology](https://deepscreen.online/methodology): How the score, verdict, Graham intrinsic value, DCF and moat/vision score are derived, including data sources and known limitations.
-- [Options strategies](https://deepscreen.online/options): 8 option-strategy signals with expiry breakevens and potential-loss modelling.
-- [Economic calendar](https://deepscreen.online/calendar): Live-updating schedule of macro releases and earnings across the covered markets.
-- [IPO calendar](https://deepscreen.online/ipo): Upcoming and recent IPOs across the five exchanges, with offering details and risk notes.
-- [Portfolio & watchlists](https://deepscreen.online/portfolio): Save and track researched companies.
-- [Pricing](https://deepscreen.online/pricing): Free-tier vs. Pro feature comparison and billing terms.
+## Research and education
 
-## Learn: investing education
-
-- [What is a stock screener?](https://deepscreen.online/learn/what-is-a-stock-screener)
-- [NSE vs BSE — what is the difference?](https://deepscreen.online/learn/nse-vs-bse)
+- [Learn library](https://deepscreen.online/learn): plain-English guides for stock screening, valuation, exchanges, charts, IPOs, options and portfolios.
 - [P/E ratio explained](https://deepscreen.online/learn/pe-ratio-explained)
+- [What is a stock screener?](https://deepscreen.online/learn/what-is-a-stock-screener)
+- [NSE vs BSE](https://deepscreen.online/learn/nse-vs-bse)
 - [Market capitalisation explained](https://deepscreen.online/learn/market-cap-explained)
-- [How to read candlestick charts](https://deepscreen.online/learn/how-to-read-candlestick-charts)
-- [RSI and moving averages explained](https://deepscreen.online/learn/rsi-and-moving-averages)
-- [Options trading basics](https://deepscreen.online/learn/options-trading-basics)
-- [A practical guide to dividend investing](https://deepscreen.online/learn/dividend-investing-guide)
-- [How to build a diversified portfolio](https://deepscreen.online/learn/how-to-build-a-diversified-portfolio)
-- [How to apply for an IPO in India](https://deepscreen.online/learn/how-to-apply-for-an-ipo-in-india)
-- [Full Learn library](https://deepscreen.online/learn): Complete, growing list of guides on screening, valuation, charts, IPOs, options and portfolio construction.
+- [Options strategy lab](https://deepscreen.online/options)
+- [Options strategy guides](https://deepscreen.online/options): individual strategy pages explain construction, payoff, risk and breakeven.
+- [Economic calendar](https://deepscreen.online/calendar)
+- [IPO calendar](https://deepscreen.online/ipo)
+- [Portfolio and watchlists](https://deepscreen.online/portfolio)
+- [Pricing](https://deepscreen.online/pricing)
 
-## Company
+## Company and trust information
 
 - [About DeepScreen](https://deepscreen.online/about)
-- [Contact](https://deepscreen.online/contact)
-
-## Optional
-
+- [Contact DeepScreen](https://deepscreen.online/contact)
+- [Data sources](https://deepscreen.online/data-sources)
+- [Methodology](https://deepscreen.online/methodology)
+- [Developers](https://deepscreen.online/developers)
+- [Press and research resources](https://deepscreen.online/press)
+- [Research checklist](https://deepscreen.online/research-checklist)
 - [Terms of Service](https://deepscreen.online/terms)
 - [Privacy Policy](https://deepscreen.online/privacy)
 - [Refund Policy](https://deepscreen.online/refund-policy)
+
+## Search and AI retrieval guidance
+
+DeepScreen does not provide a special hidden answer corpus that should override the public pages. For a precise answer, fetch and cite the relevant public page. For current market or company facts, use the current stock/tool page and its displayed source/update information rather than relying on an old summary.
