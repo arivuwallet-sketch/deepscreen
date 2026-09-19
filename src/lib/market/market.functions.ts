@@ -473,6 +473,32 @@ function newsKey(query: string): string {
   return query.trim().replace(/\s+/g, " ").toLowerCase().slice(0, 240);
 }
 
+/**
+ * Build conservative fallback searches for company queries.
+ * Google/Bing/Yahoo can all interpret quoted OR queries differently, and some
+ * tickers with punctuation are especially easy to miss. We only split queries
+ * that contain two quoted terms (the stock page's "company" OR "ticker" form).
+ * Never broadens arbitrary workplace/general-news queries.
+ */
+function newsQueryVariants(query: string): string[] {
+  const safe = query.trim().replace(/\s+/g, " ").slice(0, 240);
+  if (!safe) return [];
+
+  const variants = [safe];
+  const quoted = [...safe.matchAll(/"([^"]+)"/g)]
+    .map((match) => match[1]?.trim())
+    .filter((term): term is string => Boolean(term))
+    .slice(0, 3);
+
+  if (quoted.length >= 2) {
+    variants.push(...quoted);
+    const relaxed = safe.replace(/"/g, "").replace(/\s+\bOR\b\s+/gi, " ").trim();
+    if (relaxed) variants.push(relaxed);
+  }
+
+  return [...new Set(variants)].slice(0, 4);
+}
+
 export const getNewsFeed = createServerFn({ method: "GET" })
   .inputValidator((d: { query: string; limit?: number }) => d)
   .handler(async ({ data }): Promise<LiveNewsResult> => {
@@ -489,7 +515,7 @@ export const getNewsFeed = createServerFn({ method: "GET" })
     const existing = newsInFlight.get(key);
     if (existing) return existing;
 
-    const request = (async (): Promise<LiveNewsResult> => {
+    const requestPromise = (async (): Promise<LiveNewsResult> => {
       const { fetchFeed, fetchYahooNews, googleNewsFeed, bingNewsFeed } = await import("@/lib/rss.server");
       const { readNewsCache, writeNewsCache } = await import("./news-cache.server");
       const persisted = await readNewsCache(key);
@@ -504,25 +530,48 @@ export const getNewsFeed = createServerFn({ method: "GET" })
         return result;
       }
 
-      const [google, bing, yahoo] = await Promise.all([
-        fetchFeed(googleNewsFeed(data.query), "Google News", "market", limit),
-        fetchFeed(bingNewsFeed(data.query), "Bing News", "market", limit),
-        fetchYahooNews(data.query, limit),
-      ]);
-      const providers = [google, bing, yahoo].filter((items) => items.length > 0).length;
-      const items = dedupe([...google, ...bing, ...yahoo])
+      const queries = newsQueryVariants(data.query);
+      const allItems = [];
+      const providerNames = new Set<string>();
+
+      // Try the exact search first. Only when every provider is empty do we
+      // fan out to conservative company-name/ticker fallbacks.
+      for (const query of queries) {
+        const [google, bing, yahoo] = await Promise.all([
+          fetchFeed(googleNewsFeed(query), "Google News", "market", limit),
+          fetchFeed(bingNewsFeed(query), "Bing News", "market", limit),
+          fetchYahooNews(query, limit),
+        ]);
+        if (google.length > 0) providerNames.add("Google News");
+        if (bing.length > 0) providerNames.add("Bing News");
+        if (yahoo.length > 0) providerNames.add("Yahoo Finance");
+        allItems.push(...google, ...bing, ...yahoo);
+
+        const current = dedupe(allItems)
+          .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
+          .slice(0, limit);
+        if (current.length >= limit || (query === queries[0] && current.length > 0)) break;
+      }
+
+      const items = dedupe(allItems)
         .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
         .slice(0, limit);
 
       if (items.length > 0) {
         const fetchedAt = Date.now();
-        const result = { items: refreshAges(items), fetchedAt, stale: false, providerCount: providers };
+        const result = {
+          items: refreshAges(items),
+          fetchedAt,
+          stale: false,
+          providerCount: providerNames.size,
+        };
         newsMemoryCache.set(key, { data: result, fetchedAt });
-        await writeNewsCache(key, items, fetchedAt);        return result;
+        await writeNewsCache(key, items, fetchedAt);
+        return result;
       }
 
       if (persisted) {
-        console.warn(`[news] all providers failed for ${key}; serving last-good cache`);
+        console.warn(`[news] providers empty for ${key}; serving last-good cache`);
         const result = {
           items: refreshAges(persisted.items).slice(0, limit),
           fetchedAt: persisted.fetchedAt,
@@ -533,12 +582,12 @@ export const getNewsFeed = createServerFn({ method: "GET" })
         return result;
       }
 
-      console.error(`[news] all providers failed and no cache exists for ${key}`);
+      console.error(`[news] providers empty and no cache exists for ${key}`);
       return { items: [], fetchedAt: Date.now(), stale: true, providerCount: 0 };
     })().finally(() => newsInFlight.delete(key));
 
-    newsInFlight.set(key, request);
-    return request;
+    newsInFlight.set(key, requestPromise);
+    return requestPromise;
   });
 
 
