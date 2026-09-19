@@ -1,8 +1,9 @@
+import type { LiveFundamentals } from "@/lib/market/yahoo.server";
 import type { Stock } from "./types";
 import type { FundamentalSources } from "./live-merge";
 
 const unavailable = (topic: string) =>
-  `DeepScreen does not currently have a verified company-specific ${topic} field in the structured data for this page. That means the site should not invent an answer; the latest annual report, regulatory filings and official company disclosures should be used for this question.`;
+  `The current structured company profile does not contain a reliable company-specific ${topic} figure. The correct source for that fact is the latest annual report, exchange filing and official company disclosure; DeepScreen should not manufacture a number.`;
 
 const liveRatio = (
   sources: FundamentalSources | undefined,
@@ -11,14 +12,74 @@ const liveRatio = (
   suffix = "",
 ) =>
   sources?.[key] === "live" && Number.isFinite(value)
-    ? `${value.toFixed(key === "pe" || key === "roe" || key === "roce" || key === "dividendYield" ? 1 : 2)}${suffix}`
+    ? `${value.toFixed(
+        key === "pe" || key === "roe" || key === "roce" || key === "dividendYield"
+          ? 1
+          : 2,
+      )}${suffix}`
     : null;
+
+const money = (value: number | null | undefined, currency: string | null | undefined) => {
+  if (typeof value !== "number" || !Number.isFinite(value)) return null;
+  const unit = currency === "INR" ? "₹" : currency === "GBP" ? "£" : "$";
+  const abs = Math.abs(value);
+  if (abs >= 1_000_000_000) return unit + (value / 1_000_000_000).toFixed(2) + "B";
+  if (abs >= 1_000_000) return unit + (value / 1_000_000).toFixed(2) + "M";
+  return unit + Math.round(value).toLocaleString("en-US");
+};
+
+function officerText(officers: LiveFundamentals["officers"] | undefined): string | null {
+  if (!officers?.length) return null;
+  const names = officers
+    .slice(0, 5)
+    .map((o) => (o.title ? `${o.name} (${o.title})` : o.name))
+    .filter(Boolean);
+  return names.length ? names.join("; ") : null;
+}
+
+function businessModelAnswer(stock: Stock, live?: LiveFundamentals | null): string {
+  if (live?.summary) {
+    return `${live.summary} This describes the company's disclosed business activity; for exact segment revenue, geography and customer concentration, use the latest annual report.`;
+  }
+  return `${stock.name} operates in the ${stock.sector} sector. The business-model answer should be anchored to its products/services, pricing model, operating segments and sources of revenue rather than inferred from its stock price or valuation ratios.`;
+}
+
+function longTermDemandAnswer(stock: Stock, live?: LiveFundamentals | null): string {
+  const industry = live?.industry ?? stock.sector;
+  return `${stock.name} is classified in ${industry}. Long-term demand is supported when the underlying industry, customer base and product/service use remain durable over multiple years. For ${stock.name}, test that through multi-year revenue and customer trends, retention/repeat purchases where applicable, pricing power, capacity utilisation and the risk of substitution or technological disruption.`;
+}
+
+function profitabilityAnswer(
+  stock: Stock,
+  sources: FundamentalSources | undefined,
+  live?: LiveFundamentals | null,
+): string {
+  const growth = liveRatio(sources, "growth", stock.fundamentals.growth, "%");
+  const roe = liveRatio(sources, "roe", stock.fundamentals.roe, "%");
+  const roce = liveRatio(sources, "roce", stock.fundamentals.roce, "%");
+  const margin = liveRatio(sources, "netMargin", stock.fundamentals.netMargin, "%");
+  const bits = [
+    growth ? `the latest growth measure is ${growth}` : null,
+    margin ? `net margin is ${margin}` : null,
+    roe ? `ROE is ${roe}` : null,
+    roce ? `ROCE is ${roce}` : null,
+  ].filter(Boolean);
+  const headline = bits.length
+    ? `For ${stock.name}, the latest provider-backed snapshot shows ${bits.join(", ")}.`
+    : `For ${stock.name}, the current snapshot does not contain all of the reported profitability fields needed for a numerical conclusion.`;
+  return `${headline} Consistent profitability and healthy year-over-year growth should be confirmed over several reporting periods, with earnings reconciled to operating cash flow and one-off items removed from the analysis.`;
+}
 
 export function stockSummary(stock: Stock): string {
   return `Research ${stock.name} (${stock.exchange}: ${stock.symbol}) using available valuation, profitability and leverage data. Check each figure's source and compare reporting periods before drawing conclusions. Missing provider data must not be treated as a reported company fact.`;
 }
 
-export function stockFaqs(stock: Stock, sources?: FundamentalSources) {
+export function stockFaqs(
+  stock: Stock,
+  sources?: FundamentalSources,
+  live?: LiveFundamentals | null,
+  peerNames: string[] = [],
+) {
   const f = stock.fundamentals;
   const pe = liveRatio(sources, "pe", f.pe, "x");
   const ps = liveRatio(sources, "ps", f.ps, "x");
@@ -29,124 +90,136 @@ export function stockFaqs(stock: Stock, sources?: FundamentalSources) {
   const netMargin = liveRatio(sources, "netMargin", f.netMargin, "%");
   const dividendYield = liveRatio(sources, "dividendYield", f.dividendYield, "%");
   const payout = liveRatio(sources, "payoutRatio", f.payoutRatio, "%");
+  const fcf = money(live?.freeCashflow, live?.currency);
+  const opCash = money(live?.operatingCashflow, live?.currency);
+  const cash = money(live?.totalCash, live?.currency);
+  const debt = money(live?.totalDebt, live?.currency);
+  const netDebt =
+    typeof live?.totalDebt === "number" && typeof live?.totalCash === "number"
+      ? money(live.totalDebt - live.totalCash, live.currency)
+      : null;
+  const executives = officerText(live?.officers);
 
   return [
     {
       q: `How does DeepScreen analyze ${stock.name}?`,
-      a: "DeepScreen uses a 13-factor valuation and quality model. The methodology explains the factors, inputs and limitations; model output is analytical research, not a personalized investment recommendation.",
+      a: "DeepScreen uses a 13-factor valuation and quality model. The methodology explains the inputs, weighting and limitations; model output is analytical research, not a personalized investment recommendation.",
     },
     {
       q: `What is ${stock.symbol}'s P/E ratio?`,
       a: pe
-        ? `The latest provider-backed P/E available to DeepScreen is ${pe}. Check the reporting date and the company's latest earnings before comparing it with peers.`
-        : "A provider-backed P/E ratio is currently unavailable. DeepScreen does not substitute a simulated number for missing reported earnings data.",
+        ? `The latest provider-backed P/E available to DeepScreen is ${pe}. Compare it with the company's own historical range, sustainable earnings growth and close industry peers, using the same reporting period.`
+        : "A current provider-backed P/E is not available. The defensible approach is to calculate or verify it from the latest price and reported trailing earnings rather than substitute a synthetic figure.",
     },
     {
       q: `How should I assess ${stock.name}'s profitability?`,
-      a: [
-        roe ? `Current reported ROE is ${roe}` : "Reported ROE is not currently available",
-        roce ? `and current reported ROCE is ${roce}` : "and reported ROCE is not currently available",
-        ". For a reliable profitability assessment, compare several years of ROE/ROCE with close peers and investigate leverage, one-off gains/losses and accounting policy changes.",
-      ].join(" "),
+      a: profitabilityAnswer(stock, sources, live),
     },
     {
       q: `How much debt does ${stock.name} have?`,
       a: de
-        ? `The latest provider-backed debt-to-equity ratio available to DeepScreen is ${de}. D/E alone does not show the full liquidity picture, so also review cash, maturities, interest expense and operating cash flow in the latest balance sheet and filings.`
-        : unavailable("debt-to-equity and related leverage"),
+        ? `The latest provider-backed debt-to-equity ratio is ${de}. ${debt ? `Total debt is approximately ${debt}` : "The current debt balance is not exposed in this snapshot"}${cash ? `, while cash is approximately ${cash}` : ""}. Assess leverage together with interest expense, maturities and operating cash flow.`
+        : unavailable("debt-to-equity"),
     },
     {
       q: `Is ${stock.symbol} a buy?`,
-      a: "DeepScreen provides research tools rather than a personalized recommendation. Review valuation, business quality, balance-sheet risk, disclosures and your own objectives before making an investment decision.",
+      a: "DeepScreen provides research tools rather than a personalized recommendation. A decision should consider business quality, valuation, balance-sheet risk, disclosures, liquidity and your own objectives and risk tolerance.",
     },
-
     {
       q: "How does the company make money?",
-      a: unavailable("business-model and revenue-segment"),
+      a: businessModelAnswer(stock, live),
     },
     {
       q: "What is the company's competitive advantage (economic moat)?",
-      a: "A moat is company-specific and qualitative: look for durable cost advantages, scale, network effects, switching costs, brands, patents, licences or other structural barriers, and test whether those advantages show up in long-term margins and returns on capital. DeepScreen does not currently publish a verified moat classification for every stock page.",
+      a: `${stock.name}'s potential moat should be evaluated from observable business economics: scale or cost advantages, network effects, switching costs, brand strength, patents or licences, distribution advantages and barriers to entry. The strongest evidence is a durable combination of pricing power, stable/growing margins and returns on capital over many years; a high ROE or ROCE alone does not prove a moat.`,
     },
     {
       q: "Who are the main competitors, and how does the company differ from them?",
-      a: `The current stock dataset does not contain a verified company-by-company competitor map for ${stock.name}. Competitors should be defined using the company's actual products, customers and geographic markets, then compared on growth, margins, returns on capital, leverage, valuation and market position.`,
+      a: peerNames.length
+        ? `Within DeepScreen's current ${stock.exchange} coverage, the closest same-sector listed peers include ${peerNames.join(", ")}. Treat these as a starting peer set rather than proof that each is a direct competitor; the direct comparison should use products, customers, geography, margins, growth, returns on capital and valuation.`
+        : `${stock.name} should be compared with companies selling similar products or services to similar customers in the same geography. A direct-peer set is more informative than comparing against the entire ${stock.sector} sector.`,
     },
     {
       q: "Are its products or services in long-term demand?",
-      a: `DeepScreen cannot establish long-term demand from a single market snapshot. For ${stock.name}, the defensible test is multi-year revenue/customer growth, retention or repeat demand where relevant, industry growth, pricing power, product replacement cycles and the risk of substitution or disruption.`,
+      a: longTermDemandAnswer(stock, live),
     },
     {
       q: "Who are its primary customers (individuals, businesses, or government)?",
-      a: unavailable("customer-mix and end-market concentration"),
+      a: live?.summary
+        ? `The provider's business profile describes ${stock.name}'s activities as follows: ${live.summary} Customer mix itself is not a stock-market ratio, so the primary customers should be confirmed from the company's segment, geographic and customer disclosures.`
+        : `${stock.name} serves markets within the ${stock.sector} sector. Whether its primary customers are consumers, businesses or government depends on its disclosed end markets and contracts; use the company's segment and customer-concentration disclosures for the exact mix.`,
     },
     {
       q: "Is the company consistently profitable, and is its revenue growing year-over-year?",
-      a: [
-        growth ? `The latest provider-backed revenue/earnings growth measure available to DeepScreen is ${growth}` : "A current growth measure is not available",
-        netMargin ? `and the current reported net margin is ${netMargin}` : "and a current provider-backed net margin is not available",
-        ". Consistent profitability and year-over-year growth require a multi-year income-statement series; one period is not enough to establish consistency.",
-      ].join(" "),
+      a: profitabilityAnswer(stock, sources, live),
     },
     {
       q: "Does the company generate positive, healthy free cash flow?",
-      a: unavailable("free-cash-flow and cash-conversion"),
+      a: fcf
+        ? `The latest provider snapshot reports free cash flow of approximately ${fcf}${opCash ? `, with operating cash flow of about ${opCash}` : ""}. Whether that cash flow is healthy depends on persistence, conversion of profit to cash, capital expenditure needs and working-capital movements; inspect multiple periods rather than one TTM figure.`
+        : `Free cash flow should be assessed as operating cash flow minus capital expenditure and then tested for consistency across several periods. A positive single-period result is not enough to establish healthy cash generation.`,
     },
     {
       q: "How high are the company's debt levels compared to its cash holdings and earnings?",
-      a: de
-        ? `DeepScreen currently has a provider-backed debt-to-equity ratio of ${de}, but the page does not have a verified cash balance and interest-coverage series sufficient to answer the full question. The correct assessment combines gross debt, cash, net debt, EBITDA/EBIT and interest expense over time.`
-        : unavailable("debt, cash and interest-coverage"),
+      a: debt || cash || de
+        ? `The current snapshot shows ${de ? `D/E of ${de}` : "a partial leverage picture"}${debt ? `, debt of roughly ${debt}` : ""}${cash ? `, cash of roughly ${cash}` : ""}${netDebt ? `, implying net debt of about ${netDebt}` : ""}. The full debt burden should be compared with EBITDA/EBIT, interest expense, maturities and recurring free cash flow.`
+        : "Compare gross debt and cash first, then assess net debt relative to EBITDA/EBIT and interest coverage. This separates a highly leveraged balance sheet from a business that carries debt comfortably because cash generation is strong.",
     },
     {
       q: "How will the company finance its future growth or expansion projects?",
-      a: unavailable("management's forward financing plans and committed expansion funding"),
+      a: cash || fcf
+        ? `${stock.name} currently has ${cash ? `reported cash of about ${cash}` : "limited disclosed cash data"}${fcf ? ` and free cash flow of about ${fcf}` : ""}. Those internal resources can contribute to expansion, while additional funding can come from operating cash flow, debt, equity issuance, asset sales or project finance. The exact funding mix for a specific project must come from management's disclosed plans.`
+        : "The normal financing options are internally generated cash, existing cash reserves, new debt, equity issuance, asset sales or project finance. The exact mix for a future project should be taken from management's announced capital-allocation and funding plans.",
     },
     {
       q: "What is the company's historical Return on Equity (ROE) and Return on Capital Employed (ROCE)?",
       a: roe || roce
-        ? `The current snapshot reports ${roe ? `ROE of ${roe}` : "no live ROE"}${roe && roce ? " and " : ""}${roce ? `ROCE of ${roce}` : "no live ROCE"}. DeepScreen does not currently store a complete historical time series for these ratios on every stock page, so historical consistency should be checked against annual filings.`
-        : "A provider-backed current ROE/ROCE is unavailable. Historical ROE and ROCE should be taken from the company's annual filings rather than reconstructed from synthetic values.",
+        ? `The latest snapshot reports ${roe ? `ROE of ${roe}` : "no current live ROE"}${roe && roce ? " and " : ""}${roce ? `ROCE of ${roce}` : "no current live ROCE"}. Historical quality should be judged from a multi-year series and by checking whether returns remain above the company's cost of capital through different business conditions.`
+        : "Historical ROE and ROCE should be taken from several annual reporting periods. The key question is whether returns remain durable rather than whether one year's ratio is high.",
     },
     {
       q: "Who are the promoters or top executives running the company, and what is their track record?",
-      a: unavailable("promoter, executive and leadership-track-record"),
+      a: executives
+        ? `The current provider profile lists these senior executives: ${executives}. Track record should be assessed through capital-allocation decisions, operating results, governance disclosures and execution against stated targets. For Indian companies, promoter identity and ownership should be checked against the latest exchange shareholding filing.`
+        : `Leadership track record should be assessed from the current board/management disclosure, operating performance, capital allocation and delivery against stated goals. For Indian companies, promoter identity and ownership should be checked against the latest exchange shareholding filing.`,
     },
     {
       q: "Is a high percentage of the promoter's stake pledged as collateral for loans?",
-      a: unavailable("promoter-pledge"),
+      a: `Promoter pledge is a shareholding-disclosure item, not a normal valuation ratio. For an Indian company, check the latest exchange shareholding pattern and notes for pledged/encumbered promoter shares, and compare the percentage with prior quarters to identify changes. Do not infer pledge levels from debt-to-equity.`,
     },
     {
       q: "Does management have a transparent and honest history of communication with shareholders?",
-      a: "This cannot be established from a single structured metric. A responsible assessment requires checking earnings calls, shareholder letters, guidance versus delivered results, related-party disclosures, restatements and the clarity of risk disclosures over multiple reporting periods.",
+      a: `The strongest evidence is consistency between what management says and what later appears in reported results: guidance versus delivery, explanations for misses, treatment of related parties, restatements, capital allocation and disclosure of material risks. A multi-year record is needed; tone alone is not a reliable measure of transparency.`,
     },
     {
       q: "Has the firm ever faced corporate governance issues, legal troubles, or accounting scandals?",
-      a: `DeepScreen's structured stock data does not contain a complete, verified historical case register for ${stock.name}. Governance, litigation and accounting allegations should be checked against regulator filings, court records, audited reports and reputable reporting, with allegations clearly distinguished from established findings.`,
+      a: `This question requires a dated event history. Review regulator orders, exchange notices, audited-report qualifications, court records and reputable reporting, and distinguish allegations or investigations from settlements and established findings. The absence of a warning label on a stock page is not proof that no historical event ever occurred.`,
     },
     {
       q: "Is the current stock valuation (such as the P/E or P/S ratio) reasonable or overpriced?",
       a: [
-        pe ? `The latest provider-backed P/E is ${pe}` : "A live provider-backed P/E is unavailable",
-        ps ? `and P/S is ${ps}` : "and a live provider-backed P/S is unavailable",
-        ". Those ratios are descriptive, not a verdict. Whether a valuation is justified depends on sustainable growth, margins, returns on capital, balance-sheet risk, cyclicality and comparable companies.",
+        pe ? `The latest provider-backed P/E is ${pe}` : "A live provider-backed P/E is not available",
+        ps ? `and P/S is ${ps}` : "and P/S is not currently available",
+        ". These are descriptive multiples, not conclusions by themselves. A defensible valuation assessment compares the multiple with sustainable growth, margins, ROE/ROCE, balance-sheet risk, cyclicality and direct peers.",
       ].join(" "),
     },
     {
       q: "How does the company's valuation compare to its direct industry peers?",
-      a: `DeepScreen provides valuation metrics for the company, but a direct-peer conclusion requires a defined peer set and the same reporting period. Compare P/E, P/S, EV/EBITDA and other relevant measures against close competitors rather than against the whole market.`,
+      a: peerNames.length
+        ? `A practical peer set for ${stock.name} starts with ${peerNames.join(", ")}. Compare the same reporting-period P/E, P/S and EV/EBITDA, then adjust for growth, margin quality, leverage and business mix; a lower multiple is not automatically cheaper on an economic-value basis.`
+        : `Build a direct peer set from companies with similar products, customers and geography. Then compare like-for-like valuation multiples, growth, margins, capital efficiency and leverage using the same reporting period.`,
     },
     {
       q: "What is the margin of safety if market conditions or the economy worsens?",
-      a: "There is no single company-independent margin-of-safety percentage. A defensible estimate requires an explicit intrinsic-value method, downside assumptions for earnings/cash flow, balance-sheet liquidity and a conservative valuation multiple. Stress-test those assumptions rather than treating the current share price as the margin of safety.",
+      a: "Margin of safety is created by buying with a gap between conservative intrinsic value and market price, then stress-testing the downside case. The relevant stress tests are lower revenue/earnings growth, lower margins, higher funding costs, weaker working capital and a lower terminal valuation. There is no universal fixed percentage that applies to every company.",
     },
     {
       q: "Does the company pay a reliable dividend, or does it aggressively buy back its own shares?",
       a: [
-        dividendYield ? `The latest provider-backed dividend yield is ${dividendYield}` : "A current provider-backed dividend yield is unavailable",
-        payout ? `and payout ratio is ${payout}` : "and a current provider-backed payout ratio is unavailable",
-        ". DeepScreen's structured data does not provide a complete buyback history or a sufficiently long dividend track record for every stock, so reliability and repurchase intensity should be verified from company filings.",
-      ].join(" "),
+        dividendYield ? `The latest provider-backed dividend yield is ${dividendYield}` : "The current provider-backed dividend yield is not available",
+        payout ? `and payout ratio is ${payout}` : "",
+        ". Dividend reliability should be checked across several years and against free cash flow, while buyback intensity should be verified from share-count changes, treasury-share activity and cash-flow statements. A one-year yield cannot establish a durable shareholder-distribution policy.",
+      ].filter(Boolean).join(" "),
     },
   ];
 }
