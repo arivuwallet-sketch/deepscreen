@@ -1,6 +1,6 @@
 import type { Intel } from "@/lib/deepscreen/intel";
 import { toneClass } from "@/lib/deepscreen/intel";
-import { ProInsight, ProMetricValue } from "@/components/ds/PaywallGate";
+import { ProMetricValue } from "@/components/ds/PaywallGate";
 import { cn } from "@/lib/utils";
 
 const fmt = (v: number | null, suffix = "") =>
@@ -246,49 +246,39 @@ export function ForensicPanel({ intel, locked = false }: { intel: Intel; locked?
 export function ExtendedRatiosPanel({ intel }: { intel: Intel }) {
   const r = intel.ratios;
   const d = intel.dupont;
-  const rows: [string, string][] = [
-    ["Operating margin (OPM)", fmt(r.operatingMargin, "%")],
-    ["Net margin (NPM)", fmt(r.netMargin, "%")],
-    ["Gross margin", fmt(r.grossMargin, "%")],
-    ["Price / cash flow", fmt(r.priceToCashFlow, "x")],
-    ["EV / EBITDA", fmt(r.evEbitda, "x")],
-    ["Current ratio", fmt(r.currentRatio, "x")],
-    ["Quick ratio", fmt(r.quickRatio, "x")],
-    ["Interest coverage", fmt(r.interestCoverage, "x")],
-    ["Asset turnover", fmt(r.assetTurnover, "x")],
-    ["Inventory turnover", fmt(r.inventoryTurnover, "x")],
-    ["Days sales of inventory", fmt(r.daysSalesInventory, " d")],
-    ["Cash conversion (OCF / PAT)", fmt(r.cashConversion, "x")],
+  const rows: [string, string, boolean][] = [
+    ["Operating margin (OPM)", fmt(r.operatingMargin, "%"), false],
+    ["Net margin (NPM)", fmt(r.netMargin, "%"), false],
+    ["Gross margin", fmt(r.grossMargin, "%"), false],
+    ["Price / cash flow", fmt(r.priceToCashFlow, "x"), false],
+    ["EV / EBITDA", fmt(r.evEbitda, "x"), true],
+    ["Current ratio", fmt(r.currentRatio, "x"), false],
+    ["Quick ratio", fmt(r.quickRatio, "x"), false],
+    ["Interest coverage", fmt(r.interestCoverage, "x"), false],
+    ["Asset turnover", fmt(r.assetTurnover, "x"), false],
+    ["Inventory turnover", fmt(r.inventoryTurnover, "x"), false],
+    ["Days sales of inventory", fmt(r.daysSalesInventory, " d"), false],
+    ["Cash conversion (OCF / PAT)", fmt(r.cashConversion, "x"), false],
   ];
 
   return (
     <div className="card-hover rounded-lg border border-border bg-panel p-5">
       <h2 className="text-sm font-semibold uppercase tracking-wide">Extended ratio set</h2>
       <dl className="num mt-3 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
-        {rows.map(([label, value]) => (
+        {rows.map(([label, value, locked]) => (
           <div key={label} className="flex items-center justify-between border-b border-border/50 pb-1">
             <dt className="text-muted-foreground">{label}</dt>
-            <dd><ProMetricValue value={value} /></dd>
+            <dd>{locked ? <ProMetricValue value={value} /> : value}</dd>
           </div>
         ))}
       </dl>
       <div className="mt-4 rounded border border-border p-3">
         <p className="num text-xs uppercase text-muted-foreground">DuPont ROE breakdown</p>
-        <div className="mt-1 text-sm">
-          <ProMetricValue
-            value={
-              <span className="num">
-                {fmt(d.netMargin, "%")} margin × {fmt(d.assetTurnover, "x")} turnover ×{" "}
-                {fmt(d.leverage, "x")} leverage = {fmt(d.impliedRoe, "%")} ROE
-              </span>
-            }
-          />
-        </div>
-        {d.model ? (
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            <ProInsight>{d.model}</ProInsight>
-          </p>
-        ) : null}
+        <p className="num mt-1 text-sm">
+          {fmt(d.netMargin, "%")} margin × {fmt(d.assetTurnover, "x")} turnover ×{" "}
+          {fmt(d.leverage, "x")} leverage = {fmt(d.impliedRoe, "%")} ROE
+        </p>
+        {d.model ? <p className="mt-1 text-[11px] text-muted-foreground">{d.model}</p> : null}
       </div>
     </div>
   );
