@@ -95,7 +95,7 @@ export const Route = createFileRoute("/api/public/cashfree-webhook")({
           !Number.isFinite(remoteAmountCents) ||
           remoteAmountCents < localAmountCents
         ) {
-          await admin.from("payment_orders").update({ status: "underpaid" }).eq("link_id", orderId).eq("status", "created");
+          await admin.from("payment_orders").update({ status: "underpaid" }).eq("link_id", orderId).in("status", ["created", "pending"]);
           return new Response("ok");
         }
 
