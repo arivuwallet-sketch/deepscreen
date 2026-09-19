@@ -369,7 +369,7 @@ async function fetchAndBuildCalendar(): Promise<LiveEvent[]> {
   return getCachedForexFactoryCalendar();
 }
 
-async function fetchForexFactoryCalendar(): Promise<LiveEvent[]> {async function fetchForexFactoryCalendar(): Promise<LiveEvent[]> {
+async function fetchForexFactoryCalendar(): Promise<LiveEvent[]> {
   type RawEvent = {
     title: string;
     country: string;
