@@ -12,7 +12,10 @@ const impactDot: Record<string, string> = {
 };
 
 function dayKeyOf(d: Date) {
-  return d.toISOString().slice(0, 10);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 export function EconomicCalendar() {
@@ -27,7 +30,7 @@ export function EconomicCalendar() {
 
   const events = useMemo(() => {
     const target = new Date();
-    target.setUTCDate(target.getUTCDate() + offset);
+    target.setDate(target.getDate() + offset);
     const key = dayKeyOf(target);
     return (data ?? [])
       .filter((e: LiveEvent) => e.dayKey === key)
@@ -36,7 +39,7 @@ export function EconomicCalendar() {
 
   const label = useMemo(() => {
     const d = new Date();
-    d.setUTCDate(d.getUTCDate() + offset);
+    d.setDate(d.getDate() + offset);
     return d.toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "short" });
   }, [offset]);
 
