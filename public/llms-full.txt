@@ -155,7 +155,7 @@ Check regulator filings, court records, audited reports and reputable reporting.
 DeepScreen displays provider-backed valuation ratios when available, but a ratio is descriptive rather than a verdict. Valuation depends on sustainable growth, margins, returns on capital, balance-sheet risk, cyclicality and comparable companies.
 
 ### How does the company's valuation compare to its direct industry peers?
-Use a defined direct-peer set and the same reporting period. Compare relevant multiples such as P/E, P/S and EV/EBITDA rather than mixing unrelated companies or periods.
+Use a defined direct-peer set and the same reporting period. Compare relevant multiples such as P/E, P/S and positive EV/EBITDA only when EBITDA supports a meaningful denominator; a negative or zero EV/EBITDA is not a cheap signal and should be treated as N/M.
 
 ### What is the margin of safety if market conditions or the economy worsens?
 Margin of safety depends on an explicit intrinsic-value method and downside assumptions for earnings/cash flow, liquidity and valuation multiples. Stress-test those assumptions rather than treating a single percentage as a universal answer.
