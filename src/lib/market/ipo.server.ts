@@ -26,7 +26,7 @@ export interface LiveIpo {
   listingDate: string | null;
   status: "upcoming" | "open" | "closed" | "listed";
   note: string;
-  source: "NSE" | "BSE" | "NASDAQ" | "LSE";
+  source: "NSE official" | "BSE via NSE issue flag" | "Nasdaq/EDGAR Online" | "LSE official";
 }
 
 const CACHE_MS = 5 * 60_000;
@@ -142,7 +142,7 @@ function mapNse(rows: NseRow[], fallbackSegment: string): LiveIpo[] {
         listingDate: isoOf(listing),
         status: statusFrom(open, close, listing),
         note: sme ? "SME platform issue. Source: NSE issue feed." : "Mainboard issue. Source: NSE issue feed.",
-        source: r.isBse === "1" ? "BSE" : "NSE",
+        source: r.isBse === "1" ? "BSE via NSE issue flag" : "NSE official",
       } satisfies LiveIpo;
     });
 }
@@ -194,7 +194,7 @@ function mapNasdaq(rows: NasdaqRow[], kind: "upcoming" | "priced" | "filed"): Li
             : kind === "filed"
               ? "S-1 filed; pricing date not yet set. Source: Nasdaq/EDGAR Online."
               : "Expected to price on the US calendar. Source: Nasdaq/EDGAR Online.",
-        source: usExchange(r.proposedExchange),
+        source: "Nasdaq/EDGAR Online",
       } satisfies LiveIpo;
     });
 }
@@ -235,12 +235,18 @@ function decodeHtml(s: string): string {
 }
 
 function parseLseDate(s: string): Date | null {
-  const m = /(?:early|mid|late)?\s*([A-Za-z]+)\s+(\d{4})/i.exec(s);
-  if (!m) return null;
-  const month = ["january","february","march","april","may","june","july","august","september","october","november","december"].indexOf((m[1] ?? "").toLowerCase());
+  const exact = /(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/i.exec(s);
+  if (exact) {
+    const month = ["january","february","march","april","may","june","july","august","september","october","november","december"].indexOf((exact[2] ?? "").toLowerCase());
+    if (month < 0) return null;
+    return new Date(Date.UTC(Number(exact[3]), month, Number(exact[1])));
+  }
+  const approximate = /(?:early|mid|late)?\s*([A-Za-z]+)\s+(\d{4})/i.exec(s);
+  if (!approximate) return null;
+  const month = ["january","february","march","april","may","june","july","august","september","october","november","december"].indexOf((approximate[1] ?? "").toLowerCase());
   if (month < 0) return null;
   const day = /early/i.test(s) ? 8 : /late/i.test(s) ? 25 : /mid/i.test(s) ? 15 : 1;
-  return new Date(Date.UTC(Number(m[2]), month, day));
+  return new Date(Date.UTC(Number(approximate[2]), month, day));
 }
 
 function parseLseBand(s: string): [number | null, number | null] {
@@ -305,7 +311,7 @@ async function fetchLse(): Promise<LiveIpo[]> {
         listingDate: isoOf(listing),
         status: "upcoming",
         note: `LSE official New Issues feed. Expected first trading date: ${expected || "TBA"}.`,
-        source: "LSE",
+        source: "LSE official",
       });
     }
     return out;
