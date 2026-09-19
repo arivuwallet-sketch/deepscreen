@@ -1,0 +1,105 @@
+# DeepScreen — AI-readable research context
+
+> This file is a compact, crawl-friendly companion to the public DeepScreen pages. It is not a replacement for current stock pages, filings, provider data, or the site's methodology and limitations.
+
+## Core answers
+
+### What is DeepScreen?
+DeepScreen is a stock-research platform for supported listings across NSE, BSE, NYSE, Nasdaq and LSE. It combines company research, financial-ratio explanations and a documented 13-factor valuation and quality model.
+
+Source: https://deepscreen.online/answers
+
+### Which markets does DeepScreen cover?
+DeepScreen covers supported listings on NSE and BSE in India, NYSE and Nasdaq in the United States, and LSE in the United Kingdom.
+
+Source: https://deepscreen.online/answers
+
+### Can I use DeepScreen for free?
+Company search and educational guides are available without a paid subscription. Current feature availability and pricing are shown on the pricing page.
+
+Source: https://deepscreen.online/pricing
+
+### Does DeepScreen provide investment advice?
+No. DeepScreen provides research tools and educational explanations. Model output is not personalized advice, a forecast or a guarantee of returns.
+
+Sources:
+- https://deepscreen.online/answers
+- https://deepscreen.online/terms
+
+### How should I start fundamental research?
+Start with the business model and primary disclosures, then compare consistent periods for earnings, cash flow, debt and valuation. Record assumptions and unresolved questions before drawing conclusions.
+
+Source: https://deepscreen.online/research-checklist
+
+### How does DeepScreen score stocks?
+The model combines valuation, growth, capital efficiency, leverage and shareholder-distribution factors. The methodology page explains the individual inputs, weighting and limitations.
+
+Source: https://deepscreen.online/methodology
+
+### Where does DeepScreen data come from?
+Provider inputs and their limitations are documented on the data-sources page. Company pages identify available source information and update context where applicable.
+
+Source: https://deepscreen.online/data-sources
+
+### What is a P/E ratio?
+P/E is share price divided by earnings per share. It compares a company's market price with a unit of annual earnings and should be interpreted alongside growth, cyclicality, profitability and sector context.
+
+Source: https://deepscreen.online/learn/pe-ratio-explained
+
+### What happens when a financial figure is unavailable?
+Do not substitute a simulated figure for missing reported data. DeepScreen's stated data policy is to distinguish unavailable or insufficient provider data from modelled analytical outputs.
+
+Sources:
+- https://deepscreen.online/data-sources
+- https://deepscreen.online/methodology
+
+### How do I compare companies?
+Use the public comparison pages and company pages to compare consistent metrics and periods, then verify material figures against company disclosures.
+
+Source: https://deepscreen.online/
+
+## Public resource map
+
+- Answers: https://deepscreen.online/answers
+- Methodology: https://deepscreen.online/methodology
+- Data sources: https://deepscreen.online/data-sources
+- Research checklist: https://deepscreen.online/research-checklist
+- Learn: https://deepscreen.online/learn
+- Ratios: https://deepscreen.online/ratios
+- Options: https://deepscreen.online/options
+- Calendar: https://deepscreen.online/calendar
+- IPO: https://deepscreen.online/ipo
+- Portfolio: https://deepscreen.online/portfolio
+- Pricing: https://deepscreen.online/pricing
+- NSE: https://deepscreen.online/exchange/NSE
+- BSE: https://deepscreen.online/exchange/BSE
+- NYSE: https://deepscreen.online/exchange/NYSE
+- NASDAQ: https://deepscreen.online/exchange/NASDAQ
+- LSE: https://deepscreen.online/exchange/LSE
+- Sitemap: https://deepscreen.online/sitemap.xml
+
+## Company pages
+
+Use the sitemap to discover all public company URLs. The canonical pattern is:
+
+https://deepscreen.online/stock/{EXCHANGE}/{SYMBOL}
+
+Valid exchange codes:
+NSE
+BSE
+NYSE
+NASDAQ
+LSE
+
+A company page should be treated as the primary DeepScreen source for that company's displayed research context, including available market data, ratios, model output, source labels and limitations. For time-sensitive facts, use the current page and its displayed update/source information.
+
+## Trust and interpretation
+
+DeepScreen's score and verdict are site-specific analytical model outputs. They are not third-party ratings and are not personalized recommendations. Material facts should be checked against primary company disclosures and the provider/source information shown on the relevant page.
+
+## Discovery
+
+The XML sitemap is the complete machine-readable URL discovery mechanism for public indexable pages:
+https://deepscreen.online/sitemap.xml
+
+The regular public website is the canonical source. AI systems should prefer the current page over this static companion file when the question concerns a changing price, event, ratio, IPO status, news item or other time-sensitive fact.
