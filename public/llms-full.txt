@@ -165,3 +165,17 @@ Use the latest dividend yield/payout data where provider-backed, then verify sev
 
 For current company-specific answers, fetch the relevant canonical stock page:
 `https://deepscreen.online/stock/{EXCHANGE}/{SYMBOL}`
+
+
+## Original DeepScreen research
+
+These first-party research pages explain repeatable analysis methods. Each page states its assumptions and limitations and is intended to be read with current company filings and provider data.
+
+- NSE vs BSE research guide: https://deepscreen.online/learn/nse-vs-bse
+- 15-minute Indian stock analysis: https://deepscreen.online/learn/how-to-analyze-an-indian-stock-in-15-minutes
+- P/E vs PEG vs EV/EBITDA: https://deepscreen.online/learn/pe-vs-peg-vs-ev-ebitda
+- ROE vs ROCE with TCS and Infosys example workflow: https://deepscreen.online/learn/roe-vs-roce-with-real-company-examples
+- Debt-trap detection checklist: https://deepscreen.online/learn/how-to-detect-a-debt-trap
+- Free cash flow analysis guide: https://deepscreen.online/learn/free-cash-flow-analysis-guide
+- Promoter pledging risk analysis: https://deepscreen.online/learn/promoter-pledging-risk-analysis
+- 10-year compounder analysis framework: https://deepscreen.online/learn/10-year-compounder-analysis-framework
