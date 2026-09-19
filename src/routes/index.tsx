@@ -1,4 +1,4 @@
-import { jsonLd } from "@/lib/seo/json-ld";
+import { buildFAQSchema, buildGraph, buildWebApplicationSchema, jsonLd } from "@/lib/seo/json-ld";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowUpRight, Globe2, LineChart, ShieldCheck } from "lucide-react";
 
@@ -13,6 +13,7 @@ import { StockTable } from "@/components/ds/StockTable";
 import { EXCHANGES } from "@/lib/deepscreen/exchanges";
 import { STOCKS } from "@/lib/deepscreen/stocks";
 import { NewsletterForm } from "@/components/ds/NewsletterForm";
+import { MarketMovers } from "@/components/ds/MarketMovers";
 
 export const Route = createFileRoute("/")({
   staticData: { sitemap: true },
@@ -45,86 +46,46 @@ export const Route = createFileRoute("/")({
     scripts: [
       {
         type: "application/ld+json",
-        children: jsonLd({
-          "@context": "https://schema.org",
-          "@type": "WebApplication",
-          name: "DeepScreen",
-          url: "https://deepscreen.online/",
-          applicationCategory: "FinanceApplication",
-          operatingSystem: "Web browser",
-          description:
-            "Multi-exchange stock screener with a 13-factor fundamental model for Indian, US and UK listings.",
-          featureList: [
-            "13-factor fundamental scoring",
-            "Cap-based screening across NSE, BSE, NYSE, Nasdaq and LSE",
-            "DCF and Graham intrinsic-value models",
-            "Live IPO calendar",
-            "Earnings and dividend calendar",
-            "Options Greeks and strategy payoffs",
-          ],
-        }),
-      },
-      {
-        type: "application/ld+json",
-        children: jsonLd({
-          "@context": "https://schema.org",
-          "@type": "Organization",
-          name: "DeepScreen",
-          url: "https://deepscreen.online/",
-          email: "deepscreen.online@outlook.com",
-          description:
-            "Global stock screener and fundamental research platform covering NSE, BSE, NYSE, Nasdaq and LSE.",
-        }),
-      },
-      {
-        type: "application/ld+json",
-        children: jsonLd({
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          name: "DeepScreen",
-          url: "https://deepscreen.online/",
-        }),
-      },
-      {
-        type: "application/ld+json",
-        children: jsonLd({
-          "@context": "https://schema.org",
-          "@type": "FAQPage",
-          mainEntity: [
-            {
-              "@type": "Question",
-              name: "What is DeepScreen?",
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: "DeepScreen is a stock screener that scores listed companies on NSE, BSE, NYSE, Nasdaq and LSE using a 13-factor valuation and quality model covering P/E, PEG, P/S, P/B, EV/Revenue, EV/EBITDA, ROE, ROA, ROCE, leverage, payout and operating leverage.",
+        children: jsonLd(
+          buildGraph(
+            buildWebApplicationSchema({
+              name: "DeepScreen",
+              url: "https://deepscreen.online/",
+              description:
+                "Multi-exchange stock screener with a 13-factor fundamental model for Indian, US and UK listings.",
+              featureList: [
+                "13-factor fundamental scoring",
+                "Cap-based screening across NSE, BSE, NYSE, Nasdaq and LSE",
+                "DCF and Graham intrinsic-value models",
+                "Live IPO calendar",
+                "Earnings and dividend calendar",
+                "Options Greeks and strategy payoffs",
+              ],
+            }),
+            buildFAQSchema([
+              {
+                question: "What is DeepScreen?",
+                answer:
+                  "DeepScreen is a stock screener that scores listed companies on NSE, BSE, NYSE, Nasdaq and LSE using a 13-factor valuation and quality model.",
               },
-            },
-            {
-              "@type": "Question",
-              name: "Which markets does DeepScreen cover?",
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: "Indian markets through the NSE and BSE, US markets through the NYSE and Nasdaq, and UK markets through the LSE.",
+              {
+                question: "Which markets does DeepScreen cover?",
+                answer:
+                  "Indian markets through the NSE and BSE, US markets through the NYSE and Nasdaq, and UK markets through the LSE.",
               },
-            },
-            {
-              "@type": "Question",
-              name: "Can I use DeepScreen for free?",
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: "Yes. Search, raw fundamental ratios, the IPO pipeline, news and the economic calendar are free. The full verdict, valuation models and alerts are part of Pro, see the pricing page for current plans.",
+              {
+                question: "Can I use DeepScreen for free?",
+                answer:
+                  "Yes. Search, raw fundamental ratios, the IPO pipeline, news and the economic calendar are free. The full verdict, valuation models and alerts are part of Pro.",
               },
-            },
-            {
-              "@type": "Question",
-              name: "Is DeepScreen investment advice?",
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: "No. DeepScreen publishes analytical model output for research and education only, not investment advice.",
+              {
+                question: "Is DeepScreen investment advice?",
+                answer:
+                  "No. DeepScreen publishes analytical model output for research and education only, not personalized investment advice.",
               },
-            },
-          ],
-        }),
+            ]),
+          ),
+        ),
       },
     ],
   }),
@@ -133,6 +94,12 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const top = [...STOCKS].sort((a, b) => a.name.localeCompare(b.name)).slice(0, 10);
+  const liveMoverUniverse = EXCHANGES.flatMap((exchange) =>
+    STOCKS
+      .filter((stock) => stock.exchange === exchange.code)
+      .sort((a, b) => b.marketCap - a.marketCap)
+      .slice(0, 20),
+  );
 
   return (
     <Shell>
@@ -199,6 +166,8 @@ function Home() {
           <EconomicCalendar />
           <LiveNewsFeed query="stock market" title="Market-moving news" limit={12} />
         </div>
+
+        <MarketMovers stocks={liveMoverUniverse} title="Live global market movers" />
 
         <section>
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide">

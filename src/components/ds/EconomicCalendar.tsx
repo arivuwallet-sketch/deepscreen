@@ -11,8 +11,21 @@ const impactDot: Record<string, string> = {
   low: "bg-muted-foreground",
 };
 
+function hasReleaseValues(e: LiveEvent) {
+  return [e.actual, e.forecast, e.previous].some(
+    (value) => value && value !== "—" && value !== "-",
+  );
+}
+
+function displayReleaseValue(value: string, hasRelease: boolean) {
+  return hasRelease ? value : "N/A";
+}
+
 function dayKeyOf(d: Date) {
-  return d.toISOString().slice(0, 10);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 export function EconomicCalendar() {
@@ -21,22 +34,22 @@ export function EconomicCalendar() {
   const { data, isLoading, dataUpdatedAt } = useQuery({
     queryKey: ["economic-events"],
     queryFn: () => fetchEvents(),
-    refetchInterval: 60_000,
+    refetchInterval: 30_000,
     staleTime: 30_000,
   });
 
   const events = useMemo(() => {
     const target = new Date();
-    target.setUTCDate(target.getUTCDate() + offset);
+    target.setDate(target.getDate() + offset);
     const key = dayKeyOf(target);
     return (data ?? [])
-      .filter((e: LiveEvent) => e.dayKey === key)
+      .filter((e: LiveEvent) => dayKeyOf(new Date(e.dateIso)) === key)
       .sort((a, b) => a.dateIso.localeCompare(b.dateIso));
   }, [data, offset]);
 
   const label = useMemo(() => {
     const d = new Date();
-    d.setUTCDate(d.getUTCDate() + offset);
+    d.setDate(d.getDate() + offset);
     return d.toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "short" });
   }, [offset]);
 
@@ -87,7 +100,9 @@ export function EconomicCalendar() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {events.map((e) => (
+              {events.map((e) => {
+                const hasRelease = hasReleaseValues(e);
+                return (
                 <tr key={e.id} className="hover:bg-accent/40">
                   <td className="num px-4 py-2.5 whitespace-nowrap text-muted-foreground">
                     {new Date(e.dateIso).toLocaleTimeString(undefined, {
@@ -102,11 +117,12 @@ export function EconomicCalendar() {
                     <span className={cn("inline-block size-2 rounded-full", impactDot[e.impact])} />
                   </td>
                   <td className="px-2 py-2.5">{e.title}</td>
-                  <td className="num px-2 py-2.5 text-right font-semibold">{e.actual}</td>
-                  <td className="num px-2 py-2.5 text-right text-muted-foreground">{e.forecast}</td>
-                  <td className="num px-4 py-2.5 text-right text-muted-foreground">{e.previous}</td>
+                  <td className="num px-2 py-2.5 text-right font-semibold">{displayReleaseValue(e.actual, hasRelease)}</td>
+                  <td className="num px-2 py-2.5 text-right text-muted-foreground">{displayReleaseValue(e.forecast, hasRelease)}</td>
+                  <td className="num px-4 py-2.5 text-right text-muted-foreground">{displayReleaseValue(e.previous, hasRelease)}</td>
                 </tr>
-              ))}
+              );
+              })}
             </tbody>
           </table>
         </div>

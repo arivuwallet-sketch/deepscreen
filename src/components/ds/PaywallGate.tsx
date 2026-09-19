@@ -6,6 +6,48 @@ import { Button } from "@/components/ui/button";
 import { PLANS, useSubscription } from "@/hooks/useSubscription";
 import { cn } from "@/lib/utils";
 
+
+export function ProMetricValue({
+  value,
+  className,
+}: {
+  value: ReactNode;
+  className?: string;
+}) {
+  const { isPro } = useSubscription();
+
+  if (isPro) return <>{value}</>;
+
+  return (
+    <span
+      title="DeepScreen Pro feature — unlock to view this ratio"
+      className={cn("inline-flex items-center gap-1.5 text-primary", className)}
+    >
+      <Lock className="size-3 shrink-0" />
+      <span className="font-semibold">Pro</span>
+    </span>
+  );
+}
+
+export function ProInsight({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  const { isPro } = useSubscription();
+
+  if (isPro) return <>{children}</>;
+
+  return (
+    <span className={cn("inline-flex items-center gap-1 text-primary", className)}>
+      <Lock className="size-3 shrink-0" />
+      <Link to="/pricing" className="hover:underline">Pro insight</Link>
+    </span>
+  );
+}
+
 export function ProBadge() {
   const { isPro, tier } = useSubscription();
   if (!isPro) return null;
@@ -36,7 +78,7 @@ export function PaywallGate({
   // While the session is resolving (and during SSR, which is what crawlers
   // read) render the locked variant: the real content is present in the HTML,
   // visually blurred, so search and AI crawlers index the substance.
-  if (isPro) return <>{children}</>;
+  if (isPro) return className ? <div className={className}>{children}</div> : <>{children}</>;
   void loading;
 
   return (

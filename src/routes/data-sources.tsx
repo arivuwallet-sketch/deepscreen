@@ -8,7 +8,7 @@ export const Route = createFileRoute("/data-sources")({
       "/data-sources",
       "Data Sources, Quality & Corrections | DeepScreen",
       "Understand DeepScreen's provider inputs, incomplete data, illustrative models, source verification and how to report a correction.",
-      ["DeepScreen data sources", "stock data quality", "financial data verification"],
+      ["DeepScreen data sources", "financial data sources", "stock market data sources", "stock data quality", "financial data quality", "financial data verification", "stock data accuracy", "fundamental data verification", "company filings", "NSE filings", "BSE filings", "SEC EDGAR"],
     ),
   component: Sources,
 });
