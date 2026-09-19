@@ -406,7 +406,9 @@ function StockPage() {
                         m.display
                       )}
                     </p>
-                    <p className={cn("mt-1 text-xs", bandText[m.band])}>{m.reading}</p>
+                    <p className={cn("mt-1 text-xs", bandText[m.band])}>
+                      {["peg", "evRevenue", "evEbitda", "ltde"].includes(m.key) ? "Advanced ratio · DeepScreen Pro" : m.reading}
+                    </p>
                     <div className="mt-2 h-1 overflow-hidden rounded-full bg-muted">
                       <div
                         className={cn(
