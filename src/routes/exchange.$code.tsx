@@ -61,7 +61,19 @@ export const Route = createFileRoute("/exchange/$code")({
         { name: "twitter:description", content: description },
         {
           name: "keywords",
-          content: metaKeywords(exchangeKeywords[code] ?? [], screenerKeywords),
+          content: metaKeywords(
+            [
+              `${code} stock screener`,
+              `${code} stocks`,
+              `${country} stock market`,
+              `stocks in ${country}`,
+              `${name} stocks`,
+              `${code} stock analysis`,
+              `${code} market news`,
+            ],
+            exchangeKeywords[code] ?? [],
+            screenerKeywords,
+          ),
         },
       ],
       links: [{ rel: "canonical", href: url }],
