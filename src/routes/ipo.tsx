@@ -31,7 +31,7 @@ export const Route = createFileRoute("/ipo")({
       {
         name: "description",
         content:
-          "Complete live IPO pipeline: every mainboard and SME issue on NSE/BSE plus the full US calendar (upcoming, priced, filed) with bands, lot sizes, issue sizes and key dates.",
+          "Live IPO pipeline across NSE, BSE, NYSE, NASDAQ and LSE, refreshed automatically with source timestamps and exchange filters.",
       },
       { property: "og:title", content: "Live IPO Calendar — DeepScreen" },
       {
