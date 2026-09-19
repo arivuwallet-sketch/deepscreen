@@ -173,3 +173,148 @@
     font-variant-numeric: tabular-nums;
   }
 }
+
+
+/* Responsive foundation: keep every route inside the viewport, including
+   notched iPhones, narrow Android/Foldable viewports, tablets and ultrawide screens. */
+@layer base {
+  html {
+    width: 100%;
+    min-width: 0;
+    overflow-x: clip;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body,
+  #root {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    margin: 0;
+    overflow-x: clip;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    min-width: 0;
+  }
+
+  img,
+  svg,
+  video,
+  canvas {
+    max-width: 100%;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    max-width: 100%;
+    min-width: 0;
+    font: inherit;
+  }
+
+  a,
+  button,
+  input,
+  textarea,
+  select {
+    overflow-wrap: anywhere;
+  }
+
+  main,
+  article,
+  section,
+  aside,
+  header,
+  footer,
+  nav {
+    min-width: 0;
+  }
+
+  table {
+    border-collapse: collapse;
+  }
+
+  .safe-area-x {
+    padding-inline-start: max(1rem, env(safe-area-inset-left));
+    padding-inline-end: max(1rem, env(safe-area-inset-right));
+  }
+}
+
+@layer components {
+  .responsive-scroll {
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: thin;
+    scrollbar-gutter: stable;
+  }
+
+  .responsive-scroll > table {
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .responsive-grid {
+    min-width: 0;
+  }
+
+  .responsive-grid > * {
+    min-width: 0;
+  }
+
+  .prose-wrap,
+  .text-wrap {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}
+
+@media (max-width: 639px) {
+  /* Prevent long financial labels, symbols and utility text from forcing a
+     horizontal page scroll on phones and narrow foldables. */
+  .text-3xl {
+    font-size: 1.75rem;
+    line-height: 1.15;
+  }
+
+  .text-4xl {
+    font-size: 2rem;
+    line-height: 1.12;
+  }
+
+  .text-5xl {
+    font-size: 2.25rem;
+    line-height: 1.08;
+  }
+
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@media (min-width: 1536px) {
+  /* Use extra viewport width on ultrawide displays without making text or
+     dense financial tables feel stretched across the whole screen. */
+  .max-w-7xl {
+    max-width: 88rem;
+  }
+
+  .max-w-5xl {
+    max-width: 78rem;
+  }
+}
+
+@media (orientation: landscape) and (max-width: 900px) {
+  .sticky {
+    scroll-margin-top: 1rem;
+  }
+}
