@@ -84,11 +84,9 @@ export function SearchBar({ className, placeholder }: { className?: string; plac
                   i === active && "bg-accent",
                 )}
               >
-                <span className="min-w-0">
-                  <span className="num font-semibold text-primary">{s.symbol}</span>
-                  <span className="ml-2 truncate text-muted-foreground">{s.name}</span>
-                </span>
-                <span className="num w-[8rem] shrink-0 text-right text-xs text-muted-foreground">
+                <span className="num min-w-0 truncate font-semibold text-primary">{s.symbol}</span>
+                <span className="min-w-0 truncate text-muted-foreground">{s.name}</span>
+                <span className="num min-w-0 truncate text-right text-xs text-muted-foreground">
                   {s.exchange} · {live?.[quoteKey(s)]?.price != null
                     ? formatPrice(live[quoteKey(s)]!.price, s.exchange)
                     : "—"}
