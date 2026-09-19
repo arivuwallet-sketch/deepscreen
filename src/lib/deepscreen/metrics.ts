@@ -1,3 +1,4 @@
+import { evEbitdaReading, evEbitdaTooltip, formatEvEbitda, isMeaningfulEvEbitda } from "./ev-ebitda";
 import type { Stock } from "./types";
 
 export type Verdict = "Strong Buy" | "Buy" | "Hold" | "Caution" | "Avoid";
@@ -173,18 +174,19 @@ function computeAnalysis(stock: Stock): Analysis {
       key: "evEbitda",
       label: "EV/EBITDA",
       value: f.evEbitda,
-      display: fmt(f.evEbitda, "x", 1),
-      // Asset-light / high-growth businesses (SaaS, cloud, AI) routinely trade
-      // at 20-30x+ EV/EBITDA; asset-heavy ones (manufacturing, utilities)
-      // rarely justify >12x.
-      score: isAssetLight ? scoreLow(f.evEbitda, 12, 40) : scoreLow(f.evEbitda, 8, 30),
+      display: formatEvEbitda(f.evEbitda, 1),
+      // Non-positive EV/EBITDA is not a cheap multiple. It is normally caused
+      // by negative EBITDA, or less commonly by negative enterprise value.
+      // Keep it neutral in the score and show N/M instead of a misleading
+      // negative number.
+      score: isMeaningfulEvEbitda(f.evEbitda)
+        ? isAssetLight
+          ? scoreLow(f.evEbitda, 12, 40)
+          : scoreLow(f.evEbitda, 8, 30)
+        : 40,
       band: "fair",
-      reading: isAssetLight
-        ? f.evEbitda < 15 ? "Low for asset-light" : f.evEbitda <= 25 ? "Fair" : "Priced for exceptional growth"
-        : f.evEbitda < 10 ? "Attractive" : f.evEbitda <= 15 ? "Fair" : "Expensive",
-      tooltip: isAssetLight
-        ? "Strips out debt structure, tax and depreciation. Asset-light, high-growth businesses like this one normally trade at 15-25x+ EV/EBITDA — the market is pricing in margin expansion. Below ~12x is cheap for this kind of business."
-        : "Strips out debt structure, tax and depreciation, so capital-intensive companies can be compared fairly. Under 10 is generally attractive.",
+      reading: evEbitdaReading(f.evEbitda, isAssetLight),
+      tooltip: evEbitdaTooltip(f.evEbitda, isAssetLight),
     },
     {
       key: "roe",
