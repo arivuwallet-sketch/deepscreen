@@ -473,6 +473,19 @@ function newsKey(query: string): string {
   return query.trim().replace(/\s+/g, " ").toLowerCase().slice(0, 240);
 }
 
+// Never surface stale cached/provider headlines as "latest" news. A provider
+// can legally return old stories for thinly-covered companies, so publication
+// time is validated independently of the cache fetch time.
+const MAX_NEWS_AGE_MS = 30 * 24 * 60 * 60_000;
+
+function filterRecentNews(items: FeedItem[]): FeedItem[] {
+  const cutoff = Date.now() - MAX_NEWS_AGE_MS;
+  return items.filter((item) => {
+    const published = Date.parse(item.publishedAt);
+    return Number.isFinite(published) && published >= cutoff && published <= Date.now() + 10 * 60_000;
+  });
+}
+
 /**
  * Build conservative fallback searches for company queries.
  * Google/Bing/Yahoo can all interpret quoted OR queries differently, and some
@@ -484,7 +497,11 @@ function newsQueryVariants(query: string): string[] {
   const safe = query.trim().replace(/\s+/g, " ").slice(0, 240);
   if (!safe) return [];
 
-  const variants = [safe];
+  // Google News understands the "when:" freshness operator. Put a fresh
+  // search first so active companies return current stories instead of an
+  // old but highly-ranked evergreen result.
+  const fresh = safe.includes("when:") ? safe : `${safe} when:30d`;
+  const variants = [fresh, safe];
   const quoted = [...safe.matchAll(/"([^"]+)"/g)]
     .map((match) => match[1]?.trim())
     .filter((term): term is string => Boolean(term))
@@ -520,8 +537,9 @@ export const getNewsFeed = createServerFn({ method: "GET" })
       const { readNewsCache, writeNewsCache } = await import("./news-cache.server");
       const persisted = await readNewsCache(key);
       if (persisted && Date.now() - persisted.fetchedAt < NEWS_CACHE_TTL_MS) {
+        const recentPersisted = filterRecentNews(refreshAges(persisted.items));
         const result = {
-          items: refreshAges(persisted.items).slice(0, limit),
+          items: recentPersisted.slice(0, limit),
           fetchedAt: persisted.fetchedAt,
           stale: false,
           providerCount: 0,
@@ -557,7 +575,7 @@ export const getNewsFeed = createServerFn({ method: "GET" })
         fallbackItems.forEach((items) => allItems.push(...items));
       }
 
-      const items = dedupe(allItems)
+      const items = filterRecentNews(dedupe(allItems))
         .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
         .slice(0, limit);
 
@@ -575,15 +593,18 @@ export const getNewsFeed = createServerFn({ method: "GET" })
       }
 
       if (persisted) {
-        console.warn(`[news] providers empty for ${key}; serving last-good cache`);
-        const result = {
-          items: refreshAges(persisted.items).slice(0, limit),
-          fetchedAt: persisted.fetchedAt,
-          stale: true,
-          providerCount: 0,
-        };
-        newsMemoryCache.set(key, { data: result, fetchedAt: Date.now() });
-        return result;
+        const recentPersisted = filterRecentNews(refreshAges(persisted.items)).slice(0, limit);
+        if (recentPersisted.length > 0) {
+          console.warn(`[news] providers empty for ${key}; serving recent last-good cache`);
+          const result = {
+            items: recentPersisted,
+            fetchedAt: persisted.fetchedAt,
+            stale: true,
+            providerCount: 0,
+          };
+          newsMemoryCache.set(key, { data: result, fetchedAt: Date.now() });
+          return result;
+        }
       }
 
       console.error(`[news] providers empty and no cache exists for ${key}`);
