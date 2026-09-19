@@ -48,6 +48,7 @@ import { WatchlistButton } from "@/components/ds/WatchlistButton";
 import { FundamentalSnapshotPanel } from "@/components/ds/FundamentalSnapshotPanel";
 import { ScoreExplanationPanel } from "@/components/ds/ScoreExplanationPanel";
 import { ResearchAlertsPanel } from "@/components/ds/ResearchAlertsPanel";
+import { ScoreChangePanel } from "@/components/ds/ScoreChangePanel";
 
 
 function peerExchangeCodesFor(exchange: string): string[] {
@@ -461,6 +462,13 @@ function StockPage() {
         </section>
 
         <ScoreExplanationPanel analysis={a} />
+
+        <ScoreChangePanel
+          exchange={stock.exchange}
+          symbol={stock.symbol}
+          analysis={a}
+          liveFundamentals={liveFundamentals}
+        />
 
         <FundamentalSnapshotPanel
           stock={live}
