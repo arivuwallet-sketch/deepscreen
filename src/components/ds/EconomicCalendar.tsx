@@ -24,7 +24,7 @@ export function EconomicCalendar() {
   const { data, isLoading, dataUpdatedAt } = useQuery({
     queryKey: ["economic-events"],
     queryFn: () => fetchEvents(),
-    refetchInterval: 60_000,
+    refetchInterval: 30_000,
     staleTime: 30_000,
   });
 
@@ -33,7 +33,7 @@ export function EconomicCalendar() {
     target.setDate(target.getDate() + offset);
     const key = dayKeyOf(target);
     return (data ?? [])
-      .filter((e: LiveEvent) => e.dayKey === key)
+      .filter((e: LiveEvent) => dayKeyOf(new Date(e.dateIso)) === key)
       .sort((a, b) => a.dateIso.localeCompare(b.dateIso));
   }, [data, offset]);
 
