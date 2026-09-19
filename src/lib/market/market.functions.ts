@@ -147,7 +147,7 @@ let forexFactoryCache: { data: LiveEvent[]; fetchedAt: number } | null = null;
 let inFlight: Promise<LiveEvent[]> | null = null;
 let forexFactoryInFlight: Promise<LiveEvent[]> | null = null;
 
-const CURRENCY_BY_COUNTRY:const CURRENCY_BY_COUNTRY: Record<string, string> = {
+const CURRENCY_BY_COUNTRY: Record<string, string> = {
   US: "USD",
   EU: "EUR",
   DE: "EUR",
@@ -229,7 +229,7 @@ interface TvEvent {
   previous?: number | string | null;
 }
 
-/** TradingView economic calendar/** TradingView economic calendar — the only free source here that carries actuals. */
+/** TradingView economic calendar — the only free source here that carries actuals. */
 async function fetchTradingViewCalendar(): Promise<LiveEvent[] | null> {
   const from = new Date();
   from.setUTCDate(from.getUTCDate() - 2);
@@ -257,8 +257,7 @@ async function fetchTradingViewCalendar(): Promise<LiveEvent[] | null> {
 
     return rows.map((e) => {
       const d = new Date(e.date);
-      const currency = e.currency || CURRENCY_BY_COUNTRY[e.country] || e.country;
-      return {
+      const currency = e.currency || CURRENCY_BY_COUNTRY[e.country] || e.country;      return {
         id: `tv-${e.id}`,
         title: e.period ? `${e.title} (${e.period})` : e.title,
         currency,
@@ -268,7 +267,8 @@ async function fetchTradingViewCalendar(): Promise<LiveEvent[] | null> {
         forecast: formatEventValue(e.forecast, e.unit, e.scale),
         previous: formatEventValue(e.previous, e.unit, e.scale),
         dateIso: d.toISOString(),
-        dayKey: d.toISOString().slice(0, 10),      } satisfies LiveEvent;
+        dayKey: d.toISOString().slice(0, 10),
+      } satisfies LiveEvent;
     });
   } catch {
     return null;
@@ -517,8 +517,7 @@ export const getNewsFeed = createServerFn({ method: "GET" })
         const fetchedAt = Date.now();
         const result = { items: refreshAges(items), fetchedAt, stale: false, providerCount: providers };
         newsMemoryCache.set(key, { data: result, fetchedAt });
-        await writeNewsCache(key, items, fetchedAt);
-        return result;
+        await writeNewsCache(key, items, fetchedAt);        return result;
       }
 
       if (persisted) {
