@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { Shell } from "@/components/ds/Shell";
 import { TopicIndex } from "@/components/ds/TopicIndex";
 import { learnKeywords, metaKeywords, stocksKeywords } from "@/lib/seo/keywords";
-import { LiveNewsFeed } from "@/components/ds/LiveNewsFeed";
+import { LiveNewsFeed, YahooNewsFeed } from "@/components/ds/LiveNewsFeed";
 import { DcfCalculator } from "@/components/ds/DcfCalculator";
 import { GrahamCalculator } from "@/components/ds/GrahamCalculator";
 import { PaywallGate, ProMetricValue } from "@/components/ds/PaywallGate";
@@ -628,11 +628,18 @@ function StockPage() {
                 : "Live data hasn't loaded yet — figures shown are DeepScreen's modeled estimates."}
             </p>
           </div>
-          <LiveNewsFeed
-            query={newsSearchQuery(stock.name, stock.symbol)}
-            title={`${stock.symbol} live news`}
-            limit={10}
-          />
+          <div className="min-w-0 space-y-4">
+            <LiveNewsFeed
+              query={newsSearchQuery(stock.name, stock.symbol)}
+              title={`${stock.symbol} live news`}
+              limit={10}
+            />
+            <YahooNewsFeed
+              query={newsSearchQuery(stock.name, stock.symbol)}
+              title={`${stock.symbol} · Yahoo Finance News`}
+              limit={10}
+            />
+          </div>
         </section>
         <section className="mt-8 border-t border-border pt-6">
           <h2 className="text-lg font-semibold">Frequently asked questions about {stock.symbol}</h2>
