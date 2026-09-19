@@ -82,8 +82,8 @@ function pct(value: number | null): string {
   return value == null ? "—" : value.toFixed(1) + "%";
 }
 
-function x(value: number | null): string {
-  return value == null ? "—" : value.toFixed(1) + "x";
+function debtValue(value: number | null): string {
+  return value == null ? "—" : value.toLocaleString("en-US");
 }
 
 function changePct(now: number | null, then: number | null): number | null {
@@ -123,8 +123,9 @@ export function buildWatchlistAlerts(
       saveAlertSnapshot(stock.exchange, stock.symbol, current);
     }
 
-    const base = sameQuarter ?? current;
-    const comparison = previous ?? (sameQuarter ? history.filter((item) => item.quarter !== current.quarter).at(-1) : null);
+    const isNewQuarter = !sameQuarter;
+    const base = current;
+    const comparison = isNewQuarter ? (previous ?? null) : null;
 
     if (comparison) {
       if (base.roce != null && base.roce < 15 && (comparison.roce == null || comparison.roce >= 15)) {
@@ -146,7 +147,7 @@ export function buildWatchlistAlerts(
           symbol: stock.symbol,
           name: stock.name,
           title: "Debt increased " + Math.round(debtChange) + "%",
-          detail: "Reported total debt moved from " + x(comparison.totalDebt) + " to " + x(base.totalDebt) + " in the latest quarterly snapshot.",
+          detail: "Reported total debt moved from " + debtValue(comparison.totalDebt) + " to " + debtValue(base.totalDebt) + " in the latest quarterly snapshot.",
           tone: "attention",
           available: true,
         });
@@ -207,10 +208,10 @@ export function buildWatchlistAlerts(
 
     // 5-year P/E median uses 20 quarterly observations gathered by
     // DeepScreen on this device. No paid historical market-data series is used.
-    const peHistory = [...history, ...(sameQuarter ? [sameQuarter] : [current])]
+    const peHistory = [...history, current]
       .map((item) => item.pe)
       .filter((value): value is number => value != null && Number.isFinite(value) && value > 0);
-    if (peHistory.length >= QUARTERS && current.pe != null) {
+    if (isNewQuarter && peHistory.length >= QUARTERS && current.pe != null) {
       const peMedian = median(peHistory);
       if (peMedian != null && current.pe > peMedian) {
         alerts.push({
@@ -229,28 +230,3 @@ export function buildWatchlistAlerts(
   return alerts;
 }
 
-export function alertCoverage(rows: Array<{ stock: Stock; fundamentals?: LiveFundamentals | null }>): {
-  quarterSnapshots: number;
-  missingPledge: number;
-} {
-  let quarterSnapshots = 0;
-  let missingPledge = 0;
-
-  for (const row of rows) {
-    const history = readAlertHistory(row.stock.exchange, row.stock.symbol);
-    quarterSnapshots += history.length;
-    if (row.stock.exchange === "NSE" || row.stock.exchange === "BSE") {
-      const current = snapshotFrom(row.stock, {
-        score: 0,
-        verdict: "Hold",
-        metrics: [],
-        strengths: [],
-        risks: [],
-        summary: "",
-      }, row.fundamentals);
-      if (current.promoterPledgePct == null) missingPledge++;
-    }
-  }
-
-  return { quarterSnapshots, missingPledge };
-}
