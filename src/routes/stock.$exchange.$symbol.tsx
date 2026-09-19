@@ -7,7 +7,7 @@ import { learnKeywords, metaKeywords, stocksKeywords } from "@/lib/seo/keywords"
 import { LiveNewsFeed } from "@/components/ds/LiveNewsFeed";
 import { DcfCalculator } from "@/components/ds/DcfCalculator";
 import { GrahamCalculator } from "@/components/ds/GrahamCalculator";
-import { PaywallGate, ProInsight } from "@/components/ds/PaywallGate";
+import { PaywallGate, ProMetricValue } from "@/components/ds/PaywallGate";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useLiveFundamentals, useLiveQuote, useScreenerRatios } from "@/hooks/useLiveQuotes";
 import { HoldingPlanCard } from "@/components/ds/HoldingPlanCard";
@@ -348,12 +348,7 @@ function StockPage() {
 
         <section className="mt-6 space-y-3">
           <ForensicPanel intel={intel} locked={!isPro} />
-          <PaywallGate
-            feature="Advanced ratios — margins, cash flow, EV/EBITDA, turnover & DuPont"
-            minHeight="min-h-[280px]"
-          >
-            <ExtendedRatiosPanel intel={intel} />
-          </PaywallGate>
+          <ExtendedRatiosPanel intel={intel} />
         </section>
 
         <PaywallGate
@@ -368,7 +363,7 @@ function StockPage() {
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide">
               Fundamental breakdown{" "}
               <span className="font-normal normal-case text-muted-foreground">
-                — raw ratios are free{isPro ? ", hover any card for context" : ""} ·{" "}
+                — core ratios are free · EV/Revenue, PEG and EV/EBITDA are Pro-only{" "}
                 {hasLiveFundamentals
                   ? isIndianExchange && screenerRatios
                     ? `Screener.in filing ratios + live market data, updated ${new Date(Math.max(fundUpdatedAt, screenerUpdatedAt)).toLocaleTimeString()}`
@@ -404,7 +399,13 @@ function StockPage() {
                           : "Modeled"}
                       </span>
                     </div>
-                    <p className="num mt-1 text-2xl font-bold">{m.display}</p>
+                    <p className="num mt-1 text-2xl font-bold">
+                      ${["peg", "evRevenue", "evEbitda", "ltde"].includes(m.key) ? (
+                        <ProMetricValue value={m.display} />
+                      ) : (
+                        m.display
+                      )}
+                    </p>
                     <p className={cn("mt-1 text-xs", bandText[m.band])}>{m.reading}</p>
                     <div className="mt-2 h-1 overflow-hidden rounded-full bg-muted">
                       <div
@@ -416,7 +417,11 @@ function StockPage() {
                       />
                     </div>
                     <p className="mt-2 text-[11px] leading-snug text-muted-foreground">
-                      <ProInsight>{m.tooltip}</ProInsight>
+                      ${["peg", "evRevenue", "evEbitda", "ltde"].includes(m.key) ? (
+                        <ProMetricValue value={<span>Advanced ratio — unlock with Pro</span>} />
+                      ) : (
+                        m.tooltip
+                      )}
                     </p>
                   </div>
                 );
