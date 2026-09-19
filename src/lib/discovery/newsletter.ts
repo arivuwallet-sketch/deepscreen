@@ -1,7 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
 
-import { createAdminClient } from "@/integrations/supabase/admin.server";
 import { consumeRateLimit, requestClientKey } from "@/lib/security";
 
 const EMAIL_MAX_LENGTH = 254;
@@ -24,6 +22,7 @@ export const subscribeToNewsletter = createServerFn({ method: "POST" })
     const email = normalizeEmail(data.email);
     if (!email) return { ok: false, error: "Enter a valid email address." };
 
+    const { getRequest } = await import("@tanstack/react-start/server");
     const request = getRequest();
     const key = requestClientKey(request);
     const limit = consumeRateLimit("newsletter:ip:" + key, 3, 60 * 60_000);
@@ -37,6 +36,7 @@ export const subscribeToNewsletter = createServerFn({ method: "POST" })
     }
 
     // Avoid storing arbitrary source text: source is deliberately fixed.
+    const { createAdminClient } = await import("@/integrations/supabase/admin.server");
     const admin = createAdminClient();
     const { error } = await admin
       .from("newsletter_subscribers")
