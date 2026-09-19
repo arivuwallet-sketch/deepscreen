@@ -318,3 +318,24 @@
     scroll-margin-top: 1rem;
   }
 }
+
+@layer components {
+  /* Any data table gets native touch scrolling instead of widening its parent. */
+  .overflow-x-auto {
+    min-width: 0;
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: thin;
+  }
+
+  .overflow-x-auto > table {
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .overflow-x-auto > pre,
+  .overflow-x-auto > code {
+    max-width: 100%;
+  }
+}
