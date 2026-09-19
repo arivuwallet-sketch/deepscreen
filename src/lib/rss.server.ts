@@ -53,6 +53,10 @@ const MAX_FEED_BYTES = 1_000_000;
 const MAX_TITLE_LENGTH = 500;
 const MAX_SOURCE_LENGTH = 160;
 const MAX_LINK_LENGTH = 2048;
+const ALLOWED_FEED_HOSTS = new Set([
+  "news.google.com",
+  "www.bing.com",
+]);
 
 function decode(s: string): string {
   return s
@@ -83,7 +87,11 @@ export async function fetchFeed(
   limit = 12,
 ): Promise<FeedItem[]> {
   try {
-    const res = await fetch(url, {
+    const feedUrl = safeExternalHttpUrl(url);
+    if (!feedUrl) return [];
+    const hostname = new URL(feedUrl).hostname.toLowerCase();
+    if (!ALLOWED_FEED_HOSTS.has(hostname)) return [];
+    const res = await fetch(feedUrl, {
       headers: {
         // SEC requires a descriptive UA; harmless elsewhere.
         "User-Agent": "DeepScreen Market Research (contact: research@deepscreen.app)",
