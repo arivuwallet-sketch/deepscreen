@@ -6,6 +6,48 @@ import { Button } from "@/components/ui/button";
 import { PLANS, useSubscription } from "@/hooks/useSubscription";
 import { cn } from "@/lib/utils";
 
+
+export function ProMetricValue({
+  value,
+  className,
+}: {
+  value: ReactNode;
+  className?: string;
+}) {
+  const { isPro } = useSubscription();
+
+  if (isPro) return <>{value}</>;
+
+  return (
+    <span
+      title="DeepScreen Pro feature — unlock to view this ratio"
+      className={cn("inline-flex items-center gap-1.5", className)}
+    >
+      <span aria-hidden className="select-none blur-[5px]">{value}</span>
+      <Lock className="size-3 shrink-0 text-primary" />
+    </span>
+  );
+}
+
+export function ProInsight({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  const { isPro } = useSubscription();
+
+  if (isPro) return <>{children}</>;
+
+  return (
+    <span className={cn("inline-flex items-center gap-1 text-primary", className)}>
+      <Lock className="size-3 shrink-0" />
+      <Link to="/pricing" className="hover:underline">Pro insight</Link>
+    </span>
+  );
+}
+
 export function ProBadge() {
   const { isPro, tier } = useSubscription();
   if (!isPro) return null;
