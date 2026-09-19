@@ -1,4 +1,4 @@
-import { jsonLd } from "@/lib/seo/json-ld";
+import { buildBreadcrumbSchema, buildExchangeCollectionSchema, buildGraph, jsonLd } from "@/lib/seo/json-ld";
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 
@@ -80,24 +80,15 @@ export const Route = createFileRoute("/exchange/$code")({
       scripts: [
         {
           type: "application/ld+json",
-          children: jsonLd({
-            "@context": "https://schema.org",
-            "@type": "CollectionPage",
-            name: title,
-            description,
-            url,
-            isPartOf: { "@type": "WebSite", name: "DeepScreen", url: "https://deepscreen.online" },
-            ...(country
-              ? { spatialCoverage: { "@type": "Country", name: country } }
-              : {}),
-            breadcrumb: {
-              "@type": "BreadcrumbList",
-              itemListElement: [
-                { "@type": "ListItem", position: 1, name: "Home", item: "https://deepscreen.online/" },
-                { "@type": "ListItem", position: 2, name: `${code} screener`, item: url },
-              ],
-            },
-          }),
+          children: jsonLd(
+            buildGraph(
+              buildExchangeCollectionSchema({ code, url }),
+              buildBreadcrumbSchema([
+                { name: "Home", url: "https://deepscreen.online/" },
+                { name: `${code} screener`, url },
+              ]),
+            ),
+          ),
         },
       ],
     };
