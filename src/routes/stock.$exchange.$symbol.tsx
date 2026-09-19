@@ -275,8 +275,8 @@ function StockPage() {
           );
         })()}
 
-        <section className="mt-5 grid gap-4 lg:grid-cols-3 lg:items-stretch">
-          <div className="min-w-0 lg:col-span-2">
+        <section className="mt-5 grid items-stretch gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(300px,1fr)]">
+          <div className="min-w-0">
             <PaywallGate
               feature="DeepScreen verdict and weighted score"
               minHeight="min-h-[220px]"
