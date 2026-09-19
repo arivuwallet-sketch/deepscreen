@@ -20,7 +20,7 @@ import {
 import { buildIntel } from "@/lib/deepscreen/intel";
 import { getIndexMemberships } from "@/lib/deepscreen/indices";
 import { ScoreBar } from "@/components/ds/StockTable";
-import { findStock } from "@/lib/deepscreen/stocks";
+import { findStock, stocksByExchange } from "@/lib/deepscreen/stocks";
 import { getStockSnapshot, type StockSnapshot } from "@/lib/market/snapshot.functions";
 import { analyze, verdictClass } from "@/lib/deepscreen/metrics";
 import { METRIC_KEY_TO_FIELD, mergeLiveStock } from "@/lib/deepscreen/live-merge";
@@ -74,7 +74,12 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
     );
     const title = `${s.symbol} — ${s.name} Fundamental Analysis | DeepScreen`;
     const description = `Research ${s.name} (${s.exchange}: ${s.symbol}): available financial ratios, valuation, company news and data limitations on DeepScreen.`;
-    const faqs = stockFaqs(s, sources);
+    const peerNames = stocksByExchange(s.exchange)
+      .filter((peer) => peer.symbol !== s.symbol && peer.sector === s.sector)
+      .sort((a, b) => b.marketCap - a.marketCap)
+      .slice(0, 4)
+      .map((peer) => `${peer.symbol} (${peer.name})`);
+    const faqs = stockFaqs(s, sources, loaderData.snapshot.fundamentals, peerNames);
     const url = `https://deepscreen.online/stock/${s.exchange}/${s.symbol}`;
     const schemaAnalysis = Object.values(sources).some((value) => value === "live")
       ? analyze(s)
@@ -206,7 +211,16 @@ function StockPage() {
         <p className="mt-3 text-sm text-muted-foreground">Provider fundamentals have not loaded. Scores, valuation targets and financial ratios are withheld here rather than filled with simulated values. Try again later and check company filings.</p>
         <Link to="/methodology" className="mt-3 inline-block text-primary">How the research model works</Link>
       </section>
-      <section className="mt-6"><h2 className="text-lg font-semibold">Research questions</h2><dl className="mt-4 space-y-4">{stockFaqs(live, sources).map(faq => <div key={faq.q}><dt className="font-medium">{faq.q}</dt><dd className="mt-1 text-sm text-muted-foreground">{faq.a}</dd></div>)}</dl></section>
+      <section className="mt-6"><h2 className="text-lg font-semibold">Research questions</h2><dl className="mt-4 space-y-4">{stockFaqs(
+        live,
+        sources,
+        liveFundamentals,
+        stocksByExchange(live.exchange)
+          .filter((peer) => peer.symbol !== live.symbol && peer.sector === live.sector)
+          .sort((a, b) => b.marketCap - a.marketCap)
+          .slice(0, 4)
+          .map((peer) => `${peer.symbol} (${peer.name})`),
+      ).map(faq => <div key={faq.q}><dt className="font-medium">{faq.q}</dt><dd className="mt-1 text-sm text-muted-foreground">{faq.a}</dd></div>)}</dl></section>
       <TopicIndex ids={["stocks", "learn"]} inContainer />
     </article></Shell>;
   }
