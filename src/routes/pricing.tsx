@@ -152,12 +152,11 @@ function PricingPage() {
     setVerifying(true);
     void (async () => {
       const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData.session?.access_token;
-      if (!accessToken) {
+      if (!sessionData.session?.access_token) {
         setVerifying(false);
         return;
       }
-      const res = await confirm({ data: { orderId, accessToken } });
+      const res = await confirm({ data: { orderId } });
       setVerifying(false);
       window.history.replaceState({}, "", "/pricing");
       if (!res.ok) {
@@ -206,8 +205,7 @@ function PricingPage() {
     const selectedPlan = checkoutPlan;
 
     const { data: sessionData } = await supabase.auth.getSession();
-    const accessToken = sessionData.session?.access_token;
-    if (!accessToken) {
+    if (!sessionData.session?.access_token) {
       setBusy(null);
       toast.error("Please sign in again.");
       return;
@@ -233,7 +231,7 @@ function PricingPage() {
     try {
       await openCashfreeCheckout(result.paymentSessionId);
       setVerifying(true);
-      const confirmation = await confirm({ data: { orderId: result.orderId, accessToken } });
+      const confirmation = await confirm({ data: { orderId: result.orderId } });
       setVerifying(false);
       setBusy(null);
 
