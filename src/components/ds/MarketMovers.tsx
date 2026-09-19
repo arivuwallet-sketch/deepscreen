@@ -4,6 +4,7 @@ import { ArrowDown, ArrowUp, Minus, Radio } from "lucide-react";
 
 import { quoteKey, useLiveQuotes } from "@/hooks/useLiveQuotes";
 import { formatPrice, formatVolume } from "@/lib/deepscreen/format";
+import { analyze } from "@/lib/deepscreen/metrics";
 import { mergeLiveStock } from "@/lib/deepscreen/live-merge";
 import type { Stock } from "@/lib/deepscreen/types";
 import type { LiveQuote } from "@/lib/market/yahoo.server";
@@ -106,7 +107,7 @@ export function MarketMovers({ stocks, title = "Live market movers", exchangeLab
         const quote = live[quoteKey(key)];
         if (!stock || !quote) return null;
         const merged = mergeLiveStock(stock, quote, null, null).stock;
-        const score = merged ? Math.round((merged.fundamentals.roe + merged.fundamentals.roce + merged.fundamentals.growth) / 3) : 0;
+        const score = analyze(merged).score;
         return { stock, quote, score };
       })
       .filter((row): row is Row => row !== null && Number.isFinite(row.quote.changePct));
