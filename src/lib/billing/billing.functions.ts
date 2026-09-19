@@ -103,7 +103,8 @@ export const createCheckout = createServerFn({ method: "POST" })
         return { ok: true, orderId: order.orderId, paymentSessionId: order.paymentSessionId };
       } catch (e) {
         await admin.from("payment_orders").update({ status: "failed" }).eq("link_id", orderId);
-        return { ok: false, error: e instanceof Error ? e.message : "Could not start checkout." };
+        console.error("[payment] Cashfree checkout creation failed", e);
+        return { ok: false, error: "Could not start checkout. Please try again later." };
       }
     },
   );
@@ -157,6 +158,7 @@ export const confirmCheckout = createServerFn({ method: "POST" })
       if (!activated.ok) return activated;
       return { ok: true, paid: true, status: "PAID" };
     } catch (e) {
-      return { ok: false, error: e instanceof Error ? e.message : "Could not verify payment." };
+      console.error("[payment] payment verification failed", e);
+      return { ok: false, error: "Could not verify payment. Please try again later." };
     }
   });
