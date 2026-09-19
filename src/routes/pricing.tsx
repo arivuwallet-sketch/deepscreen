@@ -1,7 +1,7 @@
 import { jsonLd } from "@/lib/seo/json-ld";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Sparkles } from "lucide-react";
+import { Check, ChevronRight, ShieldCheck, Smartphone, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -15,6 +15,9 @@ import { confirmCheckout, createCheckout } from "@/lib/billing/billing.functions
 import { openCashfreeCheckout } from "@/lib/billing/cashfree-sdk";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/pricing")({
   staticData: { sitemap: true },
@@ -122,6 +125,9 @@ function PricingPage() {
   const [orderId, setOrderId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
+  const [checkoutPlan, setCheckoutPlan] = useState<Plan | null>(null);
+  const [phone, setPhone] = useState("");
+  const [phoneError, setPhoneError] = useState("");
   const checkout = useServerFn(createCheckout);
   const confirm = useServerFn(confirmCheckout);
   const confirmed = useRef<string | null>(null);
@@ -158,13 +164,38 @@ function PricingPage() {
     })();
   }, [orderId, user, confirm, refresh]);
 
-  const start = async (plan: Plan) => {
+  const start = (plan: Plan) => {
     if (!user) {
       window.localStorage.setItem("deepscreen_auth_redirect", "/pricing");
       window.location.assign("/auth?redirect=%2Fpricing");
       return;
     }
-    setBusy(plan.tier);
+    setPhone("");
+    setPhoneError("");
+    setCheckoutPlan(plan);
+  };
+
+  const normalizePhone = (value: string) => {
+    const digits = value.replace(/\D/g, "");
+    if (digits.startsWith("91") && digits.length === 12) return digits.slice(2);
+    if (digits.startsWith("0") && digits.length === 11) return digits.slice(1);
+    return digits.slice(0, 10);
+  };
+
+  const submitCheckout = async () => {
+    if (!checkoutPlan) return;
+    const normalizedPhone = normalizePhone(phone);
+    setPhone(normalizedPhone);
+
+    if (!/^[6-9]\d{9}$/.test(normalizedPhone) || /^([0-9])\1{9}$/.test(normalizedPhone)) {
+      setPhoneError("Enter a valid 10-digit Indian mobile number beginning with 6–9.");
+      return;
+    }
+
+    setPhoneError("");
+    setBusy(checkoutPlan.tier);
+    const selectedPlan = checkoutPlan;
+
     const { data: sessionData } = await supabase.auth.getSession();
     const accessToken = sessionData.session?.access_token;
     if (!accessToken) {
@@ -172,14 +203,24 @@ function PricingPage() {
       toast.error("Please sign in again.");
       return;
     }
+
     const result = await checkout({
-      data: { tier: plan.tier, accessToken, origin: window.location.origin },
+      data: {
+        tier: selectedPlan.tier,
+        accessToken,
+        origin: window.location.origin,
+        phone: normalizedPhone,
+      },
     });
+
     if (!result.ok) {
       setBusy(null);
       toast.error(result.error);
       return;
     }
+
+    setCheckoutPlan(null);
+
     try {
       await openCashfreeCheckout(result.paymentSessionId);
     } catch (e) {
@@ -289,7 +330,102 @@ function PricingPage() {
           to keep your plan across devices.
         </p>
       </div>
-      <TopicIndex ids={["screener"]} title={"What you can screen for on any DeepScreen plan"} />
+      <Dialog open={checkoutPlan !== null} onOpenChange={(open) => !open && busy === null && setCheckoutPlan(null)}>
+        <DialogContent className="overflow-hidden border-border/80 bg-background p-0 sm:max-w-md">
+          <div className="border-b border-border bg-gradient-to-br from-primary/10 via-background to-background px-6 pb-5 pt-6">
+            <DialogHeader className="text-left">
+              <div className="mb-3 flex size-11 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-primary">
+                <Smartphone className="size-5" />
+              </div>
+              <DialogTitle className="text-xl">Secure checkout details</DialogTitle>
+              <DialogDescription className="mt-2 max-w-sm leading-relaxed">
+                Enter the mobile number you want to use for Cashfree checkout. This replaces the
+                placeholder number and must be a valid Indian mobile number.
+              </DialogDescription>
+            </DialogHeader>
+          </div>
+
+          <div className="space-y-5 px-6 py-6">
+            {checkoutPlan && (
+              <div className="flex items-center justify-between rounded-xl border border-border bg-panel px-4 py-3">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Selected plan</p>
+                  <p className="mt-1 font-semibold">{checkoutPlan.name}</p>
+                </div>
+                <p className="num text-xl font-bold">₹{checkoutPlan.price}</p>
+              </div>
+            )}
+
+            <div>
+              <Label htmlFor="checkout-phone" className="text-sm">Mobile number</Label>
+              <div className={cn(
+                "mt-2 flex h-11 overflow-hidden rounded-lg border bg-background transition-colors",
+                phoneError ? "border-destructive ring-1 ring-destructive/20" : "border-input focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20",
+              )}>
+                <span className="flex items-center border-r border-border bg-muted/40 px-3 text-sm font-medium text-muted-foreground">
+                  +91
+                </span>
+                <Input
+                  id="checkout-phone"
+                  type="tel"
+                  inputMode="numeric"
+                  autoComplete="tel-national"
+                  maxLength={10}
+                  value={phone}
+                  onChange={(e) => {
+                    setPhone(e.target.value.replace(/\D/g, "").slice(0, 10));
+                    if (phoneError) setPhoneError("");
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      void submitCheckout();
+                    }
+                  }}
+                  placeholder="9876543210"
+                  aria-invalid={phoneError ? true : undefined}
+                  aria-describedby="checkout-phone-help"
+                  className="h-full rounded-none border-0 bg-transparent text-base shadow-none focus-visible:ring-0"
+                />
+              </div>
+              <div id="checkout-phone-help" className="mt-2 flex items-start gap-2">
+                <ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
+                <p className={cn("text-xs leading-relaxed", phoneError ? "text-destructive" : "text-muted-foreground")}>
+                  {phoneError || "10 digits, starting with 6–9. Example: 9876543210."}
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-primary/15 bg-primary/5 p-4">
+              <p className="text-xs font-semibold text-foreground">What happens next?</p>
+              <div className="mt-3 grid gap-2 text-xs text-muted-foreground">
+                <div className="flex items-center gap-2"><span className="flex size-5 items-center justify-center rounded-full bg-background font-semibold text-foreground">1</span> We create your Cashfree payment session.</div>
+                <div className="flex items-center gap-2"><span className="flex size-5 items-center justify-center rounded-full bg-background font-semibold text-foreground">2</span> Cashfree opens the secure payment page.</div>
+                <div className="flex items-center gap-2"><span className="flex size-5 items-center justify-center rounded-full bg-background font-semibold text-foreground">3</span> You return to DeepScreen after payment.</div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="border-t border-border bg-muted/20 px-6 py-4 sm:flex-row">
+            <Button type="button" variant="ghost" onClick={() => setCheckoutPlan(null)} disabled={busy !== null}>
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={() => void submitCheckout()}
+              disabled={busy !== null || verifying || !checkoutPlan}
+              className="sm:min-w-40"
+            >
+              {busy ? (
+                "Opening secure checkout…"
+              ) : (
+                <span className="flex items-center gap-2">Continue to payment <ChevronRight className="size-4" /></span>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+            <TopicIndex ids={["screener"]} title={"What you can screen for on any DeepScreen plan"} />
     </Shell>
   );
 }
