@@ -193,14 +193,14 @@ function StockPage() {
         <p className="mt-3 text-sm text-muted-foreground">Provider fundamentals have not loaded. Scores, valuation targets and financial ratios are withheld here rather than filled with simulated values. Try again later and check company filings.</p>
         <Link to="/methodology" className="mt-3 inline-block text-primary">How the research model works</Link>
       </section>
-      <section className="mt-8"><h2 className="text-lg font-semibold">Research questions</h2><dl className="mt-4 space-y-4">{stockFaqs(live, sources).map(faq => <div key={faq.q}><dt className="font-medium">{faq.q}</dt><dd className="mt-1 text-sm text-muted-foreground">{faq.a}</dd></div>)}</dl></section>
+      <section className="mt-6"><h2 className="text-lg font-semibold">Research questions</h2><dl className="mt-4 space-y-4">{stockFaqs(live, sources).map(faq => <div key={faq.q}><dt className="font-medium">{faq.q}</dt><dd className="mt-1 text-sm text-muted-foreground">{faq.a}</dd></div>)}</dl></section>
       <TopicIndex ids={["stocks", "learn"]} inContainer />
     </article></Shell>;
   }
 
   return (
     <Shell>
-      <div className="mx-auto max-w-7xl px-4 py-8">
+      <div className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 lg:px-8">
         <nav className="num text-xs text-muted-foreground">
           <Link to="/" className="hover:text-foreground">
             Home
@@ -216,7 +216,7 @@ function StockPage() {
           / {stock.symbol}
         </nav>
 
-        <header className="mt-3 flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6">
+        <header className="mt-3 flex flex-wrap items-end justify-between gap-4 border-b border-border pb-5">
           <div>
              <h1 className="num text-3xl font-bold tracking-tight">
                {stock.symbol} — {stock.name}
@@ -250,7 +250,7 @@ function StockPage() {
         </header>
 
         
-        <p className="mt-5 max-w-4xl text-sm leading-relaxed text-muted-foreground">
+        <p className="mt-4 max-w-5xl text-sm leading-relaxed text-muted-foreground">
           {stockSummary(live)}
         </p>
 
@@ -275,7 +275,7 @@ function StockPage() {
           );
         })()}
 
-        <section className="mt-6 grid gap-4 lg:grid-cols-3">
+        <section className="mt-5 grid gap-3 lg:grid-cols-3">
             <PaywallGate
               feature="DeepScreen verdict and weighted score"
               className="lg:col-span-2"
@@ -336,16 +336,16 @@ function StockPage() {
 
         <PaywallGate
           feature="Vision &amp; Utility score and Secret Tips badges"
-          className="mt-8"
+          className="mt-6"
           minHeight="min-h-[260px]"
         >
-          <section className="grid gap-4 lg:grid-cols-2">
+          <section className="grid gap-3 lg:grid-cols-2">
             <VisionCard intel={intel} />
             <SecretTipsPanel intel={intel} />
           </section>
         </PaywallGate>
 
-        <section className="mt-8 space-y-4">
+        <section className="mt-6 space-y-3">
           <ForensicPanel intel={intel} locked={!isPro} />
           <PaywallGate
             feature="Advanced ratios — margins, cash flow, EV/EBITDA, turnover & DuPont"
@@ -357,7 +357,7 @@ function StockPage() {
 
         <PaywallGate
           feature="Target price, trim level & stop-loss"
-          className="mt-8"
+          className="mt-6"
           minHeight="min-h-[220px]"
         >
           <HoldingPlanCard stock={live} />
@@ -434,7 +434,7 @@ function StockPage() {
           </section>
         </PaywallGate>
 
-        <section className="mt-8 grid gap-6 lg:grid-cols-2">
+        <section className="mt-6 grid gap-4 lg:grid-cols-2">
           <div className="rounded-lg border border-border bg-panel p-5">
             <h2 className="text-sm font-semibold uppercase tracking-wide">Company financials</h2>
             <dl className="num mt-3 grid grid-cols-2 gap-y-2 text-sm">
@@ -467,7 +467,7 @@ function StockPage() {
             limit={10}
           />
         </section>
-        <section className="mt-10 border-t border-border pt-8">
+        <section className="mt-8 border-t border-border pt-6">
           <h2 className="text-lg font-semibold">Frequently asked questions about {stock.symbol}</h2>
           <dl className="mt-5 space-y-5">
             {stockFaqs(live, sources).map((faq) => (
