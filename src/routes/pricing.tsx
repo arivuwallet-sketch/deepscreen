@@ -1,5 +1,5 @@
 import { jsonLd } from "@/lib/seo/json-ld";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Check, ChevronRight, ShieldCheck, Smartphone, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -121,7 +121,6 @@ const PRO = [
 function PricingPage() {
   const { user } = useAuth();
   const { isPro, tier, expiresAt, refresh } = useSubscription();
-  const navigate = useNavigate();
   const [orderId, setOrderId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
@@ -223,8 +222,24 @@ function PricingPage() {
 
     try {
       await openCashfreeCheckout(result.paymentSessionId);
+      setVerifying(true);
+      const confirmation = await confirm({ data: { orderId: result.orderId, accessToken } });
+      setVerifying(false);
+      setBusy(null);
+
+      if (!confirmation.ok) {
+        toast.error(confirmation.error);
+        return;
+      }
+      if (confirmation.paid) {
+        refresh();
+        toast.success("Payment received — DeepScreen Pro is unlocked.");
+      } else {
+        toast.info("Checkout closed before payment was confirmed. You can try again from the plan card.");
+      }
     } catch (e) {
       setBusy(null);
+      setVerifying(false);
       toast.error(e instanceof Error ? e.message : "Payment could not be started.");
     }
   };
