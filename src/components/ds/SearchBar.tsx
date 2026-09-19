@@ -69,7 +69,7 @@ export function SearchBar({ className, placeholder }: { className?: string; plac
         autoComplete="off"
       />
       {open && results.length > 0 && (
-        <ul className="absolute z-50 mt-1 max-h-80 w-full overflow-auto rounded-md border border-border bg-popover p-1 shadow-xl">
+        <ul className="absolute left-0 right-0 z-50 mt-2 max-h-80 overflow-y-auto overflow-x-hidden rounded-lg border border-border bg-popover p-1 shadow-xl">
           {results.map((s, i) => (
             <li key={`${s.exchange}-${s.symbol}`}>
               <button
@@ -80,15 +80,13 @@ export function SearchBar({ className, placeholder }: { className?: string; plac
                 }}
                 onMouseEnter={() => setActive(i)}
                 className={cn(
-                  "flex w-full items-center justify-between gap-3 rounded px-3 py-2 text-left text-sm hover:bg-accent",
+                  "grid w-full min-w-0 grid-cols-[4.5rem_minmax(0,1fr)_7rem] items-center gap-3 rounded px-3 py-2 text-left text-sm hover:bg-accent",
                   i === active && "bg-accent",
                 )}
               >
-                <span className="min-w-0">
-                  <span className="num font-semibold text-primary">{s.symbol}</span>
-                  <span className="ml-2 truncate text-muted-foreground">{s.name}</span>
-                </span>
-                <span className="num shrink-0 text-xs text-muted-foreground">
+                <span className="num min-w-0 truncate font-semibold text-primary">{s.symbol}</span>
+                <span className="min-w-0 truncate text-muted-foreground">{s.name}</span>
+                <span className="num min-w-0 truncate text-right text-xs text-muted-foreground">
                   {s.exchange} · {live?.[quoteKey(s)]?.price != null
                     ? formatPrice(live[quoteKey(s)]!.price, s.exchange)
                     : "—"}
