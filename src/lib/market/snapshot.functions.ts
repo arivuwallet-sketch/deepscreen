@@ -5,6 +5,7 @@ import type { ScreenerRatios } from "./screener.server";
 import { consumeRateLimit, normalizeCompanyName, normalizeSymbol, requestClientKey } from "@/lib/security";
 import { getExchange } from "@/lib/deepscreen/exchanges";
 import { getRequest } from "@tanstack/react-start/server";
+import { z } from "zod";
 
 export interface StockSnapshot {
   quote: LiveQuote | null;
@@ -23,6 +24,8 @@ export interface StockSnapshot {
  * rather than nothing if an upstream provider is down.
  */
 const TTL_MS = 3 * 60_000;
+const snapshotInput = z.object({ exchange: z.string().trim().min(1).max(16), symbol: z.string().trim().min(1).max(32), name: z.string().max(160).optional() }).strict();
+
 const MAX_ENTRIES = 500;
 const snapshots = new Map<string, StockSnapshot>();
 
@@ -75,7 +78,7 @@ async function compute(exchange: string, symbol: string, name?: string): Promise
 }
 
 export const getStockSnapshot = createServerFn({ method: "GET" })
-  .inputValidator((d: { exchange: string; symbol: string; name?: string }) => d)
+  .inputValidator(snapshotInput)
   .handler(async ({ data }): Promise<StockSnapshot> => {
     const exchange = data.exchange.trim().toUpperCase();
     const symbol = normalizeSymbol(data.symbol);
