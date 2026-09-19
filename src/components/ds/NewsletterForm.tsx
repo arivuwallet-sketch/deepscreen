@@ -1,6 +1,5 @@
 import { useId, useState, type FormEvent } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { requestNewsletterSubscription } from "@/lib/discovery/newsletter";
+import { subscribeToNewsletter } from "@/lib/discovery/newsletter";
 
 export function NewsletterForm() {
   const id = useId();
@@ -14,8 +13,8 @@ export function NewsletterForm() {
     setBusy(true);
     setStatus("");
     try {
-      const accepted = await requestNewsletterSubscription(email, (row) => supabase.from("newsletter_subscribers").insert(row));
-      if (!accepted) { setStatus("We could not record your request. Please try again, or contact deepscreen.online@outlook.com."); return; }
+      const result = await subscribeToNewsletter({ data: { email } });
+      if (!result.ok) { setStatus(result.error); return; }
       setEmail(""); setConsent(false);
       setStatus("Your subscription request is recorded. If you already subscribed, your existing subscription stays the same.");
     } finally { setBusy(false); }
