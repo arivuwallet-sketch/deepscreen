@@ -41,7 +41,7 @@ export interface ArticleFacts {
 }
 
 export interface ExchangeFacts {
-  code: ExchangeCode;
+  code: string;
   url: string;
 }
 
