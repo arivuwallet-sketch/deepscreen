@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import {
   DEFAULT_PHONE_COUNTRY,
   PHONE_COUNTRIES,
@@ -376,7 +377,7 @@ function PricingPage() {
                   <div className="min-w-0">
                     <DialogTitle className="text-lg sm:text-xl">Secure checkout</DialogTitle>
                     <DialogDescription className="mt-1.5 max-w-xl text-xs leading-relaxed sm:text-sm">
-                      Confirm your country and phone number before opening Cashfree's secure payment window.
+                      Select your country code and enter your national phone number. The country code is shown once and never counted as part of the number.
                     </DialogDescription>
                   </div>
                 </div>
@@ -401,30 +402,39 @@ function PricingPage() {
                 "mt-2 grid min-w-0 grid-cols-[minmax(118px,42%)_minmax(0,1fr)] overflow-hidden rounded-xl border bg-background transition-colors",
                 phoneError ? "border-destructive ring-1 ring-destructive/20" : "border-input focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20",
               )}>
-                <div className="relative min-w-0 border-r border-border bg-muted/30">
-                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-base" aria-hidden="true">
-                    {countryFlag(phoneCountry)}
-                  </span>
-                  <select
-                    id="checkout-country"
+                <div className="min-w-0 border-r border-border bg-muted/30 p-1">
+                  <Select
                     value={phoneCountry}
-                    onChange={(e) => {
-                      setPhoneCountry(e.target.value);
+                    onValueChange={(value) => {
+                      setPhoneCountry(value);
                       setPhone("");
                       setPhoneError("");
                     }}
-                    className="h-12 w-full min-w-0 appearance-none bg-transparent px-3 pl-10 pr-8 text-xs font-medium outline-none sm:text-sm"
-                    aria-label="Country and calling code"
                   >
-                    {PHONE_COUNTRIES.map((country) => (
-                      <option key={country.iso2} value={country.iso2}>
-                        {country.name} {country.dialCode}
-                      </option>
-                    ))}
-                  </select>
-                  <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground" aria-hidden="true">
-                    ▾
-                  </span>
+                    <SelectTrigger
+                      id="checkout-country"
+                      aria-label="Country and calling code"
+                      className="h-10 w-full min-w-0 border-0 bg-transparent px-2 shadow-none focus:ring-0 sm:px-3"
+                    >
+                      <span className="flex min-w-0 items-center gap-2">
+                        <span className="shrink-0 text-base" aria-hidden="true">{countryFlag(phoneCountry)}</span>
+                        <span className="num truncate font-semibold text-foreground">
+                          {getPhoneCountry(phoneCountry)?.dialCode ?? "+"}
+                        </span>
+                      </span>
+                    </SelectTrigger>
+                    <SelectContent className="z-[100] max-h-72 w-[min(24rem,calc(100vw-2rem))]">
+                      {PHONE_COUNTRIES.map((country) => (
+                        <SelectItem key={country.iso2} value={country.iso2}>
+                          <span className="flex items-center gap-2">
+                            <span aria-hidden="true">{countryFlag(country.iso2)}</span>
+                            <span className="min-w-0 flex-1 truncate">{country.name}</span>
+                            <span className="num shrink-0 text-muted-foreground">{country.dialCode}</span>
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <Input
