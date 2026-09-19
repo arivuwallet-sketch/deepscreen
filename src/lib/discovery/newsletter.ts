@@ -1,6 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 
 import { consumeRateLimit, requestClientKey } from "@/lib/security";
+import { z } from "zod";
+
+const newsletterInput = z.object({ email: z.string().trim().min(3).max(254) }).strict();
 
 const EMAIL_MAX_LENGTH = 254;
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
@@ -17,7 +20,7 @@ function normalizeEmail(value: string): string | null {
  * protects this server function against cross-site browser requests.
  */
 export const subscribeToNewsletter = createServerFn({ method: "POST" })
-  .inputValidator((d: { email: string }) => d)
+  .inputValidator(newsletterInput)
   .handler(async ({ data }): Promise<{ ok: true } | { ok: false; error: string }> => {
     const email = normalizeEmail(data.email);
     if (!email) return { ok: false, error: "Enter a valid email address." };
