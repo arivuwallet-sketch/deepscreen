@@ -76,7 +76,7 @@ const EXCHANGE_FULL_NAME: Record<ExchangeCode, string> = {
 
 export const SITE_URL = "https://deepscreen.online";
 export const SITE_NAME = "DeepScreen";
-export const LOGO_URL = `${SITE_URL}/favicon.ico`;
+export const LOGO_URL = `${SITE_URL}/logo.svg`;
 
 export function buildOrganizationSchema(): JsonLdNode {
   return {
