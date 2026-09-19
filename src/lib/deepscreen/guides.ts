@@ -15,6 +15,8 @@ export type Guide = {
   answer: string;
   sections: GuideSection[];
   faqs: GuideFaq[];
+  /** Original, methodology-led research content maintained as a first-party DeepScreen resource. */
+  originalResearch?: boolean;
 };
 
 export const GUIDES: Guide[] = [
@@ -78,57 +80,70 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: "nse-vs-bse",
-    title: "NSE vs BSE: Differences, Which to Trade On, and Why Prices Vary",
-    h1: "NSE vs BSE — what is the difference?",
+    title: "NSE vs BSE: A Complete Research Guide to India’s Two Stock Exchanges",
+    h1: "NSE vs BSE — a complete research guide",
     description:
-      "NSE and BSE are India's two main stock exchanges. Compare liquidity, indices, listings and settlement, and learn which one to place your order on.",
-    updated: "2026-09-11",
-    topics: ["NSE", "BSE", "Nifty 50", "Sensex", "Indian stock market"],
-    groups: ["india", "stocks"],
+      "A practical, source-led guide to comparing NSE and BSE: listings, liquidity, price formation, indices, derivatives, execution and the research questions that actually matter.",
+    updated: "2026-09-19",
+    topics: ["NSE", "BSE", "Nifty 50", "Sensex", "liquidity", "stock exchange research"],
+    groups: ["india", "stocks", "learn"],
+    originalResearch: true,
     answer:
-      "The BSE is Asia's oldest exchange with the widest list of companies and the Sensex as its benchmark; the NSE is younger, carries far higher trading volume, and runs the Nifty 50 and India's dominant derivatives market. Most active traders route orders to the NSE for liquidity; both settle T+1 and are regulated by SEBI.",
+      "NSE and BSE are both Indian stock exchanges, but a research comparison should focus on the specific security, trading segment, liquidity, order-book conditions, index exposure and available market data rather than assuming one venue is universally preferable. The same company can be listed on both while the two order books remain separate.",
     sections: [
       {
-        heading: "Size and liquidity",
+        heading: "1. Start with the security, not the exchange",
         body: [
-          "The BSE lists the larger number of companies, including many small and rarely traded names. The NSE lists fewer but captures the overwhelming majority of cash-market turnover and virtually all equity derivatives volume.",
-          "Liquidity matters more than listing count for anyone placing orders. Tighter bid-ask spreads on the NSE mean less slippage, which is why large orders in dual-listed stocks usually go there.",
+          "For a dual-listed Indian company, first confirm the ISIN and whether the security is actually available on both venues. Then compare the live quote, displayed depth, recent traded volume and the exact order type you intend to use.",
+          "Do not treat the NSE symbol and BSE scrip code as different businesses. They are exchange identifiers for the same listed issuer when the security is dual-listed; corporate disclosures and the underlying ownership remain company-level facts.",
         ],
       },
       {
-        heading: "Indices",
+        heading: "2. Compare liquidity and execution",
         body: [
-          "The BSE's benchmark is the Sensex, 30 large companies weighted by free-float market cap. The NSE's is the Nifty 50, a broader 50-stock benchmark.",
-          "Because their constituents overlap heavily, the two indices move together almost tick for tick. Divergence between them is noise, not a signal.",
+          "Liquidity is about how much you can buy or sell without moving the price materially. For research, inspect traded value, frequency of trades, quoted spread and available depth rather than using the exchange label as a shortcut.",
+          "For a large order, compare the actual bid-ask spread and depth at the time you trade. A venue can have a credible market overall while a particular small-cap security remains thinly traded there.",
         ],
       },
       {
-        heading: "Why the same stock shows two prices",
+        heading: "3. Understand the indices and market segments",
         body: [
-          "A dual-listed company trades independently on each exchange, so quotes differ by paise as order flow arrives at different times. Arbitrageurs close the gap within seconds.",
-          "You can buy on one exchange and sell on the other, since shares settle into the same demat account — but check your broker's rules before relying on it intraday.",
+          "NSE operates the Nifty family of indices and has extensive equity-derivatives activity. BSE operates the Sensex and a broad range of equity, debt and derivatives markets. The exact products and eligible securities can change, so use the exchanges’ current product pages when researching a specific segment.",
+          "Index membership is an analytical input, not a quality stamp. When a company enters or leaves an index, separate the mechanical portfolio-flow effect from any change in the underlying business.",
         ],
       },
       {
-        heading: "Which should you use?",
+        heading: "4. Why quotes can differ",
         body: [
-          "For actively traded large and mid caps: the NSE, for the spread. For small caps or older companies listed only on the BSE: the BSE, because there is no alternative.",
-          "For derivatives, the NSE is effectively the only venue that matters in India.",
+          "The two venues maintain separate order books. At any instant, buyers and sellers can be distributed differently, so the best bid, best ask and last traded price can differ slightly even for the same issuer.",
+          "Arbitrage activity can reduce persistent price differences, but that does not mean a trader should assume an executable cross-exchange opportunity. Check transaction costs, liquidity, settlement mechanics and broker rules.",
+        ],
+      },
+      {
+        heading: "5. A DeepScreen NSE-vs-BSE research workflow",
+        body: [
+          "Record the issuer, ISIN, exchange identifiers, latest price, spread, traded value and the time of observation. Then check the same company’s corporate actions, financial disclosures and shareholding information independently of the venue.",
+          "For derivatives or index research, verify the current eligible contracts directly from the relevant exchange. For ownership and promoter disclosures, use the company’s exchange filings and SEBI-required disclosure formats rather than relying on third-party summaries.",
+          "The research conclusion should be security-specific: what differs in execution, liquidity, product availability or data coverage for the exact instrument you are studying? That is more useful than a generic claim that one exchange is always better.",
         ],
       },
     ],
     faqs: [
       {
-        q: "Is NSE better than BSE?",
-        a: "For liquidity and derivatives, yes. For breadth of listed companies, the BSE is larger. Both are SEBI-regulated and equally safe to trade on.",
+        q: "Are NSE and BSE the same company?",
+        a: "No. NSE and BSE are separate stock exchanges. A listed issuer may have securities traded on both, but the venues maintain separate trading systems and order books.",
       },
       {
-        q: "Can I buy a stock on NSE and sell it on BSE?",
-        a: "Yes, once the shares are in your demat account, since both exchanges settle to the same depository. Intraday, broker rules vary.",
+        q: "Why can the same stock have different prices on NSE and BSE?",
+        a: "Each venue has its own buyers and sellers, so displayed bids, asks and last traded prices can differ temporarily.",
       },
       {
-        q: "Do NSE and BSE have the same trading hours?",
-        a: "Yes. Both run a normal equity session from 9:15 am to 3:30 pm IST, with a pre-open session from 9:00 am.",
+        q: "Which exchange should I use for a dual-listed stock?",
+        a: "Compare the actual security-level spread, depth, traded value, order type, broker costs and product availability at the time of the intended transaction. The answer is instrument- and execution-specific.",
+      },
+      {
+        q: "Where should I verify promoter or shareholding information?",
+        a: "Use the issuer’s exchange filings and the applicable SEBI disclosure format. For Indian listed companies, the exchange-distributed shareholding pattern is the primary place to check current ownership and encumbrance disclosures.",
       },
     ],
   },
@@ -177,8 +192,7 @@ export const GUIDES: Guide[] = [
     faqs: [
       {
         q: "What do green and red candles mean?",
-        a: "Green (or hollow) means the close was above the open for that period; red (or filled) means it closed below.",
-      },
+        a: "Green (or hollow) means the close was above the open for that period; red (or filled) means it closed below.",      },
       {
         q: "Which candlestick pattern is most reliable?",
         a: "No pattern is reliable in isolation. Engulfing candles and hammers at established support or resistance, confirmed by high volume, have the best track record.",
@@ -357,8 +371,7 @@ export const GUIDES: Guide[] = [
       {
         q: "What is an option chain?",
         a: "A table of all available strikes for an expiry, showing premium, volume and open interest for both calls and puts.",
-      },
-      {
+      },      {
         q: "Can I trade options with a small account?",
         a: "Technically yes, but lot sizes and margin requirements — especially for selling — mean small accounts are usually forced into the riskiest strategies.",
       },
@@ -537,8 +550,7 @@ export const GUIDES: Guide[] = [
     slug: "rsi-and-moving-averages",
     title: "RSI and Moving Averages: How to Use Them Without Fooling Yourself",
     h1: "RSI and moving averages explained",
-    description:
-      "How the relative strength index and simple/exponential moving averages are built, what crossovers actually mean, and where both indicators fail.",
+    description:      "How the relative strength index and simple/exponential moving averages are built, what crossovers actually mean, and where both indicators fail.",
     updated: "2026-09-11",
     topics: ["RSI", "moving average", "golden cross", "technical indicators"],
     groups: ["learn", "stocks"],
@@ -588,7 +600,498 @@ export const GUIDES: Guide[] = [
         a: "They describe momentum and trend, not the future. They work best as risk-management tools alongside fundamental analysis.",
       },
     ],
+  },,
+{
+    slug: "how-to-analyze-an-indian-stock-in-15-minutes",
+    title: "How to Analyse an Indian Stock in 15 Minutes: The DeepScreen Triage Framework",
+    h1: "How to analyse an Indian stock in 15 minutes",
+    description:
+      "A repeatable 15-minute triage for Indian stocks: business model, financial health, cash flow, valuation, ownership, peers and red flags before deeper due diligence.",
+    updated: "2026-09-19",
+    topics: ["Indian stock analysis", "15 minute stock analysis", "fundamental analysis", "research checklist"],
+    groups: ["india", "stocks", "learn"],
+    originalResearch: true,
+    answer:
+      "A 15-minute stock review should not try to predict the future. Its job is to decide whether a company deserves a deeper read of its annual report, exchange filings and historical financials. DeepScreen’s triage framework moves from business quality to balance sheet, cash flow, valuation, ownership and close peers in a fixed order.",
+    sections: [
+      {
+        heading: "Minute 0–2: Explain the business in one sentence",
+        body: [
+          "Write a plain-English sentence covering what the company sells, who pays it, and what drives demand. Then identify the primary revenue segments and whether the business is cyclical, regulated, capital intensive or dependent on a small number of customers.",
+          "A useful test is whether you can explain the revenue engine without using the stock price. If the description is mostly about recent share performance, restart the analysis.",
+        ],
+      },
+      {
+        heading: "Minute 2–5: Check the income statement and returns on capital",
+        body: [
+          "Look at a multi-year revenue and profit series rather than a single quarter. Ask whether growth is organic, whether margins are stable, and whether returns on equity or capital remain durable when conditions change.",
+          "Separate operating performance from accounting noise. One-off gains, unusual tax items, asset sales or acquisition effects can make the latest earnings look stronger or weaker than the recurring business.",
+        ],
+      },
+      {
+        heading: "Minute 5–8: Follow the cash",
+        body: [
+          "Start with operating cash flow, then move to capital expenditure and free cash flow. Compare cumulative operating cash flow with cumulative reported profit over several years and investigate large, persistent gaps.",
+          "Working capital is a frequent explanation. Receivables, inventory and contract assets can absorb cash even when reported earnings rise. For a capital-intensive business, also distinguish maintenance capex from expansion capex where disclosures permit.",
+        ],
+      },
+      {
+        heading: "Minute 8–11: Stress-test leverage and valuation",
+        body: [
+          "Check gross debt, cash, net debt, interest burden and the direction of leverage. A company can carry meaningful debt safely when cash generation is recurring; the same debt becomes more fragile when earnings and cash flow are falling.",
+          "Then compare P/E, EV/EBITDA and other relevant multiples with close peers and the company’s own history. A low multiple is a research prompt, not proof of cheapness.",
+        ],
+      },
+      {
+        heading: "Minute 11–13: Ownership, governance and dilution",
+        body: [
+          "For Indian listed companies, read the latest shareholding pattern and notes on promoter holdings, pledged or otherwise encumbered shares, and changes in institutional ownership. Track whether dilution, warrants, preferential issues or repeated equity raises are changing the economic claim on the business.",
+          "Governance review should focus on disclosed transactions, auditor comments, regulatory actions and consistency between guidance and reported outcomes. Do not infer governance quality from management communication style alone.",
+        ],
+      },
+      {
+        heading: "Minute 13–15: Compare the right peers and write the unresolved questions",
+        body: [
+          "Use companies with similar products, customers, geography and capital intensity. Compare growth, margins, returns on capital, leverage, cash conversion and valuation on like-for-like reporting periods.",
+          "Finish with three unresolved questions that must be answered from primary documents. This turns a quick scan into a research queue instead of a premature investment conclusion.",
+        ],
+      },
+      {
+        heading: "The 15-minute output",
+        body: [
+          "Your note should contain: business in one sentence; three-year or five-year financial trend; cash-flow observation; leverage observation; valuation multiples; ownership/governance flags; closest peers; and three questions for deeper due diligence.",
+          "The framework is deliberately a triage tool. Fifteen minutes is enough to decide what to investigate next, not enough to establish the full quality of a public company.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "Can 15 minutes really be enough to analyze a stock?",
+        a: "It is enough for a structured first-pass screen. Full research still requires primary filings, longer financial histories, peer work and a review of material risks.",
+      },
+      {
+        q: "Which metric should I check first?",
+        a: "Start with the business model and then check revenue/profit trend, operating cash flow, leverage and valuation in that order. The best sequence is designed to stop a cheap-looking ratio from dominating the research.",
+      },
+      {
+        q: "Should I use only the latest quarterly result?",
+        a: "No. Use the latest quarter for recency, but anchor the interpretation to several comparable periods so you can distinguish a trend from a one-off event.",
+      },
+    ],
   },
+  {
+    slug: "pe-vs-peg-vs-ev-ebitda",
+    title: "P/E vs PEG vs EV/EBITDA: Choosing the Right Valuation Lens",
+    h1: "P/E vs PEG vs EV/EBITDA",
+    description:
+      "A practical comparison of P/E, PEG and EV/EBITDA, including formulas, when each multiple breaks, and a worked example you can reproduce on live company data.",
+    updated: "2026-09-19",
+    topics: ["P/E", "PEG", "EV/EBITDA", "valuation multiples", "stock valuation"],
+    groups: ["stocks", "learn", "screener"],
+    originalResearch: true,
+    answer:
+      "P/E connects market value to earnings attributable to equity holders, PEG adds an explicit growth input, and EV/EBITDA compares enterprise value with a pre-interest, pre-tax, pre-depreciation operating earnings measure. None is universally superior; the correct lens depends on the business model, capital structure and quality of the denominator.",
+    sections: [
+      {
+        heading: "P/E: the equity-holder multiple",
+        body: [
+          "Price-to-earnings is market price per share divided by trailing or forward earnings per share. It is intuitive for profitable businesses where earnings are reasonably representative of recurring economics.",
+          "P/E becomes less informative when earnings are negative, highly cyclical, distorted by one-off items, or affected by unusual leverage. Always identify whether you are using trailing reported earnings or an estimate.",
+        ],
+      },
+      {
+        heading: "PEG: P/E plus an explicit growth assumption",
+        body: [
+          "A common PEG construction is P/E divided by an annual earnings-growth rate. For example, a P/E of 24 and a 12% growth assumption gives a PEG of 2.0 when the growth rate is entered as 12 rather than 0.12.",
+          "PEG looks precise but inherits every weakness of its inputs. Growth may be historical, forecast, cyclical or only one year long. Changing the growth period can change the ratio materially.",
+        ],
+      },
+      {
+        heading: "EV/EBITDA: useful when capital structure matters",
+        body: [
+          "Enterprise value starts from equity value and incorporates debt and cash. EV/EBITDA is therefore often more comparable across companies with different leverage, because the numerator is based on the whole operating enterprise rather than only common equity.",
+          "EBITDA is not free cash flow. It ignores interest, taxes, depreciation and amortisation, and it can look healthy in businesses that require heavy recurring capital expenditure.",
+        ],
+      },
+      {
+        heading: "A reproducible three-multiple worksheet",
+        body: [
+          "For the target company and three to five close peers, record the same-period revenue, EBITDA, earnings, net debt and market capitalisation. Calculate P/E, PEG and EV/EBITDA using the same definition and reporting period for every company.",
+          "Then add two quality columns: free-cash-flow conversion and return on capital. A multiple comparison without denominator quality can make two businesses look similar when their economics are not.",
+        ],
+      },
+      {
+        heading: "Worked example with hypothetical numbers",
+        body: [
+          "Company A has a P/E of 24, expected earnings growth of 12%, and EV/EBITDA of 15. Company B has a P/E of 18, expected growth of 6%, and EV/EBITDA of 11. The ratios alone do not establish which business is cheaper because debt, margins, reinvestment needs and the reliability of the growth assumptions differ.",
+          "The research question is why the market assigns each multiple. A premium can reflect higher returns on capital, stronger reinvestment opportunities, better cash conversion or lower balance-sheet risk; it can also reflect expectations that later fail.",
+        ],
+      },
+      {
+        heading: "Which multiple fits which business?",
+        body: [
+          "Use P/E as a natural starting point for mature profitable businesses where financing structure is not the dominant distortion. Use EV/EBITDA when comparing businesses with materially different leverage or where enterprise value is a better expression of operating assets.",
+          "Use PEG only when the growth input is explicit, defensible and comparable across the peer set. For banks and other financial firms, enterprise-value conventions require extra care because debt is part of the operating funding model.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "Is a lower P/E always better than a higher P/E?",
+        a: "No. The multiple is a price relative to earnings, so you also need to assess growth, durability, leverage, capital intensity and the quality of the earnings denominator.",
+      },
+      {
+        q: "What does a PEG of 1 mean?",
+        a: "Under the common convention, a PEG of 1 means the P/E equals the stated annual earnings-growth rate. It is only as useful as the growth definition behind it.",
+      },
+      {
+        q: "Why can EV/EBITDA and P/E tell different stories?",
+        a: "Debt, cash, interest expense, taxes and depreciation can create large differences between enterprise value and equity value. The two multiples therefore answer different questions.",
+      },
+    ],
+  },
+  {
+    slug: "roe-vs-roce-with-real-company-examples",
+    title: "ROE vs ROCE: What the Difference Reveals About a Business",
+    h1: "ROE vs ROCE explained with real-company examples",
+    description:
+      "Understand ROE and ROCE, why they can diverge, and how to compare companies such as TCS and Infosys without mistaking a high ratio for a complete quality verdict.",
+    updated: "2026-09-19",
+    topics: ["ROE", "ROCE", "TCS", "Infosys", "return on capital", "quality analysis"],
+    groups: ["stocks", "india", "learn"],
+    originalResearch: true,
+    answer:
+      "ROE measures the return earned on shareholders’ equity, while ROCE focuses on operating returns relative to capital employed. Both are useful, but they can diverge because of leverage, cash balances, business structure and accounting definitions. The important research task is to explain the difference, not to crown one ratio as the winner.",
+    sections: [
+      {
+        heading: "ROE: what shareholders earn on book equity",
+        body: [
+          "Return on equity is generally calculated as net income divided by shareholders’ equity, often using average equity for the period. A high ROE can reflect strong economics, but it can also be amplified by a small equity base or substantial leverage.",
+          "Read ROE together with debt-to-equity, buybacks, accumulated reserves and one-off gains. A ratio can rise because the denominator shrank, not because the operating business improved.",
+        ],
+      },
+      {
+        heading: "ROCE: focus on operating capital",
+        body: [
+          "Return on capital employed commonly relates operating profit or EBIT to capital employed. Definitions vary by provider, so use one consistent formula across the full peer set and document it.",
+          "ROCE is useful for capital-intensive companies because it asks how effectively the operating business uses the capital tied up in it. It should be compared with the cost of that capital and with prior periods.",
+        ],
+      },
+      {
+        heading: "Real-company practice: TCS and Infosys",
+        body: [
+          "TCS and Infosys are useful real-company examples because both are large listed Indian IT-services businesses, yet their balance-sheet composition, cash holdings, buybacks, margins and capital structures can produce differences between ROE and ROCE.",
+          "Open the latest DeepScreen company pages for both companies and record the same reporting-period ROE, ROCE, net margin, cash, debt and market valuation. The research goal is to explain any gap between ROE and ROCE using balance-sheet and operating facts rather than simply choosing the higher percentage.",
+        ],
+      },
+      {
+        heading: "Three questions to ask when ROE and ROCE diverge",
+        body: [
+          "First, is leverage materially changing the equity denominator? Second, is the company holding large amounts of excess cash or other non-operating assets? Third, are provider formulas using different definitions of operating profit or capital employed?",
+          "Also inspect buybacks and dilution. A company that repurchases shares can mechanically change book equity and ROE even when the underlying operating return changes much less.",
+        ],
+      },
+      {
+        heading: "The DeepScreen return-quality check",
+        body: [
+          "Build a five- to ten-year series for ROE, ROCE, operating margin, free-cash-flow conversion and leverage. Mark the years with unusually high or low returns and read the annual-report explanations for those periods.",
+          "Durable returns come from economics that persist: pricing power, efficient operations, asset turns, capital discipline, customer retention and sensible reinvestment. The ratio is the starting measurement, not the full explanation.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "Is ROE or ROCE more important?",
+        a: "They measure different aspects of return. Use both when possible and investigate why they diverge rather than treating either as a standalone quality verdict.",
+      },
+      {
+        q: "Can leverage make ROE look better?",
+        a: "Yes. More financial leverage can reduce the equity base relative to the assets used to generate earnings, which can lift ROE while increasing financial risk.",
+      },
+      {
+        q: "Why can a cash-rich company have different ROE and ROCE?",
+        a: "Large cash balances affect the denominator differently depending on the formula used. That is one reason to document the provider definition and inspect the balance sheet.",
+      },
+    ],
+  },
+  {
+    slug: "how-to-detect-a-debt-trap",
+    title: "How to Detect a Debt Trap: A Cash-Flow and Balance-Sheet Checklist",
+    h1: "How to detect a debt trap",
+    description:
+      "A practical checklist for finding debt stress early: leverage growth, interest burden, cash conversion, refinancing, working capital, dilution and collateral risk.",
+    updated: "2026-09-19",
+    topics: ["debt trap", "debt analysis", "interest coverage", "balance sheet", "cash flow"],
+    groups: ["stocks", "learn"],
+    originalResearch: true,
+    answer:
+      "A debt trap is a situation where debt service and refinancing needs become increasingly dependent on new borrowing, asset sales, equity dilution or unusually optimistic operating assumptions. No single ratio proves it; the strongest signal is a worsening combination of leverage, interest burden and weak recurring cash generation.",
+    sections: [
+      {
+        heading: "Signal 1: debt grows faster than the business",
+        body: [
+          "Compare debt growth with revenue and EBITDA growth over several periods. If borrowings rise materially faster than the operating base, ask what the capital financed and whether the returns justify the funding cost.",
+          "Separate acquisition debt, working-capital financing and long-term project finance because they carry different economic explanations and maturities.",
+        ],
+      },
+      {
+        heading: "Signal 2: interest is consuming the operating result",
+        body: [
+          "Interest coverage compares operating earnings with interest expense. A falling coverage ratio deserves attention even when headline profit remains positive, especially when debt is floating-rate or maturities are near.",
+          "Do not stop at EBITDA coverage. Compare cash interest payments with operating cash flow and check whether reported earnings convert into cash after working-capital movements.",
+        ],
+      },
+      {
+        heading: "Signal 3: cash flow repeatedly fails to service the debt",
+        body: [
+          "Persistent negative free cash flow can force a company to borrow again just to fund capex, working capital or interest. Look for a pattern rather than one weak year, and distinguish temporary expansion spending from structural cash burn.",
+          "Watch receivables, inventory and supplier financing. Fast growth can consume cash, but a multi-year deterioration in cash conversion without a credible operating explanation is a material research question.",
+        ],
+      },
+      {
+        heading: "Signal 4: refinancing becomes the strategy",
+        body: [
+          "Map the debt maturity schedule and ask what pays each tranche. A business becomes more exposed when near-term maturities are repeatedly rolled over instead of repaid from recurring cash generation.",
+          "Read covenant disclosures, secured-borrowing terms, floating-rate exposure and any requirement to maintain collateral or financial ratios. Refinancing risk is about timing as well as headline leverage.",
+        ],
+      },
+      {
+        heading: "Signal 5: balance-sheet support keeps shrinking",
+        body: [
+          "Check cash balances, unpledged assets and access to committed facilities. Repeated asset sales, emergency equity raises or other funding actions can indicate that the original capital structure is becoming harder to sustain.",
+          "For promoter-led Indian companies, also inspect whether promoter shares are pledged or otherwise encumbered. That is not automatically evidence of a company-level debt trap, but a rising pledge ratio can be an additional monitoring item.",
+        ],
+      },
+      {
+        heading: "A reproducible debt-trap worksheet",
+        body: [
+          "Record debt, cash, net debt, EBITDA or EBIT, interest expense, operating cash flow, capex, free cash flow and debt maturities for at least three comparable periods. Add notes for acquisitions, major capex projects and equity issuance.",
+          "Then write the funding bridge: recurring operating cash flow, asset sales, new borrowing and new equity. A business that needs increasingly external funding to maintain normal operations deserves deeper review than one that self-funds most of its obligations.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "Is a high debt-to-equity ratio proof of a debt trap?",
+        a: "No. Debt-to-equity is only one measure. The ability to service and refinance debt depends on recurring cash flow, interest cost, maturity profile, asset quality and access to funding.",
+      },
+      {
+        q: "Can a fast-growing company have negative free cash flow without being distressed?",
+        a: "Yes. Expansion capex and working-capital investment can consume cash temporarily. The key is whether the spending has a credible economic return and whether funding needs remain manageable.",
+      },
+      {
+        q: "What should I inspect before trusting an interest-coverage ratio?",
+        a: "Check the definition of earnings used, whether interest includes all relevant financing costs, and how cash interest compares with actual operating cash generation.",
+      },
+    ],
+  },
+  {
+    slug: "free-cash-flow-analysis-guide",
+    title: "Free Cash Flow Analysis: From Earnings to Owner Cash",
+    h1: "Free cash flow analysis guide",
+    description:
+      "Learn how to move from accounting earnings to operating cash flow and free cash flow, with checks for working capital, capex, acquisitions, leases and dilution.",
+    updated: "2026-09-19",
+    topics: ["free cash flow", "cash flow analysis", "owner earnings", "capex", "working capital"],
+    groups: ["stocks", "learn"],
+    originalResearch: true,
+    answer:
+      "Free cash flow analysis asks how much cash a business generates after the investment required to keep its operating assets productive. DeepScreen’s workflow starts with operating cash flow, subtracts relevant capital expenditure, and then explains the major adjustments before treating the result as recurring owner cash.",
+    sections: [
+      {
+        heading: "Start with operating cash flow, not net profit",
+        body: [
+          "Net income includes non-cash accounting items and can move differently from cash collected from customers. Operating cash flow is the bridge from accounting profit toward cash economics, so the first question is whether profit consistently converts into cash.",
+          "A growing gap can have reasonable causes — inventory build, receivables growth, contract timing or customer advances — but it needs an explanation from the cash-flow and balance-sheet notes.",
+        ],
+      },
+      {
+        heading: "Subtract the capital needed to run the business",
+        body: [
+          "A common practical definition is free cash flow equal to operating cash flow minus capital expenditure. The exact treatment of asset purchases, software capitalisation, development spending and acquisitions should be documented for the company being studied.",
+          "The hardest part is distinguishing maintenance capex from growth capex. Companies do not always disclose this cleanly, so use management commentary, asset schedules and historical reinvestment needs to avoid false precision.",
+        ],
+      },
+      {
+        heading: "Check working capital and cash conversion",
+        body: [
+          "Track receivables, inventory, payables and other operating working-capital balances over time. A company can report strong earnings while consuming substantial cash when customers take longer to pay or inventory builds ahead of demand.",
+          "Calculate cash conversion using a consistent definition and compare it across several years and close peers. Persistent weak conversion is more informative than a single quarter with a timing effect.",
+        ],
+      },
+      {
+        heading: "Do not ignore leases, stock compensation and acquisitions",
+        body: [
+          "Lease commitments can be economically important even when the cash-flow presentation separates them across financing and operating categories. Stock-based compensation is non-cash today but can dilute existing owners; acquisitions are often excluded from simple FCF definitions even though they consume cash.",
+          "For an owner-oriented analysis, keep a separate line for acquisition spending and share dilution. This makes it easier to distinguish cash created by the existing business from cash redeployed to buy growth.",
+        ],
+      },
+      {
+        heading: "A ten-year FCF research table",
+        body: [
+          "Record revenue, net income, operating cash flow, capex, free cash flow, diluted shares and net debt for each year. Add FCF margin and FCF per share, then mark years with unusually large working-capital swings or acquisitions.",
+          "A durable cash generator should be understandable from the table: cash tends to follow the operating model, capex stays within a plausible range, dilution is visible, and weak years have identifiable causes.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "Is free cash flow the same as profit?",
+        a: "No. Profit is an accounting measure; free cash flow focuses on operating cash generated after relevant capital expenditure.",
+      },
+      {
+        q: "Can free cash flow be negative for a good company?",
+        a: "Yes. Expansion, working-capital investment or acquisitions can create temporarily negative cash flow. The research question is whether the spending has a credible return and remains financeable.",
+      },
+      {
+        q: "What is FCF yield?",
+        a: "FCF yield is commonly free cash flow divided by market capitalisation, expressed as a percentage. Use the same period and share count definition across the comparison set.",
+      },
+    ],
+  },
+  {
+    slug: "promoter-pledging-risk-analysis",
+    title: "How Promoter Pledging Affects Risk: A Practical Disclosure Guide",
+    h1: "How promoter pledging affects risk",
+    description:
+      "Understand pledged or otherwise encumbered promoter shares, where to verify them in Indian filings, what can change the risk, and why the trend matters more than a single percentage.",
+    updated: "2026-09-19",
+    topics: ["promoter pledge", "promoter holding", "shareholding pattern", "SEBI disclosures", "Indian stocks"],
+    groups: ["india", "stocks", "learn"],
+    originalResearch: true,
+    answer:
+      "Promoter pledging means shares held by promoters are pledged or otherwise encumbered as collateral. The disclosure is important because a fall in the share price can affect collateral coverage, but a pledge is not automatically a sign of financial distress. The correct analysis is to verify the disclosure, trace the trend and understand what the borrowing supports.",
+    sections: [
+      {
+        heading: "What exactly is being pledged?",
+        body: [
+          "Start with the latest exchange shareholding pattern and the reported number of promoter shares pledged or otherwise encumbered. Separate pledged shares from locked-in shares and other categories because the economic implications differ.",
+          "For listed Indian companies, promoter and promoter-group ownership is part of the disclosure framework overseen by SEBI. Use the current exchange filing rather than a third-party percentage copied from an older quarter.",
+        ],
+      },
+      {
+        heading: "Why the risk can change with the stock price",
+        body: [
+          "When pledged shares are collateral for borrowing, the market value of that collateral moves with the share price. A large price decline can therefore create pressure for additional collateral, partial repayment or lender action depending on the financing terms.",
+          "This mechanism is separate from the company’s own debt. Promoter-level borrowing can affect control and ownership even when the operating company’s balance sheet looks stable.",
+        ],
+      },
+      {
+        heading: "Track the trend, not just the snapshot",
+        body: [
+          "Create a quarter-by-quarter series of promoter holding, pledged or encumbered shares, public holding and institutional holding. Mark large increases, sudden releases and any changes in promoter ownership.",
+          "A falling pledge ratio can result from repayment, release of collateral, or changes in the promoter share base. Read the filing notes before interpreting the percentage as a standalone improvement.",
+        ],
+      },
+      {
+        heading: "Five questions for a promoter-pledge review",
+        body: [
+          "What percentage of promoter shares is pledged or otherwise encumbered? Who appears to be the borrower? What assets or obligations does the borrowing support? Has the pledge ratio changed materially? Could lender enforcement change voting control if the share price falls?",
+          "Answer those questions from exchange filings, corporate announcements and the company’s disclosures. Do not infer pledge levels from debt-to-equity, market cap or the stock chart.",
+        ],
+      },
+      {
+        heading: "How DeepScreen should present this data",
+        body: [
+          "Pledge information should always carry a reporting date and source label. The interface should distinguish live provider data, company filing data and older reference values so a historical disclosure is not mistaken for today’s position.",
+          "For research purposes, the most useful output is a dated trend line plus a link back to the source document. A single bold warning label without the underlying filing is not enough.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "Is promoter pledging always bad?",
+        a: "No. The economic purpose, amount, collateral terms and trend matter. A pledge should be investigated rather than treated as a universal verdict.",
+      },
+      {
+        q: "Where can I verify promoter pledging in India?",
+        a: "Start with the latest exchange shareholding pattern and related company disclosures. SEBI’s disclosure framework specifies promoter and promoter-group reporting requirements.",
+      },
+      {
+        q: "Is promoter pledge the same as company debt?",
+        a: "No. Promoter-level borrowing is distinct from debt recorded on the operating company’s balance sheet, although it can still create ownership and control risk.",
+      },
+    ],
+  },
+  {
+    slug: "10-year-compounder-analysis-framework",
+    title: "10-Year Compounder Analysis Framework: A Repeatable Business-Quality Checklist",
+    h1: "10-year compounder analysis framework",
+    description:
+      "A long-horizon framework for researching businesses with the potential to compound value: reinvestment runway, returns on capital, cash flow, competition, governance, dilution and valuation.",
+    updated: "2026-09-19",
+    topics: ["compounder", "10 year stock analysis", "long term investing", "quality business", "reinvestment"],
+    groups: ["stocks", "learn", "india"],
+    originalResearch: true,
+    answer:
+      "A 10-year compounder framework studies the business as an operating system rather than a stock chart. It asks whether the company can reinvest capital at attractive returns, grow without excessive leverage or dilution, preserve its competitive position and remain understandable enough to monitor through multiple economic cycles.",
+    sections: [
+      {
+        heading: "1. Reinvestment runway",
+        body: [
+          "Estimate where future growth can actually come from: new customers, new products, capacity, geographic expansion, pricing, market share or acquisitions. A company cannot compound rapidly for a decade if its addressable market is already exhausted.",
+          "Then ask how much capital the growth requires. High growth with proportionally higher capital needs can produce a very different economic outcome from growth that needs little incremental capital.",
+        ],
+      },
+      {
+        heading: "2. Returns on incremental capital",
+        body: [
+          "Historical ROE and ROCE are useful starting points, but a long-term study should also ask what return the next unit of invested capital appears to earn. Watch margins, asset turns, working capital and capital expenditure as the company scales.",
+          "Strong historical returns can deteriorate when a business gets larger, enters tougher markets or overinvests. The 10-year framework therefore focuses on durability, not a single peak ratio.",
+        ],
+      },
+      {
+        heading: "3. Cash generation and balance-sheet resilience",
+        body: [
+          "Build a decade-long series for operating cash flow, free cash flow, net debt and diluted shares. Note the years in which cash conversion broke down and explain the cause.",
+          "A compounding business still encounters recessions, commodity shocks, regulatory changes and competitive pressure. Balance-sheet resilience determines how much damage a bad cycle can do to the long-run reinvestment plan.",
+        ],
+      },
+      {
+        heading: "4. Competitive advantage and industry structure",
+        body: [
+          "Look for observable economics: switching costs, network effects, scale, distribution, brand strength, patents or licenses, cost advantages and regulatory barriers. Then test whether those advantages show up in price retention, margins, customer retention and returns on capital.",
+          "Study competitors in the same period. A moat is not a label; it is a hypothesis that should survive direct peer comparison and repeated business-cycle tests.",
+        ],
+      },
+      {
+        heading: "5. Management, governance and dilution",
+        body: [
+          "Compare management promises with delivered revenue, margins, capital allocation and acquisitions across several years. Review related-party transactions, auditor commentary, regulatory events and equity issuance.",
+          "Dilution matters because a business can grow while the per-share economics lag. Track diluted shares, stock compensation, warrants and acquisitions funded with new equity.",
+        ],
+      },
+      {
+        heading: "6. Valuation must fit the operating story",
+        body: [
+          "A strong business can be a weak investment at an unsupported price, while a slower business can be priced for very low expectations. Compare the current valuation with the company’s own history, close peers and a range of operating outcomes.",
+          "Use scenario analysis instead of a single-point forecast: lower growth, lower margins, higher reinvestment, higher funding costs and a more conservative exit multiple should all be visible in the research note.",
+        ],
+      },
+      {
+        heading: "The 10-year evidence table",
+        body: [
+          "For each year, record revenue, operating margin, net income, operating cash flow, free cash flow, ROE, ROCE, net debt and diluted shares. Add a short note for major acquisitions, restructurings, regulatory events and major changes in business mix.",
+          "After ten years, the pattern should be legible. You should be able to explain not only how the company grew, but why returns on capital, cash generation and per-share economics did or did not keep pace.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "What makes a business a 10-year compounder?",
+        a: "The phrase describes a business capable of repeatedly reinvesting capital at attractive returns while maintaining a durable competitive position. It is a research hypothesis, not a guarantee of future returns.",
+      },
+      {
+        q: "How many years of data should I study?",
+        a: "Ten years is a useful horizon because it includes more than one market and business cycle in many cases. Shorter series can still be informative when the company is young, but the limitations should be stated.",
+      },
+      {
+        q: "Should valuation be ignored when finding a compounder?",
+        a: "No. Long-run operating quality and entry valuation both matter. A business can execute well while the price already assumes an overly optimistic future.",
+      },
+    ],
+  },
+
 ];
 
 export const findGuide = (slug: string) => GUIDES.find((g) => g.slug === slug);
