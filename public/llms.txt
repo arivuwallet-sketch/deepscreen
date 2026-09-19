@@ -37,7 +37,7 @@
 
 - [Learn library](https://deepscreen.online/learn): plain-English guides for stock screening, valuation, exchanges, charts, IPOs, options and portfolios.
 
-- Original DeepScreen research
+- [Original DeepScreen research](https://deepscreen.online/learn): first-party research frameworks and worked methodologies.
   - https://deepscreen.online/learn/nse-vs-bse
   - https://deepscreen.online/learn/how-to-analyze-an-indian-stock-in-15-minutes
   - https://deepscreen.online/learn/pe-vs-peg-vs-ev-ebitda
