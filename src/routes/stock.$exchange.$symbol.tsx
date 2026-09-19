@@ -275,12 +275,13 @@ function StockPage() {
           );
         })()}
 
-        <section className="mt-5 grid items-stretch gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(300px,1fr)]">
-          <div className="min-w-0">
-            <PaywallGate
-              feature="DeepScreen verdict and weighted score"
-              minHeight="min-h-[220px]"
-            >
+        <PaywallGate
+          feature="DeepScreen score, verdict, strengths & risks"
+          className="mt-5"
+          minHeight="min-h-[330px]"
+        >
+          <section className="grid items-stretch gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(300px,1fr)]">
+            <div className="min-w-0">
               <div className="card-hover h-full rounded-lg border border-border bg-panel p-5">
                 <div className="flex items-center justify-between">
                   <h2 className="text-sm font-semibold uppercase tracking-wide">
@@ -306,10 +307,9 @@ function StockPage() {
                 </div>
                 <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{a.summary}</p>
               </div>
-            </PaywallGate>
-          </div>
+            </div>
 
-          <div className="grid min-w-0 gap-4">
+            <div className="grid min-w-0 gap-4">
               <div className="card-hover rounded-lg border border-bull/30 bg-panel p-4">
                 <h3 className="text-xs font-semibold uppercase tracking-wide text-bull">
                   Strengths
@@ -333,7 +333,8 @@ function StockPage() {
                 </ul>
               </div>
             </div>
-        </section>
+          </section>
+        </PaywallGate>
 
         <PaywallGate
           feature="Vision &amp; Utility score and Secret Tips badges"
@@ -343,9 +344,13 @@ function StockPage() {
           <VisionCard intel={intel} />
         </PaywallGate>
 
-        <div className="mt-4">
+        <PaywallGate
+          feature="DeepScreen Secret Tips, traps & X-Ray analysis"
+          className="mt-4"
+          minHeight="min-h-[420px]"
+        >
           <SecretTipsPanel intel={intel} />
-        </div>
+        </PaywallGate>
 
         <section className="mt-6 space-y-3">
           <ForensicPanel intel={intel} locked={!isPro} />
