@@ -1,4 +1,6 @@
 // Yahoo Finance's coverage of Indian small/micro-caps is thin and
+import { isAllowedScreenerPath, normalizeCompanyName, normalizeSymbol } from "@/lib/security";
+
 // sometimes stale (missing ROE/ROA/ROCE entirely, or a trailingPE computed
 // off an outdated EPS for a company whose earnings recently swung sharply —
 // exactly the kind of company this ends up mattering most for). Screener.in
@@ -266,9 +268,27 @@ export async function fetchScreenerRatios(
   knownSlug?: string | null,
 ): Promise<ScreenerRatios | null> {
   try {
+    const safeSymbol = normalizeSymbol(symbol);
+    if (!safeSymbol) return null;
+    const safeCompanyName = companyName ? normalizeCompanyName(companyName) : null;
+    if (companyName && !safeCompanyName) return null;
     if (knownSlug) {
-      const known = await fetchAndParse(new URL(knownSlug, "https://www.screener.in").toString());
-      if (known) return known;
+      // Only server-generated Screener company paths are accepted here. Never
+      // let a caller turn this helper into an arbitrary outbound fetcher.
+      try {
+        const knownUrl = new URL(knownSlug, "https://www.screener.in");
+        if (
+          knownUrl.origin === "https://www.screener.in" &&
+          isAllowedScreenerPath(knownUrl.pathname) &&
+          !knownUrl.search &&
+          !knownUrl.hash
+        ) {
+          const known = await fetchAndParse(knownUrl.toString());
+          if (known) return known;
+        }
+      } catch {
+        // Ignore malformed cached paths and fall back to the normal resolver.
+      }
     }
     // /consolidated/ first — the standalone page shows wrong values for
     // some companies (e.g. RELIANCE shows P/E 44.4 which is actually
@@ -284,20 +304,20 @@ export async function fetchScreenerRatios(
     // large companies with subsidiaries carry the small residual risk the
     // consolidated switch was meant to avoid.
     const consolidated = await fetchAndParse(
-      `https://www.screener.in/company/${encodeURIComponent(symbol)}/consolidated/`,
+      `https://www.screener.in/company/${encodeURIComponent(safeSymbol)}/consolidated/`,
     );
     if (consolidated) return consolidated;
 
     const standalone = await fetchAndParse(
-      `https://www.screener.in/company/${encodeURIComponent(symbol)}/`,
+      `https://www.screener.in/company/${encodeURIComponent(safeSymbol)}/`,
     );
     if (standalone) return standalone;
 
     // Some exchange symbols do not match Screener's slug (notably numeric BSE
     // pages and renamed/demerged companies). Resolve those through the same
     // search endpoint used by Screener's own search box.
-    const symbolMatch = await searchCompany(symbol, companyName);
-    const nameMatch = symbolMatch ?? (companyName ? await searchCompany(companyName, companyName) : null);
+    const symbolMatch = await searchCompany(safeSymbol, safeCompanyName ?? undefined);
+    const nameMatch = symbolMatch ?? (safeCompanyName ? await searchCompany(safeCompanyName, safeCompanyName) : null);
     return nameMatch
       ? await fetchAndParse(new URL(nameMatch, "https://www.screener.in").toString())
       : null;

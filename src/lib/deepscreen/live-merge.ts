@@ -1,6 +1,7 @@
 import type { LiveFundamentals, LiveQuote } from "@/lib/market/yahoo.server";
 import type { ScreenerRatios } from "@/lib/market/screener.server";
 
+import { isMeaningfulEvEbitda } from "./ev-ebitda";
 import type { Fundamentals, Stock } from "./types";
 
 /** Per-field provenance so the UI can be honest about what is real vs. modeled. */
@@ -98,10 +99,9 @@ export function mergeFundamentals(
 
   // Drivers and any field Yahoo reports directly. P/E is excluded when
   // non-positive: a loss-making company (present on every exchange, not just
-  // one) can have a negative or undefined trailing P/E, and since P/E is the
-  // multiplier/divisor behind P/S, P/B, EV/EBITDA and PEG below, letting a
-  // bad P/E through would corrupt every derived ratio for that stock rather
-  // than just leaving P/E itself unavailable.
+  // one) can have a negative or undefined trailing P/E. In the fallback model,
+  // allowing a bad P/E through would corrupt the ratios that depend on it
+  // (P/S, P/B, EV/EBITDA and PEG) rather than leaving those fields unavailable.
   if (live) {
     set("pe", typeof live.pe === "number" && live.pe > 0 ? live.pe : null);
     set("roe", live.roe);
@@ -132,7 +132,13 @@ export function mergeFundamentals(
     set("dividendYield", live.dividendYield);
     set("ps", live.ps);
     set("pb", live.pb);
-    set("evEbitda", live.evEbitda);
+    // A provider can return a negative EV/EBITDA when EBITDA is negative,
+    // or in the rarer case of negative enterprise value. Neither is a usable
+    // valuation multiple, so retain the fact that the provider reported the
+    // field but normalize the metric to 0 (the internal N/M sentinel).
+    if (typeof live.evEbitda === "number" && Number.isFinite(live.evEbitda)) {
+      set("evEbitda", isMeaningfulEvEbitda(live.evEbitda) ? live.evEbitda : 0);
+    }
     set("evRevenue", live.evRevenue);
     set("peg", live.peg);
   }
@@ -259,22 +265,42 @@ export function mergeFundamentals(
   // 6. P/B tracks P/E x ROE unless given directly.
   if (sources.pb !== "live") next.pb = round2((next.pe * next.roe) / 100);
 
-  // 7. EV/EBITDA: when not independently live, derive from P/E and margins
-  //    rather than scaling the synthetic base by a P/E ratio.
-  //    EV/EBITDA ≈ P/E × (1 - tax_rate) × (Net Income / EBITDA)
-  //    ≈ P/E × (netMargin / ebitdaMargin) × 0.75
-  if (sources.evEbitda !== "live" && sources.pe === "live") {
-    if (sources.netMargin === "live" && sources.ebitdaMargin === "live") {
-      // Use P/E × margin ratio — more accurate than synthetic scaling.
-      next.evEbitda = round1((next.pe * next.netMargin * 0.75) / Math.max(1, next.ebitdaMargin));
+  // 7. EV/EBITDA: when not independently live, derive it only when the
+  // denominator is positive. A negative or zero EBITDA cannot produce a
+  // conventional valuation multiple, so use 0 as the internal N/M sentinel.
+  const liveEbitdaNonPositive =
+    typeof live?.ebitda === "number" && Number.isFinite(live.ebitda) && live.ebitda <= 0;
+  const liveEbitdaMarginNonPositive =
+    typeof live?.ebitdaMargin === "number" && Number.isFinite(live.ebitdaMargin) && live.ebitdaMargin <= 0;
+
+  if (sources.evEbitda !== "live" && (liveEbitdaNonPositive || liveEbitdaMarginNonPositive)) {
+    next.evEbitda = 0;
+    // Keep provenance live: the provider data itself established that the
+    // conventional multiple is not meaningful for this period.
+    sources.evEbitda = "live";
+  } else if (sources.evEbitda !== "live" && sources.pe === "live") {
+    if (
+      sources.netMargin === "live" &&
+      sources.ebitdaMargin === "live" &&
+      next.netMargin > 0 &&
+      next.ebitdaMargin > 0
+    ) {
+      // Use P/E × margin ratio only when the EBITDA denominator is positive.
+      next.evEbitda = round1((next.pe * next.netMargin * 0.75) / next.ebitdaMargin);
     } else if (base.pe > 0) {
-      // Fall back to ratio scaling only when no margin data is available.
+      // Fall back to ratio scaling only when no live profitability signal says
+      // the denominator is non-positive.
       next.evEbitda = round1((next.pe / base.pe) * base.evEbitda);
     }
   }
 
+  // A live negative/zero multiple or a known non-positive EBITDA must never
+  // leak through as a numeric "cheap" multiple.
+  if (!isMeaningfulEvEbitda(next.evEbitda)) next.evEbitda = 0;
+
   // 8. EV/Revenue = EV/EBITDA x EBITDA margin, unless given directly.
-  if (sources.evRevenue !== "live") {
+  // Do not manufacture EV/Revenue from an N/M EV/EBITDA value.
+  if (sources.evRevenue !== "live" && isMeaningfulEvEbitda(next.evEbitda)) {
     next.evRevenue = round2((next.evEbitda * next.ebitdaMargin) / 100);
   }
 

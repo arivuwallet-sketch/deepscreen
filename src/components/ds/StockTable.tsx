@@ -9,7 +9,7 @@ import {
 } from "@/hooks/useLiveQuotes";
 
 import { analyze, verdictClass } from "@/lib/deepscreen/metrics";
-import { METRIC_KEY_TO_FIELD, mergeLiveStock } from "@/lib/deepscreen/live-merge";
+import { mergeLiveStock } from "@/lib/deepscreen/live-merge";
 import { formatCap, formatPrice, formatVolume } from "@/lib/deepscreen/format";
 import type { Stock } from "@/lib/deepscreen/types";
 import type { LiveFundamentals, LiveQuote } from "@/lib/market/yahoo.server";
@@ -31,7 +31,6 @@ export function ScoreBar({ score }: { score: number }) {
   );
 }
 
-/** Briefly washes an element green/red when the value it's showing changes — so a live tick is noticed, not just silently different. */
 function usePriceFlash(value: number) {
   const prevRef = useRef(value);
   const [flash, setFlash] = useState<"up" | "down" | null>(null);
@@ -40,8 +39,8 @@ function usePriceFlash(value: number) {
     if (value !== prevRef.current) {
       setFlash(value > prevRef.current ? "up" : "down");
       prevRef.current = value;
-      const t = setTimeout(() => setFlash(null), 700);
-      return () => clearTimeout(t);
+      const timer = setTimeout(() => setFlash(null), 700);
+      return () => clearTimeout(timer);
     }
     return undefined;
   }, [value]);
@@ -62,30 +61,19 @@ function StockRow({
   screener: ScreenerRatios | null | undefined;
   delayMs: number;
 }) {
-  const { stock: merged, sources } = mergeLiveStock(stock, quote, fundamentals, screener);
-  const a = analyze(merged);
-  const isLive = sources.pe === "live";
-  const scoreReady = Object.values(METRIC_KEY_TO_FIELD).every(field => sources[field] === "live");
+  const { stock: merged } = mergeLiveStock(stock, quote, fundamentals, screener);
+  const analysis = analyze(merged);
   const priceFlash = usePriceFlash(merged.price);
 
   return (
-    <tr
-      className="group animate-fade-in hover:bg-accent/40"
-      style={{ animationDelay: `${delayMs}ms` }}
-    >
+    <tr className="group animate-fade-in hover:bg-accent/40" style={{ animationDelay: `${delayMs}ms` }}>
       <td className="num px-4 py-2.5 font-semibold text-primary">
-        <Link
-          to="/stock/$exchange/$symbol"
-          params={{ exchange: stock.exchange, symbol: stock.symbol }}
-        >
+        <Link to="/stock/$exchange/$symbol" params={{ exchange: stock.exchange, symbol: stock.symbol }}>
           {stock.symbol}
         </Link>
       </td>
       <td className="max-w-[220px] truncate px-2 py-2.5">
-        <Link
-          to="/stock/$exchange/$symbol"
-          params={{ exchange: stock.exchange, symbol: stock.symbol }}
-        >
+        <Link to="/stock/$exchange/$symbol" params={{ exchange: stock.exchange, symbol: stock.symbol }}>
           {stock.name}
         </Link>
         <span className="ml-2 text-xs text-muted-foreground">{stock.sector}</span>
@@ -98,60 +86,26 @@ function StockRow({
         )}
       >
         {quote ? formatPrice(merged.price, stock.exchange) : "—"}
-        {quote ? (
-          <span
-            className="ml-1 inline-block size-1.5 rounded-full bg-bull align-middle"
-            title="Live price"
-          />
-        ) : null}
+        {quote ? <span className="ml-1 inline-block size-1.5 rounded-full bg-bull align-middle" title="Live price" /> : null}
       </td>
-      <td
-        className={cn(
-          "num px-2 py-2.5 text-right font-medium",
-          merged.changePct >= 0 ? "text-bull" : "text-bear",
-        )}
-      >
+      <td className={cn("num px-2 py-2.5 text-right font-medium", merged.changePct >= 0 ? "text-bull" : "text-bear")}>
         {quote ? `${merged.changePct >= 0 ? "+" : ""}${merged.changePct.toFixed(2)}%` : "—"}
       </td>
-      <td className="num px-2 py-2.5 text-right">{fundamentals?.marketCap != null ? formatCap(merged.marketCap, stock.exchange) : "—"}</td>
-      <td className="num px-2 py-2.5 text-right" title={isLive ? "Live" : "Provider data unavailable"}>
-        {isLive ? merged.fundamentals.pe.toFixed(1) : "—"}
+      <td className="num px-2 py-2.5 text-right">
+        {fundamentals?.marketCap != null ? formatCap(merged.marketCap, stock.exchange) : "—"}
       </td>
-      <td
-        className="num px-2 py-2.5 text-right"
-        title={sources.peg === "live" ? "Live" : "Provider data unavailable"}
-      >
-        {sources.peg === "live" ? merged.fundamentals.peg.toFixed(2) : "—"}
-      </td>
-      <td
-        className="num px-2 py-2.5 text-right"
-        title={
-          sources.roce === "live" ? "Available provider data" : "Provider data unavailable"
-        }
-      >
-        {sources.roce === "live" ? `${merged.fundamentals.roce.toFixed(1)}%` : "—"}
-      </td>
+      <td className="num px-2 py-2.5 text-right">{merged.fundamentals.pe.toFixed(1)}</td>
+      <td className="num px-2 py-2.5 text-right">{merged.fundamentals.peg.toFixed(2)}</td>
+      <td className="num px-2 py-2.5 text-right">{merged.fundamentals.roce.toFixed(1)}%</td>
       <td className="num px-2 py-2.5 text-right text-muted-foreground">
         {quote?.volume != null ? formatVolume(quote.volume) : "—"}
       </td>
-      <td
-        className="px-2 py-2.5"
-        title={
-          Object.values(sources).some((source) => source === "live")
-            ? "Calculated with available live fundamentals"
-            : "Calculated with modeled estimates while live fundamentals load"
-        }
-      >
-        {scoreReady ? <ScoreBar score={a.score} /> : <span className="text-xs text-muted-foreground">Incomplete</span>}
+      <td className="px-2 py-2.5" title="Calculated from the available live and modeled fundamentals">
+        <ScoreBar score={analysis.score} />
       </td>
       <td className="px-4 py-2.5">
-        <span
-          className={cn(
-            "num rounded border px-2 py-0.5 text-[11px] font-semibold transition-colors",
-            scoreReady ? verdictClass(a.verdict) : "text-muted-foreground",
-          )}
-        >
-          {scoreReady ? a.verdict : "Insufficient data"}
+        <span className={cn("num rounded border px-2 py-0.5 text-[11px] font-semibold transition-colors", verdictClass(analysis.verdict))}>
+          {analysis.verdict}
         </span>
       </td>
     </tr>
@@ -159,18 +113,13 @@ function StockRow({
 }
 
 export function StockTable({ stocks }: { stocks: Stock[] }) {
-  const keys = stocks.map((s) => ({ exchange: s.exchange, symbol: s.symbol, name: s.name }));
+  const keys = stocks.map((stock) => ({ exchange: stock.exchange, symbol: stock.symbol, name: stock.name }));
   const { data: live } = useLiveQuotes(keys);
-  const { data: liveFundamentals, isFetching: fundamentalsLoading } =
-    useLiveFundamentalsBatch(keys);
+  const { data: liveFundamentals, isFetching: fundamentalsLoading } = useLiveFundamentalsBatch(keys);
   const { data: screenerRatios } = useScreenerRatiosBatch(keys);
 
   if (stocks.length === 0) {
-    return (
-      <p className="animate-fade-in rounded-lg border border-border bg-panel p-8 text-center text-sm text-muted-foreground">
-        No companies match these filters.
-      </p>
-    );
+    return <p className="animate-fade-in rounded-lg border border-border bg-panel p-8 text-center text-sm text-muted-foreground">No companies match these filters.</p>;
   }
 
   return (
@@ -192,24 +141,20 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
-          {stocks.map((s, i) => (
+          {stocks.map((stock, index) => (
             <StockRow
-              key={`${s.exchange}-${s.symbol}`}
-              stock={s}
-              quote={live?.[quoteKey(s)]}
-              fundamentals={liveFundamentals?.[quoteKey(s)]}
-              screener={screenerRatios?.[quoteKey(s)]}
-              delayMs={Math.min(i, 20) * 15}
+              key={`${stock.exchange}-${stock.symbol}`}
+              stock={stock}
+              quote={live?.[quoteKey(stock)]}
+              fundamentals={liveFundamentals?.[quoteKey(stock)]}
+              screener={screenerRatios?.[quoteKey(stock)]}
+              delayMs={Math.min(index, 20) * 15}
             />
           ))}
         </tbody>
       </table>
       <p className="border-t border-border px-4 py-2 text-[11px] text-muted-foreground">
-        <span className="mr-1 inline-block size-1.5 rounded-full bg-bull align-middle" /> Live price
-        refreshed every 15s. Indian ratios are fetched from Screener.in and retained in the shared
-        cache; Yahoo Finance supplies other exchanges
-        {fundamentalsLoading ? " (updating…)" : ""}. Hover a ratio to see its source.
-        {" "}A dash means provider data is unavailable. Scores require provider-backed inputs for every scoring factor.
+        <span className="mr-1 inline-block size-1.5 rounded-full bg-bull align-middle" /> Live price refreshed every 15s. Indian ratios are fetched from Screener.in and retained in the shared cache; Yahoo Finance supplies other exchanges{fundamentalsLoading ? " (updating…)" : ""}. Scores and verdicts use the available fundamentals and modeled fallback values while provider data loads.
       </p>
     </div>
   );

@@ -73,8 +73,31 @@ function LearnIndex() {
           jargon, no signals, no hype.
         </p>
 
+        <section className="mt-8 rounded-xl border border-border bg-card/30 p-5 sm:p-6">
+          <p className="text-xs font-semibold uppercase tracking-wide text-primary">Original DeepScreen research</p>
+          <h2 className="mt-1 text-xl font-semibold tracking-tight">Research frameworks designed for DeepScreen</h2>
+          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+            These first-party research pages focus on reproducible workflows, primary-source checks, worked examples and
+            transparent limitations. They are designed to be updated as the underlying methodology and source data change.
+          </p>
+          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+            {GUIDES.filter((g) => g.originalResearch).map((g) => (
+              <Link
+                key={g.slug}
+                to="/learn/$slug"
+                params={{ slug: g.slug }}
+                className="rounded-lg border border-border bg-background p-5 transition-colors hover:border-primary"
+              >
+                <h3 className="text-base font-semibold text-foreground">{g.h1}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{g.description}</p>
+                <p className="mt-3 text-xs text-muted-foreground">{g.topics.slice(0, 4).join(" · ")}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
-          {GUIDES.map((g) => (
+          {GUIDES.filter((g) => !g.originalResearch).map((g) => (
             <Link
               key={g.slug}
               to="/learn/$slug"
@@ -83,9 +106,7 @@ function LearnIndex() {
             >
               <h2 className="text-base font-semibold text-foreground">{g.h1}</h2>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{g.description}</p>
-              <p className="mt-3 text-xs text-muted-foreground">
-                {g.topics.slice(0, 4).join(" · ")}
-              </p>
+              <p className="mt-3 text-xs text-muted-foreground">{g.topics.slice(0, 4).join(" · ")}</p>
             </Link>
           ))}
         </div>

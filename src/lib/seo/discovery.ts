@@ -1,4 +1,11 @@
-import { jsonLd } from "./json-ld";
+import {
+  buildBreadcrumbSchema,
+  buildGraph,
+  buildOrganizationSchema,
+  buildWebPageSchema,
+  buildWebSiteSchema,
+  jsonLd,
+} from "./json-ld";
 export const ORIGIN = "https://deepscreen.online";
 export const ORGANIZATION_ID = `${ORIGIN}/#organization`;
 export const WEBSITE_ID = `${ORIGIN}/#website`;
@@ -69,13 +76,18 @@ export function resourceHead(
       { name: "twitter:title", content: title },
       { name: "twitter:description", content: description },
     ],
-    links: [{ rel: "canonical", href: url }],
+    links: [
+      { rel: "canonical", href: url },
+      { rel: "describedby", href: `${ORIGIN}/llms.txt` },
+      { rel: "help", href: `${ORIGIN}/answers` },
+    ],
     scripts: [
       {
         type: "application/ld+json",
-        children: jsonLd({
-          "@context": "https://schema.org",
-          "@graph": [
+        children: jsonLd(
+          buildGraph(
+            buildOrganizationSchema(),
+            buildWebSiteSchema(),
             answers
               ? {
                   ...faqNode(path, answers),
@@ -84,26 +96,17 @@ export function resourceHead(
                   breadcrumb: { "@id": `${url}#breadcrumbs` },
                 }
               : {
-                  "@type": "WebPage",
+                  ...buildWebPageSchema({ name: title, description, url }),
                   "@id": `${url}#webpage`,
-                  url,
-                  name: title,
-                  description,
                   inLanguage: "en",
-                  isPartOf: { "@id": WEBSITE_ID },
-                  publisher: { "@id": ORGANIZATION_ID },
                   breadcrumb: { "@id": `${url}#breadcrumbs` },
                 },
-            {
-              "@type": "BreadcrumbList",
-              "@id": `${url}#breadcrumbs`,
-              itemListElement: [
-                { "@type": "ListItem", position: 1, name: "DeepScreen", item: `${ORIGIN}/` },
-                { "@type": "ListItem", position: 2, name: title.split(" | ")[0], item: url },
-              ],
-            },
-          ],
-        }),
+            buildBreadcrumbSchema([
+              { name: "DeepScreen", url: `${ORIGIN}/` },
+              { name: title.split(" | ")[0], url },
+            ]),
+          ),
+        ),
       },
     ],
   };

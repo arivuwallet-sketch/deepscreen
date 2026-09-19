@@ -1,3 +1,4 @@
+import { evEbitdaReading, evEbitdaTooltip, formatEvEbitda, isMeaningfulEvEbitda } from "./ev-ebitda";
 import type { Stock } from "./types";
 
 export type Verdict = "Strong Buy" | "Buy" | "Hold" | "Caution" | "Avoid";
@@ -43,6 +44,22 @@ function scoreHigh(value: number, worst: number, best: number): number {
   if (value <= worst) return 5;
   return Math.round(5 + ((value - worst) / (best - worst)) * 95);
 }
+
+export const ANALYSIS_WEIGHTS: Record<string, number> = {
+  pe: 1,
+  peg: 1.6,
+  ps: 0.7,
+  pb: 0.7,
+  evRevenue: 0.8,
+  evEbitda: 1.2,
+  roe: 1.3,
+  roa: 0.9,
+  roce: 1.6,
+  de: 1.1,
+  ltde: 0.8,
+  payout: 0.5,
+  oplev: 0.6,
+};
 
 const analysisCache = new WeakMap<Stock, Analysis>();
 
@@ -157,18 +174,19 @@ function computeAnalysis(stock: Stock): Analysis {
       key: "evEbitda",
       label: "EV/EBITDA",
       value: f.evEbitda,
-      display: fmt(f.evEbitda, "x", 1),
-      // Asset-light / high-growth businesses (SaaS, cloud, AI) routinely trade
-      // at 20-30x+ EV/EBITDA; asset-heavy ones (manufacturing, utilities)
-      // rarely justify >12x.
-      score: isAssetLight ? scoreLow(f.evEbitda, 12, 40) : scoreLow(f.evEbitda, 8, 30),
+      display: formatEvEbitda(f.evEbitda, 1),
+      // Non-positive EV/EBITDA is not a cheap multiple. It is normally caused
+      // by negative EBITDA, or less commonly by negative enterprise value.
+      // Keep it neutral in the score and show N/M instead of a misleading
+      // negative number.
+      score: isMeaningfulEvEbitda(f.evEbitda)
+        ? isAssetLight
+          ? scoreLow(f.evEbitda, 12, 40)
+          : scoreLow(f.evEbitda, 8, 30)
+        : 40,
       band: "fair",
-      reading: isAssetLight
-        ? f.evEbitda < 15 ? "Low for asset-light" : f.evEbitda <= 25 ? "Fair" : "Priced for exceptional growth"
-        : f.evEbitda < 10 ? "Attractive" : f.evEbitda <= 15 ? "Fair" : "Expensive",
-      tooltip: isAssetLight
-        ? "Strips out debt structure, tax and depreciation. Asset-light, high-growth businesses like this one normally trade at 15-25x+ EV/EBITDA — the market is pricing in margin expansion. Below ~12x is cheap for this kind of business."
-        : "Strips out debt structure, tax and depreciation, so capital-intensive companies can be compared fairly. Under 10 is generally attractive.",
+      reading: evEbitdaReading(f.evEbitda, isAssetLight),
+      tooltip: evEbitdaTooltip(f.evEbitda, isAssetLight),
     },
     {
       key: "roe",
@@ -297,25 +315,11 @@ function computeAnalysis(stock: Stock): Analysis {
     },
   ].map((m) => ({ ...m, band: band(m.score) }));
 
-  const weights: Record<string, number> = {
-    pe: 1,
-    peg: 1.6,
-    ps: 0.7,
-    pb: 0.7,
-    evRevenue: 0.8,
-    evEbitda: 1.2,
-    roe: 1.3,
-    roa: 0.9,
-    roce: 1.6,
-    de: 1.1,
-    ltde: 0.8,
-    payout: 0.5,
-    oplev: 0.6,
-  };
 
-  const totalWeight = metrics.reduce((a, m) => a + (weights[m.key] ?? 1), 0);
+
+  const totalWeight = metrics.reduce((a, m) => a + (ANALYSIS_WEIGHTS[m.key] ?? 1), 0);
   const score = Math.round(
-    metrics.reduce((a, m) => a + m.score * (weights[m.key] ?? 1), 0) / totalWeight,
+    metrics.reduce((a, m) => a + m.score * (ANALYSIS_WEIGHTS[m.key] ?? 1), 0) / totalWeight,
   );
 
   const verdict: Verdict =
