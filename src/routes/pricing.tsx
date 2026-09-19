@@ -18,6 +18,14 @@ import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  DEFAULT_PHONE_COUNTRY,
+  PHONE_COUNTRIES,
+  countryFlag,
+  getPhoneCountry,
+  normalizeNationalPhone,
+  validatePhoneNumber,
+} from "@/lib/billing/phone";
 
 export const Route = createFileRoute("/pricing")({
   staticData: { sitemap: true },
@@ -125,6 +133,7 @@ function PricingPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
   const [checkoutPlan, setCheckoutPlan] = useState<Plan | null>(null);
+  const [phoneCountry, setPhoneCountry] = useState(DEFAULT_PHONE_COUNTRY);
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const checkout = useServerFn(createCheckout);
@@ -169,25 +178,25 @@ function PricingPage() {
       window.location.assign("/auth?redirect=%2Fpricing");
       return;
     }
+    setPhoneCountry(DEFAULT_PHONE_COUNTRY);
     setPhone("");
     setPhoneError("");
     setCheckoutPlan(plan);
   };
 
-  const normalizePhone = (value: string) => {
-    const digits = value.replace(/\D/g, "");
-    if (digits.startsWith("91") && digits.length === 12) return digits.slice(2);
-    if (digits.startsWith("0") && digits.length === 11) return digits.slice(1);
-    return digits.slice(0, 10);
-  };
-
   const submitCheckout = async () => {
     if (!checkoutPlan) return;
-    const normalizedPhone = normalizePhone(phone);
-    setPhone(normalizedPhone);
+    const country = getPhoneCountry(phoneCountry);
+    if (!country) {
+      setPhoneError("Select a valid country calling code.");
+      return;
+    }
 
-    if (!/^[6-9]\d{9}$/.test(normalizedPhone) || /^([0-9])\1{9}$/.test(normalizedPhone)) {
-      setPhoneError("Enter a valid 10-digit Indian mobile number beginning with 6–9.");
+    const normalizedPhone = normalizeNationalPhone(phone, country);
+    setPhone(normalizedPhone);
+    const validation = validatePhoneNumber(country.iso2, normalizedPhone);
+    if (!validation.valid) {
+      setPhoneError(validation.error);
       return;
     }
 
@@ -208,7 +217,8 @@ function PricingPage() {
         tier: selectedPlan.tier,
         accessToken,
         origin: window.location.origin,
-        phone: normalizedPhone,
+        countryIso2: country.iso2,
+        phone: validation.digits,
       },
     });
 
@@ -242,6 +252,16 @@ function PricingPage() {
       setVerifying(false);
       toast.error(e instanceof Error ? e.message : "Payment could not be started.");
     }
+  };
+
+  const phoneHelperText = () => {
+    const country = getPhoneCountry(phoneCountry);
+    if (!country) return "Select a country and enter your phone number.";
+    const lengthText =
+      country.minLength === country.maxLength
+        ? country.minLength + " digits"
+        : country.minLength + "–" + country.maxLength + " digits";
+    return lengthText + " for " + country.name + ". The country code is added automatically.";
   };
 
   return (
@@ -371,46 +391,83 @@ function PricingPage() {
               </div>
             )}
 
-            <div>
-              <Label htmlFor="checkout-phone" className="text-sm">Mobile number</Label>
-              <div className={cn(
-                "mt-2 flex h-11 overflow-hidden rounded-lg border bg-background transition-colors",
-                phoneError ? "border-destructive ring-1 ring-destructive/20" : "border-input focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20",
-              )}>
-                <span className="flex items-center border-r border-border bg-muted/40 px-3 text-sm font-medium text-muted-foreground">
-                  +91
-                </span>
-                <Input
-                  id="checkout-phone"
-                  type="tel"
-                  inputMode="numeric"
-                  autoComplete="tel-national"
-                  maxLength={10}
-                  value={phone}
-                  onChange={(e) => {
-                    let digits = e.target.value.replace(/\D/g, "");
-                    if (digits.startsWith("91") && digits.length > 10) digits = digits.slice(2);
-                    if (digits.startsWith("0") && digits.length > 10) digits = digits.slice(1);
-                    setPhone(digits.slice(0, 10));
-                    if (phoneError) setPhoneError("");
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      void submitCheckout();
-                    }
-                  }}
-                  placeholder="9876543210"
-                  aria-invalid={phoneError ? true : undefined}
-                  aria-describedby="checkout-phone-help"
-                  className="h-full rounded-none border-0 bg-transparent text-base shadow-none focus-visible:ring-0"
-                />
+            <div className="space-y-3">
+              <div>
+                <Label htmlFor="checkout-country" className="text-sm">Country / calling code</Label>
+                <div className={cn(
+                  "relative mt-2 flex h-11 overflow-hidden rounded-lg border bg-background transition-colors",
+                  phoneError ? "border-destructive ring-1 ring-destructive/20" : "border-input focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20",
+                )}>
+                  <span className="flex items-center border-r border-border bg-muted/40 px-3 text-lg" aria-hidden="true">
+                    {countryFlag(phoneCountry)}
+                  </span>
+                  <select
+                    id="checkout-country"
+                    value={phoneCountry}
+                    onChange={(e) => {
+                      setPhoneCountry(e.target.value);
+                      setPhone("");
+                      setPhoneError("");
+                    }}
+                    className="h-full min-w-0 flex-1 appearance-none bg-transparent px-3 pr-9 text-sm outline-none"
+                    aria-label="Country calling code"
+                  >
+                    {PHONE_COUNTRIES.map((country) => (
+                      <option key={country.iso2} value={country.iso2}>
+                        {country.name} ({country.dialCode})
+                      </option>
+                    ))}
+                  </select>
+                  <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">⌄</span>
+                </div>
               </div>
-              <div id="checkout-phone-help" className="mt-2 flex items-start gap-2">
-                <ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
-                <p className={cn("text-xs leading-relaxed", phoneError ? "text-destructive" : "text-muted-foreground")}>
-                  {phoneError || "10 digits, starting with 6–9. Example: 9876543210."}
-                </p>
+
+              <div>
+                <Label htmlFor="checkout-phone" className="text-sm">Phone number</Label>
+                <div className={cn(
+                  "mt-2 flex h-11 overflow-hidden rounded-lg border bg-background transition-colors",
+                  phoneError ? "border-destructive ring-1 ring-destructive/20" : "border-input focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20",
+                )}>
+                  <span className="flex items-center border-r border-border bg-muted/40 px-3 text-sm font-medium text-muted-foreground">
+                    {getPhoneCountry(phoneCountry)?.dialCode ?? "+"}
+                  </span>
+                  <Input
+                    id="checkout-phone"
+                    type="tel"
+                    inputMode="tel"
+                    autoComplete="tel-national"
+                    maxLength={getPhoneCountry(phoneCountry)?.maxLength ?? 15}
+                    value={phone}
+                    onChange={(e) => {
+                      const country = getPhoneCountry(phoneCountry);
+                      if (!country) return;
+                      setPhone(normalizeNationalPhone(e.target.value, country));
+                      if (phoneError) setPhoneError("");
+                    }}
+                    onBlur={() => {
+                      const country = getPhoneCountry(phoneCountry);
+                      if (!country || !phone) return;
+                      const validation = validatePhoneNumber(country.iso2, phone);
+                      setPhoneError(validation.valid ? "" : validation.error);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        void submitCheckout();
+                      }
+                    }}
+                    placeholder="Enter your number"
+                    aria-invalid={phoneError ? true : undefined}
+                    aria-describedby="checkout-phone-help"
+                    className="h-full rounded-none border-0 bg-transparent text-base shadow-none focus-visible:ring-0"
+                  />
+                </div>
+                <div id="checkout-phone-help" className="mt-2 flex items-start gap-2">
+                  <ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
+                  <p className={cn("text-xs leading-relaxed", phoneError ? "text-destructive" : "text-muted-foreground")}>
+                    {phoneError || phoneHelperText()}
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -425,8 +482,8 @@ function PricingPage() {
           </div>
 
           <DialogFooter className="border-t border-border bg-muted/20 px-6 py-4 sm:flex-row">
-            <Button type="button" variant="ghost" onClick={() => setCheckoutPlan(null)} disabled={busy !== null}>
-              Cancel
+            <Button type="button" variant="outline" onClick={() => setCheckoutPlan(null)} disabled={busy !== null}>
+              Cancel checkout
             </Button>
             <Button
               type="button"
