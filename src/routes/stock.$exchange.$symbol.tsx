@@ -340,11 +340,12 @@ function StockPage() {
           className="mt-6"
           minHeight="min-h-[260px]"
         >
-          <section className="grid gap-3 lg:grid-cols-2">
-            <VisionCard intel={intel} />
-            <SecretTipsPanel intel={intel} />
-          </section>
+          <VisionCard intel={intel} />
         </PaywallGate>
+
+        <div className="mt-4">
+          <SecretTipsPanel intel={intel} />
+        </div>
 
         <section className="mt-6 space-y-3">
           <ForensicPanel intel={intel} locked={!isPro} />
