@@ -1,10 +1,10 @@
-// Live IPO pipeline. Two public sources cover four of the five exchanges:
-//   * NSE India   — /api/all-upcoming-issues + /api/ipo-current-issue
-//                   (mainboard + SME; BSE-only issues are flagged by isBse)
-//   * Nasdaq Trader — /api/ipo/calendar, which carries the whole US calendar
-//                   (upcoming, priced and filed) for NASDAQ *and* NYSE.
-// LSE publishes no open new-issues feed, so those come from the curated list
-// in src/lib/deepscreen/ipos.ts and are merged by the caller.
+// Live IPO pipeline for the five exchanges covered by DeepScreen:
+//   * NSE/BSE India — NSE's live issue feeds, including BSE flags where supplied
+//   * NYSE/NASDAQ   — Nasdaq's IPO calendar (upcoming, priced and filed)
+//   * LSE           — London Stock Exchange's official New Issues page
+// The page is refreshed on demand, cached briefly per server instance, and
+// the client polls it so users see current primary-market changes without a
+// stale hand-maintained IPO list.
 
 const UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36";
@@ -26,9 +26,10 @@ export interface LiveIpo {
   listingDate: string | null;
   status: "upcoming" | "open" | "closed" | "listed";
   note: string;
+  source: "NSE" | "BSE" | "NASDAQ" | "LSE";
 }
 
-const CACHE_MS = 10 * 60_000;
+const CACHE_MS = 5 * 60_000;
 let cache: { at: number; data: LiveIpo[] } | null = null;
 
 function today(): Date {
@@ -130,7 +131,7 @@ function mapNse(rows: NseRow[], fallbackSegment: string): LiveIpo[] {
       return {
         symbol: (r.symbol || r.companyName || "").trim().toUpperCase().slice(0, 20),
         name: (r.companyName ?? r.symbol ?? "").trim(),
-        exchange: r.isBse === "1" && (r.series ?? "").toUpperCase() === "SME" ? "BSE" : "NSE",
+        exchange: r.isBse === "1" ? "BSE" : "NSE",
         segment: sme ? "sme" : fallbackSegment,
         bandLow,
         bandHigh,
@@ -140,7 +141,8 @@ function mapNse(rows: NseRow[], fallbackSegment: string): LiveIpo[] {
         closeDate: isoOf(close),
         listingDate: isoOf(listing),
         status: statusFrom(open, close, listing),
-        note: sme ? "SME platform issue." : "Mainboard book-built issue.",
+        note: sme ? "SME platform issue. Source: NSE issue feed." : "Mainboard issue. Source: NSE issue feed.",
+        source: r.isBse === "1" ? "BSE" : "NSE",
       } satisfies LiveIpo;
     });
 }
@@ -188,10 +190,11 @@ function mapNasdaq(rows: NasdaqRow[], kind: "upcoming" | "priced" | "filed"): Li
         status,
         note:
           kind === "priced"
-            ? "Priced and listed on the US calendar."
+            ? "Priced and listed on the US calendar. Source: Nasdaq/EDGAR Online."
             : kind === "filed"
-              ? "S-1 filed; pricing date not yet set."
-              : "Expected to price on the US calendar.",
+              ? "S-1 filed; pricing date not yet set. Source: Nasdaq/EDGAR Online."
+              : "Expected to price on the US calendar. Source: Nasdaq/EDGAR Online.",
+        source: usExchange(r.proposedExchange),
       } satisfies LiveIpo;
     });
 }
@@ -213,6 +216,102 @@ function monthKey(offset: number): string {
   d.setDate(1);
   d.setMonth(d.getMonth() + offset);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
+
+function decodeHtml(s: string): string {
+  return s
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&pound;/gi, "£")
+    .replace(/&#163;/g, "£")
+    .replace(/&ndash;/gi, "–")
+    .replace(/&mdash;/gi, "—")
+    .replace(/&#39;/g, "'")
+    .replace(/&quot;/gi, '"')
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function parseLseDate(s: string): Date | null {
+  const m = /(?:early|mid|late)?\s*([A-Za-z]+)\s+(\d{4})/i.exec(s);
+  if (!m) return null;
+  const month = ["january","february","march","april","may","june","july","august","september","october","november","december"].indexOf((m[1] ?? "").toLowerCase());
+  if (month < 0) return null;
+  const day = /early/i.test(s) ? 8 : /late/i.test(s) ? 25 : /mid/i.test(s) ? 15 : 1;
+  return new Date(Date.UTC(Number(m[2]), month, day));
+}
+
+function parseLseBand(s: string): [number | null, number | null] {
+  const nums = (s.match(/\d[\d,]*(?:\.\d+)?/g) ?? []).map((x) => Number(x.replace(/,/g, "")));
+  if (nums.length === 0) return [null, null];
+  return [Math.min(...nums), Math.max(...nums)];
+}
+
+function parseLseSize(s: string): number | null {
+  const m = /([\d,.]+)\s*(billion|million|bn|m)/i.exec(s);
+  if (!m) return null;
+  const n = Number((m[1] ?? "").replace(/,/g, ""));
+  if (!Number.isFinite(n)) return null;
+  return /billion|bn/i.test(m[2] ?? "") ? n : n / 1000;
+}
+
+/** London Stock Exchange official New Issues page. Only equity issues are kept. */
+async function fetchLse(): Promise<LiveIpo[]> {
+  const url = "https://www.londonstockexchange.com/live-markets/new-issues";
+  try {
+    const res = await fetch(url, {
+      headers: { "User-Agent": UA, Accept: "text/html,application/xhtml+xml" },
+      signal: AbortSignal.timeout(12_000),
+    });
+    if (!res.ok) return [];
+    const html = await res.text();
+    const start = html.search(/Upcoming issues/i);
+    const end = html.search(/Recent issues/i);
+    if (start < 0 || end <= start) return [];
+
+    const section = html.slice(start, end);
+    const rows = section.match(/<tr[\\s\\S]*?<\\/tr>/gi) ?? [];
+    const out: LiveIpo[] = [];
+
+    for (const row of rows) {
+      const cells = (row.match(/<t[dh][^>]*>[\\s\\S]*?<\\/t[dh]>/gi) ?? []).map(decodeHtml);
+      if (cells.length < 7) continue;
+      if (/^name$/i.test(cells[0] ?? "")) continue;
+      const type = cells[6] ?? "";
+      if (!/equity/i.test(type)) continue;
+
+      const expected = cells[5] ?? "";
+      const listing = parseLseDate(expected);
+      const [bandLow, bandHigh] = parseLseBand(cells[4] ?? "");
+      const primary = parseLseSize(cells[1] ?? "");
+      const secondary = parseLseSize(cells[2] ?? "");
+      const size = primary !== null && secondary !== null ? primary + secondary : primary ?? secondary;
+      const name = cells[0] ?? "";
+      if (!name) continue;
+
+      out.push({
+        symbol: "—",
+        name,
+        exchange: "LSE",
+        segment: "mainboard",
+        bandLow,
+        bandHigh,
+        sharesOffered: null,
+        issueSize: size,
+        openDate: isoOf(listing),
+        closeDate: null,
+        listingDate: isoOf(listing),
+        status: "upcoming",
+        note: `LSE official New Issues feed. Expected first trading date: ${expected || "TBA"}.`,
+        source: "LSE",
+      });
+    }
+    return out;
+  } catch {
+    return [];
+  }
 }
 
 async function fetchUs(): Promise<LiveIpo[]> {
@@ -245,10 +344,10 @@ async function fetchUs(): Promise<LiveIpo[]> {
 export async function fetchLiveIpos(): Promise<LiveIpo[]> {
   if (cache && Date.now() - cache.at < CACHE_MS) return cache.data;
 
-  const [india, us] = await Promise.all([fetchIndia(), fetchUs()]);
+  const [india, us, lse] = await Promise.all([fetchIndia(), fetchUs(), fetchLse()]);
   const seen = new Set<string>();
   const merged: LiveIpo[] = [];
-  for (const ipo of [...india, ...us]) {
+  for (const ipo of [...india, ...us, ...lse]) {
     if (!ipo.name) continue;
     const key = `${ipo.exchange}:${ipo.symbol}:${ipo.name.toLowerCase()}`;
     if (seen.has(key)) continue;
