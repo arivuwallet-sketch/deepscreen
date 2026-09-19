@@ -87,5 +87,6 @@ export function normalizeSymbol(value: string, max = 32): string | null {
 export function normalizeCompanyName(value: string, max = 160): string | null {
   const normalized = value.trim().replace(/\s+/g, " ");
   if (!normalized || normalized.length > max) return null;
+  if (/[\u0000-\u001f\u007f]/.test(normalized)) return null;
   return normalized;
 }
