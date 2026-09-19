@@ -43,7 +43,7 @@ export const GUIDES: Guide[] = [
         heading: "The filters that do most of the work",
         body: [
           "Market capitalisation sets the risk band. Large caps move slower and are better covered; small caps swing harder and are where mispricing usually hides.",
-          "Valuation filters (P/E, P/B, EV/EBITDA) tell you what the market is already paying for the earnings. Quality filters (return on equity, debt-to-equity, interest coverage) tell you whether those earnings are durable.",
+          "Valuation filters (P/E, P/B, EV/EBITDA) tell you what the market is already paying for the earnings. Treat EV/EBITDA as usable only when EBITDA and enterprise value support a positive multiple. Quality filters (return on equity, debt-to-equity, interest coverage) tell you whether those earnings are durable.",
           "Growth filters (revenue and profit CAGR over three to five years) separate a cheap compounder from a cheap melting ice cube. Liquidity filters (average traded volume) stop you from finding a great business you cannot exit.",
         ],
       },
@@ -520,7 +520,7 @@ export const GUIDES: Guide[] = [
         heading: "Enterprise value: the fuller picture",
         body: [
           "Market cap ignores the balance sheet. Enterprise value adds net debt, which is why two companies with identical market caps can be valued very differently by an acquirer.",
-          "For leveraged businesses, compare EV/EBITDA rather than P/E.",
+          "For leveraged businesses, EV/EBITDA can complement P/E when EBITDA is positive and consistently defined; a negative or zero multiple is not a cheap signal and should be shown as N/M while EBITDA and enterprise value are reviewed separately.",
         ],
       },
       {
@@ -639,7 +639,7 @@ export const GUIDES: Guide[] = [
         heading: "Minute 8–11: Stress-test leverage and valuation",
         body: [
           "Check gross debt, cash, net debt, interest burden and the direction of leverage. A company can carry meaningful debt safely when cash generation is recurring; the same debt becomes more fragile when earnings and cash flow are falling.",
-          "Then compare P/E, EV/EBITDA and other relevant multiples with close peers and the company’s own history. A low multiple is a research prompt, not proof of cheapness.",
+          "Then compare P/E, positive EV/EBITDA and other relevant multiples with close peers and the company’s own history. A non-positive EV/EBITDA is not a low valuation signal; show it as N/M and inspect the EBITDA and enterprise-value inputs.",
         ],
       },
       {
@@ -709,8 +709,8 @@ export const GUIDES: Guide[] = [
       {
         heading: "EV/EBITDA: useful when capital structure matters",
         body: [
-          "Enterprise value starts from equity value and incorporates debt and cash. EV/EBITDA is therefore often more comparable across companies with different leverage, because the numerator is based on the whole operating enterprise rather than only common equity.",
-          "EBITDA is not free cash flow. It ignores interest, taxes, depreciation and amortisation, and it can look healthy in businesses that require heavy recurring capital expenditure.",
+          "Enterprise value starts from equity value and incorporates debt and cash. EV/EBITDA is therefore often more comparable across companies with different leverage, because the numerator is based on the whole operating enterprise rather than only common equity. The ratio itself should be treated as N/M when EBITDA is zero/negative or enterprise value is negative.",
+          "EBITDA is not free cash flow. It ignores interest, taxes, depreciation and amortisation, and it can look healthy in businesses that require heavy recurring capital expenditure. A negative or zero EBITDA denominator makes EV/EBITDA non-meaningful rather than cheap.",
         ],
       },
       {
