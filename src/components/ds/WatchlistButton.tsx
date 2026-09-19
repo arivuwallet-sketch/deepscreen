@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Star } from "lucide-react";
+import { Heart } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -54,7 +54,7 @@ export function WatchlistButton({ stock }: { stock: Stock }) {
         return;
       }
       setTracked(false);
-      toast.success(`${stock.symbol} removed from your alerts`);
+      toast.success(`${stock.symbol} removed from your wishlist`);
       return;
     }
     const { error } = await supabase.from("watchlist").insert({
@@ -69,7 +69,7 @@ export function WatchlistButton({ stock }: { stock: Stock }) {
       return;
     }
     setTracked(true);
-    toast.success(`${stock.symbol} added — daily alerts will cover it`);
+    toast.success(`${stock.symbol} added to your wishlist`);
   }
 
   return (
@@ -80,8 +80,8 @@ export function WatchlistButton({ stock }: { stock: Stock }) {
       onClick={toggle}
       disabled={busy || loading}
     >
-      <Star className={tracked ? "size-4 fill-current text-primary" : "size-4"} />
-      {tracked ? "Tracking" : "Track & alert me"}
+      <Heart className={tracked ? "size-4 fill-current text-primary" : "size-4"} />
+      {tracked ? "In wishlist" : "Add to wishlist"}
     </Button>
   );
 }
