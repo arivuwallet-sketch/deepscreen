@@ -46,6 +46,12 @@ import { stockFaqs, stockSummary } from "@/lib/deepscreen/narrative";
 import { StockSignupPrompt } from "@/components/ds/StockSignupPrompt";
 import { WatchlistButton } from "@/components/ds/WatchlistButton";
 
+function peerExchangeCodesFor(exchange: string): string[] {
+  if (exchange === "NSE" || exchange === "BSE") return ["NSE", "BSE"];
+  if (exchange === "NYSE" || exchange === "NASDAQ") return ["NYSE", "NASDAQ"];
+  return ["LSE"];
+}
+
 export const Route = createFileRoute("/stock/$exchange/$symbol")({
   staticData: { sitemap: true },
   loader: async ({ params }) => {
@@ -85,11 +91,12 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
     );
     const title = `${s.symbol} — ${s.name} Fundamental Analysis | DeepScreen`;
     const description = `Research ${s.name} (${s.exchange}: ${s.symbol}): available financial ratios, valuation, company news and data limitations on DeepScreen.`;
-    const peerNames = stocksByExchange(s.exchange)
+    const peerNames = peerExchangeCodesFor(s.exchange)
+      .flatMap((exchange) => stocksByExchange(exchange))
       .filter((peer) => peer.symbol !== s.symbol && peer.sector === s.sector)
-      .sort((a, b) => b.marketCap - a.marketCap)
-      .slice(0, 4)
-      .map((peer) => `${peer.symbol} (${peer.name})`);
+      .sort((a, b) => Math.abs(Math.log(Math.max(a.marketCap, 0.001) / Math.max(s.marketCap, 0.001))) - Math.abs(Math.log(Math.max(b.marketCap, 0.001) / Math.max(s.marketCap, 0.001))))
+      .slice(0, 5)
+      .map((peer) => peer.symbol + " (" + peer.name + ")");
     const faqs = stockFaqs(s, sources, loaderData.snapshot.fundamentals, peerNames);
     const url = `https://deepscreen.online/stock/${s.exchange}/${s.symbol}`;
     const schemaAnalysis = Object.values(sources).some((value) => value === "live")
@@ -211,11 +218,7 @@ function StockPage() {
     quote: quote ?? null,
   });
 
-  const peerExchangeCodes = stock.exchange === "NSE" || stock.exchange === "BSE"
-    ? ["NSE", "BSE"]
-    : stock.exchange === "NYSE" || stock.exchange === "NASDAQ"
-      ? ["NYSE", "NASDAQ"]
-      : ["LSE"];
+  const peerExchangeCodes = peerExchangeCodesFor(stock.exchange);
 
   const peerPool = useMemo(
     () =>
@@ -301,11 +304,12 @@ function StockPage() {
         live,
         sources,
         liveFundamentals,
-        stocksByExchange(live.exchange)
+        peerExchangeCodesFor(live.exchange)
+          .flatMap((exchange) => stocksByExchange(exchange))
           .filter((peer) => peer.symbol !== live.symbol && peer.sector === live.sector)
-          .sort((a, b) => b.marketCap - a.marketCap)
-          .slice(0, 4)
-          .map((peer) => `${peer.symbol} (${peer.name})`),
+          .sort((a, b) => Math.abs(Math.log(Math.max(a.marketCap, 0.001) / Math.max(live.marketCap, 0.001))) - Math.abs(Math.log(Math.max(b.marketCap, 0.001) / Math.max(live.marketCap, 0.001))))
+          .slice(0, 5)
+          .map((peer) => peer.symbol + " (" + peer.name + ")"),
       ).map(faq => <div key={faq.q}><dt className="font-medium">{faq.q}</dt><dd className="mt-1 text-sm text-muted-foreground">{faq.a}</dd></div>)}</dl></section>
       <TopicIndex ids={["stocks", "learn"]} inContainer />
     </article></Shell>;
