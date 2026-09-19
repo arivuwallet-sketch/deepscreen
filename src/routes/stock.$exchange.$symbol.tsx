@@ -275,13 +275,13 @@ function StockPage() {
           );
         })()}
 
-        <section className="mt-5 grid gap-3 lg:grid-cols-3">
+        <section className="mt-5 grid gap-4 lg:grid-cols-3 lg:items-stretch">
+          <div className="min-w-0 lg:col-span-2">
             <PaywallGate
               feature="DeepScreen verdict and weighted score"
-              className="lg:col-span-2"
               minHeight="min-h-[220px]"
             >
-              <div className="card-hover rounded-lg border border-border bg-panel p-5">
+              <div className="card-hover h-full rounded-lg border border-border bg-panel p-5">
                 <div className="flex items-center justify-between">
                   <h2 className="text-sm font-semibold uppercase tracking-wide">
                     DeepScreen verdict
@@ -307,8 +307,9 @@ function StockPage() {
                 <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{a.summary}</p>
               </div>
             </PaywallGate>
+          </div>
 
-            <div className="grid gap-4">
+          <div className="grid min-w-0 gap-4">
               <div className="card-hover rounded-lg border border-bull/30 bg-panel p-4">
                 <h3 className="text-xs font-semibold uppercase tracking-wide text-bull">
                   Strengths
