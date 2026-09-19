@@ -36,7 +36,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
           <nav
             aria-label="Primary navigation"
-            className="col-span-2 row-start-3 flex w-full min-w-0 gap-1 overflow-x-auto overscroll-x-contain pb-0.5 text-xs [scrollbar-width:thin] xl:order-3 xl:col-auto xl:row-auto xl:w-auto xl:max-w-[min(52vw,56rem)]"
+            className="col-span-2 row-start-3 flex w-full min-w-0 gap-1 overflow-x-auto overscroll-x-contain pb-0.5 text-xs xl:order-3 xl:col-auto xl:row-auto xl:w-auto xl:max-w-[min(52vw,56rem)]"
           >
             <div className="flex min-w-max items-center gap-1">
               {EXCHANGES.map((e) => (
