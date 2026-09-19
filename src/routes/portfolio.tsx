@@ -55,12 +55,13 @@ function PortfolioPage() {
     () =>
       stocks.map((s) => {
         const k = quoteKey(s);
-        const { stock } = mergeLiveStock(s, quotes?.[k], funds?.[k], screener?.[k]);
+        const merged = mergeLiveStock(s, quotes?.[k], funds?.[k], screener?.[k]);
         return {
-          stock,
-          analysis: analyze(stock),
-          plan: holdingPlan(stock),
+          stock: merged.stock,
+          analysis: analyze(merged.stock),
+          plan: holdingPlan(merged.stock),
           fundamentals: funds?.[k] ?? null,
+          sources: merged.sources,
         };
       }),
     [stocks, quotes, funds, screener],
@@ -98,7 +99,14 @@ function PortfolioPage() {
           Your saved stocks, live fundamental changes, research alerts and portfolio health in one place.
         </p>
 
-        <WatchlistAlertsPanel rows={rows.map(({ stock, analysis, fundamentals }) => ({ stock, analysis, fundamentals }))} />
+        <WatchlistAlertsPanel
+          rows={rows.map(({ stock, analysis, fundamentals, sources }) => ({
+            stock,
+            analysis,
+            fundamentals,
+            sources,
+          }))}
+        />
 
         <PaywallGate feature="Portfolio X-Ray" className="mt-6" minHeight="min-h-[420px]">
         <div>
