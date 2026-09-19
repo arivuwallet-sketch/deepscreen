@@ -1,4 +1,4 @@
-import { jsonLd } from "@/lib/seo/json-ld";
+import { buildGraph, buildOrganizationSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -94,39 +94,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     scripts: [
       {
         type: "application/ld+json",
-        children: jsonLd({
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          name: "DeepScreen",
-          url: "https://deepscreen.online",
-          description:
-            "Global stock screener and fundamental analysis for NSE, BSE, NYSE, Nasdaq and LSE.",
-        }),
-      },
-      {
-        type: "application/ld+json",
-        children: jsonLd({
-          "@context": "https://schema.org",
-          "@type": "Organization",
-          name: "DeepScreen",
-          url: "https://deepscreen.online",
-          email: "deepscreen.online@outlook.com",
-          areaServed: ["IN", "US", "GB"],
-          contactPoint: [
-            {
-              "@type": "ContactPoint",
-              contactType: "customer support",
-              email: "deepscreen.online@outlook.com",
-              availableLanguage: ["en"],
-              hoursAvailable: {
-                "@type": "OpeningHoursSpecification",
-                dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-                opens: "09:00",
-                closes: "18:00",
-              },
-            },
-          ],
-        }),
+        children: jsonLd(
+          buildGraph(
+            buildOrganizationSchema(),
+            buildWebSiteSchema(),
+          ),
+        ),
       },
     ],
     links: [
@@ -141,6 +114,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap",
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "shortcut icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "apple-touch-icon", href: "/favicon.ico" },
+      { rel: "describedby", href: "https://deepscreen.online/llms.txt" },
+      { rel: "help", href: "https://deepscreen.online/answers" },
     ],
   }),
   shellComponent: RootShell,
@@ -155,17 +132,7 @@ function RootShell({ children }: { children: ReactNode }) {
       <head>
         <HeadContent />
         <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18457575020" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'AW-18457575020');
-`,
-          }}
-        />
+        <script src="/gtag.js" />
       </head>
       <body>
         {children}

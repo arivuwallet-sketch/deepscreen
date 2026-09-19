@@ -1,3 +1,4 @@
+import { getCspNonce } from "@/lib/csp";
 import * as React from "react";
 import * as RechartsPrimitive from "recharts";
 
@@ -70,6 +71,7 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 
   return (
     <style
+      nonce={getCspNonce()}
       dangerouslySetInnerHTML={{
         __html: Object.entries(THEMES)
           .map(

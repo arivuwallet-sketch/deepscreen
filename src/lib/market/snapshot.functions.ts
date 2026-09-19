@@ -2,6 +2,10 @@ import { createServerFn } from "@tanstack/react-start";
 
 import type { LiveFundamentals, LiveQuote } from "./yahoo.server";
 import type { ScreenerRatios } from "./screener.server";
+import { consumeRateLimit, normalizeCompanyName, normalizeSymbol, requestClientKey } from "@/lib/security";
+import { getExchange } from "@/lib/deepscreen/exchanges";
+import { getRequest } from "@tanstack/react-start/server";
+import { z } from "zod";
 
 export interface StockSnapshot {
   quote: LiveQuote | null;
@@ -20,6 +24,8 @@ export interface StockSnapshot {
  * rather than nothing if an upstream provider is down.
  */
 const TTL_MS = 3 * 60_000;
+const snapshotInput = z.object({ exchange: z.string().trim().min(1).max(16), symbol: z.string().trim().min(1).max(32), name: z.string().max(160).optional() }).strict();
+
 const MAX_ENTRIES = 500;
 const snapshots = new Map<string, StockSnapshot>();
 
@@ -72,14 +78,23 @@ async function compute(exchange: string, symbol: string, name?: string): Promise
 }
 
 export const getStockSnapshot = createServerFn({ method: "GET" })
-  .inputValidator((d: { exchange: string; symbol: string; name?: string }) => d)
+  .inputValidator(snapshotInput)
   .handler(async ({ data }): Promise<StockSnapshot> => {
-    const key = `${data.exchange}:${data.symbol}`;
+    const exchange = data.exchange.trim().toUpperCase();
+    const symbol = normalizeSymbol(data.symbol);
+    const name = data.name ? normalizeCompanyName(data.name) : null;
+    if (!getExchange(exchange) || !symbol || (data.name && !name)) {
+      return { ...EMPTY, fetchedAt: Date.now() };
+    }
+    const request = getRequest();
+    const rate = consumeRateLimit("snapshot:ip:" + requestClientKey(request), 30, 60_000);
+    if (!rate.allowed) return { ...EMPTY, fetchedAt: Date.now() };
+    const key = `${exchange}:${symbol}`;
     const cached = snapshots.get(key);
     if (cached && Date.now() - cached.fetchedAt < TTL_MS) return cached;
 
     try {
-      const fresh = await compute(data.exchange, data.symbol, data.name);
+      const fresh = await compute(exchange, symbol, name ?? undefined);
       // Never overwrite a good snapshot with an empty one.
       if (fresh.degraded && cached) {
         console.warn(`[snapshot] serving stale snapshot for ${key}`);
