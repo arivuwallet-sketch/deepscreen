@@ -728,7 +728,7 @@ export const getScreenerRatiosBatch = createServerFn({ method: "POST" })
     return out;
   });
 
-/** Full live IPO pipeline across NSE, BSE, NYSE and NASDAQ. */
+/** Live IPO pipeline across NSE, BSE, NYSE, NASDAQ and LSE. */
 export const getLiveIpos = createServerFn({ method: "GET" }).handler(async () => {
   const { fetchLiveIpos } = await import("./ipo.server");
   return fetchLiveIpos();
