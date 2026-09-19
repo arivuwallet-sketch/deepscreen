@@ -114,11 +114,7 @@ export const confirmCheckout = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: true; paid: boolean; status: string } | Fail> => {
     if (!isValidOrderId(data.orderId)) return { ok: false, error: "Invalid order." };
     const request = getRequest();
-    const rate = consumeRateLimit(
-      "confirm:ip:" + request.headers.get("cf-connecting-ip")?.trim().slice(0, 128),
-      20,
-      10 * 60_000,
-    );
+    const rate = consumeRateLimit("confirm:ip:" + requestClientKey(request), 20, 10 * 60_000);
     if (!rate.allowed) return { ok: false, error: "Too many verification attempts. Please try again later." };
 
     const user = await verifyRequestUser(request);
@@ -147,7 +143,7 @@ export const confirmCheckout = createServerFn({ method: "POST" })
       const remote = await fetchOrder(cfg, data.orderId);
       if (remote.orderId !== data.orderId) return { ok: false, error: "Payment order verification failed." };
       if (remote.status !== "PAID") {
-        await admin.from("payment_orders").update({ status: remote.status === "EXPIRED" ? "expired" : "failed" }).eq("link_id", data.orderId).eq("status", "created");
+        await admin.from("payment_orders").update({ status: remote.status === "EXPIRED" ? "expired" : "pending" }).eq("link_id", data.orderId).eq("status", "created");
         return { ok: true, paid: false, status: remote.status };
       }
       const remoteAmountCents = Math.round(remote.amount * 100);
