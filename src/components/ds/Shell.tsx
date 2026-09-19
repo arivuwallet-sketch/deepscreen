@@ -20,7 +20,7 @@ export function Shell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen min-w-0 overflow-x-clip bg-background text-foreground">
       <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85">
-        <div className="safe-area-x mx-auto grid w-full max-w-7xl min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-3 px-4 py-3 lg:flex lg:flex-wrap lg:gap-3">
+        <div className="safe-area-x mx-auto grid w-full max-w-7xl min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-3 py-3 lg:flex lg:flex-wrap lg:gap-3">
           <Link to="/" className="flex min-w-0 shrink items-center gap-2">
             <span className="flex size-8 shrink-0 items-center justify-center rounded bg-primary text-primary-foreground">
               <Activity className="size-4" />
