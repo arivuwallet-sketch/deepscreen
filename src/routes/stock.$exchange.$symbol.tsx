@@ -225,7 +225,11 @@ function StockPage() {
       peerExchangeCodes
         .flatMap((exchange) => stocksByExchange(exchange))
         .filter((candidate) => candidate.symbol !== stock.symbol && candidate.sector === live.sector)
-        .slice(0, 100),
+      .sort((a, b) =>
+        Math.abs(Math.log(Math.max(a.marketCap, 0.001) / Math.max(live.marketCap, 0.001))) -
+        Math.abs(Math.log(Math.max(b.marketCap, 0.001) / Math.max(live.marketCap, 0.001))),
+      )
+      .slice(0, 40),
     [stock.symbol, live.sector],
   );
   const peerKeys = useMemo(
@@ -233,8 +237,8 @@ function StockPage() {
     [peerPool],
   );
   const { data: peerQuotes } = useLiveQuotes(peerKeys);
-  const { data: peerFundamentals } = useLiveFundamentalsBatch(peerKeys);
-  const { data: peerScreener } = useScreenerRatiosBatch(peerKeys);
+  const { data: peerFundamentals, dataUpdatedAt: peerFundamentalsUpdatedAt } = useLiveFundamentalsBatch(peerKeys);
+  const { data: peerScreener, dataUpdatedAt: peerScreenerUpdatedAt } = useScreenerRatiosBatch(peerKeys);
   const peerIndustry = liveFundamentals?.industry?.trim() || null;
 
   const peerRows = useMemo<PeerRow[]>(() => {
@@ -282,6 +286,8 @@ function StockPage() {
     peerQuotes,
     peerScreener,
     peerIndustry,
+    peerFundamentalsUpdatedAt,
+    peerScreenerUpdatedAt,
     live.marketCap,
     stock.exchange,
   ]);
@@ -455,6 +461,7 @@ function StockPage() {
           analysis={a}
           peers={peerRows}
           targetIndustry={peerIndustry}
+          dataUpdatedAt={Math.max(peerFundamentalsUpdatedAt, peerScreenerUpdatedAt)}
         />
 
         <PaywallGate
