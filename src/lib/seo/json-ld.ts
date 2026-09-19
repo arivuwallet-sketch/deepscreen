@@ -23,7 +23,7 @@ export interface QA {
 
 export interface StockFacts {
   symbol: string;
-  exchange: ExchangeCode;
+  exchange: string;
   companyName: string;
   sector?: string;
   score?: number;
@@ -119,6 +119,7 @@ export function buildWebApplicationSchema(app: WebApplicationFacts): JsonLdNode 
     url: app.url,
     applicationCategory: "FinanceApplication",
     operatingSystem: "Web browser",
+    publisher: { "@id": `${SITE_URL}/#organization` },
     description: app.description,
     ...(app.featureList?.length ? { featureList: app.featureList } : {}),
   };
@@ -183,7 +184,7 @@ export function buildCorporationSchema(stock: StockFacts): JsonLdNode {
   return {
     "@type": "Corporation",
     name: stock.companyName,
-    tickerSymbol: `${EXCHANGE_MIC[stock.exchange]} ${stock.symbol}`,
+    tickerSymbol: `${EXCHANGE_MIC[stock.exchange as ExchangeCode] ?? stock.exchange} ${stock.symbol}`,
     ...(additionalProperty.length ? { additionalProperty } : {}),
   };
 }
@@ -208,11 +209,11 @@ export function buildArticleSchema(article: ArticleFacts): JsonLdNode {
 export function buildExchangeCollectionSchema(ex: ExchangeFacts): JsonLdNode {
   return {
     "@type": "CollectionPage",
-    name: `${EXCHANGE_FULL_NAME[ex.code]} — DeepScreen screener`,
+    name: `${EXCHANGE_FULL_NAME[ex.code as ExchangeCode] ?? ex.code} — DeepScreen screener`,
     url: ex.url,
     about: {
       "@type": "Thing",
-      name: EXCHANGE_FULL_NAME[ex.code],
+      name: EXCHANGE_FULL_NAME[ex.code as ExchangeCode] ?? ex.code,
     },
     isPartOf: { "@id": `${SITE_URL}/#website` },
   };
