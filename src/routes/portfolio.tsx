@@ -17,6 +17,7 @@ import { mergeLiveStock } from "@/lib/deepscreen/live-merge";
 import { analyze, verdictClass } from "@/lib/deepscreen/metrics";
 import { holdingPlan } from "@/lib/deepscreen/horizon";
 import { cn } from "@/lib/utils";
+import { WatchlistAlertsPanel } from "@/components/ds/WatchlistAlertsPanel";
 
 export const Route = createFileRoute("/portfolio")({
   staticData: { sitemap: false },
@@ -54,8 +55,14 @@ function PortfolioPage() {
     () =>
       stocks.map((s) => {
         const k = quoteKey(s);
-        const { stock } = mergeLiveStock(s, quotes?.[k], funds?.[k], screener?.[k]);
-        return { stock, analysis: analyze(stock), plan: holdingPlan(stock) };
+        const merged = mergeLiveStock(s, quotes?.[k], funds?.[k], screener?.[k]);
+        return {
+          stock: merged.stock,
+          analysis: analyze(merged.stock),
+          plan: holdingPlan(merged.stock),
+          fundamentals: funds?.[k] ?? null,
+          sources: merged.sources,
+        };
       }),
     [stocks, quotes, funds, screener],
   );
@@ -87,11 +94,19 @@ function PortfolioPage() {
   return (
     <Shell>
       <div className="mx-auto max-w-7xl px-4 py-8">
-        <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Portfolio health & risk matrix</h1>
+        <h1 className="text-2xl font-bold tracking-tight md:text-3xl">My Stocks</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Cap-weighted valuation, leverage and sector concentration across every stock you track,
-          recomputed from live prices and fundamentals.
+          Your saved stocks, live fundamental changes, research alerts and portfolio health in one place.
         </p>
+
+        <WatchlistAlertsPanel
+          rows={rows.map(({ stock, analysis, fundamentals, sources }) => ({
+            stock,
+            analysis,
+            fundamentals,
+            sources,
+          }))}
+        />
 
         <PaywallGate feature="Portfolio X-Ray" className="mt-6" minHeight="min-h-[420px]">
         <div>
@@ -106,24 +121,44 @@ function PortfolioPage() {
 
         {signedIn && !loading && rows.length === 0 ? (
           <EmptyCard>
-            Your watchlist is empty — open any stock page and tap the star to add it here.
+            Your My Stocks is empty — open any stock page and tap “Add to My Stocks” to add a company here.
           </EmptyCard>
         ) : null}
 
         {totals ? (
           <>
             <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
-              <Stat label="Holdings" value={String(rows.length)} />
+              <Stat label="My Stocks companies" value={String(rows.length)} />
               <Stat label="Weighted P/E" value={totals.pe.toFixed(2)} />
               <Stat label="Weighted PEG" value={totals.peg.toFixed(2)} />
               <Stat label="Weighted D/E" value={`${totals.de.toFixed(2)} · ${riskLabel(totals.de)}`} />
-              <Stat label="Avg deep score" value={totals.score.toFixed(0)} />
+              <Stat label="Portfolio health" value={totals.score.toFixed(0)} />
               <Stat label="Action alerts" value={String(totals.alerts)} />
             </div>
 
+            <section className="mt-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
+              <div className="rounded-lg border border-primary/30 bg-primary/5 p-5">
+                <div className="flex flex-wrap items-end justify-between gap-3">
+                  <div>
+                    <h2 className="text-sm font-semibold uppercase tracking-wide">Overall portfolio health score</h2>
+                    <p className="mt-1 text-xs text-muted-foreground">Cap-weighted DeepScreen stock scores across your My Stocks. This is a model score, not a measure of your invested capital weights.</p>
+                  </div>
+                  <div className="num text-4xl font-bold">{totals.score.toFixed(0)}<span className="text-lg text-muted-foreground">/100</span></div>
+                </div>
+                <div className="mt-4 h-3 overflow-hidden rounded-full bg-muted">
+                  <div className={cn("h-full rounded-full transition-[width]", totals.score >= 67 ? "bg-bull" : totals.score >= 40 ? "bg-warn" : "bg-bear")} style={{ width: `${Math.min(100, Math.max(0, totals.score))}%` }} />
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">Higher scores mean the underlying DeepScreen quality-and-value model is scoring more of the My Stocks factors positively.</p>
+              </div>
+              <div className="rounded-lg border border-border p-5">
+                <h2 className="text-sm font-semibold uppercase tracking-wide">DeepScreen analysis suggestion</h2>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{portfolioSuggestion(rows, totals)}</p>
+              </div>
+            </section>
+
             <section className="mt-8 grid gap-6 lg:grid-cols-[1fr_320px]">
               <div className="overflow-x-auto rounded-lg border border-border">
-                <table className="w-full min-w-[720px] text-sm">
+                <table className="w-full min-w-[960px] text-sm">
                   <thead className="bg-panel text-xs uppercase text-muted-foreground">
                     <tr>
                       <th scope="col" className="px-3 py-2 text-left">Stock</th>
@@ -133,6 +168,7 @@ function PortfolioPage() {
                       <th scope="col" className="px-3 py-2 text-right">D/E</th>
                       <th scope="col" className="px-3 py-2 text-right">Score</th>
                       <th scope="col" className="px-3 py-2 text-left">Action</th>
+                      <th scope="col" className="px-3 py-2 text-left">DeepScreen analysis</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -158,6 +194,7 @@ function PortfolioPage() {
                           </span>
                         </td>
                         <td className="px-3 py-2 text-xs capitalize text-muted-foreground">{plan.alertLabel}</td>
+                        <td className="max-w-[340px] px-3 py-2 text-xs leading-relaxed text-muted-foreground">{analysisSuggestion(analysis)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -197,6 +234,31 @@ function PortfolioPage() {
       <TopicIndex ids={["portfolio"]} title={"Portfolio and diversification topics"} />
     </Shell>
   );
+}
+
+
+function analysisSuggestion(analysis: ReturnType<typeof analyze>): string {
+  if (analysis.risks[0]) return `Review: ${analysis.risks[0]}`;
+  if (analysis.strengths[0]) return `Check whether the strength persists: ${analysis.strengths[0]}`;
+  return "Review the full DeepScreen analysis and compare the key ratios with direct peers.";
+}
+
+function portfolioSuggestion(
+  rows: Array<{ stock: import("@/lib/deepscreen/types").Stock; analysis: ReturnType<typeof analyze> }>,
+  totals: { score: number; de: number; sectors: [string, number][] },
+): string {
+  const topSector = totals.sectors[0];
+  if (topSector && topSector[1] > 40) {
+    return `Review sector concentration first: ${topSector[0]} represents ${topSector[1].toFixed(1)}% of the model weight. Then inspect the weakest holdings within that sector.`;
+  }
+  if (totals.de >= 2) {
+    return `Review leverage exposure next: the My Stocks has a cap-weighted D/E of ${totals.de.toFixed(2)}x. Open the highest-D/E companies and check their cash, debt and interest coverage.`;
+  }
+  const weakest = [...rows].sort((a, b) => a.analysis.score - b.analysis.score)[0];
+  if (weakest) {
+    return `Review ${weakest.stock.symbol} first (${weakest.analysis.score}/100): ${analysisSuggestion(weakest.analysis)}`;
+  }
+  return "Add a few companies to the My Stocks, then use the score, sector mix and leverage panels to structure your research review.";
 }
 
 function Stat({ label, value }: { label: string; value: string }) {

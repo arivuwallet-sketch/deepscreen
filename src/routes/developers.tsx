@@ -8,7 +8,7 @@ export const Route = createFileRoute("/developers")({
       "/developers",
       "Public Reference API & Agent Documentation | DeepScreen",
       "Use DeepScreen's read-only API for exchange metadata, metric definitions and screening answers. OpenAPI 3.1 specification, examples and limitations.",
-      ["DeepScreen API", "stock research reference API", "financial metric definitions API"],
+      ["DeepScreen API", "stock research API", "financial reference API", "financial metric definitions API", "financial metrics API", "OpenAPI financial API", "stock research reference API", "market metadata API"],
     ),
   component: Developers,
 });

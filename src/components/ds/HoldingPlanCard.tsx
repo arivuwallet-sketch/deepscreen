@@ -2,7 +2,6 @@ import { alertClass, holdingPlan } from "@/lib/deepscreen/horizon";
 import { formatPrice } from "@/lib/deepscreen/format";
 import type { Stock } from "@/lib/deepscreen/types";
 import { cn } from "@/lib/utils";
-import { WatchlistButton } from "./WatchlistButton";
 
 export function HoldingPlanCard({ stock }: { stock: Stock }) {
   const p = holdingPlan(stock);
@@ -15,7 +14,6 @@ export function HoldingPlanCard({ stock }: { stock: Stock }) {
           <span className={cn("num rounded border px-3 py-1 text-xs font-semibold", alertClass(p.alert))}>
             {p.alertLabel}
           </span>
-          <WatchlistButton stock={stock} />
         </div>
       </div>
 
