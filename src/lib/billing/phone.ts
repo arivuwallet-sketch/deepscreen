@@ -274,30 +274,71 @@ const RAW_COUNTRIES: readonly RawCountry[] = [
   ["Zimbabwe","zw","263","+...-.-......"],
 ];
 
-function digitCount(format: string): number | null {
-  const count = [...format].filter((char) => char === ".").length;
-  return count > 0 ? count : null;
-}
+const COUNTRY_LENGTH_OVERRIDES: Record<string, [min: number, max: number]> = {
+  IN: [10, 10],
+  US: [10, 10],
+  CA: [10, 10],
+  AG: [10, 10],
+  AI: [10, 10],
+  AS: [10, 10],
+  BB: [10, 10],
+  BM: [10, 10],
+  BS: [10, 10],
+  DM: [10, 10],
+  DO: [10, 10],
+  GD: [10, 10],
+  GU: [10, 10],
+  JM: [10, 10],
+  KN: [10, 10],
+  KY: [10, 10],
+  LC: [10, 10],
+  MP: [10, 10],
+  MS: [10, 10],
+  PR: [10, 10],
+  SX: [10, 10],
+  TC: [10, 10],
+  TT: [10, 10],
+  VC: [10, 10],
+  VG: [10, 10],
+  VI: [10, 10],
+  AU: [9, 10],
+  BR: [10, 11],
+  CN: [11, 11],
+  FR: [9, 9],
+  DE: [7, 11],
+  GB: [9, 10],
+  ID: [9, 11],
+  IT: [9, 10],
+  JP: [10, 10],
+  KR: [9, 10],
+  MX: [10, 10],
+  MY: [9, 10],
+  NL: [9, 9],
+  NZ: [8, 10],
+  PK: [10, 10],
+  RU: [10, 10],
+  SA: [9, 9],
+  SG: [8, 8],
+  TH: [8, 9],
+  TR: [10, 10],
+  AE: [9, 9],
+};
 
 function cleanCountryName(name: string): string {
-  const cleaned = name.replace(/ \([^)]*\)$/g, "").trim();
-  if (cleaned === "Macedonia (FYROM)") return "North Macedonia";
-  if (cleaned === "Swaziland") return "Eswatini";
-  if (cleaned === "Czech Republic") return "Czechia";
-  if (cleaned === "AmericanSamoa") return "American Samoa";
-  return cleaned;
+  return name.replace(/ \([^)]*\)$/g, "").trim();
 }
 
 export const PHONE_COUNTRIES: CountryPhone[] = RAW_COUNTRIES.map(
   ([name, iso2, rawDialCode, format]) => {
+    const upperIso2 = iso2.toUpperCase();
     const dialCode = `+${rawDialCode}`;
-    const formattedLength = digitCount(format);
     const e164MaxNationalLength = Math.max(1, 15 - rawDialCode.length);
-    const maxLength = Math.min(formattedLength ?? e164MaxNationalLength, e164MaxNationalLength);
-    const minLength = Math.min(formattedLength ?? 6, maxLength);
+    const [overrideMin, overrideMax] = COUNTRY_LENGTH_OVERRIDES[upperIso2] ?? [7, e164MaxNationalLength];
+    const minLength = Math.min(overrideMin, e164MaxNationalLength);
+    const maxLength = Math.min(overrideMax, e164MaxNationalLength);
     return {
       name: cleanCountryName(name),
-      iso2: iso2.toUpperCase(),
+      iso2: upperIso2,
       dialCode,
       format,
       minLength,
@@ -338,7 +379,7 @@ export function validatePhoneNumber(
       country.minLength === country.maxLength
         ? `${country.minLength} digits`
         : `${country.minLength}–${country.maxLength} digits`;
-    return { valid: false, error: `Enter a valid ${lengthText} number for ${country.name}.` };
+    return { valid: false, error: `Enter a valid ${lengthText} phone number for ${country.name}.` };
   }
   if (/^(\d)\1+$/.test(digits) || /^0+$/.test(digits)) {
     return { valid: false, error: "That number looks like a placeholder. Enter your real phone number." };
