@@ -121,14 +121,14 @@ function PortfolioPage() {
 
         {signedIn && !loading && rows.length === 0 ? (
           <EmptyCard>
-            Your wishlist is empty — open any stock page and tap “Add to wishlist” to add a company here.
+            Your My Stocks is empty — open any stock page and tap “Add to My Stocks” to add a company here.
           </EmptyCard>
         ) : null}
 
         {totals ? (
           <>
             <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
-              <Stat label="Wishlist companies" value={String(rows.length)} />
+              <Stat label="My Stocks companies" value={String(rows.length)} />
               <Stat label="Weighted P/E" value={totals.pe.toFixed(2)} />
               <Stat label="Weighted PEG" value={totals.peg.toFixed(2)} />
               <Stat label="Weighted D/E" value={`${totals.de.toFixed(2)} · ${riskLabel(totals.de)}`} />
@@ -141,14 +141,14 @@ function PortfolioPage() {
                 <div className="flex flex-wrap items-end justify-between gap-3">
                   <div>
                     <h2 className="text-sm font-semibold uppercase tracking-wide">Overall portfolio health score</h2>
-                    <p className="mt-1 text-xs text-muted-foreground">Cap-weighted DeepScreen stock scores across your wishlist. This is a model score, not a measure of your invested capital weights.</p>
+                    <p className="mt-1 text-xs text-muted-foreground">Cap-weighted DeepScreen stock scores across your My Stocks. This is a model score, not a measure of your invested capital weights.</p>
                   </div>
                   <div className="num text-4xl font-bold">{totals.score.toFixed(0)}<span className="text-lg text-muted-foreground">/100</span></div>
                 </div>
                 <div className="mt-4 h-3 overflow-hidden rounded-full bg-muted">
                   <div className={cn("h-full rounded-full transition-[width]", totals.score >= 67 ? "bg-bull" : totals.score >= 40 ? "bg-warn" : "bg-bear")} style={{ width: `${Math.min(100, Math.max(0, totals.score))}%` }} />
                 </div>
-                <p className="mt-2 text-xs text-muted-foreground">Higher scores mean the underlying DeepScreen quality-and-value model is scoring more of the wishlist factors positively.</p>
+                <p className="mt-2 text-xs text-muted-foreground">Higher scores mean the underlying DeepScreen quality-and-value model is scoring more of the My Stocks factors positively.</p>
               </div>
               <div className="rounded-lg border border-border p-5">
                 <h2 className="text-sm font-semibold uppercase tracking-wide">DeepScreen analysis suggestion</h2>
@@ -252,13 +252,13 @@ function portfolioSuggestion(
     return `Review sector concentration first: ${topSector[0]} represents ${topSector[1].toFixed(1)}% of the model weight. Then inspect the weakest holdings within that sector.`;
   }
   if (totals.de >= 2) {
-    return `Review leverage exposure next: the wishlist has a cap-weighted D/E of ${totals.de.toFixed(2)}x. Open the highest-D/E companies and check their cash, debt and interest coverage.`;
+    return `Review leverage exposure next: the My Stocks has a cap-weighted D/E of ${totals.de.toFixed(2)}x. Open the highest-D/E companies and check their cash, debt and interest coverage.`;
   }
   const weakest = [...rows].sort((a, b) => a.analysis.score - b.analysis.score)[0];
   if (weakest) {
     return `Review ${weakest.stock.symbol} first (${weakest.analysis.score}/100): ${analysisSuggestion(weakest.analysis)}`;
   }
-  return "Add a few companies to the wishlist, then use the score, sector mix and leverage panels to structure your research review.";
+  return "Add a few companies to the My Stocks, then use the score, sector mix and leverage panels to structure your research review.";
 }
 
 function Stat({ label, value }: { label: string; value: string }) {
