@@ -21,10 +21,10 @@ export function ProMetricValue({
   return (
     <span
       title="DeepScreen Pro feature — unlock to view this ratio"
-      className={cn("inline-flex items-center gap-1.5", className)}
+      className={cn("inline-flex items-center gap-1.5 text-primary", className)}
     >
-      <span aria-hidden className="select-none blur-[5px]">{value}</span>
-      <Lock className="size-3 shrink-0 text-primary" />
+      <Lock className="size-3 shrink-0" />
+      <span className="font-semibold">Pro</span>
     </span>
   );
 }
