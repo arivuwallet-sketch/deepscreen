@@ -1,5 +1,6 @@
 import type { Intel } from "@/lib/deepscreen/intel";
 import { toneClass } from "@/lib/deepscreen/intel";
+import { ProInsight, ProMetricValue } from "@/components/ds/PaywallGate";
 import { cn } from "@/lib/utils";
 
 const fmt = (v: number | null, suffix = "") =>
@@ -267,17 +268,27 @@ export function ExtendedRatiosPanel({ intel }: { intel: Intel }) {
         {rows.map(([label, value]) => (
           <div key={label} className="flex items-center justify-between border-b border-border/50 pb-1">
             <dt className="text-muted-foreground">{label}</dt>
-            <dd>{value}</dd>
+            <dd><ProMetricValue value={value} /></dd>
           </div>
         ))}
       </dl>
       <div className="mt-4 rounded border border-border p-3">
         <p className="num text-xs uppercase text-muted-foreground">DuPont ROE breakdown</p>
-        <p className="num mt-1 text-sm">
-          {fmt(d.netMargin, "%")} margin × {fmt(d.assetTurnover, "x")} turnover ×{" "}
-          {fmt(d.leverage, "x")} leverage = {fmt(d.impliedRoe, "%")} ROE
-        </p>
-        {d.model ? <p className="mt-1 text-[11px] text-muted-foreground">{d.model}</p> : null}
+        <div className="mt-1 text-sm">
+          <ProMetricValue
+            value={
+              <span className="num">
+                {fmt(d.netMargin, "%")} margin × {fmt(d.assetTurnover, "x")} turnover ×{" "}
+                {fmt(d.leverage, "x")} leverage = {fmt(d.impliedRoe, "%")} ROE
+              </span>
+            }
+          />
+        </div>
+        {d.model ? (
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            <ProInsight>{d.model}</ProInsight>
+          </p>
+        ) : null}
       </div>
     </div>
   );
