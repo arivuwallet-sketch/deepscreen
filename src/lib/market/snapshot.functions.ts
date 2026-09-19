@@ -2,6 +2,9 @@ import { createServerFn } from "@tanstack/react-start";
 
 import type { LiveFundamentals, LiveQuote } from "./yahoo.server";
 import type { ScreenerRatios } from "./screener.server";
+import { consumeRateLimit, normalizeCompanyName, normalizeSymbol, requestClientKey } from "@/lib/security";
+import { getExchange } from "@/lib/deepscreen/exchanges";
+import { getRequest } from "@tanstack/react-start/server";
 
 export interface StockSnapshot {
   quote: LiveQuote | null;
@@ -74,12 +77,21 @@ async function compute(exchange: string, symbol: string, name?: string): Promise
 export const getStockSnapshot = createServerFn({ method: "GET" })
   .inputValidator((d: { exchange: string; symbol: string; name?: string }) => d)
   .handler(async ({ data }): Promise<StockSnapshot> => {
-    const key = `${data.exchange}:${data.symbol}`;
+    const exchange = data.exchange.trim().toUpperCase();
+    const symbol = normalizeSymbol(data.symbol);
+    const name = data.name ? normalizeCompanyName(data.name) : null;
+    if (!getExchange(exchange) || !symbol || (data.name && !name)) {
+      return { ...EMPTY, fetchedAt: Date.now() };
+    }
+    const request = getRequest();
+    const rate = consumeRateLimit("snapshot:ip:" + requestClientKey(request), 30, 60_000);
+    if (!rate.allowed) return { ...EMPTY, fetchedAt: Date.now() };
+    const key = `${exchange}:${symbol}`;
     const cached = snapshots.get(key);
     if (cached && Date.now() - cached.fetchedAt < TTL_MS) return cached;
 
     try {
-      const fresh = await compute(data.exchange, data.symbol, data.name);
+      const fresh = await compute(exchange, symbol, name ?? undefined);
       // Never overwrite a good snapshot with an empty one.
       if (fresh.degraded && cached) {
         console.warn(`[snapshot] serving stale snapshot for ${key}`);
