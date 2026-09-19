@@ -1,4 +1,4 @@
-import { jsonLd } from "@/lib/seo/json-ld";
+import { buildGraph, buildOrganizationSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -94,39 +94,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     scripts: [
       {
         type: "application/ld+json",
-        children: jsonLd({
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          name: "DeepScreen",
-          url: "https://deepscreen.online",
-          description:
-            "Global stock screener and fundamental analysis for NSE, BSE, NYSE, Nasdaq and LSE.",
-        }),
-      },
-      {
-        type: "application/ld+json",
-        children: jsonLd({
-          "@context": "https://schema.org",
-          "@type": "Organization",
-          name: "DeepScreen",
-          url: "https://deepscreen.online",
-          email: "deepscreen.online@outlook.com",
-          areaServed: ["IN", "US", "GB"],
-          contactPoint: [
-            {
-              "@type": "ContactPoint",
-              contactType: "customer support",
-              email: "deepscreen.online@outlook.com",
-              availableLanguage: ["en"],
-              hoursAvailable: {
-                "@type": "OpeningHoursSpecification",
-                dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-                opens: "09:00",
-                closes: "18:00",
-              },
-            },
-          ],
-        }),
+        children: jsonLd(
+          buildGraph(
+            buildOrganizationSchema(),
+            buildWebSiteSchema(),
+          ),
+        ),
       },
     ],
     links: [
