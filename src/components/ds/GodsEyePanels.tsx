@@ -1,6 +1,7 @@
 import type { Intel } from "@/lib/deepscreen/intel";
 import { toneClass } from "@/lib/deepscreen/intel";
 import { ProMetricValue } from "@/components/ds/PaywallGate";
+import { formatEvEbitda } from "@/lib/deepscreen/ev-ebitda";
 import { cn } from "@/lib/utils";
 
 const fmt = (v: number | null, suffix = "") =>
@@ -251,7 +252,7 @@ export function ExtendedRatiosPanel({ intel }: { intel: Intel }) {
     ["Net margin (NPM)", fmt(r.netMargin, "%"), false],
     ["Gross margin", fmt(r.grossMargin, "%"), false],
     ["Price / cash flow", fmt(r.priceToCashFlow, "x"), false],
-    ["EV / EBITDA", fmt(r.evEbitda, "x"), true],
+    ["EV / EBITDA", r.evEbitda === null ? "N/M" : formatEvEbitda(r.evEbitda), true],
     ["Current ratio", fmt(r.currentRatio, "x"), false],
     ["Quick ratio", fmt(r.quickRatio, "x"), false],
     ["Interest coverage", fmt(r.interestCoverage, "x"), false],
