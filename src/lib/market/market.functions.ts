@@ -99,7 +99,7 @@ export const getLiveQuotes = createServerFn({ method: "POST" })
   });
 
 export const getLiveFundamentals = createServerFn({ method: "GET" })
-  .inputValidator((d: { exchange: string; symbol: string }) => d)
+  .inputValidator(marketKeyInput)
   .handler(async ({ data }): Promise<LiveFundamentals | null> => {
     const request = getRequest();
     const rate = consumeRateLimit("fundamentals:ip:" + requestClientKey(request), 60, 60_000);
@@ -117,13 +117,13 @@ export const getLiveFundamentals = createServerFn({ method: "GET" })
  * stay gentle rather than firing dozens of requests at once.
  */
 export const getLiveFundamentalsBatch = createServerFn({ method: "POST" })
-  .inputValidator((d: { keys: { exchange: string; symbol: string }[] }) => d)
+  .inputValidator(marketKeysInput)
   .handler(async ({ data }): Promise<Record<string, LiveFundamentals>> => {
     const request = getRequest();
     const rate = consumeRateLimit("fundamentals-batch:ip:" + requestClientKey(request), 20, 60_000);
     if (!rate.allowed) return {};
     const { fetchFundamentals, yahooSymbol } = await import("./yahoo.server");
-    const keys = data.keys
+    const keys = data.keys.slice(0, 100)
       .map((key) => safeMarketKey(key.exchange, key.symbol))
       .filter((key): key is { exchange: string; symbol: string } => Boolean(key))
       .slice(0, 100);
