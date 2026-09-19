@@ -1,4 +1,4 @@
-import { jsonLd } from "@/lib/seo/json-ld";
+import { buildBreadcrumbSchema, buildExchangeCollectionSchema, buildGraph, jsonLd } from "@/lib/seo/json-ld";
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 
@@ -14,6 +14,7 @@ import { CAP_LABEL } from "@/lib/deepscreen/format";
 import type { CapTier } from "@/lib/deepscreen/types";
 import { cn } from "@/lib/utils";
 import { exchangeKeywords, metaKeywords, screenerKeywords } from "@/lib/seo/keywords";
+import { MarketMovers } from "@/components/ds/MarketMovers";
 
 const TOPIC_BY_EXCHANGE: Record<string, string> = {
   NSE: "india",
@@ -60,31 +61,34 @@ export const Route = createFileRoute("/exchange/$code")({
         { name: "twitter:description", content: description },
         {
           name: "keywords",
-          content: metaKeywords(exchangeKeywords[code] ?? [], screenerKeywords),
+          content: metaKeywords(
+            [
+              `${code} stock screener`,
+              `${code} stocks`,
+              `${country} stock market`,
+              `stocks in ${country}`,
+              `${name} stocks`,
+              `${code} stock analysis`,
+              `${code} market news`,
+            ],
+            exchangeKeywords[code] ?? [],
+            screenerKeywords,
+          ),
         },
       ],
       links: [{ rel: "canonical", href: url }],
       scripts: [
         {
           type: "application/ld+json",
-          children: jsonLd({
-            "@context": "https://schema.org",
-            "@type": "CollectionPage",
-            name: title,
-            description,
-            url,
-            isPartOf: { "@type": "WebSite", name: "DeepScreen", url: "https://deepscreen.online" },
-            ...(country
-              ? { spatialCoverage: { "@type": "Country", name: country } }
-              : {}),
-            breadcrumb: {
-              "@type": "BreadcrumbList",
-              itemListElement: [
-                { "@type": "ListItem", position: 1, name: "Home", item: "https://deepscreen.online/" },
-                { "@type": "ListItem", position: 2, name: `${code} screener`, item: url },
-              ],
-            },
-          }),
+          children: jsonLd(
+            buildGraph(
+              buildExchangeCollectionSchema({ code, url }),
+              buildBreadcrumbSchema([
+                { name: "Home", url: "https://deepscreen.online/" },
+                { name: `${code} screener`, url },
+              ]),
+            ),
+          ),
         },
       ],
     };
@@ -233,6 +237,12 @@ function ExchangePage() {
         <div className="mt-6">
           <StockTable stocks={filtersActive ? filtered.slice(0, limit) : filtered.slice((page - 1) * 100, page * 100)} />
         </div>
+
+        <MarketMovers
+          stocks={all}
+          title={`${exchange.code} live market movers`}
+          exchangeLabel={`${exchange.flag} ${exchange.name}`}
+        />
 
         <section className="mt-8">
           <h2 className="text-sm font-semibold uppercase tracking-wide">Browse {exchange.code} sectors</h2>
