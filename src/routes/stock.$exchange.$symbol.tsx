@@ -275,12 +275,7 @@ function StockPage() {
           );
         })()}
 
-        <PaywallGate
-          feature="DeepScreen score, verdict, strengths & risks"
-          className="mt-5"
-          minHeight="min-h-[330px]"
-        >
-          <section className="grid items-stretch gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(300px,1fr)]">
+        <section className="mt-5 grid items-stretch gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(300px,1fr)]">
             <div className="min-w-0">
               <div className="card-hover h-full rounded-lg border border-border bg-panel p-5">
                 <div className="flex items-center justify-between">
@@ -333,8 +328,7 @@ function StockPage() {
                 </ul>
               </div>
             </div>
-          </section>
-        </PaywallGate>
+        </section>
 
         <PaywallGate
           feature="Vision &amp; Utility score and Secret Tips badges"
