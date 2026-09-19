@@ -34,6 +34,7 @@ import {
 import { cn } from "@/lib/utils";
 import { stockFaqs, stockSummary } from "@/lib/deepscreen/narrative";
 import { StockSignupPrompt } from "@/components/ds/StockSignupPrompt";
+import { WatchlistButton } from "@/components/ds/WatchlistButton";
 
 export const Route = createFileRoute("/stock/$exchange/$symbol")({
   staticData: { sitemap: true },
@@ -203,7 +204,10 @@ function StockPage() {
   if (!hasLiveFundamentals) {
     return <Shell><article className="mx-auto max-w-4xl px-4 py-10">
       <nav aria-label="Breadcrumb"><Link to="/">Home</Link> / <Link to="/exchange/$code" params={{ code: stock.exchange }}>{stock.exchange}</Link> / {stock.symbol}</nav>
-      <h1 className="mt-6 text-3xl font-bold">{stock.symbol} — {stock.name}</h1>
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-3xl font-bold">{stock.symbol} — {stock.name}</h1>
+        <WatchlistButton stock={live} />
+      </div>
       <p className="mt-5 text-muted-foreground">{stockSummary(stock)}</p>
       {quote && <p className="mt-5 text-xl">Latest available price: {formatPrice(quote.price, stock.exchange)}</p>}
       <section className="mt-6 rounded-lg border border-border p-5">
@@ -265,6 +269,9 @@ function StockPage() {
                 ? `Live · ${quote.marketState || "market"} · updated ${new Date(dataUpdatedAt).toLocaleTimeString()}`
                 : "Fetching live price…"}
             </p>
+            <div className="mt-3 flex justify-end">
+              <WatchlistButton stock={live} />
+            </div>
             {quote ? (
               <p className="num mt-0.5 text-[11px] text-muted-foreground">
                 Day {formatPrice(quote.dayLow, stock.exchange)}–
