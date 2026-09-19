@@ -1,5 +1,6 @@
 import type { LiveFundamentals } from "@/lib/market/yahoo.server";
 import type { Stock } from "@/lib/deepscreen/types";
+import type { FundamentalSources } from "@/lib/deepscreen/live-merge";
 import type { Analysis } from "@/lib/deepscreen/metrics";
 
 export interface AlertSnapshot {
@@ -61,13 +62,14 @@ export function snapshotFrom(
   stock: Stock,
   analysis: Analysis,
   fundamentals?: LiveFundamentals | null,
+  sources?: FundamentalSources,
   now = Date.now(),
 ): AlertSnapshot {
   return {
     quarter: quarterKey(new Date(now)),
     observedAt: now,
-    pe: stock.fundamentals.pe ?? analysis.metrics.find((m) => m.key === "pe")?.value ?? null,
-    roce: stock.fundamentals.roce ?? analysis.metrics.find((m) => m.key === "roce")?.value ?? null,
+    pe: sources?.pe === "live" ? stock.fundamentals.pe : null,
+    roce: sources?.roce === "live" ? stock.fundamentals.roce : null,
     totalDebt: fundamentals?.totalDebt ?? null,
     revenueGrowth: fundamentals?.revenueGrowth ?? null,
     earningsGrowth: fundamentals?.earningsGrowth ?? null,
