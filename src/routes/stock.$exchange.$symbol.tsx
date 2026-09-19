@@ -45,6 +45,10 @@ import { cn } from "@/lib/utils";
 import { stockFaqs, stockSummary } from "@/lib/deepscreen/narrative";
 import { StockSignupPrompt } from "@/components/ds/StockSignupPrompt";
 import { WatchlistButton } from "@/components/ds/WatchlistButton";
+import { FundamentalSnapshotPanel } from "@/components/ds/FundamentalSnapshotPanel";
+import { ScoreExplanationPanel } from "@/components/ds/ScoreExplanationPanel";
+import { ResearchAlertsPanel } from "@/components/ds/ResearchAlertsPanel";
+
 
 function peerExchangeCodesFor(exchange: string): string[] {
   if (exchange === "NSE" || exchange === "BSE") return ["NSE", "BSE"];
@@ -456,7 +460,22 @@ function StockPage() {
             </div>
         </section>
 
-        <PeerAnalysisPanel
+        <ScoreExplanationPanel analysis={a} />
+
+        <FundamentalSnapshotPanel
+          stock={live}
+          liveFundamentals={liveFundamentals}
+          sources={sources}
+          updatedAt={Math.max(fundUpdatedAt, screenerUpdatedAt)}
+        />
+
+        <ResearchAlertsPanel
+          stock={live}
+          analysis={a}
+          liveFundamentals={liveFundamentals}
+        />
+
+                <PeerAnalysisPanel
           stock={live}
           analysis={a}
           peers={peerRows}
