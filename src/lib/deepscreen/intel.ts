@@ -12,6 +12,7 @@
 import type { LiveFundamentals, LiveQuote } from "@/lib/market/yahoo.server";
 import type { ScreenerRatios } from "@/lib/market/screener.server";
 
+import { formatEvEbitda, isMeaningfulEvEbitda } from "./ev-ebitda";
 import type { Stock } from "./types";
 
 export type Tone = "good" | "warn" | "bad" | "info";
@@ -185,7 +186,8 @@ function computeRatios(input: IntelInput): ExtendedRatios {
     assetTurnover: r2(div(revenue, totalAssets)),
     inventoryTurnover: null,
     daysSalesInventory: null,
-    evEbitda: r2(num(f.evEbitda)),
+    // Negative/zero EV/EBITDA is not a meaningful valuation multiple.
+    evEbitda: isMeaningfulEvEbitda(f.evEbitda) ? r2(f.evEbitda) : null,
     cashConversion: r2(div(ocf, netIncome)),
   };
 }
@@ -433,7 +435,7 @@ function computeXRay(input: IntelInput, ratios: ExtendedRatios): XRayRead {
     { id: "ps", category: "Valuation", metric: "P/S", value: fmt(f.ps, "x", 2), badge: badgeFor(f.ps < 2 && f.netMargin <= 0 ? "trap" : f.ps < 2 ? "quality" : f.ps > 8 ? "destroyer" : "growth"), tone: f.ps < 2 && f.netMargin <= 0 ? "trap" : f.ps < 2 ? "quality" : f.ps > 8 ? "destroyer" : "growth", tooltip: f.ps < 2 && f.netMargin <= 0 ? "🪤 Low P/S with no margin support: cheap revenue is not the same as profitable revenue." : `P/S ${fmt(f.ps, "x", 2)} should be read with margin trajectory; receivables history is not available for channel-stuffing tests.` },
     { id: "pb", category: "Valuation", metric: "P/B", value: fmt(f.pb, "x", 2), badge: badgeFor(isAssetLight ? "info" : classifyPb()), tone: isAssetLight ? "info" : classifyPb(), tooltip: isAssetLight ? (ruleOf40 ? "ℹ️ Sector Relative: Rule of 40 is met, so high P/B is not treated as a value trap. Cash generation and growth carry more weight." : "ℹ️ Sector Relative: P/B can be structurally high for software/IP-heavy businesses; evaluate cash flow and Rule of 40 evidence instead.") : f.pb < 1 && f.roe < 10 ? "🪤 Low P/B with poor ROE: cheap for structural reasons." : `P/B ${fmt(f.pb, "x", 2)} is most useful alongside stable ROE.`, sectorRelative: isAssetLight },
     { id: "evRevenue", category: "Valuation", metric: "EV/Revenue", value: fmt(f.evRevenue, "x", 2), badge: badgeFor(f.evRevenue < (isAssetLight ? 4 : 2) ? "quality" : f.evRevenue > 10 ? "destroyer" : "growth"), tone: f.evRevenue < (isAssetLight ? 4 : 2) ? "quality" : f.evRevenue > 10 ? "destroyer" : "growth", tooltip: isAssetLight ? "Sector Relative: high EV/Revenue can be reasonable when growth and cash margins support it." : `EV/Revenue ${fmt(f.evRevenue, "x", 2)} should be read against the sector band and revenue trajectory.`, sectorRelative: isAssetLight },
-    { id: "evEbitda", category: "Valuation", metric: "EV/EBITDA", value: fmt(f.evEbitda, "x"), badge: badgeFor(isAssetLight && ruleOf40 ? "growth" : f.evEbitda < 8 ? "quality" : f.evEbitda > 20 ? "destroyer" : "growth"), tone: isAssetLight && ruleOf40 ? "growth" : f.evEbitda < 8 ? "quality" : f.evEbitda > 20 ? "destroyer" : "growth", tooltip: isAssetLight && ruleOf40 ? "🌱 Sector Relative: Rule of 40 is met, so a high EV/EBITDA multiple is not automatically a trap; verify SBC and maintenance capex." : f.evEbitda < 8 ? `✅ EV/EBITDA ${fmt(f.evEbitda, "x")} is low; maintenance capex and SBC still need checking.` : isAssetLight ? "Sector Relative: high EV/EBITDA is not automatically a trap for asset-light software." : `EV/EBITDA ${fmt(f.evEbitda, "x")} should be stress-tested for maintenance capex and SBC.`, sectorRelative: isAssetLight },
+    { id: "evEbitda", category: "Valuation", metric: "EV/EBITDA", value: isMeaningfulEvEbitda(f.evEbitda) ? formatEvEbitda(f.evEbitda) : "N/M", badge: isMeaningfulEvEbitda(f.evEbitda) ? badgeFor(isAssetLight && ruleOf40 ? "growth" : f.evEbitda < 8 ? "quality" : f.evEbitda > 20 ? "destroyer" : "growth") : badgeFor("info"), tone: isMeaningfulEvEbitda(f.evEbitda) ? (isAssetLight && ruleOf40 ? "growth" : f.evEbitda < 8 ? "quality" : f.evEbitda > 20 ? "destroyer" : "growth") : "info", tooltip: !isMeaningfulEvEbitda(f.evEbitda) ? "EV/EBITDA is not meaningful here because the multiple is non-positive. Negative values are not a cheap valuation signal; review enterprise value, EBITDA and free cash flow separately." : isAssetLight && ruleOf40 ? "🌱 Sector Relative: Rule of 40 is met, so a high EV/EBITDA multiple is not automatically a trap; verify SBC and maintenance capex." : f.evEbitda < 8 ? `EV/EBITDA ${formatEvEbitda(f.evEbitda)} is a lower positive multiple; maintenance capex and SBC still need checking.` : isAssetLight ? "Sector Relative: high EV/EBITDA is not automatically a trap for asset-light software." : `EV/EBITDA ${formatEvEbitda(f.evEbitda)} should be stress-tested for maintenance capex and SBC.`, sectorRelative: isAssetLight },
     { id: "peg", category: "Valuation", metric: "PEG", value: fmt(f.peg, "x", 2), badge: badgeFor(f.peg < 1 && (revenueGrowth ?? f.growth) <= 0 ? "trap" : f.peg > 2 && f.growth < 10 ? "destroyer" : f.peg < 1.2 && f.roce > WACC_BENCHMARK ? "quality" : "growth"), tone: f.peg < 1 && (revenueGrowth ?? f.growth) <= 0 ? "trap" : f.peg > 2 && f.growth < 10 ? "destroyer" : f.peg < 1.2 && f.roce > WACC_BENCHMARK ? "quality" : "growth", tooltip: f.peg < 1 && (revenueGrowth ?? f.growth) <= 0 ? "🪤 Trailing Growth Deception: PEG looks attractive while current revenue growth is flat/negative. A true 3-year CAGR test needs historical revenue data." : `PEG ${fmt(f.peg, "x", 2)} should be checked against multi-year growth, not one period.` },
     { id: "de", category: "Solvency", metric: "Debt / Equity", value: isBank ? "Excluded" : fmt(f.debtToEquity, "x", 2), badge: badgeFor(classifyDebt()), tone: classifyDebt(), tooltip: isBank ? "Sector Relative: standard D/E is suppressed for banks; use Tier 1 capital and NPA trends." : f.debtToEquity > 1.5 ? "🚩 High leverage: check whether debt funds productive capex or operating cash gaps." : "D/E is most useful alongside interest coverage and ROCE.", sectorRelative: isBank },
     { id: "payout", category: "Capital Allocation", metric: isReitInfra ? "Payout Ratio" : "Payout Ratio", value: fmt(f.payoutRatio, "%", 0), badge: badgeFor(isReitInfra ? "growth" : f.payoutRatio > 100 ? "destroyer" : f.payoutRatio <= 20 ? "growth" : f.payoutRatio <= 60 ? "quality" : "engineering"), tone: isReitInfra ? "info" : f.payoutRatio > 100 ? "destroyer" : f.payoutRatio <= 20 ? "growth" : f.payoutRatio <= 60 ? "quality" : "engineering", tooltip: isReitInfra ? "Sector Relative: verify dividend safety using FFO/AFFO payout instead of EPS payout." : f.payoutRatio > 100 ? "🚩 Payout above 100%: earnings coverage is broken; FCF coverage still needs verification." : f.payoutRatio <= 20 ? "🌱 Low payout leaves most earnings available for reinvestment." : "✅ Moderate payout leaves room for reinvestment.", sectorRelative: isReitInfra },
@@ -446,7 +448,7 @@ function computeXRay(input: IntelInput, ratios: ExtendedRatios): XRayRead {
   if (!isReitInfra && f.payoutRatio <= 100 && live?.freeCashflow != null && live.freeCashflow < 0) warnings.push({ id: "negative-fcf-payout", tone: "warn", message: "⚠️ Dividend coverage mismatch: the earnings payout ratio looks contained, but free cash flow is negative. Recheck the cash funding of distributions." });
   if (isBank) warnings.push({ id: "bank-rules", tone: "info", message: "ℹ️ Sector Relative: bank D/E and standard asset-turnover penalties are suppressed; review Tier 1 capital, NPA trends and P/B vs ROA." });
   else if (isReitInfra) warnings.push({ id: "reit-rules", tone: "info", message: "ℹ️ Sector Relative: P/E and EPS payout are suppressed; review Price/FFO and FFO/AFFO payout where available." });
-  else if (isAssetLight) warnings.push({ id: "asset-light-rules", tone: "info", message: "ℹ️ Sector Relative: high P/B or EV/EBITDA is not automatically a trap for asset-light software; cash flow and Rule of 40 evidence matter more." });
+  else if (isAssetLight) warnings.push({ id: "asset-light-rules", tone: "info", message: "ℹ️ Sector Relative: high P/B or a positive EV/EBITDA multiple is not automatically a trap for asset-light software; cash flow and Rule of 40 evidence matter more." });
   else if (isCyclical) warnings.push({ id: "cyclical-rules", tone: "info", message: "ℹ️ Sector Relative: cyclical P/E is read in reverse — unusually low P/E can coincide with peak earnings." });
   if (stock.exchange === "LSE") warnings.push({ id: "accounting-standards", tone: "info", message: "ℹ️ Data-source note: IFRS, lease treatment and reporting definitions can distort direct comparisons with GAAP-based markets." });
   warnings.push({ id: "exec-comp-data", tone: "info", message: "ℹ️ Executive-compensation test: the current provider exposes officer names/titles but not bonus formulas, EPS hurdles or ROIC hurdles, so no incentive trap is inferred." });
@@ -555,12 +557,12 @@ function computeBadges(input: IntelInput, ratios: ExtendedRatios, vision: Vision
     );
   }
 
-  // 16. EV/EBITDA
-  if (ratios.evEbitda !== null) {
+  // 16. EV/EBITDA — only positive, interpretable multiples are classified.
+  if (isMeaningfulEvEbitda(ratios.evEbitda)) {
     if (ratios.evEbitda < 10)
-      add("ev-ebitda-good", "🟢 Healthy EV/EBITDA", "good", `${ratios.evEbitda.toFixed(1)}x operating profit — undemanding pricing.`);
+      add("ev-ebitda-good", "🟢 Low EV/EBITDA", "good", `${formatEvEbitda(ratios.evEbitda)} operating profit — lower positive multiple; verify business quality and cash needs.`);
     else if (ratios.evEbitda > 15)
-      add("ev-ebitda-rich", "🔴 Premium growth pricing", "warn", `${ratios.evEbitda.toFixed(1)}x operating profit — the price already assumes strong growth.`);
+      add("ev-ebitda-rich", "🔴 Premium EV/EBITDA", "warn", `${formatEvEbitda(ratios.evEbitda)} operating profit — the valuation assumes stronger economics.`);
   }
 
   // 17. Quality of earnings
