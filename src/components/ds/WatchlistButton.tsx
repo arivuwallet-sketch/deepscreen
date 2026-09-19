@@ -54,7 +54,7 @@ export function WatchlistButton({ stock }: { stock: Stock }) {
         return;
       }
       setTracked(false);
-      toast.success(`${stock.symbol} removed from your wishlist`);
+      toast.success(`${stock.symbol} removed from My Stocks`);
       return;
     }
     const { error } = await supabase.from("watchlist").insert({
@@ -69,7 +69,7 @@ export function WatchlistButton({ stock }: { stock: Stock }) {
       return;
     }
     setTracked(true);
-    toast.success(`${stock.symbol} added to your wishlist`);
+    toast.success(`${stock.symbol} added to My Stocks`);
   }
 
   return (
@@ -81,7 +81,7 @@ export function WatchlistButton({ stock }: { stock: Stock }) {
       disabled={busy || loading}
     >
       <Heart className={tracked ? "size-4 fill-current text-primary" : "size-4"} />
-      {tracked ? "In wishlist" : "Add to wishlist"}
+      {tracked ? "In My Stocks" : "Add to My Stocks"}
     </Button>
   );
 }
