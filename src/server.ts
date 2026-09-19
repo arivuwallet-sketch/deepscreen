@@ -8,7 +8,7 @@ const SECURITY_HEADERS: Record<string, string> = {
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "DENY",
   "Referrer-Policy": "strict-origin-when-cross-origin",
-  "Permissions-Policy": "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()",
+  "Permissions-Policy": "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), usb=()",
   "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
   "Cross-Origin-Resource-Policy": "same-site",
   "Origin-Agent-Cluster": "?1",
@@ -47,6 +47,7 @@ function withSecurityHeaders(response: Response, request: Request): Response {
   if (
     pathname === "/auth" ||
     pathname === "/portfolio" ||
+    pathname === "/pricing" ||
     pathname === "/api/public/cashfree-webhook"
   ) {
     headers.set("Cache-Control", "no-store, max-age=0");
