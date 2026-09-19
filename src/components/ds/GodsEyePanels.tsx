@@ -120,6 +120,23 @@ export function SecretTipsPanel({ intel }: { intel: Intel }) {
         </div>
       ) : null}
 
+      {(() => {
+        const suppressed = new Set(["value-creator", "wealth-destroyer", "ev-rev", "ev-ebitda-good", "ev-ebitda-rich", "roe-trap", "pure-quality", "paper-profits"]);
+        const uniqueFlags = intel.badges.filter((badge) => !suppressed.has(badge.id));
+        if (uniqueFlags.length === 0) return null;
+        return (
+          <div className="mt-5 border-t border-border pt-4">
+            <h3 className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Additional pattern flags</h3>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {uniqueFlags.map((badge) => (
+                <span key={badge.id} title={badge.tooltip} className={cn("num cursor-help rounded border px-2.5 py-1 text-[11px] font-medium", toneClass[badge.tone])}>
+                  {badge.label}
+                </span>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
         {grouped.map(({ category, cards }) => (
           <div key={category} className="min-w-0">
