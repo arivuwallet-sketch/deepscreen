@@ -469,6 +469,8 @@ async function fetchForexFactoryCalendar(): Promise<LiveEvent[]> {
 
 export const getEconomicEvents = createServerFn({ method: "GET" }).handler(
   async (): Promise<LiveEvent[]> => {
+    const rate = consumeRateLimit("calendar:ip:" + requestClientKey(getRequest()), 30, 60_000);
+    if (!rate.allowed) return calendarCache?.data ?? [];
     const fresh = calendarCache && Date.now() - calendarCache.fetchedAt < CACHE_TTL_MS;
     if (fresh) return calendarCache!.data;
 
@@ -599,6 +601,8 @@ const AAA_CACHE_TTL_MS = 12 * 60 * 60_000; // 12h — this moves slowly; no need
  */
 export const getAaaBondYield = createServerFn({ method: "GET" }).handler(
   async (): Promise<number> => {
+    const rate = consumeRateLimit("aaa-yield:ip:" + requestClientKey(getRequest()), 30, 60_000);
+    if (!rate.allowed) return aaaYieldCache?.value ?? 5.0;
     if (aaaYieldCache && Date.now() - aaaYieldCache.fetchedAt < AAA_CACHE_TTL_MS) {
       return aaaYieldCache.value;
     }
@@ -786,6 +790,8 @@ export const getScreenerRatiosBatch = createServerFn({ method: "POST" })
 
 /** Live IPO pipeline across NSE, BSE, NYSE, NASDAQ and LSE. */
 export const getLiveIpos = createServerFn({ method: "GET" }).handler(async () => {
+  const rate = consumeRateLimit("ipo:ip:" + requestClientKey(getRequest()), 20, 60_000);
+  if (!rate.allowed) return [];
   const { fetchLiveIpos } = await import("./ipo.server");
   return fetchLiveIpos();
 });
