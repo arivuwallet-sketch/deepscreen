@@ -79,7 +79,23 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
       meta: [
         { title },
         { name: "description", content: description },
-      { name: "keywords", content: metaKeywords(stocksKeywords, learnKeywords) },
+      {
+          name: "keywords",
+          content: metaKeywords(
+            [
+              `${s.name} stock`,
+              `${s.symbol} share price`,
+              `${s.symbol} stock analysis`,
+              `${s.symbol} fundamentals`,
+              `${s.symbol} valuation`,
+              `${s.symbol} financials`,
+              `${s.symbol} news`,
+              `${s.exchange} ${s.symbol}`,
+            ],
+            stocksKeywords,
+            learnKeywords,
+          ),
+        },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:url", content: url },
