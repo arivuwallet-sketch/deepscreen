@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { Shell } from "@/components/ds/Shell";
 import { TopicIndex } from "@/components/ds/TopicIndex";
 import { learnKeywords, metaKeywords, stocksKeywords } from "@/lib/seo/keywords";
-import { LiveNewsFeed, YahooNewsFeed } from "@/components/ds/LiveNewsFeed";
+import { LiveNewsFeed } from "@/components/ds/LiveNewsFeed";
 import { DcfCalculator } from "@/components/ds/DcfCalculator";
 import { GrahamCalculator } from "@/components/ds/GrahamCalculator";
 import { PaywallGate, ProMetricValue } from "@/components/ds/PaywallGate";
@@ -632,11 +632,6 @@ function StockPage() {
             <LiveNewsFeed
               query={newsSearchQuery(stock.name, stock.symbol)}
               title={`${stock.symbol} live news`}
-              limit={10}
-            />
-            <YahooNewsFeed
-              query={newsSearchQuery(stock.name, stock.symbol)}
-              title={`${stock.symbol} · Yahoo Finance News`}
               limit={10}
             />
           </div>
