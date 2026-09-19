@@ -5,7 +5,7 @@ import { resourceHead } from "@/lib/seo/discovery";
 
 export const Route = createFileRoute("/press")({
   staticData: { sitemap: true },
-  head: () => resourceHead("/press", "DeepScreen Press & Research Resources", "A factual overview of DeepScreen, its supported markets and resources for journalists and educators.", ["DeepScreen press", "stock research resources", "DeepScreen media"]),
+  head: () => resourceHead("/press", "DeepScreen Press & Research Resources", "A factual overview of DeepScreen, its supported markets and resources for journalists and educators.", ["DeepScreen press", "DeepScreen media", "stock research resources", "financial research platform", "fundamental analysis platform", "stock screening platform", "stock market research tools", "investment research tools"]),
   component: Press,
 });
 
