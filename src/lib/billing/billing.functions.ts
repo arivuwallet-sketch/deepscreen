@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
+import { z } from "zod";
 
 import type { Database } from "@/integrations/supabase/types";
 import { PLANS, type Tier } from "@/hooks/useSubscription";
@@ -8,6 +9,17 @@ import { getPhoneCountry, validatePhoneNumber } from "@/lib/billing/phone";
 import { consumeRateLimit, isValidOrderId, PUBLIC_APP_ORIGIN, requestClientKey } from "@/lib/security";
 
 type Fail = { ok: false; error: string };
+
+const checkoutInput = z.object({
+  tier: z.enum(["weekly", "monthly", "annual"]),
+  countryIso2: z.string().length(2),
+  phone: z.string().min(3).max(32),
+}).strict();
+
+const confirmInput = z.object({
+  orderId: z.string().min(1).max(64),
+}).strict();
+
 
 async function verifyRequestUser(request: Request) {
   const auth = request.headers.get("authorization");
@@ -29,7 +41,7 @@ async function verifyRequestUser(request: Request) {
  * only granted once Cashfree confirms the payment (webhook or confirmCheckout).
  */
 export const createCheckout = createServerFn({ method: "POST" })
-  .inputValidator((d: { tier: Tier; countryIso2: string; phone: string }) => d)
+  .inputValidator(checkoutInput)
   .handler(
     async ({
       data,
@@ -111,7 +123,7 @@ export const createCheckout = createServerFn({ method: "POST" })
 
 /** Called when the user returns from Cashfree: re-checks the order server-side. */
 export const confirmCheckout = createServerFn({ method: "POST" })
-  .inputValidator((d: { orderId: string }) => d)
+  .inputValidator(confirmInput)
   .handler(async ({ data }): Promise<{ ok: true; paid: boolean; status: string } | Fail> => {
     if (!isValidOrderId(data.orderId)) return { ok: false, error: "Invalid order." };
     const request = getRequest();
