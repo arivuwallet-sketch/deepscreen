@@ -77,11 +77,11 @@ export function Shell({ children }: { children: ReactNode }) {
           <Link to="/contact" className="hover:text-foreground">Contact Us</Link>
           <Link to="/about" className="hover:text-foreground">About</Link>
           <Link to="/methodology" className="hover:text-foreground">Methodology</Link>
-          <a href="/answers" className="hover:text-foreground">Answers</a>
-          <a href="/research-checklist" className="hover:text-foreground">Research checklist</a>
-          <a href="/data-sources" className="hover:text-foreground">Data sources</a>
-          <a href="/developers" className="hover:text-foreground">Developers</a>
-          <a href="/press" className="hover:text-foreground">Press</a>
+          <Link to="/answers" className="hover:text-foreground">Answers</Link>
+          <Link to="/research-checklist" className="hover:text-foreground">Research checklist</Link>
+          <Link to="/data-sources" className="hover:text-foreground">Data sources</Link>
+          <Link to="/developers" className="hover:text-foreground">Developers</Link>
+          <Link to="/press" className="hover:text-foreground">Press</Link>
           <Link to="/terms" className="hover:text-foreground">Terms of Service</Link>
           <Link to="/privacy" className="hover:text-foreground">Privacy Policy</Link>
           <Link to="/refund-policy" className="hover:text-foreground">Refund Policy</Link>
