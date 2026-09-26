@@ -67,17 +67,37 @@ export function buildOrganizationSchema(): JsonLdNode {
     "@type": "Organization",
     "@id": `${SITE_URL}/#organization`,
     name: SITE_NAME,
+    alternateName: ["DeepScreen Stock Research", "DeepScreen Stock Screener"],
     url: SITE_URL,
     logo: {
       "@type": "ImageObject",
       url: LOGO_URL,
     },
     description:
-      "Stock screener and fundamental-analysis platform covering NSE, BSE, NYSE, Nasdaq and LSE listings.",
+      "Beginner-first stock research and financial-analysis platform covering supported listings across NSE, BSE, NYSE, Nasdaq and LSE. DeepScreen explains financial ratios, highlights potential traps and research questions, and documents the limits of its data and models.",
     founder: {
       "@type": "Person",
       name: "Sooraj",
     },
+    email: "deepscreen.online@outlook.com",
+    areaServed: ["IN", "US", "GB"],
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer support",
+      email: "deepscreen.online@outlook.com",
+      availableLanguage: ["en"],
+    },
+    knowsAbout: [
+      "stock research",
+      "fundamental analysis",
+      "financial ratios",
+      "valuation",
+      "accounting risk",
+      "earnings quality",
+      "cash flow analysis",
+      "debt and leverage analysis",
+      "beginner investing education",
+    ],
     // Add once you have real public profile URLs (X/LinkedIn/GitHub/etc.) —
     // sameAs is one of the stronger signals for entity disambiguation:
     // sameAs: ["https://x.com/...", "https://linkedin.com/company/..."],
@@ -104,6 +124,19 @@ export function buildWebSiteSchema(): JsonLdNode {
     url: SITE_URL,
     publisher: { "@id": `${SITE_URL}/#organization` },
     inLanguage: "en",
+    alternateName: "DeepScreen Stock Research",
+    description:
+      "The official DeepScreen website for beginner-first stock research, financial-ratio explanations, accounting-risk checks and fundamental analysis across supported Indian, US and UK listings.",
+    about: { "@id": `${SITE_URL}/#organization` },
+    keywords: [
+      "DeepScreen",
+      "DeepScreen Stock Research",
+      "stock research for beginners",
+      "fundamental analysis",
+      "financial ratios",
+      "accounting traps",
+      "stock screener",
+    ],
     // Uncomment once a query-string-driven search page exists:
     // potentialAction: {
     //   "@type": "SearchAction",
@@ -128,12 +161,19 @@ export interface BreadcrumbItem {
 export function buildWebApplicationSchema(app: WebApplicationFacts): JsonLdNode {
   return {
     "@type": "WebApplication",
+    "@id": `${app.url}#application`,
     name: app.name,
+    alternateName: ["DeepScreen Stock Research", "DeepScreen Stock Screener"],
     url: app.url,
     applicationCategory: "FinanceApplication",
     operatingSystem: "Web browser",
+    brand: { "@id": `${SITE_URL}/#organization` },
     publisher: { "@id": `${SITE_URL}/#organization` },
     description: app.description,
+    audience: {
+      "@type": "Audience",
+      audienceType: "Beginner investors and people learning fundamental stock research",
+    },
     ...(app.featureList?.length ? { featureList: app.featureList } : {}),
   };
 }
