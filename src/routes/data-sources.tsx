@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
 import { resourceHead } from "@/lib/seo/discovery";
 export const Route = createFileRoute("/data-sources")({
