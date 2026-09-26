@@ -45,7 +45,7 @@ function Answers() {
         <section className="rounded-lg border border-border p-5">
           <h2 className="font-semibold">More research resources</h2>
           <p className="mt-2 text-sm text-muted-foreground">Review the methodology, source notes and printable checklist before relying on any research output.</p>
-          <div className="mt-3 flex flex-wrap gap-5 text-sm text-primary"><a href="/research-checklist">Research checklist</a><a href="/methodology">Methodology</a><a href="/contact">Contact the team</a></div>
+          <div className="mt-3 flex flex-wrap gap-5 text-sm text-primary"><Link to="/research-checklist">Research checklist</Link><a href="/methodology">Methodology</a><a href="/contact">Contact the team</a></div>
         </section>
       </article>
     </Shell>
