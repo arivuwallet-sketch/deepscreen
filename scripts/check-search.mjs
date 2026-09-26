@@ -61,6 +61,23 @@ try {
   const auth = await get('/auth');
   assert.match(await auth.text(), /noindex, follow/);
   console.log('PASS account page noindex');
+  const footerPages = ['/contact', '/about', '/methodology', '/answers', '/research-checklist', '/data-sources', '/developers', '/press', '/terms', '/privacy', '/refund-policy'];
+  for (const path of footerPages) {
+    const response = await get(path);
+    assert.equal(response.status, 200, path);
+    const pageHtml = await response.text();
+    for (const match of pageHtml.matchAll(/(?:href|to)="(\/[^"]+)"/g)) {
+      const target = match[1];
+      if (/^\/(?:api|sitemaps\/)/.test(target) || target === '/sitemap.xml' || target === '/openapi.json' || target.endsWith('.txt') || target.endsWith('.ssml')) continue;
+      const targetResponse = await get(target, { redirect: 'manual' });
+      assert.ok(targetResponse.status < 500, `${path} -> ${target} returned ${targetResponse.status}`);
+    }
+  }
+  const peRatio = await get('/learn/pe-ratio', { redirect: 'manual' });
+  assert.equal(peRatio.status, 308);
+  assert.equal(new URL(peRatio.headers.get('location'), origin).pathname, '/learn/pe-ratio-explained');
+  console.log('PASS footer destination crawl and legacy P/E URL compatibility');
+
 } finally {
   server?.kill('SIGTERM');
 }
