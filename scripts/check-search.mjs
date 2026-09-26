@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 
@@ -62,7 +63,13 @@ try {
   const auth = await get('/auth');
   assert.match(await auth.text(), /noindex, follow/);
   console.log('PASS account page noindex');
-  const footerPages = ['/contact', '/about', '/methodology', '/answers', '/research-checklist', '/data-sources', '/developers', '/press', '/terms', '/privacy', '/refund-policy'];
+  const auditPaths = JSON.parse(await readFile(new URL('../tests/semrush-error-paths.json', import.meta.url), 'utf8'));
+  for (const path of auditPaths) {
+    const response = await get(path);
+    assert.equal(response.status, 200, `Semrush error URL: ${path}`);
+  }
+  console.log(`PASS all ${auditPaths.length} error URLs from the 2026-09-26 Semrush export`);
+  const footerPages = ['/', '/learn', '/ratios', '/contact', '/about', '/methodology', '/answers', '/research-checklist', '/data-sources', '/developers', '/press', '/terms', '/privacy', '/refund-policy'];
   const checkedTargets = new Set();
   for (const path of footerPages) {
     const response = await get(path);
@@ -80,7 +87,7 @@ try {
   const peRatio = await get('/learn/pe-ratio', { redirect: 'manual' });
   assert.equal(peRatio.status, 308);
   assert.equal(new URL(peRatio.headers.get('location'), origin).pathname, '/learn/pe-ratio-explained');
-  console.log('PASS footer destination crawl and legacy P/E URL compatibility');
+  console.log('PASS audit-source and footer destination crawl, plus legacy P/E URL compatibility');
 
 } finally {
   server?.kill('SIGTERM');

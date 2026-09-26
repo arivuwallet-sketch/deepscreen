@@ -30,6 +30,7 @@ import { Route as ResearchChecklistRouteImport } from './routes/research-checkli
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as BestSlugRouteImport } from './routes/best.$slug'
+import { Route as CompareIndexRouteImport } from './routes/compare.index'
 import { Route as CompareSlugRouteImport } from './routes/compare.$slug'
 import { Route as ExchangeCodeRouteImport } from './routes/exchange.$code'
 import { Route as LearnIndexRouteImport } from './routes/learn.index'
@@ -150,6 +151,11 @@ const BestSlugRoute = BestSlugRouteImport.update({
   path: '/best/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CompareIndexRoute = CompareIndexRouteImport.update({
+  id: '/compare/',
+  path: '/compare/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CompareSlugRoute = CompareSlugRouteImport.update({
   id: '/compare/$slug',
   path: '/compare/$slug',
@@ -252,6 +258,7 @@ export interface FileRoutesByFullPath {
   '/options/$slug': typeof OptionsSlugRoute
   '/ratios/$slug': typeof RatiosSlugRoute
   '/sitemaps/{$name}.xml': typeof SitemapsChar123nameChar125DotxmlRoute
+  '/compare/': typeof CompareIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/options/': typeof OptionsIndexRoute
   '/ratios/': typeof RatiosIndexRoute
@@ -289,6 +296,7 @@ export interface FileRoutesByTo {
   '/options/$slug': typeof OptionsSlugRoute
   '/ratios/$slug': typeof RatiosSlugRoute
   '/sitemaps/{$name}.xml': typeof SitemapsChar123nameChar125DotxmlRoute
+  '/compare': typeof CompareIndexRoute
   '/learn': typeof LearnIndexRoute
   '/options': typeof OptionsIndexRoute
   '/ratios': typeof RatiosIndexRoute
@@ -327,6 +335,7 @@ export interface FileRoutesById {
   '/options/$slug': typeof OptionsSlugRoute
   '/ratios/$slug': typeof RatiosSlugRoute
   '/sitemaps/{$name}.xml': typeof SitemapsChar123nameChar125DotxmlRoute
+  '/compare/': typeof CompareIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/options/': typeof OptionsIndexRoute
   '/ratios/': typeof RatiosIndexRoute
@@ -366,6 +375,7 @@ export interface FileRouteTypes {
     | '/options/$slug'
     | '/ratios/$slug'
     | '/sitemaps/{$name}.xml'
+    | '/compare/'
     | '/learn/'
     | '/options/'
     | '/ratios/'
@@ -403,6 +413,7 @@ export interface FileRouteTypes {
     | '/options/$slug'
     | '/ratios/$slug'
     | '/sitemaps/{$name}.xml'
+    | '/compare'
     | '/learn'
     | '/options'
     | '/ratios'
@@ -440,6 +451,7 @@ export interface FileRouteTypes {
     | '/options/$slug'
     | '/ratios/$slug'
     | '/sitemaps/{$name}.xml'
+    | '/compare/'
     | '/learn/'
     | '/options/'
     | '/ratios/'
@@ -478,6 +490,7 @@ export interface RootRouteChildren {
   OptionsSlugRoute: typeof OptionsSlugRoute
   RatiosSlugRoute: typeof RatiosSlugRoute
   SitemapsChar123nameChar125DotxmlRoute: typeof SitemapsChar123nameChar125DotxmlRoute
+  CompareIndexRoute: typeof CompareIndexRoute
   LearnIndexRoute: typeof LearnIndexRoute
   OptionsIndexRoute: typeof OptionsIndexRoute
   RatiosIndexRoute: typeof RatiosIndexRoute
@@ -636,6 +649,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BestSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/compare/': {
+      id: '/compare/'
+      path: '/compare'
+      fullPath: '/compare/'
+      preLoaderRoute: typeof CompareIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/compare/$slug': {
       id: '/compare/$slug'
       path: '/compare/$slug'
@@ -766,6 +786,7 @@ const rootRouteChildren: RootRouteChildren = {
   OptionsSlugRoute: OptionsSlugRoute,
   RatiosSlugRoute: RatiosSlugRoute,
   SitemapsChar123nameChar125DotxmlRoute: SitemapsChar123nameChar125DotxmlRoute,
+  CompareIndexRoute: CompareIndexRoute,
   LearnIndexRoute: LearnIndexRoute,
   OptionsIndexRoute: OptionsIndexRoute,
   RatiosIndexRoute: RatiosIndexRoute,
