@@ -49,6 +49,13 @@ export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     const canonical = canonicalRedirect(request);
     if (canonical) return canonical;
+
+    // Keep the historical P/E ratio URL working even if a deployment has a
+    // stale generated route manifest. The guide is the canonical P/E resource.
+    const pathname = new URL(request.url).pathname;
+    if (request.method === "GET" && pathname === "/learn/pe-ratio") {
+      return Response.redirect(new URL("/learn/pe-ratio-explained", request.url), 308);
+    }
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
