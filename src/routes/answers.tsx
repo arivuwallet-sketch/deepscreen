@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
 import { AnswerList } from "@/components/ds/AnswerList";
 import { ANSWERS, ANSWERS_REVIEWED } from "@/lib/discovery/answers";
@@ -36,9 +36,9 @@ function Answers() {
             data sources and limitations explain how to interpret the information.
           </p>
           <div className="mt-3 flex flex-wrap gap-5 text-sm">
-            <a href="/llms.txt" className="text-primary hover:underline">AI-readable site index</a>
-            <a href="/llms-full.txt" className="text-primary hover:underline">AI-readable research context</a>
-            <a href="/sitemap.xml" className="text-primary hover:underline">Complete public URL sitemap</a>
+            <Link to="/llms.txt" className="text-primary hover:underline">AI-readable site index</Link>
+            <Link to="/llms-full.txt" className="text-primary hover:underline">AI-readable research context</Link>
+            <Link to="/sitemap.xml" className="text-primary hover:underline">Complete public URL sitemap</Link>
           </div>
         </section>
 
