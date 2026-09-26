@@ -9,6 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AnswersSsmlRouteImport } from './routes/answers[.]ssml'
+import { Route as OpenapiJsonRouteImport } from './routes/openapi[.]json'
+import { Route as DevelopersRouteImport } from './routes/developers'
+import { Route as DataSourcesRouteImport } from './routes/data-sources'
+import { Route as PressRouteImport } from './routes/press'
+import { Route as ResearchChecklistRouteImport } from './routes/research-checklist'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -37,6 +43,36 @@ import { Route as ApiPublicCashfreeWebhookRouteImport } from './routes/api/publi
 import { Route as SectorExchangeSectorRouteImport } from './routes/sector.$exchange.$sector'
 import { Route as StockExchangeSymbolRouteImport } from './routes/stock.$exchange.$symbol'
 
+const AnswersSsmlRoute = AnswersSsmlRouteImport.update({
+  id: '/answers.ssml',
+  path: '/answers.ssml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OpenapiJsonRoute = OpenapiJsonRouteImport.update({
+  id: '/openapi.json',
+  path: '/openapi.json',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevelopersRoute = DevelopersRouteImport.update({
+  id: '/developers',
+  path: '/developers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DataSourcesRoute = DataSourcesRouteImport.update({
+  id: '/data-sources',
+  path: '/data-sources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PressRoute = PressRouteImport.update({
+  id: '/press',
+  path: '/press',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResearchChecklistRoute = ResearchChecklistRouteImport.update({
+  id: '/research-checklist',
+  path: '/research-checklist',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -176,6 +212,12 @@ const StockExchangeSymbolRoute = StockExchangeSymbolRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/answers.ssml': typeof AnswersSsmlRoute
+  '/openapi.json': typeof OpenapiJsonRoute
+  '/developers': typeof DevelopersRoute
+  '/data-sources': typeof DataSourcesRoute
+  '/press': typeof PressRoute
+  '/research-checklist': typeof ResearchChecklistRoute
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
@@ -205,6 +247,12 @@ export interface FileRoutesByFullPath {
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
 }
 export interface FileRoutesByTo {
+  '/answers.ssml': typeof AnswersSsmlRoute
+  '/openapi.json': typeof OpenapiJsonRoute
+  '/developers': typeof DevelopersRoute
+  '/data-sources': typeof DataSourcesRoute
+  '/press': typeof PressRoute
+  '/research-checklist': typeof ResearchChecklistRoute
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
@@ -234,6 +282,12 @@ export interface FileRoutesByTo {
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
 }
 export interface FileRoutesById {
+  '/answers.ssml': typeof AnswersSsmlRoute
+  '/openapi.json': typeof OpenapiJsonRoute
+  '/developers': typeof DevelopersRoute
+  '/data-sources': typeof DataSourcesRoute
+  '/press': typeof PressRoute
+  '/research-checklist': typeof ResearchChecklistRoute
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
@@ -266,6 +320,12 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/answers.ssml'
+    | '/openapi.json'
+    | '/developers'
+    | '/data-sources'
+    | '/press'
+    | '/research-checklist'
     | '/'
     | '/about'
     | '/auth'
@@ -295,6 +355,12 @@ export interface FileRouteTypes {
     | '/stock/$exchange/$symbol'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/answers.ssml'
+    | '/openapi.json'
+    | '/developers'
+    | '/data-sources'
+    | '/press'
+    | '/research-checklist'
     | '/'
     | '/about'
     | '/auth'
@@ -323,6 +389,12 @@ export interface FileRouteTypes {
     | '/sector/$exchange/$sector'
     | '/stock/$exchange/$symbol'
   id:
+    | '/answers.ssml'
+    | '/openapi.json'
+    | '/developers'
+    | '/data-sources'
+    | '/press'
+    | '/research-checklist'
     | '__root__'
     | '/'
     | '/about'
@@ -354,6 +426,12 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  AnswersSsmlRoute: typeof AnswersSsmlRoute
+  OpenapiJsonRoute: typeof OpenapiJsonRoute
+  DevelopersRoute: typeof DevelopersRoute
+  DataSourcesRoute: typeof DataSourcesRoute
+  PressRoute: typeof PressRoute
+  ResearchChecklistRoute: typeof ResearchChecklistRoute
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
@@ -385,6 +463,48 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/answers.ssml': {
+      id: '/answers.ssml'
+      path: '/answers.ssml'
+      fullPath: '/answers.ssml'
+      preLoaderRoute: typeof AnswersSsmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/openapi.json': {
+      id: '/openapi.json'
+      path: '/openapi.json'
+      fullPath: '/openapi.json'
+      preLoaderRoute: typeof OpenapiJsonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/developers': {
+      id: '/developers'
+      path: '/developers'
+      fullPath: '/developers'
+      preLoaderRoute: typeof DevelopersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/data-sources': {
+      id: '/data-sources'
+      path: '/data-sources'
+      fullPath: '/data-sources'
+      preLoaderRoute: typeof DataSourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/press': {
+      id: '/press'
+      path: '/press'
+      fullPath: '/press'
+      preLoaderRoute: typeof PressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/research-checklist': {
+      id: '/research-checklist'
+      path: '/research-checklist'
+      fullPath: '/research-checklist'
+      preLoaderRoute: typeof ResearchChecklistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -578,6 +698,12 @@ declare module '@tanstack/react-router' {
 }
 
 const rootRouteChildren: RootRouteChildren = {
+  AnswersSsmlRoute: AnswersSsmlRoute,
+  OpenapiJsonRoute: OpenapiJsonRoute,
+  DevelopersRoute: DevelopersRoute,
+  DataSourcesRoute: DataSourcesRoute,
+  PressRoute: PressRoute,
+  ResearchChecklistRoute: ResearchChecklistRoute,
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
