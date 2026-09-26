@@ -19,7 +19,7 @@ try {
   const home = await get('/');
   assert.equal(home.status, 200);
   const html = await home.text();
-  assert.match(html, /Global stock screening across five exchanges/);
+  assert.match(html, /Understand stocks before you trust the numbers/);
   assert.ok(!html.includes('SearchAction'));
   assert.ok(!html.includes('Highest-scoring companies globally'));
   const jsonScripts = [...html.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)];
@@ -38,6 +38,7 @@ try {
     assert.match(response.headers.get('content-type'), /xml/);
     const xml = await response.text();
     assert.ok(!xml.includes('/ratios/pe-ratio'));
+    assert.ok(!xml.includes('/learn/pe-ratio</loc>'));
     assert.ok(!xml.includes('/options-strategy/'));
     urls += [...xml.matchAll(/<url>/g)].length;
   }
@@ -45,7 +46,7 @@ try {
   assert.equal((await get('/sitemaps/unknown.xml')).status, 404);
   console.log(`PASS sitemap index, ${sections.length} child sitemaps and ${urls} URLs`);
 
-  for (const [from, to] of [['/ratios/pe-ratio', '/learn/pe-ratio'], ['/options-strategy/long-call', '/options/long-call']]) {
+  for (const [from, to] of [['/ratios/pe-ratio', '/learn/pe-ratio-explained'], ['/options-strategy/long-call', '/options/long-call']]) {
     const response = await get(from, { redirect: 'manual' });
     assert.equal(response.status, 301, from);
     assert.equal(new URL(response.headers.get('location'), origin).pathname, to);
@@ -62,15 +63,18 @@ try {
   assert.match(await auth.text(), /noindex, follow/);
   console.log('PASS account page noindex');
   const footerPages = ['/contact', '/about', '/methodology', '/answers', '/research-checklist', '/data-sources', '/developers', '/press', '/terms', '/privacy', '/refund-policy'];
+  const checkedTargets = new Set();
   for (const path of footerPages) {
     const response = await get(path);
     assert.equal(response.status, 200, path);
     const pageHtml = await response.text();
     for (const match of pageHtml.matchAll(/(?:href|to)="(\/[^"]+)"/g)) {
-      const target = match[1];
+      const target = match[1].replaceAll('&amp;', '&');
       if (/^\/(?:api|sitemaps\/)/.test(target) || target === '/sitemap.xml' || target === '/openapi.json' || target.endsWith('.txt') || target.endsWith('.ssml')) continue;
-      const targetResponse = await get(target, { redirect: 'manual' });
-      assert.ok(targetResponse.status < 500, `${path} -> ${target} returned ${targetResponse.status}`);
+      if (checkedTargets.has(target)) continue;
+      checkedTargets.add(target);
+      const targetResponse = await get(target);
+      assert.ok(targetResponse.ok, `${path} -> ${target} returned ${targetResponse.status}`);
     }
   }
   const peRatio = await get('/learn/pe-ratio', { redirect: 'manual' });

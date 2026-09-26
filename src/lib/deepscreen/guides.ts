@@ -600,7 +600,7 @@ export const GUIDES: Guide[] = [
         a: "They describe momentum and trend, not the future. They work best as risk-management tools alongside fundamental analysis.",
       },
     ],
-  },,
+  },
 {
     slug: "how-to-analyze-an-indian-stock-in-15-minutes",
     title: "How to Analyse an Indian Stock in 15 Minutes: The DeepScreen Triage Framework",

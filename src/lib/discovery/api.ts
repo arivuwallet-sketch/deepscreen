@@ -1,5 +1,5 @@
 import { EXCHANGES } from "@/lib/deepscreen/exchanges";
-import { RATIOS } from "@/lib/seo/content";
+import { RATIOS, ratioGuideSlug } from "@/lib/seo/content";
 import { ANSWERS, ANSWERS_REVIEWED } from "./answers";
 
 const origin = "https://deepscreen.online";
@@ -25,7 +25,7 @@ export function resourceData(resource: Resource) {
         formula: r.formula,
         definition: r.answer,
         cautions: r.cautions,
-        url: `${origin}/learn/${r.slug}`,
+        url: `${origin}/learn/${ratioGuideSlug(r.slug)}`,
       }));
     case "answers":
       return ANSWERS.map((a) => ({
