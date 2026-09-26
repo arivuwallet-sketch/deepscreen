@@ -70,7 +70,7 @@ try {
       const target = match[1];
       if (/^\/(?:api|sitemaps\/)/.test(target) || target === '/sitemap.xml' || target === '/openapi.json' || target.endsWith('.txt') || target.endsWith('.ssml')) continue;
       const targetResponse = await get(target, { redirect: 'manual' });
-      assert.ok(targetResponse.status < 500, `${path} -> ${target} returned ${targetResponse.status}`);
+      assert.ok(targetResponse.status >= 200 && targetResponse.status < 400, `${path} -> ${target} returned ${targetResponse.status}`);
     }
   }
   const peRatio = await get('/learn/pe-ratio', { redirect: 'manual' });
