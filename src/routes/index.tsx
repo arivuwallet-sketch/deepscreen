@@ -19,26 +19,26 @@ export const Route = createFileRoute("/")({
   staticData: { sitemap: true },
   head: () => ({
     meta: [
-      { title: "DeepScreen — Global Stock Screener & Fundamental Analysis" },
+      { title: "DeepScreen — Beginner Stock Research & Fundamental Analysis" },
       {
         name: "description",
         content:
-          "Research supported listings across NSE, BSE, NYSE, Nasdaq and LSE with deep fundamental scoring, live market news and an economic calendar.",
+          "Beginner-first stock research across NSE, BSE, NYSE, Nasdaq and LSE. DeepScreen explains ratios, highlights potential traps and combines fundamental analysis with market context.",
       },
-      { property: "og:title", content: "DeepScreen — Global Stock Screener & Fundamental Analysis" },
+      { property: "og:title", content: "DeepScreen — Beginner Stock Research & Fundamental Analysis" },
       {
         property: "og:description",
         content:
-          "Cap-based screening, 13-factor fundamental scoring, stock-level news and a live economic calendar for India, US and UK markets.",
+          "Understand stocks before you trust the numbers: beginner-friendly ratio explanations, trap checks, 13-factor analysis and company research across India, the US and the UK.",
       },
       { property: "og:url", content: "https://deepscreen.online/" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "DeepScreen — Global Stock Screener & Fundamental Analysis" },
+      { name: "twitter:title", content: "DeepScreen — Beginner Stock Research & Fundamental Analysis" },
       {
         name: "twitter:description",
         content:
-          "Screen NSE, BSE, NYSE, Nasdaq and LSE listings with 13-factor fundamental scoring, live news and an economic calendar.",
+          "Beginner-first stock research across NSE, BSE, NYSE, Nasdaq and LSE, with ratio explanations, potential-trap checks, fundamental scoring and company research.",
       },
       { name: "keywords", content: metaKeywords(screenerKeywords, stocksKeywords, learnKeywords) },
     ],
@@ -49,10 +49,10 @@ export const Route = createFileRoute("/")({
         children: jsonLd(
           buildGraph(
             buildWebApplicationSchema({
-              name: "DeepScreen",
+              name: "DeepScreen Stock Research",
               url: "https://deepscreen.online/",
               description:
-                "Multi-exchange stock screener with a 13-factor fundamental model for Indian, US and UK listings.",
+                "Beginner-first multi-exchange stock research platform that explains financial ratios, highlights potential accounting and valuation traps, and uses a documented 13-factor fundamental model for Indian, US and UK listings.",
               featureList: [
                 "13-factor fundamental scoring",
                 "Cap-based screening across NSE, BSE, NYSE, Nasdaq and LSE",
@@ -107,11 +107,10 @@ function Home() {
         <div className="mx-auto max-w-7xl px-4 py-14">
           <p className="num text-xs uppercase tracking-[0.25em] text-primary">God-mode screening</p>
           <h1 className="mt-3 max-w-3xl text-4xl font-bold leading-tight tracking-tight md:text-5xl">
-            Global stock screening across five exchanges.
+            Understand stocks before you trust the numbers.
           </h1>
           <p className="mt-4 max-w-2xl text-muted-foreground">
-            DeepScreen is a stock screener and fundamental analysis platform. Its 13-factor valuation and quality model covers P/E, PEG, P/S, P/B,
-            EV/Revenue, EV/EBITDA, ROE, ROA, ROCE, leverage, payout and operating leverage — across
+            DeepScreen is a beginner-first stock research and fundamental-analysis platform. It explains what ratios mean, highlights potential traps and tells you what to investigate next. Its 13-factor model covers P/E, PEG, P/S, P/B, EV/Revenue, EV/EBITDA, ROE, ROA, ROCE, leverage, payout and operating leverage — across
             Indian, US and UK markets, then pairs it with live news and macro events.
           </p>
           <div className="mt-6 max-w-xl">
