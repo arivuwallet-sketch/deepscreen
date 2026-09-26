@@ -1,5 +1,5 @@
 import "./lib/error-capture";
-import { canonicalRedirect } from "./lib/seo/canonical";
+import { canonicalRedirect, legacyGuideRedirect } from "./lib/seo/canonical";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
@@ -52,10 +52,8 @@ export default {
 
     // Keep the historical P/E ratio URL working even if a deployment has a
     // stale generated route manifest. The guide is the canonical P/E resource.
-    const pathname = new URL(request.url).pathname;
-    if (request.method === "GET" && pathname === "/learn/pe-ratio") {
-      return Response.redirect(new URL("/learn/pe-ratio-explained", request.url), 308);
-    }
+    const legacyGuide = legacyGuideRedirect(request);
+    if (legacyGuide) return legacyGuide;
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);

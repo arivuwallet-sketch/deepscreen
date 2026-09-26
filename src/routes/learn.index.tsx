@@ -5,7 +5,7 @@ import { Shell } from "@/components/ds/Shell";
 import { TopicIndex } from "@/components/ds/TopicIndex";
 import { GUIDES } from "@/lib/deepscreen/guides";
 import { learnKeywords, metaKeywords, screenerKeywords } from "@/lib/seo/keywords";
-import { RATIOS } from "@/lib/seo/content";
+import { RATIOS, ratioGuideSlug } from "@/lib/seo/content";
 
 const URL = "https://deepscreen.online/learn";
 
@@ -110,7 +110,7 @@ function LearnIndex() {
             </Link>
           ))}
         </div>
-        <section className="mt-10"><h2 className="text-lg font-semibold">Fundamental ratio glossary</h2><div className="mt-4 grid gap-3 sm:grid-cols-2">{RATIOS.map(r => <Link key={r.slug} to="/learn/$slug" params={{ slug: r.slug }} className="rounded-lg border border-border bg-card p-4 hover:border-primary"><h3 className="font-semibold">{r.shortName}</h3><p className="mt-2 text-sm text-muted-foreground">{r.answer}</p></Link>)}</div></section>
+        <section className="mt-10"><h2 className="text-lg font-semibold">Fundamental ratio glossary</h2><div className="mt-4 grid gap-3 sm:grid-cols-2">{RATIOS.map(r => <Link key={r.slug} to="/learn/$slug" params={{ slug: ratioGuideSlug(r.slug) }} className="rounded-lg border border-border bg-card p-4 hover:border-primary"><h3 className="font-semibold">{r.shortName}</h3><p className="mt-2 text-sm text-muted-foreground">{r.answer}</p></Link>)}</div></section>
 
         <TopicIndex
           title="Every topic covered on DeepScreen"

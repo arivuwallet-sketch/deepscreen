@@ -12,6 +12,7 @@ import {
   COMPARISONS,
   RANKINGS,
   RATIOS,
+  ratioGuideSlug,
   STOCK_COMPARISONS,
   STRATEGY_GUIDES,
 } from "@/lib/seo/content";
@@ -154,7 +155,7 @@ export function buildSitemapSections(router: AnyRouter): Map<string, SitemapEntr
       router,
       "/learn/$slug",
       "/learn/$slug",
-      [...GUIDES, ...RATIOS].map((item) => ({ slug: item.slug })),
+      [...new Set([...GUIDES.map((item) => item.slug), ...RATIOS.map((item) => ratioGuideSlug(item.slug))])].map((slug) => ({ slug })),
     ),
     ...collectDynamic(
       router,

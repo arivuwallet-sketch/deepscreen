@@ -69,3 +69,6 @@ export const STRATEGY_GUIDES: StrategyGuide[] = [
   { slug: "iron-condor", name: "Iron Condor", outlook: "Neutral", description: "Iron condor strategy explained with four options, defined risk, capped reward and two breakevens.", answer: "An iron condor combines a bull put spread and bear call spread. It earns a limited credit when price stays between the short strikes, with defined losses outside the wings.", construction: "Sell an out-of-the-money put spread and call spread with the same expiry.", risk: "Spread width minus net credit.", reward: "Net credit received.", breakeven: "Short put minus credit and short call plus credit." },
 ];
 export const findStrategyGuide = (slug: string) => STRATEGY_GUIDES.find((strategy) => strategy.slug === slug);
+
+/** Canonical guide slug; keep metric IDs stable for API consumers. */
+export const ratioGuideSlug = (slug: string) => slug === "pe-ratio" ? "pe-ratio-explained" : slug;

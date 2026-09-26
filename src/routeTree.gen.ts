@@ -11,18 +11,26 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AnswersRouteImport } from './routes/answers'
+import { Route as AnswersDotssmlRouteImport } from './routes/answers[.]ssml'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as DataSourcesRouteImport } from './routes/data-sources'
+import { Route as DevelopersRouteImport } from './routes/developers'
 import { Route as IpoRouteImport } from './routes/ipo'
 import { Route as MethodologyRouteImport } from './routes/methodology'
+import { Route as OpenapiDotjsonRouteImport } from './routes/openapi[.]json'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
+import { Route as PressRouteImport } from './routes/press'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
+import { Route as ResearchChecklistRouteImport } from './routes/research-checklist'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as BestSlugRouteImport } from './routes/best.$slug'
+import { Route as CompareIndexRouteImport } from './routes/compare.index'
 import { Route as CompareSlugRouteImport } from './routes/compare.$slug'
 import { Route as ExchangeCodeRouteImport } from './routes/exchange.$code'
 import { Route as LearnIndexRouteImport } from './routes/learn.index'
@@ -34,6 +42,7 @@ import { Route as RatiosIndexRouteImport } from './routes/ratios.index'
 import { Route as RatiosSlugRouteImport } from './routes/ratios.$slug'
 import { Route as SitemapsChar123nameChar125DotxmlRouteImport } from './routes/sitemaps.{$name}[.]xml'
 import { Route as ApiPublicCashfreeWebhookRouteImport } from './routes/api/public/cashfree-webhook'
+import { Route as ApiV1ResourceRouteImport } from './routes/api.v1.$resource'
 import { Route as SectorExchangeSectorRouteImport } from './routes/sector.$exchange.$sector'
 import { Route as StockExchangeSymbolRouteImport } from './routes/stock.$exchange.$symbol'
 
@@ -45,6 +54,16 @@ const IndexRoute = IndexRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnswersRoute = AnswersRouteImport.update({
+  id: '/answers',
+  path: '/answers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnswersDotssmlRoute = AnswersDotssmlRouteImport.update({
+  id: '/answers.ssml',
+  path: '/answers.ssml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -62,6 +81,16 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DataSourcesRoute = DataSourcesRouteImport.update({
+  id: '/data-sources',
+  path: '/data-sources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevelopersRoute = DevelopersRouteImport.update({
+  id: '/developers',
+  path: '/developers',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IpoRoute = IpoRouteImport.update({
   id: '/ipo',
   path: '/ipo',
@@ -72,9 +101,19 @@ const MethodologyRoute = MethodologyRouteImport.update({
   path: '/methodology',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OpenapiDotjsonRoute = OpenapiDotjsonRouteImport.update({
+  id: '/openapi.json',
+  path: '/openapi.json',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PortfolioRoute = PortfolioRouteImport.update({
   id: '/portfolio',
   path: '/portfolio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PressRoute = PressRouteImport.update({
+  id: '/press',
+  path: '/press',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PricingRoute = PricingRouteImport.update({
@@ -92,6 +131,11 @@ const RefundPolicyRoute = RefundPolicyRouteImport.update({
   path: '/refund-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResearchChecklistRoute = ResearchChecklistRouteImport.update({
+  id: '/research-checklist',
+  path: '/research-checklist',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -105,6 +149,11 @@ const TermsRoute = TermsRouteImport.update({
 const BestSlugRoute = BestSlugRouteImport.update({
   id: '/best/$slug',
   path: '/best/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareIndexRoute = CompareIndexRouteImport.update({
+  id: '/compare/',
+  path: '/compare/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompareSlugRoute = CompareSlugRouteImport.update({
@@ -164,6 +213,11 @@ const ApiPublicCashfreeWebhookRoute =
     path: '/api/public/cashfree-webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiV1ResourceRoute = ApiV1ResourceRouteImport.update({
+  id: '/api/v1/$resource',
+  path: '/api/v1/$resource',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SectorExchangeSectorRoute = SectorExchangeSectorRouteImport.update({
   id: '/sector/$exchange/$sector',
   path: '/sector/$exchange/$sector',
@@ -178,15 +232,22 @@ const StockExchangeSymbolRoute = StockExchangeSymbolRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/answers': typeof AnswersRoute
+  '/answers.ssml': typeof AnswersDotssmlRoute
   '/auth': typeof AuthRoute
   '/calendar': typeof CalendarRoute
   '/contact': typeof ContactRoute
+  '/data-sources': typeof DataSourcesRoute
+  '/developers': typeof DevelopersRoute
   '/ipo': typeof IpoRoute
   '/methodology': typeof MethodologyRoute
+  '/openapi.json': typeof OpenapiDotjsonRoute
   '/portfolio': typeof PortfolioRoute
+  '/press': typeof PressRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
+  '/research-checklist': typeof ResearchChecklistRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/best/$slug': typeof BestSlugRoute
@@ -197,25 +258,34 @@ export interface FileRoutesByFullPath {
   '/options/$slug': typeof OptionsSlugRoute
   '/ratios/$slug': typeof RatiosSlugRoute
   '/sitemaps/{$name}.xml': typeof SitemapsChar123nameChar125DotxmlRoute
+  '/compare/': typeof CompareIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/options/': typeof OptionsIndexRoute
   '/ratios/': typeof RatiosIndexRoute
   '/api/public/cashfree-webhook': typeof ApiPublicCashfreeWebhookRoute
+  '/api/v1/$resource': typeof ApiV1ResourceRoute
   '/sector/$exchange/$sector': typeof SectorExchangeSectorRoute
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/answers': typeof AnswersRoute
+  '/answers.ssml': typeof AnswersDotssmlRoute
   '/auth': typeof AuthRoute
   '/calendar': typeof CalendarRoute
   '/contact': typeof ContactRoute
+  '/data-sources': typeof DataSourcesRoute
+  '/developers': typeof DevelopersRoute
   '/ipo': typeof IpoRoute
   '/methodology': typeof MethodologyRoute
+  '/openapi.json': typeof OpenapiDotjsonRoute
   '/portfolio': typeof PortfolioRoute
+  '/press': typeof PressRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
+  '/research-checklist': typeof ResearchChecklistRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/best/$slug': typeof BestSlugRoute
@@ -226,10 +296,12 @@ export interface FileRoutesByTo {
   '/options/$slug': typeof OptionsSlugRoute
   '/ratios/$slug': typeof RatiosSlugRoute
   '/sitemaps/{$name}.xml': typeof SitemapsChar123nameChar125DotxmlRoute
+  '/compare': typeof CompareIndexRoute
   '/learn': typeof LearnIndexRoute
   '/options': typeof OptionsIndexRoute
   '/ratios': typeof RatiosIndexRoute
   '/api/public/cashfree-webhook': typeof ApiPublicCashfreeWebhookRoute
+  '/api/v1/$resource': typeof ApiV1ResourceRoute
   '/sector/$exchange/$sector': typeof SectorExchangeSectorRoute
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
 }
@@ -237,15 +309,22 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/answers': typeof AnswersRoute
+  '/answers.ssml': typeof AnswersDotssmlRoute
   '/auth': typeof AuthRoute
   '/calendar': typeof CalendarRoute
   '/contact': typeof ContactRoute
+  '/data-sources': typeof DataSourcesRoute
+  '/developers': typeof DevelopersRoute
   '/ipo': typeof IpoRoute
   '/methodology': typeof MethodologyRoute
+  '/openapi.json': typeof OpenapiDotjsonRoute
   '/portfolio': typeof PortfolioRoute
+  '/press': typeof PressRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
+  '/research-checklist': typeof ResearchChecklistRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/best/$slug': typeof BestSlugRoute
@@ -256,10 +335,12 @@ export interface FileRoutesById {
   '/options/$slug': typeof OptionsSlugRoute
   '/ratios/$slug': typeof RatiosSlugRoute
   '/sitemaps/{$name}.xml': typeof SitemapsChar123nameChar125DotxmlRoute
+  '/compare/': typeof CompareIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/options/': typeof OptionsIndexRoute
   '/ratios/': typeof RatiosIndexRoute
   '/api/public/cashfree-webhook': typeof ApiPublicCashfreeWebhookRoute
+  '/api/v1/$resource': typeof ApiV1ResourceRoute
   '/sector/$exchange/$sector': typeof SectorExchangeSectorRoute
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
 }
@@ -268,15 +349,22 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/answers'
+    | '/answers.ssml'
     | '/auth'
     | '/calendar'
     | '/contact'
+    | '/data-sources'
+    | '/developers'
     | '/ipo'
     | '/methodology'
+    | '/openapi.json'
     | '/portfolio'
+    | '/press'
     | '/pricing'
     | '/privacy'
     | '/refund-policy'
+    | '/research-checklist'
     | '/sitemap.xml'
     | '/terms'
     | '/best/$slug'
@@ -287,25 +375,34 @@ export interface FileRouteTypes {
     | '/options/$slug'
     | '/ratios/$slug'
     | '/sitemaps/{$name}.xml'
+    | '/compare/'
     | '/learn/'
     | '/options/'
     | '/ratios/'
     | '/api/public/cashfree-webhook'
+    | '/api/v1/$resource'
     | '/sector/$exchange/$sector'
     | '/stock/$exchange/$symbol'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
+    | '/answers'
+    | '/answers.ssml'
     | '/auth'
     | '/calendar'
     | '/contact'
+    | '/data-sources'
+    | '/developers'
     | '/ipo'
     | '/methodology'
+    | '/openapi.json'
     | '/portfolio'
+    | '/press'
     | '/pricing'
     | '/privacy'
     | '/refund-policy'
+    | '/research-checklist'
     | '/sitemap.xml'
     | '/terms'
     | '/best/$slug'
@@ -316,25 +413,34 @@ export interface FileRouteTypes {
     | '/options/$slug'
     | '/ratios/$slug'
     | '/sitemaps/{$name}.xml'
+    | '/compare'
     | '/learn'
     | '/options'
     | '/ratios'
     | '/api/public/cashfree-webhook'
+    | '/api/v1/$resource'
     | '/sector/$exchange/$sector'
     | '/stock/$exchange/$symbol'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/answers'
+    | '/answers.ssml'
     | '/auth'
     | '/calendar'
     | '/contact'
+    | '/data-sources'
+    | '/developers'
     | '/ipo'
     | '/methodology'
+    | '/openapi.json'
     | '/portfolio'
+    | '/press'
     | '/pricing'
     | '/privacy'
     | '/refund-policy'
+    | '/research-checklist'
     | '/sitemap.xml'
     | '/terms'
     | '/best/$slug'
@@ -345,10 +451,12 @@ export interface FileRouteTypes {
     | '/options/$slug'
     | '/ratios/$slug'
     | '/sitemaps/{$name}.xml'
+    | '/compare/'
     | '/learn/'
     | '/options/'
     | '/ratios/'
     | '/api/public/cashfree-webhook'
+    | '/api/v1/$resource'
     | '/sector/$exchange/$sector'
     | '/stock/$exchange/$symbol'
   fileRoutesById: FileRoutesById
@@ -356,15 +464,22 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AnswersRoute: typeof AnswersRoute
+  AnswersDotssmlRoute: typeof AnswersDotssmlRoute
   AuthRoute: typeof AuthRoute
   CalendarRoute: typeof CalendarRoute
   ContactRoute: typeof ContactRoute
+  DataSourcesRoute: typeof DataSourcesRoute
+  DevelopersRoute: typeof DevelopersRoute
   IpoRoute: typeof IpoRoute
   MethodologyRoute: typeof MethodologyRoute
+  OpenapiDotjsonRoute: typeof OpenapiDotjsonRoute
   PortfolioRoute: typeof PortfolioRoute
+  PressRoute: typeof PressRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
+  ResearchChecklistRoute: typeof ResearchChecklistRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   BestSlugRoute: typeof BestSlugRoute
@@ -375,10 +490,12 @@ export interface RootRouteChildren {
   OptionsSlugRoute: typeof OptionsSlugRoute
   RatiosSlugRoute: typeof RatiosSlugRoute
   SitemapsChar123nameChar125DotxmlRoute: typeof SitemapsChar123nameChar125DotxmlRoute
+  CompareIndexRoute: typeof CompareIndexRoute
   LearnIndexRoute: typeof LearnIndexRoute
   OptionsIndexRoute: typeof OptionsIndexRoute
   RatiosIndexRoute: typeof RatiosIndexRoute
   ApiPublicCashfreeWebhookRoute: typeof ApiPublicCashfreeWebhookRoute
+  ApiV1ResourceRoute: typeof ApiV1ResourceRoute
   SectorExchangeSectorRoute: typeof SectorExchangeSectorRoute
   StockExchangeSymbolRoute: typeof StockExchangeSymbolRoute
 }
@@ -397,6 +514,20 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/answers': {
+      id: '/answers'
+      path: '/answers'
+      fullPath: '/answers'
+      preLoaderRoute: typeof AnswersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/answers.ssml': {
+      id: '/answers.ssml'
+      path: '/answers.ssml'
+      fullPath: '/answers.ssml'
+      preLoaderRoute: typeof AnswersDotssmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -420,6 +551,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/data-sources': {
+      id: '/data-sources'
+      path: '/data-sources'
+      fullPath: '/data-sources'
+      preLoaderRoute: typeof DataSourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/developers': {
+      id: '/developers'
+      path: '/developers'
+      fullPath: '/developers'
+      preLoaderRoute: typeof DevelopersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ipo': {
       id: '/ipo'
       path: '/ipo'
@@ -434,11 +579,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MethodologyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/openapi.json': {
+      id: '/openapi.json'
+      path: '/openapi.json'
+      fullPath: '/openapi.json'
+      preLoaderRoute: typeof OpenapiDotjsonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/portfolio': {
       id: '/portfolio'
       path: '/portfolio'
       fullPath: '/portfolio'
       preLoaderRoute: typeof PortfolioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/press': {
+      id: '/press'
+      path: '/press'
+      fullPath: '/press'
+      preLoaderRoute: typeof PressRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pricing': {
@@ -462,6 +621,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RefundPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/research-checklist': {
+      id: '/research-checklist'
+      path: '/research-checklist'
+      fullPath: '/research-checklist'
+      preLoaderRoute: typeof ResearchChecklistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -481,6 +647,13 @@ declare module '@tanstack/react-router' {
       path: '/best/$slug'
       fullPath: '/best/$slug'
       preLoaderRoute: typeof BestSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare/': {
+      id: '/compare/'
+      path: '/compare'
+      fullPath: '/compare/'
+      preLoaderRoute: typeof CompareIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/compare/$slug': {
@@ -560,6 +733,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCashfreeWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/$resource': {
+      id: '/api/v1/$resource'
+      path: '/api/v1/$resource'
+      fullPath: '/api/v1/$resource'
+      preLoaderRoute: typeof ApiV1ResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sector/$exchange/$sector': {
       id: '/sector/$exchange/$sector'
       path: '/sector/$exchange/$sector'
@@ -580,15 +760,22 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AnswersRoute: AnswersRoute,
+  AnswersDotssmlRoute: AnswersDotssmlRoute,
   AuthRoute: AuthRoute,
   CalendarRoute: CalendarRoute,
   ContactRoute: ContactRoute,
+  DataSourcesRoute: DataSourcesRoute,
+  DevelopersRoute: DevelopersRoute,
   IpoRoute: IpoRoute,
   MethodologyRoute: MethodologyRoute,
+  OpenapiDotjsonRoute: OpenapiDotjsonRoute,
   PortfolioRoute: PortfolioRoute,
+  PressRoute: PressRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   RefundPolicyRoute: RefundPolicyRoute,
+  ResearchChecklistRoute: ResearchChecklistRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   BestSlugRoute: BestSlugRoute,
@@ -599,10 +786,12 @@ const rootRouteChildren: RootRouteChildren = {
   OptionsSlugRoute: OptionsSlugRoute,
   RatiosSlugRoute: RatiosSlugRoute,
   SitemapsChar123nameChar125DotxmlRoute: SitemapsChar123nameChar125DotxmlRoute,
+  CompareIndexRoute: CompareIndexRoute,
   LearnIndexRoute: LearnIndexRoute,
   OptionsIndexRoute: OptionsIndexRoute,
   RatiosIndexRoute: RatiosIndexRoute,
   ApiPublicCashfreeWebhookRoute: ApiPublicCashfreeWebhookRoute,
+  ApiV1ResourceRoute: ApiV1ResourceRoute,
   SectorExchangeSectorRoute: SectorExchangeSectorRoute,
   StockExchangeSymbolRoute: StockExchangeSymbolRoute,
 }
