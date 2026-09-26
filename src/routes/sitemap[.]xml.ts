@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getRouterInstance } from "@tanstack/react-start";
 
-import { buildSitemapSections, sitemapIndexXML } from "@/lib/deepscreen/sitemap-sections";
+import { sitemapIndexXML, sitemapSectionNames } from "@/lib/deepscreen/sitemap-sections";
 
 const BASE_URL = "https://deepscreen.online";
 
@@ -11,25 +10,14 @@ export const Route = createFileRoute("/sitemap.xml")({
     handlers: {
       GET: async () => {
         try {
-          const router = await getRouterInstance();
-          const sections = buildSitemapSections(router);
-
-          if (sections.size === 0) {
-            return new Response(
-              "No pages are included in this sitemap. Check route decisions and ancestor exclusions.",
-              { status: 404, headers: { "Cache-Control": "no-store" } },
-            );
-          }
-
-          const xml = sitemapIndexXML(
-            BASE_URL,
-            [...sections.keys()].map((name) => `/sitemaps/${name}.xml`),
-          );
+          const paths = sitemapSectionNames().map((name) => "/sitemaps/" + name + ".xml");
+          const xml = sitemapIndexXML(BASE_URL, paths);
 
           return new Response(xml, {
             headers: {
-              "Content-Type": "application/xml",
-              "Cache-Control": "public, max-age=3600",
+              "Content-Type": "application/xml; charset=utf-8",
+              "Cache-Control":
+                "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
             },
           });
         } catch (error) {
