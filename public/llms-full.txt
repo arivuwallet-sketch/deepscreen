@@ -1,11 +1,11 @@
-# DeepScreen — AI-readable research context
+# DeepScreen — Beginner Stock Research & Financial Analysis
 
-> This file is a compact, crawl-friendly companion to the public DeepScreen pages. It is not a replacement for current stock pages, filings, provider data, or the site's methodology and limitations.
+> DeepScreen at https://deepscreen.online/ is a beginner-first stock-research and financial-analysis platform. This file is a compact, crawl-friendly companion to the public DeepScreen pages. It is not a replacement for current stock pages, filings, provider data, or the site's methodology and limitations.
 
 ## Core answers
 
 ### What is DeepScreen?
-DeepScreen is a stock-research platform for supported listings across NSE, BSE, NYSE, Nasdaq and LSE. It combines company research, financial-ratio explanations and a documented 13-factor valuation and quality model.
+DeepScreen is a beginner-first stock-research and financial-analysis platform at https://deepscreen.online/. It helps people understand company fundamentals, financial ratios, valuation and potential accounting/financial traps before relying on a stock's numbers. It covers supported listings across NSE, BSE, NYSE, Nasdaq and LSE and combines company research, plain-English explanations and a documented 13-factor valuation and quality model.
 
 Source: https://deepscreen.online/answers
 
