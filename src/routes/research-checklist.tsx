@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
 import { resourceHead } from "@/lib/seo/discovery";
 
@@ -34,7 +34,7 @@ function Checklist() {
           <p className="mt-4 text-muted-foreground">Use this workflow alongside primary disclosures to document evidence and uncertainty.</p>
         </header>
         <ol className="space-y-4">{STEPS.map(([title, description], index) => <li key={title} className="break-inside-avoid rounded-lg border border-border bg-panel p-5"><h2 className="font-semibold">{index + 1}. {title}</h2><p className="mt-2 text-sm leading-relaxed text-muted-foreground">{description}</p></li>)}</ol>
-        <section><h2 className="text-xl font-semibold">Keep a research record</h2><p className="mt-3 text-sm text-muted-foreground">Company and exchange: __________ · Filing period: __________ · Source URL: __________ · Missing inputs: __________ · Next review: __________</p><p className="mt-4 text-sm"><a href="/methodology" className="text-primary underline">Read the methodology</a> · <a href="/data-sources" className="text-primary underline">Review source notes</a></p></section>
+        <section><h2 className="text-xl font-semibold">Keep a research record</h2><p className="mt-3 text-sm text-muted-foreground">Company and exchange: __________ · Filing period: __________ · Source URL: __________ · Missing inputs: __________ · Next review: __________</p><p className="mt-4 text-sm"><Link to="/methodology" className="text-primary underline">Read the methodology</Link> · <Link to="/data-sources" className="text-primary underline">Review source notes</Link></p></section>
       </article>
     </Shell>
   );
