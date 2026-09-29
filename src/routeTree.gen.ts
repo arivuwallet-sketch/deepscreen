@@ -27,6 +27,7 @@ import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as ResearchChecklistRouteImport } from './routes/research-checklist'
+import { Route as ScreenerRouteImport } from './routes/screener'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as BestSlugRouteImport } from './routes/best.$slug'
@@ -134,6 +135,11 @@ const RefundPolicyRoute = RefundPolicyRouteImport.update({
 const ResearchChecklistRoute = ResearchChecklistRouteImport.update({
   id: '/research-checklist',
   path: '/research-checklist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScreenerRoute = ScreenerRouteImport.update({
+  id: '/screener',
+  path: '/screener',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -248,6 +254,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/research-checklist': typeof ResearchChecklistRoute
+  '/screener': typeof ScreenerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/best/$slug': typeof BestSlugRoute
@@ -286,6 +293,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/research-checklist': typeof ResearchChecklistRoute
+  '/screener': typeof ScreenerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/best/$slug': typeof BestSlugRoute
@@ -325,6 +333,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/research-checklist': typeof ResearchChecklistRoute
+  '/screener': typeof ScreenerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/best/$slug': typeof BestSlugRoute
@@ -365,6 +374,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/refund-policy'
     | '/research-checklist'
+    | '/screener'
     | '/sitemap.xml'
     | '/terms'
     | '/best/$slug'
@@ -403,6 +413,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/refund-policy'
     | '/research-checklist'
+    | '/screener'
     | '/sitemap.xml'
     | '/terms'
     | '/best/$slug'
@@ -441,6 +452,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/refund-policy'
     | '/research-checklist'
+    | '/screener'
     | '/sitemap.xml'
     | '/terms'
     | '/best/$slug'
@@ -480,6 +492,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
   ResearchChecklistRoute: typeof ResearchChecklistRoute
+  ScreenerRoute: typeof ScreenerRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   BestSlugRoute: typeof BestSlugRoute
@@ -626,6 +639,13 @@ declare module '@tanstack/react-router' {
       path: '/research-checklist'
       fullPath: '/research-checklist'
       preLoaderRoute: typeof ResearchChecklistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/screener': {
+      id: '/screener'
+      path: '/screener'
+      fullPath: '/screener'
+      preLoaderRoute: typeof ScreenerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -776,6 +796,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   RefundPolicyRoute: RefundPolicyRoute,
   ResearchChecklistRoute: ResearchChecklistRoute,
+  ScreenerRoute: ScreenerRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   BestSlugRoute: BestSlugRoute,

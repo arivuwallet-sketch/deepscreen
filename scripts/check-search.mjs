@@ -17,7 +17,12 @@ try {
     try { await get('/robots.txt'); ready = true; break; } catch { await delay(200); }
   }
   assert.ok(ready, `Server did not start: ${logs}`);
-  const home = await get('/');
+  const landing = await get('/');
+  assert.equal(landing.status, 200);
+  const landingHtml = await landing.text();
+  assert.match(landingHtml, /See the signal/);
+  assert.match(landingHtml, /href="\/screener"/);
+  const home = await get('/screener');
   assert.equal(home.status, 200);
   const html = await home.text();
   assert.match(html, /Understand stocks before you trust the numbers/);
