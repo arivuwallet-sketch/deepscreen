@@ -17,6 +17,7 @@ type Row = {
 
 export function WatchlistAlertsPanel({ rows }: { rows: Row[] }) {
   const [notification, setNotification] = useState<"default" | "granted" | "denied">("default");
+  const [supportsNotifications, setSupportsNotifications] = useState(false);
   const [alerts, setAlerts] = useState<ReturnType<typeof buildWatchlistAlerts>>([]);
   const [historyCount, setHistoryCount] = useState(0);
   const [hasFiveYearMedian, setHasFiveYearMedian] = useState(false);
@@ -38,6 +39,7 @@ export function WatchlistAlertsPanel({ rows }: { rows: Row[] }) {
 
   useEffect(() => {
     if (typeof Notification === "undefined") return;
+    setSupportsNotifications(true);
     setNotification(Notification.permission);
   }, []);
 
@@ -74,7 +76,7 @@ export function WatchlistAlertsPanel({ rows }: { rows: Row[] }) {
             Alerts are evaluated locally, so no paid alert-data service is required.
           </p>
         </div>
-        {typeof Notification !== "undefined" ? (
+        {supportsNotifications ? (
           <Button type="button" variant="outline" size="sm" onClick={enableNotifications} disabled={notification === "granted"}>
             {notification === "granted" ? <Bell className="mr-2 size-4" /> : <BellOff className="mr-2 size-4" />}
             {notification === "granted" ? "Browser alerts on" : "Enable browser alerts"}

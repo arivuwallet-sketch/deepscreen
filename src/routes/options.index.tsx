@@ -210,6 +210,7 @@ function SliderField({
       </div>
       <input
         type="range"
+        aria-label={label}
         min={min}
         max={max}
         step={step}
@@ -243,13 +244,14 @@ function StrategyCard({ s, exchange, spot }: { s: StrategyResult; exchange: stri
       <div className="mt-3 h-36">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={s.payoff}>
-            <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
-            <XAxis dataKey="spot" tick={{ fontSize: 10 }} tickFormatter={(v: number) => v.toFixed(0)} />
-            <YAxis tick={{ fontSize: 10 }} width={44} tickFormatter={(v: number) => v.toFixed(0)} />
+            <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" opacity={0.5} />
+            <XAxis dataKey="spot" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} tickFormatter={(v: number) => v.toFixed(0)} />
+            <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} width={44} tickFormatter={(v: number) => v.toFixed(0)} />
             <Tooltip
               formatter={(v: number) => [v.toFixed(2), "P&L"]}
               labelFormatter={(v: number) => `Spot ${v.toFixed(2)}`}
-              contentStyle={{ fontSize: 12 }}
+              contentStyle={{ fontSize: 12, background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--foreground)" }}
+              itemStyle={{ color: "var(--primary)" }}
             />
             <ReferenceLine y={0} stroke="currentColor" opacity={0.4} />
             <ReferenceLine x={spot} stroke="var(--primary)" strokeDasharray="4 4" strokeWidth={1.5} />
