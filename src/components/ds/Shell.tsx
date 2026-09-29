@@ -7,6 +7,7 @@ import { AuthButton } from "./AuthButton";
 import { SearchBar } from "./SearchBar";
 
 const NAV_ITEMS: Array<readonly [string, string]> = [
+  ["/screener", "Screener"],
   ["/portfolio", "My Stocks"],
   ["/calendar", "Calendar"],
   ["/options", "Options"],
