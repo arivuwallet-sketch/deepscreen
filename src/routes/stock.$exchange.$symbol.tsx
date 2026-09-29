@@ -1,5 +1,6 @@
+import { stockPath } from "@/lib/seo/directory";
 import { buildArticleSchema, buildBreadcrumbSchema, buildCorporationSchema, buildFAQSchema, buildGraph, jsonLd } from "@/lib/seo/json-ld";
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { useMemo } from "react";
 
 import { Shell } from "@/components/ds/Shell";
@@ -58,11 +59,14 @@ function peerExchangeCodesFor(exchange: string): string[] {
 
 export const Route = createFileRoute("/stock/$exchange/$symbol")({
   staticData: { sitemap: true },
-  loader: async ({ params }) => {
+  loader: async ({ params, location }) => {
     const stock = findStock(params.exchange, params.symbol);
     if (!stock) throw notFound();
-    // Server-rendered snapshot: real price, ratios, forensics, score and
-    // verdict are in the first HTML byte for crawlers, before any client JS.
+    if (params.exchange !== stock.exchange || params.symbol !== stock.symbol) {
+      throw redirect({ href: `${stockPath(stock.exchange, stock.symbol)}${location.searchStr}`, statusCode: 308 });
+    }
+    // Render available provider data within the shared SSR budget. Slow or
+    // unavailable providers are retried by the existing client hooks.
     let snapshot: StockSnapshot = {
       quote: null,
       fundamentals: null,
@@ -102,7 +106,7 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
       .slice(0, 5)
       .map((peer) => peer.symbol + " (" + peer.name + ")");
     const faqs = stockFaqs(s, sources, loaderData.snapshot.fundamentals, peerNames);
-    const url = `https://deepscreen.online/stock/${s.exchange}/${s.symbol}`;
+    const url = `https://deepscreen.online${stockPath(s.exchange, s.symbol)}`;
     const schemaAnalysis = Object.values(sources).some((value) => value === "live")
       ? analyze(s)
       : undefined;

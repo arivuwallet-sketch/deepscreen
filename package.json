@@ -9,7 +9,9 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test:indexing": "node --experimental-strip-types --test tests/indexing.test.ts",
+    "test:indexing:ssr": "npm run build && node scripts/check-indexing.mjs"
   },
   "overrides": {
     "rolldown": "1.2.1"

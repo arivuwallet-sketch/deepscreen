@@ -1,5 +1,6 @@
+import { directoryPage, exchangePath, DIRECTORY_PAGE_SIZE } from "@/lib/seo/directory";
 import { buildBreadcrumbSchema, buildExchangeCollectionSchema, buildGraph, jsonLd } from "@/lib/seo/json-ld";
-import { createFileRoute, notFound, Link } from "@tanstack/react-router";
+import { createFileRoute, notFound, redirect, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 
 import { Shell } from "@/components/ds/Shell";
@@ -26,16 +27,23 @@ const TOPIC_BY_EXCHANGE: Record<string, string> = {
 
 export const Route = createFileRoute("/exchange/$code")({
   staticData: { sitemap: true },
-  validateSearch: (search: Record<string, unknown>): { page?: number } => ({
-    page: typeof search["page"] === "string" || typeof search["page"] === "number"
-      ? Math.max(1, Math.min(1000, Math.floor(Number(search["page"])) || 1)) : 1,
-  }),
-  loaderDeps: ({ search }) => ({ page: search.page ?? 1 }),
-  loader: ({ params, deps }) => {
+  // Do not inject page=1 here: Start redirects to validated search values,
+  // which would conflict with the first page's clean canonical URL.
+  validateSearch: (search: Record<string, unknown>): { page?: unknown } => (
+    search["page"] === undefined ? {} : { page: search["page"] }
+  ),
+  loaderDeps: ({ search }) => ({ page: directoryPage(search.page) }),
+  loader: ({ params, deps, location }) => {
     const exchange = getExchange(params.code);
     if (!exchange) throw notFound();
-    const pageCount = Math.max(1, Math.ceil(stocksByExchange(exchange.code).length / 100));
-    if (deps.page > pageCount) throw notFound();
+    const pageCount = Math.max(1, Math.ceil(stocksByExchange(exchange.code).length / DIRECTORY_PAGE_SIZE));
+    if (deps.page < 1 || deps.page > pageCount) throw notFound();
+    if (params.code !== exchange.code || (deps.page === 1 && new URLSearchParams(location.searchStr).has("page"))) {
+      const query = new URLSearchParams(location.searchStr);
+      if (deps.page === 1) query.delete("page");
+      const suffix = query.size ? `?${query}` : "";
+      throw redirect({ href: `${exchangePath(exchange.code)}${suffix}`, statusCode: 308 });
+    }
     return { exchange, page: deps.page };
   },
   head: ({ loaderData }) => {
@@ -47,7 +55,7 @@ export const Route = createFileRoute("/exchange/$code")({
     const page = loaderData?.page ?? 1;
     const title = `${code} Stock Screener${page > 1 ? ` — Page ${page}` : " & Fundamental Analysis"} | DeepScreen`;
     const description = `Screen ${count} ${name} (${code}) companies in ${country || "this market"} by market cap, sector, P/E, PEG, ROCE and a transparent 13-factor score with ${currency} prices.`;
-    const url = `https://deepscreen.online/exchange/${code}${page > 1 ? `?page=${page}` : ""}`;
+    const url = `https://deepscreen.online${exchangePath(code, page)}`;
     return {
       meta: [
         { title },
@@ -104,7 +112,7 @@ function ExchangePage() {
   const [sector, setSector] = useState("all");
   const [indexIds, setIndexIds] = useState<string[]>([]);
   const [sort, setSort] = useState<SortKey>("name");
-  const [limit, setLimit] = useState(100);
+  const [limit, setLimit] = useState(DIRECTORY_PAGE_SIZE);
   const filtersActive = caps.length > 0 || sector !== "all" || indexIds.length > 0 || sort !== "name";
 
 
@@ -235,7 +243,7 @@ function ExchangePage() {
         </div>
 
         <div className="mt-6">
-          <StockTable stocks={filtersActive ? filtered.slice(0, limit) : filtered.slice((page - 1) * 100, page * 100)} />
+          <StockTable stocks={filtersActive ? filtered.slice(0, limit) : filtered.slice((page - 1) * DIRECTORY_PAGE_SIZE, page * DIRECTORY_PAGE_SIZE)} />
         </div>
 
         <MarketMovers
@@ -257,8 +265,16 @@ function ExchangePage() {
 
         {!filtersActive && <nav aria-label="Stock directory pages" className="mt-5 flex items-center justify-center gap-5 text-sm">
           {page > 1 && <a href={`/exchange/${exchange.code}${page > 2 ? `?page=${page - 1}` : ""}`} rel="prev" className="text-primary hover:underline">Previous page</a>}
-          <span>Page {page} of {Math.ceil(all.length / 100)}</span>
-          {page * 100 < all.length && <a href={`/exchange/${exchange.code}?page=${page + 1}`} rel="next" className="text-primary hover:underline">Next page</a>}
+          <span>Page {page} of {Math.ceil(all.length / DIRECTORY_PAGE_SIZE)}</span>
+          {page * DIRECTORY_PAGE_SIZE < all.length && <a href={`/exchange/${exchange.code}?page=${page + 1}`} rel="next" className="text-primary hover:underline">Next page</a>}
+        </nav>}
+        {!filtersActive && <nav aria-label="All stock directory pages" className="mt-4 flex flex-wrap justify-center gap-2">
+          {Array.from({ length: Math.ceil(all.length / DIRECTORY_PAGE_SIZE) }, (_, index) => index + 1).map((number) => (
+            <a key={number} href={exchangePath(exchange.code, number)} aria-current={number === page ? "page" : undefined}
+              className={cn("num rounded border px-3 py-1.5 text-xs", number === page ? "border-primary text-primary" : "border-border text-muted-foreground hover:text-foreground")}>
+              {number}
+            </a>
+          ))}
         </nav>}
         {filtersActive && filtered.length > limit && (
           <div className="mt-4 flex items-center justify-center gap-3">
