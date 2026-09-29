@@ -193,6 +193,7 @@ function ExchangePage() {
 
           <span className="num ml-4 text-xs uppercase text-muted-foreground">Sector</span>
           <select
+            aria-label="Filter by sector"
             value={sector}
             onChange={(e) => setSector(e.target.value)}
             className="rounded border border-border bg-background px-2 py-1.5 text-xs"
@@ -207,6 +208,7 @@ function ExchangePage() {
 
           <span className="num ml-4 text-xs uppercase text-muted-foreground">Sort</span>
           <select
+            aria-label="Sort stocks"
             value={sort}
             onChange={(e) => setSort(e.target.value as SortKey)}
             className="rounded border border-border bg-background px-2 py-1.5 text-xs"

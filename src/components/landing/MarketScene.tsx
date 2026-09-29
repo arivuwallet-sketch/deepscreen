@@ -1,7 +1,16 @@
 import { useEffect, useRef, useState } from "react";
+import "./scene.css";
 
 /** A decorative, locally rendered scene. The complete page also works without WebGL. */
-export function MarketScene({ paused, market }: { paused: boolean; market: number }) {
+export function MarketScene({
+  paused,
+  market,
+  variant = "journey",
+}: {
+  paused: boolean;
+  market: number;
+  variant?: "journey" | "compact";
+}) {
   const host = useRef<HTMLDivElement>(null);
   const controls = useRef({ paused, market });
   const [ready, setReady] = useState(false);
@@ -25,7 +34,7 @@ export function MarketScene({ paused, market }: { paused: boolean; market: numbe
         } catch {
           return;
         }
-        const compact = window.innerWidth < 760;
+        const compact = variant === "compact" || window.innerWidth < 760;
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, compact ? 1.25 : 1.75));
         renderer.setClearColor(0x000000, 0);
         renderer.toneMapping = T.ACESFilmicToneMapping;
@@ -177,27 +186,29 @@ export function MarketScene({ paused, market }: { paused: boolean; market: numbe
           const delta = Math.min((time - lastTime) / 1000, 0.04);
           lastTime = time;
           if (!reduced) rotation += delta * 0.13;
-          const journey = element.closest(".ds-journey")!;
-          const scroll = -journey.getBoundingClientRect().top;
+          const journey = element.closest(".ds-journey");
           const height = window.innerHeight;
-          const marketTop = (journey.querySelector("#markets") as HTMLElement).offsetTop;
-          const engineTop = (journey.querySelector("#engine") as HTMLElement).offsetTop;
-          const toMarkets = T.MathUtils.smoothstep(
-            scroll,
-            marketTop - height * 0.6,
-            marketTop - height * 0.2,
-          );
-          const back = T.MathUtils.smoothstep(
-            scroll,
-            engineTop - height * 0.6,
-            engineTop - height * 0.2,
-          );
-          const progress = toMarkets + back;
+          const scroll = journey ? -journey.getBoundingClientRect().top : window.scrollY;
+          const marketTop =
+            (journey?.querySelector("#markets") as HTMLElement | null)?.offsetTop ?? 0;
+          const engineTop =
+            (journey?.querySelector("#engine") as HTMLElement | null)?.offsetTop ?? 0;
+          const toMarkets =
+            variant === "compact"
+              ? 0
+              : T.MathUtils.smoothstep(scroll, marketTop - height * 0.6, marketTop - height * 0.2);
+          const back =
+            variant === "compact"
+              ? 0
+              : T.MathUtils.smoothstep(scroll, engineTop - height * 0.6, engineTop - height * 0.2);
+          const progress = variant === "compact" ? Math.min(scroll / height, 1) : toMarkets + back;
           const isMobile = window.innerWidth < 760;
-          // Deterministic scroll positions also work on low-frame-rate devices.
-          engine.position.x = isMobile ? 0 : 2.5 - toMarkets * 5 + back * 5;
+          // Keep the compact scene inside its own column, clear of text and controls.
+          engine.position.x =
+            variant === "compact" || isMobile ? 0 : 2.5 - toMarkets * 5 + back * 5;
           engine.position.y = isMobile ? 0.05 : -0.05;
-          const scale = isMobile ? 0.85 : 0.82;
+          const scale =
+            variant === "compact" ? Math.min(0.92, camera.aspect) : isMobile ? 0.85 : 0.82;
           engine.scale.setScalar(scale);
           engine.rotation.y =
             (reduced ? 0.1 : rotation + pointerX) +
@@ -288,13 +299,13 @@ export function MarketScene({ paused, market }: { paused: boolean; market: numbe
       disposed = true;
       cleanup();
     };
-  }, []);
+  }, [variant]);
 
   useEffect(() => {
     host.current?.dispatchEvent(new Event("scene-update"));
   }, [paused, market]);
   return (
-    <div className={`ds-scene ${ready ? "is-ready" : ""}`} aria-hidden="true">
+    <div className={`ds-scene ds-scene--${variant} ${ready ? "is-ready" : ""}`} aria-hidden="true">
       <div className="ds-scene-glow" />
       <div className="ds-scene-fallback">
         <span />

@@ -22,6 +22,7 @@ import {
   X,
 } from "lucide-react";
 import { MarketScene } from "./MarketScene";
+import { useMotionPreference } from "@/hooks/useMotionPreference";
 import "./landing.css";
 
 const MARKETS = [
@@ -277,7 +278,7 @@ function OptionsDemo() {
 export function LandingPage() {
   const [market, setMarket] = useState(0);
   const [factor, setFactor] = useState(0);
-  const [paused, setPaused] = useState(false);
+  const { paused, toggle: toggleMotion } = useMotionPreference();
   const [menu, setMenu] = useState(false);
   const [faq, setFaq] = useState<number | null>(0);
   const root = useRef<HTMLDivElement>(null);
@@ -376,7 +377,7 @@ export function LandingPage() {
                 <span className="ds-scroll-line" />
                 Scroll to discover
               </a>
-              <button onClick={() => setPaused(!paused)} aria-pressed={paused}>
+              <button onClick={toggleMotion} aria-pressed={paused}>
                 {paused ? <Play size={13} /> : <Pause size={13} />}
                 {paused ? "Resume motion" : "Pause motion"}
               </button>
