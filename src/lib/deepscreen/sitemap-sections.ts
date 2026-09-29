@@ -1,3 +1,4 @@
+import { DIRECTORY_PAGE_SIZE, exchangePath } from "@/lib/seo/directory";
 import type { AnyRouter } from "@tanstack/react-router";
 
 import {
@@ -17,9 +18,8 @@ import {
   STRATEGY_GUIDES,
 } from "@/lib/seo/content";
 
-// Large sites index better when the sitemap is split into smaller, topic-scoped
-// child sitemaps. This also avoids making Google wait for the whole universe
-// before it can fetch one small section.
+// Topic-scoped child sitemaps keep individual responses small and make
+// coverage easier to diagnose. Sitemap inclusion does not guarantee indexing.
 export const STOCK_CHUNK_SIZE = 2000;
 
 const SAFE_SITEMAP_PATH = /^\/[A-Za-z0-9\-._~/=%&'()]*$/;
@@ -116,7 +116,7 @@ function sectorParams(): Array<Record<string, string>> {
 
 /** Returns the stable list of child sitemap names without building all URLs. */
 export function sitemapSectionNames(): string[] {
-  const names = ["core", "markets", "learn"];
+  const names = ["core", "markets", "learn", "directories"];
 
   for (let index = 0; index * STOCK_CHUNK_SIZE < STOCKS.length; index += 1) {
     names.push("stocks-" + (index + 1));
@@ -149,6 +149,15 @@ export function buildSitemapSections(router: AnyRouter): Map<string, SitemapEntr
       sectorParams(),
     ),
   ];
+
+  const directories = isSitemapRouteIncluded(router.routesById["/exchange/$code"])
+    ? EXCHANGES.flatMap((exchange) => {
+        const pages = Math.ceil(stocksByExchange(exchange.code).length / DIRECTORY_PAGE_SIZE);
+        return Array.from({ length: Math.max(0, pages - 1) }, (_, index) => ({
+          path: exchangePath(exchange.code, index + 2),
+        }));
+      })
+    : [];
 
   const learn = [
     ...collectDynamic(
@@ -190,6 +199,7 @@ export function buildSitemapSections(router: AnyRouter): Map<string, SitemapEntr
   if (core.length) sections.set("core", core);
   if (markets.length) sections.set("markets", markets);
   if (learn.length) sections.set("learn", learn);
+  if (directories.length) sections.set("directories", directories);
 
   for (let index = 0; index * STOCK_CHUNK_SIZE < stocks.length; index += 1) {
     sections.set(

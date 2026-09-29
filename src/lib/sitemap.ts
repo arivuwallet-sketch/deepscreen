@@ -63,7 +63,12 @@ export interface SitemapEntry {
 }
 
 function isSafeSitemapPath(pathname: string): boolean {
-  if (!pathname.startsWith("/") || pathname.startsWith("//") || /[?#\\]/.test(pathname)) return false;
+  // Only the real, self-canonical exchange directory pages may carry a query.
+  // Arbitrary filters/tracking parameters must never enter the sitemap.
+  if (pathname.includes("?")) {
+    return /^\/exchange\/(?:NSE|BSE|NYSE|NASDAQ|LSE)\?page=(?:[2-9]|[1-9]\d+)$/.test(pathname);
+  }
+  if (!pathname.startsWith("/") || pathname.startsWith("//") || /[#\\]/.test(pathname)) return false;
   try {
     return decodeURI(new URL(pathname, "https://sitemap.invalid").pathname) === decodeURI(pathname);
   } catch {

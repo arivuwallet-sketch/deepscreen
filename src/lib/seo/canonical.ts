@@ -2,7 +2,8 @@
 export function canonicalRedirect(request: Request): Response | null {
   if (request.method !== "GET" && request.method !== "HEAD") return null;
   const url = new URL(request.url);
-  if (url.hostname !== "www.deepscreen.online") return null;
+  if (url.hostname !== "www.deepscreen.online" && url.hostname !== "deepscreen.online") return null;
+  if (url.hostname === "deepscreen.online" && url.protocol === "https:") return null;
   url.protocol = "https:";
   url.hostname = "deepscreen.online";
   url.port = "";

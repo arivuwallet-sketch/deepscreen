@@ -186,10 +186,10 @@ function extractBalanceSheetAndCompute(html: string): {
   };
 }
 
-async function fetchAndParse(url: string): Promise<ScreenerRatios | null> {
+async function fetchAndParse(url: string, signal?: AbortSignal): Promise<ScreenerRatios | null> {
   const res = await fetch(url, {
     headers: { "User-Agent": UA, Accept: "text/html" },
-    signal: AbortSignal.timeout(9000),
+    signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(9000)]) : AbortSignal.timeout(9000),
   });
   if (!res.ok) return null;
 
@@ -238,11 +238,11 @@ function normalizedWords(value: string): string[] {
     .filter(Boolean);
 }
 
-async function searchCompany(query: string, companyName?: string): Promise<string | null> {
+async function searchCompany(query: string, companyName?: string, signal?: AbortSignal): Promise<string | null> {
   if (!query.trim()) return null;
   const res = await fetch(`https://www.screener.in/api/company/search/?q=${encodeURIComponent(query)}`, {
     headers: { "User-Agent": UA, Accept: "application/json" },
-    signal: AbortSignal.timeout(7000),
+    signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(7000)]) : AbortSignal.timeout(7000),
   });
   if (!res.ok) return null;
   const hits = (await res.json()) as SearchHit[];
@@ -264,10 +264,11 @@ export async function fetchScreenerRatios(
   symbol: string,
   companyName?: string,
   knownSlug?: string | null,
+  signal?: AbortSignal,
 ): Promise<ScreenerRatios | null> {
   try {
     if (knownSlug) {
-      const known = await fetchAndParse(new URL(knownSlug, "https://www.screener.in").toString());
+      const known = await fetchAndParse(new URL(knownSlug, "https://www.screener.in").toString(), signal);
       if (known) return known;
     }
     // /consolidated/ first — the standalone page shows wrong values for
@@ -284,22 +285,22 @@ export async function fetchScreenerRatios(
     // large companies with subsidiaries carry the small residual risk the
     // consolidated switch was meant to avoid.
     const consolidated = await fetchAndParse(
-      `https://www.screener.in/company/${encodeURIComponent(symbol)}/consolidated/`,
+      `https://www.screener.in/company/${encodeURIComponent(symbol)}/consolidated/`, signal,
     );
     if (consolidated) return consolidated;
 
     const standalone = await fetchAndParse(
-      `https://www.screener.in/company/${encodeURIComponent(symbol)}/`,
+      `https://www.screener.in/company/${encodeURIComponent(symbol)}/`, signal,
     );
     if (standalone) return standalone;
 
     // Some exchange symbols do not match Screener's slug (notably numeric BSE
     // pages and renamed/demerged companies). Resolve those through the same
     // search endpoint used by Screener's own search box.
-    const symbolMatch = await searchCompany(symbol, companyName);
-    const nameMatch = symbolMatch ?? (companyName ? await searchCompany(companyName, companyName) : null);
+    const symbolMatch = await searchCompany(symbol, companyName, signal);
+    const nameMatch = symbolMatch ?? (companyName ? await searchCompany(companyName, companyName, signal) : null);
     return nameMatch
-      ? await fetchAndParse(new URL(nameMatch, "https://www.screener.in").toString())
+      ? await fetchAndParse(new URL(nameMatch, "https://www.screener.in").toString(), signal)
       : null;
   } catch {
     return null;

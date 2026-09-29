@@ -14,12 +14,12 @@ interface Session {
 
 let session: Session | null = null;
 
-async function getSession(): Promise<Session | null> {
+async function getSession(signal?: AbortSignal): Promise<Session | null> {
   if (session && Date.now() - session.at < 30 * 60_000) return session;
   try {
     const res = await fetch("https://fc.yahoo.com", {
       headers: { "User-Agent": UA },
-      signal: AbortSignal.timeout(8000),
+      signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(8000)]) : AbortSignal.timeout(8000),
     });
     const raw = res.headers.get("set-cookie") ?? "";
     const cookie = raw
@@ -30,7 +30,7 @@ async function getSession(): Promise<Session | null> {
     if (!cookie) return null;
     const cr = await fetch("https://query1.finance.yahoo.com/v1/test/getcrumb", {
       headers: { "User-Agent": UA, Cookie: cookie },
-      signal: AbortSignal.timeout(8000),
+      signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(8000)]) : AbortSignal.timeout(8000),
     });
     const crumb = (await cr.text()).trim();
     if (!crumb || crumb.length > 32) return null;
@@ -86,11 +86,11 @@ function isPence(currency: string | null | undefined): boolean {
   return c === "GBp" || c.toUpperCase() === "GBX";
 }
 
-export async function fetchChartQuote(ySymbol: string): Promise<LiveQuote | null> {
+export async function fetchChartQuote(ySymbol: string, signal?: AbortSignal): Promise<LiveQuote | null> {
   try {
     const res = await fetch(
       `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ySymbol)}?interval=1d&range=5d`,
-      { headers: { "User-Agent": UA }, signal: AbortSignal.timeout(9000) },
+      { headers: { "User-Agent": UA }, signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(9000)]) : AbortSignal.timeout(9000) },
     );
     if (!res.ok) return null;
     const json = (await res.json()) as {
@@ -196,8 +196,8 @@ function str(v: unknown): string | null {
   return typeof v === "string" && v.trim() ? v.trim() : null;
 }
 
-export async function fetchFundamentals(ySymbol: string): Promise<LiveFundamentals | null> {
-  const s = await getSession();
+export async function fetchFundamentals(ySymbol: string, signal?: AbortSignal): Promise<LiveFundamentals | null> {
+  const s = await getSession(signal);
   if (!s) return null;
   try {
     const modules = "summaryDetail,defaultKeyStatistics,financialData,assetProfile,price";
@@ -207,7 +207,7 @@ export async function fetchFundamentals(ySymbol: string): Promise<LiveFundamenta
       )}?modules=${modules}&crumb=${encodeURIComponent(s.crumb)}`,
       {
         headers: { "User-Agent": UA, Cookie: s.cookie },
-        signal: AbortSignal.timeout(10000),
+        signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(10000)]) : AbortSignal.timeout(10000),
       },
     );
     if (!res.ok) {
