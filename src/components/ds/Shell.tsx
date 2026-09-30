@@ -194,12 +194,6 @@ export function Shell({ children }: { children: ReactNode }) {
             Analytical model output, not investment advice.
           </p>
           <p className="mt-2 text-[11px] text-muted-foreground/80">Sooraj · Founder</p>
-          <a
-            href="tel:+917200689491"
-            className="mt-1 inline-block max-w-full text-[11px] text-muted-foreground/80 hover:text-foreground"
-          >
-            +91 72006 89491
-          </a>
         </div>
       </footer>
     </div>
