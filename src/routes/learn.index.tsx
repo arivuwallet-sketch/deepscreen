@@ -66,7 +66,7 @@ function LearnIndex() {
   return (
     <Shell>
       <div className="mx-auto max-w-5xl px-4 py-10">
-        <h1 className="text-3xl font-bold tracking-tight">Learn the markets</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Stock market guides and fundamental analysis</h1>
         <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground">
           Direct answers to the questions investors actually search for — how screening works, how
           Indian, US and UK exchanges differ, how to read a chart, and how to size a portfolio. No

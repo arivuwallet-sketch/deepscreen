@@ -338,7 +338,7 @@ export function LandingPage() {
           <MarketScene paused={paused} market={market} />
           <section className="ds-chapter ds-hero">
             <div className="ds-hero-copy">
-              <Eyebrow>Independent thinking. Informed investing.</Eyebrow>
+              <Eyebrow>Global stock screener. Informed investing.</Eyebrow>
               <h1>
                 See the signal.
                 <br />
@@ -347,7 +347,7 @@ export function LandingPage() {
                 <em>the noise.</em>
               </h1>
               <p className="ds-lead">
-                A world of stocks. A clearer perspective.
+                Research stocks across India, the US and the UK.
                 <br className="ds-desktop-break" /> Go deeper with powerful fundamentals, meaningful
                 market context and tools that put you in control.
               </p>

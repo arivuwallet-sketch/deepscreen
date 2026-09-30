@@ -41,12 +41,12 @@ function businessModelAnswer(stock: Stock, live?: LiveFundamentals | null): stri
   if (live?.summary) {
     return `${live.summary} This describes the company's disclosed business activity; for exact segment revenue, geography and customer concentration, use the latest annual report.`;
   }
-  return `${stock.name} operates in the ${stock.sector} sector. The business-model answer should be anchored to its products/services, pricing model, operating segments and sources of revenue rather than inferred from its stock price or valuation ratios.`;
+  return `A provider business profile for ${stock.name} is unavailable. The business-model answer should be anchored to its products/services, pricing model, operating segments and sources of revenue rather than inferred from its stock price or valuation ratios.`;
 }
 
 function longTermDemandAnswer(stock: Stock, live?: LiveFundamentals | null): string {
-  const industry = live?.industry ?? stock.sector;
-  return `${stock.name} is classified in ${industry}. Long-term demand is supported when the underlying industry, customer base and product/service use remain durable over multiple years. For ${stock.name}, test that through multi-year revenue and customer trends, retention/repeat purchases where applicable, pricing power, capacity utilisation and the risk of substitution or technological disruption.`;
+  const industry = live?.industry;
+  return `${industry ? `The provider classifies ${stock.name} in ${industry}.` : `A provider industry classification for ${stock.name} is unavailable.`} Long-term demand is supported when the underlying industry, customer base and product/service use remain durable over multiple years. For ${stock.name}, test that through multi-year revenue and customer trends, retention/repeat purchases where applicable, pricing power, capacity utilisation and the risk of substitution or technological disruption.`;
 }
 
 function profitabilityAnswer(
@@ -109,7 +109,7 @@ export function stockFaqs(
       q: `What is ${stock.symbol}'s P/E ratio?`,
       a: pe
         ? `The latest provider-backed P/E available to DeepScreen is ${pe}. Compare it with the company's own historical range, sustainable earnings growth and close industry peers, using the same reporting period.`
-        : "A current provider-backed P/E is not available. The defensible approach is to calculate or verify it from the latest price and reported trailing earnings rather than substitute a synthetic figure.",
+        : "A provider-backed P/E is currently unavailable. The defensible approach is to calculate or verify it from the latest price and reported trailing earnings rather than substitute a synthetic figure.",
     },
     {
       q: `How should I assess ${stock.name}'s profitability?`,
@@ -136,8 +136,8 @@ export function stockFaqs(
     {
       q: "Who are the main competitors, and how does the company differ from them?",
       a: peerNames.length
-        ? `Within DeepScreen's current ${stock.exchange} coverage, the closest same-sector listed peers include ${peerNames.join(", ")}. Treat these as a starting peer set rather than proof that each is a direct competitor; the direct comparison should use products, customers, geography, margins, growth, returns on capital and valuation.`
-        : `${stock.name} should be compared with companies selling similar products or services to similar customers in the same geography. A direct-peer set is more informative than comparing against the entire ${stock.sector} sector.`,
+        ? `DeepScreen's directory-based comparison candidates include ${peerNames.join(", ")}. Sector labels and market-cap proximity can use inferred or modeled directory inputs; these candidates are not a verified list of direct competitors; the direct comparison should use products, customers, geography, margins, growth, returns on capital and valuation.`
+        : `${stock.name} should be compared with companies selling similar products or services to similar customers in the same geography. A direct-peer set is more informative than comparing against a broad sector group inferred from directory data.`,
     },
     {
       q: "Are its products or services in long-term demand?",
@@ -147,7 +147,7 @@ export function stockFaqs(
       q: "Who are its primary customers (individuals, businesses, or government)?",
       a: live?.summary
         ? `The provider's business profile describes ${stock.name}'s activities as follows: ${live.summary} Customer mix itself is not a stock-market ratio, so the primary customers should be confirmed from the company's segment, geographic and customer disclosures.`
-        : `${stock.name} serves markets within the ${stock.sector} sector. Whether its primary customers are consumers, businesses or government depends on its disclosed end markets and contracts; use the company's segment and customer-concentration disclosures for the exact mix.`,
+        : `A provider business profile for ${stock.name} is unavailable. Whether its primary customers are consumers, businesses or government depends on its disclosed end markets and contracts; use the company's segment and customer-concentration disclosures for the exact mix.`,
     },
     {
       q: "Is the company consistently profitable, and is its revenue growing year-over-year?",

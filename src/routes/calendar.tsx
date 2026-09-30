@@ -16,22 +16,22 @@ export const Route = createFileRoute("/calendar")({
   staticData: { sitemap: true },
   head: () => ({
     meta: [
-      { title: "Earnings & Dividend Calendar — DeepScreen" },
+      { title: "Earnings & Dividend Calendar Planner | DeepScreen" },
       {
         name: "description",
         content:
-          "Upcoming earnings dates, estimated EPS, dividend ex-dates and payouts for the stocks you track across NSE, BSE, NYSE, NASDAQ and LSE.",
+          "Explore an illustrative earnings and dividend planner for your watchlist. Learn which event dates and figures to verify in official company announcements.",
       },
-      { property: "og:title", content: "Earnings & Dividend Calendar — DeepScreen" },
+      { property: "og:title", content: "Earnings & Dividend Calendar Planner | DeepScreen" },
       {
         property: "og:description",
-        content: "Corporate event schedule for your watchlist: earnings, ex-dates and payouts.",
+        content: "Explore an illustrative earnings and dividend planner for your watchlist. Learn which event dates and figures to verify in official company announcements.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "https://deepscreen.online/calendar" },
-      { name: "twitter:title", content: "Earnings & Dividend Calendar — DeepScreen" },
-      { name: "twitter:description", content: "Upcoming earnings dates, estimates, dividend ex-dates and payouts across five exchanges." },
+      { name: "twitter:title", content: "Earnings & Dividend Calendar Planner | DeepScreen" },
+      { name: "twitter:description", content: "Explore an illustrative earnings and dividend planner for your watchlist. Learn which event dates and figures to verify in official company announcements." },
       { name: "keywords", content: metaKeywords(calendarKeywords, screenerKeywords) },
     ],
     links: [{ rel: "canonical", href: "https://deepscreen.online/calendar" }],
@@ -74,13 +74,14 @@ function CalendarPage() {
   return (
     <Shell>
       <div className="mx-auto max-w-5xl px-4 py-8">
-        <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Earnings & dividend calendar</h1>
+        <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Earnings & dividend calendar planner</h1>
+        <p className="mt-4 rounded-lg border border-warn/40 bg-warn/5 p-4 text-sm"><strong>Illustrative schedule.</strong> Dates, EPS estimates and dividend amounts on this board are generated model examples, not confirmed company announcements. Verify earnings dates, ex-dividend dates and payouts with the company or exchange before using them.</p>
         <p className="mt-2 text-sm text-muted-foreground">
           {stocks.length
-            ? `Corporate events for the ${stocks.length} stocks on your watchlist.`
+            ? `Illustrative events for the ${stocks.length} stocks on your watchlist.`
             : signedIn
-              ? "Your watchlist is empty — showing the large-cap default board."
-              : "Showing the large-cap default board. Sign in and star stocks to personalise it."}
+              ? "Your watchlist is empty — showing the example default board."
+              : "Showing the example default board. Sign in and star stocks to personalise it."}
         </p>
 
         <div className="mt-4 flex flex-wrap gap-2 text-xs">

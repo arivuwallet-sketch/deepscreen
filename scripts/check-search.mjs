@@ -25,7 +25,7 @@ try {
   const home = await get('/screener');
   assert.equal(home.status, 200);
   const html = await home.text();
-  assert.match(html, /Understand stocks before you trust the numbers/);
+  assert.match(html, /Global stock screener and fundamental research/);
   assert.ok(!html.includes('SearchAction'));
   assert.ok(!html.includes('Highest-scoring companies globally'));
   const jsonScripts = [...html.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)];

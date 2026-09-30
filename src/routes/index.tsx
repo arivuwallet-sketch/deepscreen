@@ -3,7 +3,7 @@ import { LandingPage } from "@/components/landing/LandingPage";
 import { buildGraph, buildWebApplicationSchema, jsonLd } from "@/lib/seo/json-ld";
 import { metaKeywords, screenerKeywords, stocksKeywords, learnKeywords, optionsKeywords, calendarKeywords, ipoKeywords, portfolioKeywords, indiaKeywords, usKeywords, ukKeywords } from "@/lib/seo/keywords";
 
-const title = "DeepScreen — See the Signal. Beyond the Noise.";
+const title = "Global Stock Screener & Fundamental Analysis | DeepScreen";
 const description =
   "Explore global stocks with DeepScreen: five exchanges, a 13-factor fundamental model, DCF and Graham valuation, company research, market news, IPOs and options strategy tools.";
 export const Route = createFileRoute("/")({

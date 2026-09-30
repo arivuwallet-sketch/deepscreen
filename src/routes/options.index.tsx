@@ -99,10 +99,10 @@ function OptionsPage() {
   return (
     <Shell>
       <div className="mx-auto max-w-7xl px-4 py-8">
-        <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Options strategy lab</h1>
+        <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Options strategy calculator: payoffs and Greeks</h1>
         <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
           Black-Scholes-Merton pricing with dividend yield, exact Greeks per leg, payoff scan and
-          lognormal probability of profit — all 12 strategies evaluated at once on the live spot.
+          lognormal probability of profit — compare 12 theoretical strategies. The calculator uses an available provider spot quote or a modeled fallback, with user-selected volatility, rate and expiry assumptions. Premiums are calculated estimates, not executable option-chain quotes.
         </p>
 
         <div className="mt-6 grid gap-4 rounded-lg border border-border p-4 md:grid-cols-4">

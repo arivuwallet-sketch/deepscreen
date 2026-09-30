@@ -1,3 +1,6 @@
+import { CompanyResearch } from "@/components/ds/CompanyResearch";
+import type { Stock } from "@/lib/deepscreen/types";
+import type { ExchangeCode } from "@/lib/seo/json-ld";
 import { stockPath } from "@/lib/seo/directory";
 import { buildArticleSchema, buildBreadcrumbSchema, buildCorporationSchema, buildFAQSchema, buildGraph, jsonLd } from "@/lib/seo/json-ld";
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
@@ -57,6 +60,16 @@ function peerExchangeCodesFor(exchange: string): string[] {
   return ["LSE"];
 }
 
+// Keep the existing directory peer selection identical in the body and schema.
+function researchPeerNames(stock: Stock): string[] {
+  return peerExchangeCodesFor(stock.exchange)
+    .flatMap((exchange) => stocksByExchange(exchange))
+    .filter((peer) => peer.symbol !== stock.symbol && peer.sector === stock.sector)
+    .sort((a, b) => Math.abs(Math.log(Math.max(a.marketCap, 0.001) / Math.max(stock.marketCap, 0.001))) - Math.abs(Math.log(Math.max(b.marketCap, 0.001) / Math.max(stock.marketCap, 0.001))))
+    .slice(0, 5)
+    .map((peer) => peer.symbol + " (" + peer.name + ")");
+}
+
 export const Route = createFileRoute("/stock/$exchange/$symbol")({
   staticData: { sitemap: true },
   loader: async ({ params, location }) => {
@@ -97,15 +110,9 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
       loaderData.snapshot.fundamentals,
       loaderData.snapshot.screener,
     );
-    const title = `${s.symbol} — ${s.name} Fundamental Analysis | DeepScreen`;
+    const title = `${s.name} (${s.exchange}: ${s.symbol}) — Share Price & Fundamentals | DeepScreen`;
     const description = `Research ${s.name} (${s.exchange}: ${s.symbol}): available financial ratios, valuation, company news and data limitations on DeepScreen.`;
-    const peerNames = peerExchangeCodesFor(s.exchange)
-      .flatMap((exchange) => stocksByExchange(exchange))
-      .filter((peer) => peer.symbol !== s.symbol && peer.sector === s.sector)
-      .sort((a, b) => Math.abs(Math.log(Math.max(a.marketCap, 0.001) / Math.max(s.marketCap, 0.001))) - Math.abs(Math.log(Math.max(b.marketCap, 0.001) / Math.max(s.marketCap, 0.001))))
-      .slice(0, 5)
-      .map((peer) => peer.symbol + " (" + peer.name + ")");
-    const faqs = stockFaqs(s, sources, loaderData.snapshot.fundamentals, peerNames);
+    const faqs = stockFaqs(s, sources, loaderData.snapshot.fundamentals, researchPeerNames(s));
     const url = `https://deepscreen.online${stockPath(s.exchange, s.symbol)}`;
     const schemaAnalysis = Object.values(sources).some((value) => value === "live")
       ? analyze(s)
@@ -160,11 +167,10 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
                 url,
                 about: buildCorporationSchema({
                   symbol: s.symbol,
-                  exchange: s.exchange,
+                  exchange: s.exchange as ExchangeCode,
                   companyName: s.name,
-                  sector: s.sector,
-                  score: schemaAnalysis?.score,
-                  verdict: schemaAnalysis?.verdict,
+                  ...(loaderData.snapshot.fundamentals?.sector ? { sector: loaderData.snapshot.fundamentals.sector } : {}),
+                  ...(schemaAnalysis ? { score: schemaAnalysis.score, verdict: schemaAnalysis.verdict } : {}),
                 }),
               }),
               buildFAQSchema(
@@ -314,17 +320,8 @@ function StockPage() {
         <p className="mt-3 text-sm text-muted-foreground">Provider fundamentals have not loaded. Scores, valuation targets and financial ratios are withheld here rather than filled with simulated values. Try again later and check company filings.</p>
         <Link to="/methodology" className="mt-3 inline-block text-primary">How the research model works</Link>
       </section>
-      <section className="mt-6"><h2 className="text-lg font-semibold">Research questions</h2><dl className="mt-4 space-y-4">{stockFaqs(
-        live,
-        sources,
-        liveFundamentals,
-        peerExchangeCodesFor(live.exchange)
-          .flatMap((exchange) => stocksByExchange(exchange))
-          .filter((peer) => peer.symbol !== live.symbol && peer.sector === live.sector)
-          .sort((a, b) => Math.abs(Math.log(Math.max(a.marketCap, 0.001) / Math.max(live.marketCap, 0.001))) - Math.abs(Math.log(Math.max(b.marketCap, 0.001) / Math.max(live.marketCap, 0.001))))
-          .slice(0, 5)
-          .map((peer) => peer.symbol + " (" + peer.name + ")"),
-      ).map(faq => <div key={faq.q}><dt className="font-medium">{faq.q}</dt><dd className="mt-1 text-sm text-muted-foreground">{faq.a}</dd></div>)}</dl></section>
+      <CompanyResearch stock={stock} profile={liveFundamentals ?? null} />
+      <section className="mt-6"><h2 className="text-lg font-semibold">Research questions</h2><dl className="mt-4 space-y-4">{stockFaqs(live, sources, liveFundamentals, researchPeerNames(live)).map(faq => <div key={faq.q}><dt className="font-medium">{faq.q}</dt><dd className="mt-1 text-sm text-muted-foreground">{faq.a}</dd></div>)}</dl></section>
       <TopicIndex ids={["stocks", "learn"]} inContainer />
     </article></Shell>;
   }
@@ -640,10 +637,11 @@ function StockPage() {
             />
           </div>
         </section>
+        <CompanyResearch stock={stock} profile={liveFundamentals ?? null} />
         <section className="mt-8 border-t border-border pt-6">
           <h2 className="text-lg font-semibold">Frequently asked questions about {stock.symbol}</h2>
           <dl className="mt-5 space-y-5">
-            {stockFaqs(live, sources).map((faq) => (
+            {stockFaqs(live, sources, liveFundamentals, researchPeerNames(live)).map((faq) => (
               <div key={faq.q}>
                 <dt className="text-sm font-semibold">{faq.q}</dt>
                 <dd className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{faq.a}</dd>
