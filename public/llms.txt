@@ -35,11 +35,11 @@
 
 ## Stock filter library
 
-- [Stock filters and screener categories](https://deepscreen.online/stock-filters): the public directory of all DeepScreen stock-filter categories.
+- [Stock filters and screener categories](https://deepscreen.online/stock-filters): the public directory of DeepScreen's live, data-backed stock-filter categories.
 - Category URL pattern: `https://deepscreen.online/stock-filters/{FILTER-SLUG}`.
-- Data-backed filter pages list matching companies using the documented fields available to the filter engine.
-- Reference filter pages explain what the category means, which data is required, how to research it and why unsupported stock memberships are not invented.
-- Every public stock-filter URL is internally linked and included in the XML sitemap for discovery.
+- Every published filter page has a working classification rule and lists matching companies using fields available to the filter engine.
+- Categories that cannot be classified reliably from DeepScreen's current dataset are not published as filter pages and are not included in the XML sitemap.
+- Published filter URLs are internally linked and included in the XML sitemap for discovery.
 - Examples: [Value stocks](https://deepscreen.online/stock-filters/value-stocks), [Growth stocks](https://deepscreen.online/stock-filters/growth-stocks), [High ROCE low debt stocks](https://deepscreen.online/stock-filters/high-roce-low-debt-stocks), [Nifty 50 stocks](https://deepscreen.online/stock-filters/nifty-50-stocks).
 
 ## Research and education
