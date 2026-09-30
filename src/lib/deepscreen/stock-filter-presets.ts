@@ -288,7 +288,16 @@ function descriptorRules(label: string): Rule[] {
 
 function buildPreset(label: string): StockFilterPreset {
   const exact = direct.get(label.toLowerCase());
-  if (exact) return { id: slugify(label), label, group: groupFor(label), status: "available", ...exact };
+  if (exact) {
+    return {
+      id: slugify(label),
+      label,
+      group: groupFor(label),
+      status: "available",
+      description: exact.description,
+      test: exact.rule,
+    };
+  }
 
   const unsupported = unsupportedPatterns.find(([pattern]) => pattern.test(label));
   if (unsupported) {
