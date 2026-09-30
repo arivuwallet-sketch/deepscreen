@@ -65,6 +65,8 @@ try {
   for (const path of samples) {
     const html = documents.get(path).html;
     assert.match(html, /Financial data currently unavailable/, `${path}: explicit unavailable state`);
+    assert.match(html, /Company profile reference:/, `${path}: missing profile is not attributed as a sourced description`);
+    assert.match(html, /href="https:\/\/finance\.yahoo\.com\/quote\/[^"]+\/profile\/"/, `${path}: external company profile reference`);
     assert.match(html, /Financial statements and reporting periods/, `${path}: statement coverage explained`);
     assert.ok(!html.includes('DeepScreen Score'), `${path}: no synthetic score in degraded structured data`);
   }

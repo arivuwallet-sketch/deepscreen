@@ -384,6 +384,7 @@ function StockPage() {
         <p className="mt-4 max-w-5xl text-sm leading-relaxed text-muted-foreground">
           {stockSummary(live)}
         </p>
+        <CompanyResearch stock={stock} profile={liveFundamentals ?? null} />
 
         {(() => {
           const memberships = getIndexMemberships(stock.exchange, stock.symbol);
@@ -637,7 +638,6 @@ function StockPage() {
             />
           </div>
         </section>
-        <CompanyResearch stock={stock} profile={liveFundamentals ?? null} />
         <section className="mt-8 border-t border-border pt-6">
           <h2 className="text-lg font-semibold">Frequently asked questions about {stock.symbol}</h2>
           <dl className="mt-5 space-y-5">
