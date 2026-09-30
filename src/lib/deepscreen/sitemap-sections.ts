@@ -187,16 +187,14 @@ export function buildSitemapSections(router: AnyRouter): Map<string, SitemapEntr
     ),
   ];
 
-  // Only data-backed filter pages are submitted for indexing. Reference URLs
-  // that still need verified ownership, technical, historical or event data
-  // remain accessible from the hub but carry noindex and are omitted here.
+  // Every public stock-filter URL is discoverable. Data-backed pages show
+  // matching companies; reference pages explain the category and required
+  // evidence without fabricating membership.
   const filters = collectDynamic(
     router,
     "/stock-filters/$slug",
     "/stock-filters/$slug",
-    STOCK_FILTER_PRESETS.filter((preset) => preset.status === "available").map((preset) => ({
-      slug: preset.id,
-    })),
+    STOCK_FILTER_PRESETS.map((preset) => ({ slug: preset.id })),
   );
 
   const stocks = collectDynamic(
