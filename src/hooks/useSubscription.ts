@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
+import {
+  isSubscriptionActive,
+  MAX_EXPIRY_TIMER_MS,
+  subscriptionExpiryDelay,
+} from "@/lib/billing/subscription-entitlement";
 import { useAuth } from "./useAuth";
 
 export type Tier = "weekly" | "monthly" | "annual";
@@ -60,11 +65,19 @@ export interface SubscriptionState {
   refresh: () => void;
 }
 
+type SubscriptionRow = {
+  tier: Tier;
+  expires_at: string;
+  status: string;
+};
+
 export function useSubscription(): SubscriptionState {
   const { user, loading: authLoading } = useAuth();
-  const [row, setRow] = useState<{ tier: Tier; expires_at: string } | null>(null);
+  const [row, setRow] = useState<SubscriptionRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [nonce, setNonce] = useState(0);
+
+  const refresh = useCallback(() => setNonce((n) => n + 1), []);
 
   useEffect(() => {
     if (authLoading) return;
@@ -73,33 +86,78 @@ export function useSubscription(): SubscriptionState {
       setLoading(false);
       return;
     }
+
     let active = true;
     setLoading(true);
+    const nowIso = new Date().toISOString();
+
     supabase
       .from("subscriptions")
       .select("tier, expires_at, status")
       .eq("user_id", user.id)
+      .eq("status", "active")
+      .gt("expires_at", nowIso)
       .maybeSingle()
       .then(({ data }) => {
         if (!active) return;
-        setRow(
-          data && data.status === "active" && new Date(data.expires_at) > new Date()
-            ? { tier: data.tier as Tier, expires_at: data.expires_at }
-            : null,
-        );
+        const candidate = data
+          ? {
+              tier: data.tier as Tier,
+              expires_at: data.expires_at,
+              status: data.status,
+            }
+          : null;
+        setRow(isSubscriptionActive(candidate) ? candidate : null);
         setLoading(false);
       });
+
     return () => {
       active = false;
     };
   }, [user, authLoading, nonce]);
 
-  const refresh = useCallback(() => setNonce((n) => n + 1), []);
+  // Lock paid features at the exact end time even if the user leaves a page
+  // open continuously. Long plans are re-armed in browser-safe timer chunks.
+  useEffect(() => {
+    if (!row) return;
+
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const arm = () => {
+      const remaining = subscriptionExpiryDelay(row.expires_at);
+      if (remaining <= 0) {
+        setRow(null);
+        return;
+      }
+      timer = setTimeout(arm, Math.min(remaining + 25, MAX_EXPIRY_TIMER_MS));
+    };
+    arm();
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [row]);
+
+  // Revalidate against the database whenever the tab becomes active again.
+  // This catches server-side cancellations and expiries that happened while
+  // the browser was asleep/suspended.
+  useEffect(() => {
+    if (!user) return;
+    const onFocus = () => refresh();
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") refresh();
+    };
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [user, refresh]);
 
   return {
-    isPro: row !== null,
-    tier: row?.tier ?? null,
-    expiresAt: row?.expires_at ?? null,
+    isPro: isSubscriptionActive(row),
+    tier: isSubscriptionActive(row) ? row?.tier ?? null : null,
+    expiresAt: isSubscriptionActive(row) ? row?.expires_at ?? null : null,
     loading: authLoading || loading,
     signedIn: !!user,
     refresh,

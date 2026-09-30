@@ -69,7 +69,7 @@ export const createCheckout = createServerFn({ method: "POST" })
 
         const { getAdmin } = await import("./activate.server");
         const admin = await getAdmin();
-        await admin.from("payment_orders").insert({
+        const { error: insertError } = await admin.from("payment_orders").insert({
           link_id: order.orderId,
           user_id: user.id,
           tier: plan.tier,
@@ -77,6 +77,9 @@ export const createCheckout = createServerFn({ method: "POST" })
           currency: "INR",
           status: "created",
         });
+        if (insertError) {
+          return { ok: false, error: "Payment order could not be recorded. Please try again." };
+        }
 
         return { ok: true, orderId: order.orderId, paymentSessionId: order.paymentSessionId };
       } catch (e) {
@@ -98,12 +101,12 @@ export const confirmCheckout = createServerFn({ method: "POST" })
 
     try {
       const remote = await fetchOrder(cfg, data.orderId);
-      const { getAdmin, grantSubscription } = await import("./activate.server");
+      const { activatePaidOrder, getAdmin } = await import("./activate.server");
       const admin = await getAdmin();
 
       const { data: order } = await admin
         .from("payment_orders")
-        .select("user_id, tier, status, amount, currency")
+        .select("user_id, status, amount, currency")
         .eq("link_id", data.orderId)
         .maybeSingle();
 
@@ -114,10 +117,10 @@ export const confirmCheckout = createServerFn({ method: "POST" })
         await admin
           .from("payment_orders")
           .update({ status: remote.status.toLowerCase() })
-          .eq("link_id", data.orderId);
+          .eq("link_id", data.orderId)
+          .neq("status", "paid");
         return { ok: true, paid: false, status: remote.status };
       }
-      if (order.status === "paid") return { ok: true, paid: true, status: "PAID" };
       if (
         order.currency !== "INR" ||
         remote.currency !== "INR" ||
@@ -126,13 +129,13 @@ export const confirmCheckout = createServerFn({ method: "POST" })
         await admin
           .from("payment_orders")
           .update({ status: "underpaid" })
-          .eq("link_id", data.orderId);
+          .eq("link_id", data.orderId)
+          .neq("status", "paid");
         return { ok: true, paid: false, status: "PARTIALLY_PAID" };
       }
 
-      const granted = await grantSubscription(admin, order.user_id, order.tier as Tier);
-      if (!granted.ok) return granted;
-      await admin.from("payment_orders").update({ status: "paid" }).eq("link_id", data.orderId);
+      const activation = await activatePaidOrder(admin, data.orderId);
+      if (!activation.ok) return activation;
       return { ok: true, paid: true, status: "PAID" };
     } catch (e) {
       return { ok: false, error: e instanceof Error ? e.message : "Could not verify payment." };
