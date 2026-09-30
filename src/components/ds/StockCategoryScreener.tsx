@@ -64,16 +64,10 @@ export function StockCategoryScreener({
   const [showCatalog, setShowCatalog] = useState(false);
   const [limit, setLimit] = useState(100);
 
-  const availableCount = useMemo(
-    () => STOCK_FILTER_PRESETS.filter((preset) => preset.status === "available").length,
-    [],
-  );
-  const needsDataCount = STOCK_FILTER_PRESETS.length - availableCount;
-
   const counts = useMemo(() => {
     const map = new Map<string, number>();
     for (const preset of STOCK_FILTER_PRESETS) {
-      if (preset.status !== "available" || !preset.test) continue;
+      if (!preset.test) continue;
       let count = 0;
       for (const stock of stocks) if (preset.test(stock)) count += 1;
       map.set(preset.id, count);
@@ -88,7 +82,7 @@ export function StockCategoryScreener({
 
   const totalMatches = selected ? counts.get(selected.id) ?? 0 : 0;
   const matches = useMemo(() => {
-    if (!selected || selected.status !== "available") return [];
+    if (!selected) return [];
     return sortByMarketCap(filterStocksByPreset(stocks, selected)).slice(0, limit);
   }, [stocks, selected, limit]);
 
@@ -102,14 +96,9 @@ export function StockCategoryScreener({
         )
       : showCatalog
         ? STOCK_FILTER_PRESETS
-        : STOCK_FILTER_PRESETS.filter(
-            (preset) => preset.status === "available" && FEATURED_LABELS.has(preset.label),
-          );
+        : STOCK_FILTER_PRESETS.filter((preset) => FEATURED_LABELS.has(preset.label));
 
-    return [...base].sort((a, b) => {
-      if (a.status !== b.status) return a.status === "available" ? -1 : 1;
-      return a.label.localeCompare(b.label);
-    });
+    return [...base].sort((a, b) => a.label.localeCompare(b.label));
   }, [query, showCatalog]);
 
   const groups = useMemo(() => {
@@ -123,7 +112,6 @@ export function StockCategoryScreener({
   }, [visiblePresets]);
 
   const choose = (preset: StockFilterPreset) => {
-    if (preset.status !== "available") return;
     setSelectedId((current) => (current === preset.id ? null : preset.id));
     setLimit(100);
   };
@@ -137,15 +125,12 @@ export function StockCategoryScreener({
             <h2 className="text-base font-semibold">{title}</h2>
           </div>
           <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-            Search the full category catalog and open a data-backed preset. A stock can belong to
-            multiple categories at the same time. Category rules use existing DeepScreen directory
-            fields only; filters that need missing ownership, technical, event or historical data
-            are listed but disabled rather than guessed.
+            Search the live category catalog and open any preset. A stock can belong to multiple
+            categories at the same time. Every published category uses an existing DeepScreen
+            directory field and a working classification rule.
           </p>
           <p className="mt-2 text-xs text-muted-foreground">
-            {STOCK_FILTER_PRESETS.length.toLocaleString()} requested category names ·{" "}
-            {availableCount.toLocaleString()} currently classifiable ·{" "}
-            {needsDataCount.toLocaleString()} protected from unsupported classification
+            {STOCK_FILTER_PRESETS.length.toLocaleString()} live, data-backed category filters
           </p>
         </div>
 
@@ -186,26 +171,22 @@ export function StockCategoryScreener({
             <div className="flex flex-wrap gap-2">
               {presets.map((preset) => {
                 const active = selectedId === preset.id;
-                const disabled = preset.status !== "available";
                 const count = counts.get(preset.id);
                 return (
                   <button
                     type="button"
                     key={preset.id}
-                    disabled={disabled}
                     onClick={() => choose(preset)}
-                    title={disabled ? preset.missingData : preset.description}
+                    title={preset.description}
                     className={cn(
                       "rounded-full border px-3 py-1.5 text-left text-xs transition-colors",
                       active
                         ? "border-primary bg-primary text-primary-foreground"
-                        : disabled
-                          ? "cursor-not-allowed border-border/70 bg-background/30 text-muted-foreground/50"
-                          : "border-border bg-background text-muted-foreground hover:border-primary/60 hover:text-foreground",
+                        : "border-border bg-background text-muted-foreground hover:border-primary/60 hover:text-foreground",
                     )}
                   >
                     {preset.label}
-                    {!disabled && typeof count === "number" && (
+                    {typeof count === "number" && (
                       <span
                         className={cn(
                           "ml-1.5",
@@ -215,7 +196,6 @@ export function StockCategoryScreener({
                         {count.toLocaleString()}
                       </span>
                     )}
-                    {disabled && <span className="ml-1.5">· needs data</span>}
                   </button>
                 );
               })}
@@ -224,7 +204,7 @@ export function StockCategoryScreener({
         ))}
       </div>
 
-      {selected && selected.status === "available" && (
+      {selected && (
         <div className="mt-6 border-t border-border pt-5">
           <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
             <div>
