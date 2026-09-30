@@ -11,6 +11,13 @@ export type ActivationResult =
   | { ok: true; outcome: "activated" | "already_paid"; expiresAt: string | null }
   | { ok: false; error: string };
 
+type ActivationRpcRow = {
+  outcome: string;
+  user_id: string;
+  tier: string;
+  expires_at: string | null;
+};
+
 /**
  * Atomically marks one verified Cashfree order as paid and grants its plan.
  * The database function locks the order row, so webhook delivery and browser
@@ -20,7 +27,17 @@ export async function activatePaidOrder(
   admin: SupabaseClient<Database>,
   orderId: string,
 ): Promise<ActivationResult> {
-  const { data, error } = await admin.rpc("activate_paid_order", { p_link_id: orderId });
+  // The checked-in generated Supabase types intentionally lag migrations.
+  // Keep this one RPC typed locally until the next schema type regeneration.
+  const rpc = admin.rpc as unknown as (
+    fn: "activate_paid_order",
+    args: { p_link_id: string },
+  ) => PromiseLike<{
+    data: ActivationRpcRow[] | null;
+    error: { message: string } | null;
+  }>;
+
+  const { data, error } = await rpc("activate_paid_order", { p_link_id: orderId });
   if (error) return { ok: false, error: error.message };
 
   const result = Array.isArray(data) ? data[0] : null;
