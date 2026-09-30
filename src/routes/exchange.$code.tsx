@@ -47,14 +47,15 @@ export const Route = createFileRoute("/exchange/$code")({
     return { exchange, page: deps.page };
   },
   head: ({ loaderData }) => {
-    const name = loaderData?.exchange.name ?? "Exchange";
-    const code = loaderData?.exchange.code ?? "";
+    if (!loaderData) return { meta: [{ title: "Exchange not found | DeepScreen" }, { name: "robots", content: "noindex" }] };
+    const name = loaderData.exchange.name;
+    const code = loaderData.exchange.code;
     const country = loaderData?.exchange.country ?? "";
     const currency = loaderData?.exchange.currency ?? "";
     const count = code ? stocksByExchange(code).length : 0;
     const page = loaderData?.page ?? 1;
     const title = `${code} Stock Screener${page > 1 ? ` — Page ${page}` : " & Fundamental Analysis"} | DeepScreen`;
-    const description = `Screen ${count} ${name} (${code}) companies in ${country || "this market"} by market cap, sector, P/E, PEG, ROCE and a transparent 13-factor score with ${currency} prices.`;
+    const description = `Browse ${name} (${code}) stocks in ${country}. Page ${page} of ${Math.ceil(count / DIRECTORY_PAGE_SIZE)}: company names, symbols and links to available share prices, financial ratios and research.`;
     const url = `https://deepscreen.online${exchangePath(code, page)}`;
     return {
       meta: [
@@ -164,7 +165,7 @@ function ExchangePage() {
             {exchange.country} · {exchange.currency} · {exchange.timezone}
           </p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight">
-            {exchange.flag} {exchange.code} Screener
+            {exchange.flag} {exchange.code} Stock Screener{page > 1 ? ` — Page ${page}` : ""}
           </h1>
           <p className="mt-1 text-muted-foreground">{exchange.name}</p>
           <p className="mt-4 max-w-3xl text-sm leading-relaxed text-muted-foreground">
@@ -172,6 +173,7 @@ function ExchangePage() {
             valuation, growth, capital efficiency and leverage. DeepScreen combines 13 fundamental
             ratios into one research score while keeping each underlying figure visible.
           </p>
+          <p className="mt-3 max-w-3xl text-xs text-muted-foreground">Directory filters and initial ordering can use modeled market caps, ratios and inferred sectors. Open a company page to check provider-backed fields and data availability; these groupings are not an official exchange classification.</p>
         </header>
 
         <div className="mt-6 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-panel p-3">

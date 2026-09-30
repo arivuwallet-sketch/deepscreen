@@ -8,7 +8,7 @@ export const Route = createFileRoute("/ratios/")({
   staticData: { sitemap: true },
   head: () => ({ meta: [
     { title: "Stock Market Ratio Glossary | DeepScreen" },
-    { name: "description", content: "Plain-English definitions, formulas and limitations for the 13 fundamental ratios used by DeepScreen." },
+    { name: "description", content: "Financial ratio definitions, formulas and limitations: the 13-factor model plus Piotroski F-Score, Altman Z-Score and Beneish M-Score." },
     { name: "keywords", content: metaKeywords(["stock market ratios", "financial ratio glossary", "fundamental ratios", "stock valuation ratios", "13 factor stock model"], stocksKeywords, learnKeywords) },
     { property: "og:title", content: "Stock Market Ratio Glossary | DeepScreen" },
     { property: "og:description", content: "Learn P/E, PEG, P/S, P/B, EV/EBITDA, ROE, ROA, ROCE, debt ratios and more." },

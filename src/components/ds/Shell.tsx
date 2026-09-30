@@ -6,6 +6,7 @@ import { useMotionPreference } from "@/hooks/useMotionPreference";
 import { useWorkspaceEffects } from "@/hooks/useWorkspaceEffects";
 import { AuthButton } from "./AuthButton";
 import { SearchBar } from "./SearchBar";
+import { ResearchNextSteps } from "./ResearchNextSteps";
 import { WorkspaceAtmosphere } from "./WorkspaceAtmosphere";
 
 const NAV_ITEMS: Array<readonly [string, string]> = [
@@ -129,6 +130,7 @@ export function Shell({ children }: { children: ReactNode }) {
       <WorkspaceAtmosphere path={path} paused={paused} onToggle={toggle} />
       <main id="workspace-content" tabIndex={-1} className="ds-workspace-content min-w-0">
         {children}
+        <ResearchNextSteps path={path} />
       </main>
       <footer className="ds-workspace-footer">
         <div className="ds-workspace-footer-intro">

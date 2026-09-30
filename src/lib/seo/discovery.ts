@@ -103,7 +103,7 @@ export function resourceHead(
                 },
             buildBreadcrumbSchema([
               { name: "DeepScreen", url: `${ORIGIN}/` },
-              { name: title.split(" | ")[0], url },
+              { name: title.split(" | ")[0] ?? title, url },
             ]),
           ),
         ),

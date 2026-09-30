@@ -19,13 +19,13 @@ export const Route = createFileRoute("/screener")({
   staticData: { sitemap: true },
   head: () => ({
     meta: [
-      { title: "DeepScreen — Beginner Stock Research & Fundamental Analysis" },
+      { title: "Stock Screener for NSE, BSE, US & UK Markets | DeepScreen" },
       {
         name: "description",
         content:
           "Beginner-first stock research across NSE, BSE, NYSE, Nasdaq and LSE. DeepScreen explains ratios, highlights potential traps and combines fundamental analysis with market context.",
       },
-      { property: "og:title", content: "DeepScreen — Beginner Stock Research & Fundamental Analysis" },
+      { property: "og:title", content: "Stock Screener for NSE, BSE, US & UK Markets | DeepScreen" },
       {
         property: "og:description",
         content:
@@ -34,7 +34,7 @@ export const Route = createFileRoute("/screener")({
       { property: "og:url", content: "https://deepscreen.online/screener" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "DeepScreen — Beginner Stock Research & Fundamental Analysis" },
+      { name: "twitter:title", content: "Stock Screener for NSE, BSE, US & UK Markets | DeepScreen" },
       {
         name: "twitter:description",
         content:
@@ -58,7 +58,7 @@ export const Route = createFileRoute("/screener")({
                 "Cap-based screening across NSE, BSE, NYSE, Nasdaq and LSE",
                 "DCF and Graham intrinsic-value models",
                 "Live IPO calendar",
-                "Earnings and dividend calendar",
+                "Illustrative earnings and dividend planner",
                 "Options Greeks and strategy payoffs",
               ],
             }),
@@ -66,22 +66,22 @@ export const Route = createFileRoute("/screener")({
               {
                 question: "What is DeepScreen?",
                 answer:
-                  "DeepScreen is a stock screener that scores listed companies on NSE, BSE, NYSE, Nasdaq and LSE using a 13-factor valuation and quality model.",
+                  `DeepScreen is a stock screener that scores listed companies on ${EXCHANGES.length} exchanges — NSE, BSE, NYSE, Nasdaq and LSE — using a 13-factor valuation and quality model covering P/E, PEG, P/S, P/B, EV/Revenue, EV/EBITDA, ROE, ROA, ROCE, leverage, payout and operating leverage.`,
               },
               {
-                question: "Which markets does DeepScreen cover?",
+                question: "Which markets does it cover?",
                 answer:
                   "Indian markets through the NSE and BSE, US markets through the NYSE and Nasdaq, and UK markets through the LSE.",
               },
               {
-                question: "Can I use DeepScreen for free?",
+                question: "Can I use it free?",
                 answer:
-                  "Yes. Search, raw fundamental ratios, the IPO pipeline, news and the economic calendar are free. The full verdict, valuation models and alerts are part of Pro.",
+                  "Yes. Search, raw fundamental ratios, the IPO pipeline, news and the economic calendar are free. The full verdict, valuation models and alerts are part of Pro — see pricing.",
               },
               {
-                question: "Is DeepScreen investment advice?",
+                question: "Is this investment advice?",
                 answer:
-                  "No. DeepScreen publishes analytical model output for research and education only, not personalized investment advice.",
+                  "No. DeepScreen publishes analytical model output for research and education only, not investment advice. Questions? Reach the team on the contact page.",
               },
             ]),
           ),
@@ -107,10 +107,10 @@ function Home() {
         <div className="mx-auto max-w-7xl px-4 py-14">
           <p className="num text-xs uppercase tracking-[0.25em] text-primary">God-mode screening</p>
           <h1 className="mt-3 max-w-3xl text-4xl font-bold leading-tight tracking-tight md:text-5xl">
-            Understand stocks before you trust the numbers.
+            Global stock screener and fundamental research
           </h1>
           <p className="mt-4 max-w-2xl text-muted-foreground">
-            DeepScreen is a beginner-first stock research and fundamental-analysis platform. It explains what ratios mean, highlights potential traps and tells you what to investigate next. Its 13-factor model covers P/E, PEG, P/S, P/B, EV/Revenue, EV/EBITDA, ROE, ROA, ROCE, leverage, payout and operating leverage — across
+            DeepScreen is a stock screener for NSE, BSE, NYSE, Nasdaq and LSE listings, with fundamental research for beginners. It explains what ratios mean, highlights potential traps and tells you what to investigate next. Its 13-factor model covers P/E, PEG, P/S, P/B, EV/Revenue, EV/EBITDA, ROE, ROA, ROCE, leverage, payout and operating leverage — across
             Indian, US and UK markets, then pairs it with live news and macro events.
           </p>
           <div className="mt-6 max-w-xl">
