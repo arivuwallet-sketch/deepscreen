@@ -11,6 +11,24 @@ export function CompanyResearch({
   stock: Stock;
   profile?: LiveFundamentals | null;
 }) {
+  const summary = profile?.summary?.trim();
+  // Use the exact provider ticker when available. Fallback follows the existing
+  // Yahoo integration's exchange mapping without changing its data requests.
+  const suffix: Record<string, string> = { NSE: ".NS", BSE: ".BO", LSE: ".L" };
+  const ticker =
+    profile?.symbol?.trim() ||
+    `${stock.symbol.trim().toUpperCase().replace(/\s+/g, "-")}${suffix[stock.exchange.toUpperCase()] ?? ""}`;
+  const sourceUrl = `https://finance.yahoo.com/quote/${encodeURIComponent(ticker)}/profile/`;
+  let companyWebsite: string | null = null;
+  if (profile?.website) {
+    try {
+      const url = new URL(profile.website);
+      if (["https:", "http:"].includes(url.protocol) && !url.username && !url.password)
+        companyWebsite = url.href;
+    } catch {
+      /* Omit malformed provider URLs. */
+    }
+  }
   const comparisons = STOCK_COMPARISONS.filter((pair) =>
     [pair.left, pair.right].some(
       (item) => item.exchange === stock.exchange && item.symbol === stock.symbol,
@@ -54,8 +72,31 @@ export function CompanyResearch({
         )}
       </dl>
       <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-        {profile?.summary ||
-          `A provider business description for ${stock.name} is currently unavailable. Check its official annual report for products, customers, operating segments and geographic exposure.`}
+        {summary ||
+          `${stock.name} is listed in DeepScreen’s ${stock.exchange} directory under the ticker ${stock.symbol}. A verified business description is currently unavailable; consult the company profile or its annual report for products, services and operating segments.`}
+      </p>
+      <p className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs text-muted-foreground">
+        <span>
+          {summary ? "Source: " : "Company profile reference: "}
+          <a
+            href={sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline"
+          >
+            Yahoo Finance — {stock.name} company profile
+          </a>
+        </span>
+        {companyWebsite && (
+          <a
+            href={companyWebsite}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline"
+          >
+            Company website
+          </a>
+        )}
       </p>
       <h3 className="mt-6 font-semibold">Financial statements and reporting periods</h3>
       <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
