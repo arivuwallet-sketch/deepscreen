@@ -12,9 +12,12 @@ const schemaNodes = value => Array.isArray(value) ? value.flatMap(schemaNodes) :
 const documents = new Map();
 const issues = [];
 try {
-  const index = locs(await (await get('/sitemap.xml')).text());
-  const allUrls = [];
-  for (const child of index) allUrls.push(...locs(await (await get(new URL(child).pathname)).text()));
+  const sitemapResponse = await get('/sitemap.xml');
+  assert.equal(sitemapResponse.status, 200, 'sitemap status');
+  const sitemapXml = await sitemapResponse.text();
+  assert.match(sitemapXml, /<urlset\b/, 'flat sitemap root');
+  assert.ok(!sitemapXml.includes('<sitemapindex'), 'sitemap is not a child index');
+  const allUrls = locs(sitemapXml);
   const listed = new Set(allUrls.map(url => new URL(url).pathname + new URL(url).search));
   const samples = ['NSE', 'BSE', 'NYSE', 'NASDAQ', 'LSE'].map(exchange => {
     const path = [...listed].find(path => path.startsWith(`/stock/${exchange}/`));

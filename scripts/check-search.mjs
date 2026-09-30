@@ -33,24 +33,19 @@ try {
   for (const match of jsonScripts) JSON.parse(match[1]);
   console.log('PASS home SSR, descriptive heading and valid JSON-LD');
 
-  const index = await get('/sitemap.xml');
-  assert.equal(index.status, 200);
-  const sections = [...(await index.text()).matchAll(/<loc>(.*?)<\/loc>/g)].map(m => new URL(m[1]).pathname);
-  assert.ok(sections.length > 3);
-  let urls = 0;
-  for (const path of sections) {
-    const response = await get(path);
-    assert.equal(response.status, 200, path);
-    assert.match(response.headers.get('content-type'), /xml/);
-    const xml = await response.text();
-    assert.ok(!xml.includes('/ratios/pe-ratio'));
-    assert.ok(!xml.includes('/learn/pe-ratio</loc>'));
-    assert.ok(!xml.includes('/options-strategy/'));
-    urls += [...xml.matchAll(/<url>/g)].length;
-  }
+  const sitemap = await get('/sitemap.xml');
+  assert.equal(sitemap.status, 200);
+  assert.match(sitemap.headers.get('content-type') || '', /xml/);
+  const xml = await sitemap.text();
+  assert.match(xml, /<urlset\b/);
+  assert.ok(!xml.includes('<sitemapindex'));
+  assert.ok(!xml.includes('/ratios/pe-ratio'));
+  assert.ok(!xml.includes('/learn/pe-ratio</loc>'));
+  assert.ok(!xml.includes('/options-strategy/'));
+  const urls = [...xml.matchAll(/<url>/g)].length;
   assert.ok(urls > 13000);
   assert.equal((await get('/sitemaps/unknown.xml')).status, 404);
-  console.log(`PASS sitemap index, ${sections.length} child sitemaps and ${urls} URLs`);
+  console.log(`PASS single sitemap with ${urls} URLs`);
 
   for (const [from, to] of [['/ratios/pe-ratio', '/learn/pe-ratio-explained'], ['/options-strategy/long-call', '/options/long-call']]) {
     const response = await get(from, { redirect: 'manual' });
