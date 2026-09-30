@@ -12,6 +12,7 @@ import { analyze, verdictClass } from "@/lib/deepscreen/metrics";
 import { mergeLiveStock } from "@/lib/deepscreen/live-merge";
 import { formatCap, formatPrice, formatVolume } from "@/lib/deepscreen/format";
 import type { Stock } from "@/lib/deepscreen/types";
+import { liveMarketCapBillions, liveQuoteVolume } from "@/lib/market/live-equity-stats";
 import type { LiveFundamentals, LiveQuote } from "@/lib/market/yahoo.server";
 import type { ScreenerRatios } from "@/lib/market/screener.server";
 import { cn } from "@/lib/utils";
@@ -64,6 +65,8 @@ function StockRow({
   const { stock: merged } = mergeLiveStock(stock, quote, fundamentals, screener);
   const analysis = analyze(merged);
   const priceFlash = usePriceFlash(merged.price);
+  const marketCap = liveMarketCapBillions(quote, fundamentals);
+  const volume = liveQuoteVolume(quote);
 
   return (
     <tr className="group animate-fade-in hover:bg-accent/40" style={{ animationDelay: `${delayMs}ms` }}>
@@ -86,19 +89,32 @@ function StockRow({
         )}
       >
         {quote ? formatPrice(merged.price, stock.exchange) : "—"}
-        {quote ? <span className="ml-1 inline-block size-1.5 rounded-full bg-bull align-middle" title="Live price" /> : null}
+        {quote ? <span className="ml-1 inline-block size-1.5 rounded-full bg-bull align-middle" title="Latest provider quote" /> : null}
       </td>
       <td className={cn("num px-2 py-2.5 text-right font-medium", merged.changePct >= 0 ? "text-bull" : "text-bear")}>
         {quote ? `${merged.changePct >= 0 ? "+" : ""}${merged.changePct.toFixed(2)}%` : "—"}
       </td>
       <td className="num px-2 py-2.5 text-right">
-        {fundamentals?.marketCap != null ? formatCap(merged.marketCap, stock.exchange) : "—"}
+        {marketCap.value !== null ? formatCap(marketCap.value, stock.exchange) : "—"}
+        {marketCap.source !== "unavailable" ? (
+          <span
+            className="ml-1 inline-block size-1.5 rounded-full bg-bull align-middle"
+            title={
+              marketCap.source === "quote-derived"
+                ? "Latest quote × reported shares outstanding"
+                : "Latest available provider market cap"
+            }
+          />
+        ) : null}
       </td>
       <td className="num px-2 py-2.5 text-right">{merged.fundamentals.pe.toFixed(1)}</td>
       <td className="num px-2 py-2.5 text-right">{merged.fundamentals.peg.toFixed(2)}</td>
       <td className="num px-2 py-2.5 text-right">{merged.fundamentals.roce.toFixed(1)}%</td>
       <td className="num px-2 py-2.5 text-right text-muted-foreground">
-        {quote?.volume != null ? formatVolume(quote.volume) : "—"}
+        {volume !== null ? formatVolume(volume) : "—"}
+        {volume !== null ? (
+          <span className="ml-1 inline-block size-1.5 rounded-full bg-bull align-middle" title="Latest provider volume" />
+        ) : null}
       </td>
       <td className="px-2 py-2.5" title="Calculated from the available live and modeled fundamentals">
         <ScoreBar score={analysis.score} />
@@ -154,7 +170,7 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
         </tbody>
       </table>
       <p className="border-t border-border px-4 py-2 text-[11px] text-muted-foreground">
-        <span className="mr-1 inline-block size-1.5 rounded-full bg-bull align-middle" /> Live price refreshed every 15s. Indian ratios are fetched from Screener.in and retained in the shared cache; Yahoo Finance supplies other exchanges{fundamentalsLoading ? " (updating…)" : ""}. Scores and verdicts use the available fundamentals and modeled fallback values while provider data loads.
+        <span className="mr-1 inline-block size-1.5 rounded-full bg-bull align-middle" /> Price, volume and quote-derived market cap refresh every 15s while upstream quote data is available. Market cap uses latest price × reported shares outstanding, with provider market cap as a fallback{fundamentalsLoading ? " (updating…)" : ""}. Exchange/provider data can be delayed, especially outside market hours. Scores and verdicts are unchanged.
       </p>
     </div>
   );

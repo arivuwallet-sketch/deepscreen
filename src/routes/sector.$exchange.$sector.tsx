@@ -1,10 +1,12 @@
 import { jsonLd } from "@/lib/seo/json-ld";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useState } from "react";
 import { Shell } from "@/components/ds/Shell";
 import { StockTable } from "@/components/ds/StockTable";
 import { getExchange } from "@/lib/deepscreen/exchanges";
 import { SECTORS, stocksByExchange } from "@/lib/deepscreen/stocks";
 import { analyze } from "@/lib/deepscreen/metrics";
+import { DIRECTORY_PAGE_SIZE } from "@/lib/seo/directory";
 import {
   exchangeKeywords,
   metaKeywords,
@@ -84,6 +86,12 @@ export const Route = createFileRoute("/sector/$exchange/$sector")({
 });
 function SectorPage() {
   const { exchange, sector, stocks } = Route.useLoaderData();
+  const [page, setPage] = useState(1);
+  const pageCount = Math.max(1, Math.ceil(stocks.length / DIRECTORY_PAGE_SIZE));
+  const safePage = Math.min(page, pageCount);
+  const start = (safePage - 1) * DIRECTORY_PAGE_SIZE;
+  const visibleStocks = stocks.slice(start, start + DIRECTORY_PAGE_SIZE);
+
   return (
     <Shell>
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -104,8 +112,35 @@ function SectorPage() {
           business profile and reported figures before treating it as a sector peer.
         </p>
         <div className="mt-8">
-          <StockTable stocks={stocks} />
+          <StockTable stocks={visibleStocks} />
         </div>
+        {pageCount > 1 ? (
+          <nav
+            className="mt-5 flex flex-wrap items-center justify-center gap-3 text-sm"
+            aria-label={`${sector} stock pages`}
+          >
+            <button
+              type="button"
+              disabled={safePage <= 1}
+              onClick={() => setPage((current) => Math.max(1, current - 1))}
+              className="rounded-md border border-border px-3 py-1.5 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Previous
+            </button>
+            <span className="num text-xs text-muted-foreground" aria-live="polite">
+              Showing {start + 1}–{Math.min(start + DIRECTORY_PAGE_SIZE, stocks.length)} of {stocks.length}
+              {` · Page ${safePage} of ${pageCount}`}
+            </span>
+            <button
+              type="button"
+              disabled={safePage >= pageCount}
+              onClick={() => setPage((current) => Math.min(pageCount, current + 1))}
+              className="rounded-md border border-border px-3 py-1.5 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Next
+            </button>
+          </nav>
+        ) : null}
       </div>
     </Shell>
   );
