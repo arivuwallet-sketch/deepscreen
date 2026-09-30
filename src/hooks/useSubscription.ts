@@ -2,9 +2,12 @@ import { useCallback, useEffect, useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import {
+  entitlementFromPaidOrders,
+  hasPaidOrderHistory,
   isSubscriptionActive,
   MAX_EXPIRY_TIMER_MS,
   subscriptionExpiryDelay,
+  type PaidSubscriptionOrder,
 } from "@/lib/billing/subscription-entitlement";
 import { useAuth } from "./useAuth";
 
@@ -81,7 +84,7 @@ export function useSubscription(): SubscriptionState {
   // React Query hooks immediately after useSubscription(), and changing the
   // number/order of hooks inside this custom hook can corrupt an already-mounted
   // Vite/React Fast Refresh tree (the updateReducerImpl "reading next" crash).
-  // Expiry timing, focus revalidation and the database read therefore live in
+  // Expiry timing, focus revalidation and all database reads therefore live in
   // this single effect rather than adding/removing separate hooks over time.
   useEffect(() => {
     if (authLoading) return;
@@ -133,15 +136,38 @@ export function useSubscription(): SubscriptionState {
 
     setLoading(true);
     const nowIso = new Date().toISOString();
-    supabase
-      .from("subscriptions")
-      .select("tier, expires_at, status")
-      .eq("user_id", user.id)
-      .eq("status", "active")
-      .gt("expires_at", nowIso)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (!active) return;
+
+    // Read both the current subscription row and the user's immutable paid-order
+    // ledger. For accounts that have paid orders, the ledger is authoritative:
+    // it prevents a historically over-extended subscriptions.expires_at value
+    // from keeping Pro unlocked after the actual purchased duration ended.
+    void Promise.all([
+      supabase
+        .from("subscriptions")
+        .select("tier, expires_at, status")
+        .eq("user_id", user.id)
+        .eq("status", "active")
+        .gt("expires_at", nowIso)
+        .maybeSingle(),
+      supabase
+        .from("payment_orders")
+        .select("tier, status, created_at")
+        .eq("user_id", user.id)
+        .eq("status", "paid")
+        .order("created_at", { ascending: true }),
+    ]).then(([subscriptionResult, ordersResult]) => {
+      if (!active) return;
+
+      const paidOrders = (ordersResult.data ?? []) as PaidSubscriptionOrder[];
+      let nextRow: SubscriptionRow | null = null;
+
+      if (!ordersResult.error && hasPaidOrderHistory(paidOrders)) {
+        const ledger = entitlementFromPaidOrders(paidOrders);
+        nextRow = ledger
+          ? { tier: ledger.tier, expires_at: ledger.expires_at, status: ledger.status }
+          : null;
+      } else {
+        const data = subscriptionResult.data;
         const candidate = data
           ? {
               tier: data.tier as Tier,
@@ -149,11 +175,13 @@ export function useSubscription(): SubscriptionState {
               status: data.status,
             }
           : null;
-        const nextRow = isSubscriptionActive(candidate) ? candidate : null;
-        setRow(nextRow);
-        setLoading(false);
-        if (nextRow) armExpiry(nextRow.expires_at);
-      });
+        nextRow = isSubscriptionActive(candidate) ? candidate : null;
+      }
+
+      setRow(nextRow);
+      setLoading(false);
+      if (nextRow) armExpiry(nextRow.expires_at);
+    });
 
     return () => {
       active = false;
