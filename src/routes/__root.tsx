@@ -14,6 +14,28 @@ import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
+const FONT_CSS =
+  "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=optional";
+
+// This small layout-only stylesheet is deliberately rendered directly in the
+// document head. It makes the very first paint use the real device width even
+// when the main CSS/font assets are still cold. The full design system replaces
+// these declarations as soon as styles.css is available.
+const CRITICAL_RESPONSIVE_CSS = `
+html,body{width:100%;min-width:0;max-width:100%;margin:0;overflow-x:hidden;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+@supports (overflow:clip){html,body{overflow-x:clip}}
+*,*::before,*::after{box-sizing:border-box}
+img,svg,video,canvas{max-width:100%}
+.ds-workspace,.ds-workspace-header,.ds-workspace-content{width:100%;min-width:0;max-width:100%}
+.ds-workspace{overflow-x:hidden}
+@supports (overflow:clip){.ds-workspace{overflow-x:clip}}
+.ds-workspace-topbar,.ds-workspace-navrow{width:100%;min-width:0;max-width:1440px;margin-inline:auto}
+.ds-workspace-topbar>*{min-width:0}
+.ds-workspace-search{min-width:0;max-width:100%}
+@media(max-width:959px){.ds-workspace-navrow{display:none}.ds-workspace-search{flex:1;width:auto}}
+@media(max-width:639px){.ds-workspace-topbar{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto auto}.ds-workspace-search{grid-column:1/-1;width:100%;margin:0}}
+`;
+
 function NotFoundComponent() {
   return (
     <div className="ds-system-page">
@@ -78,8 +100,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   staticData: { sitemap: false },
   head: () => ({
     meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "DeepScreen — Beginner Stock Research & Financial Analysis" },
       { name: "description", content: "DeepScreen is a beginner-first stock research platform that explains financial ratios, highlights potential traps and guides you through fundamental analysis across India, the US and the UK." },
       { name: "author", content: "DeepScreen" },
@@ -103,15 +123,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap",
+        href: appCss,
+      },
+      {
+        rel: "stylesheet",
+        href: FONT_CSS,
       },
       { rel: "icon", href: "/favicon.svg?v=20260930", type: "image/svg+xml" },
       { rel: "icon", href: "/favicon.ico?v=20260930", type: "image/x-icon" },
@@ -131,6 +151,12 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
+        <meta charSet="utf-8" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover"
+        />
+        <style dangerouslySetInnerHTML={{ __html: CRITICAL_RESPONSIVE_CSS }} />
         <HeadContent />
         <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18457575020" />
         <script
