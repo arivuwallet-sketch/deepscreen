@@ -1,0 +1,278 @@
+import { useMemo, useState } from "react";
+import { Search, SlidersHorizontal } from "lucide-react";
+
+import { StockTable } from "@/components/ds/StockTable";
+import {
+  STOCK_FILTER_PRESETS,
+  filterStocksByPreset,
+  type StockFilterPreset,
+} from "@/lib/deepscreen/stock-filter-presets";
+import type { Stock } from "@/lib/deepscreen/types";
+import { cn } from "@/lib/utils";
+
+const FEATURED_LABELS = new Set([
+  "Value stocks",
+  "Growth stocks",
+  "Income stocks",
+  "Quality stocks",
+  "Momentum stocks",
+  "Blue chip stocks",
+  "Large cap stocks",
+  "Mid cap stocks",
+  "Small cap stocks",
+  "Penny stocks",
+  "Undervalued stocks",
+  "High ROE stocks",
+  "High ROCE stocks",
+  "Debt free stocks",
+  "Low debt stocks",
+  "High dividend yield stocks",
+  "High growth stocks",
+  "Potential multibagger stocks",
+  "Quality compounder stocks",
+  "High ROE low PE stocks",
+  "High ROCE low debt stocks",
+  "Top gainers",
+  "Top losers",
+  "High volume stocks",
+  "Defensive stocks",
+  "Cyclical stocks",
+  "Nifty 50 stocks",
+  "S&P 500 stocks",
+  "Nasdaq 100 stocks",
+  "FTSE 100 stocks",
+]);
+
+function sortByMarketCap(stocks: Stock[]): Stock[] {
+  return [...stocks].sort(
+    (a, b) =>
+      b.marketCap - a.marketCap ||
+      a.name.localeCompare(b.name) ||
+      a.symbol.localeCompare(b.symbol),
+  );
+}
+
+export function StockCategoryScreener({
+  stocks,
+  title = "Stock categories & preset filters",
+}: {
+  stocks: Stock[];
+  title?: string;
+}) {
+  const [query, setQuery] = useState("");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [showCatalog, setShowCatalog] = useState(false);
+  const [limit, setLimit] = useState(100);
+
+  const availableCount = useMemo(
+    () => STOCK_FILTER_PRESETS.filter((preset) => preset.status === "available").length,
+    [],
+  );
+  const needsDataCount = STOCK_FILTER_PRESETS.length - availableCount;
+
+  const counts = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const preset of STOCK_FILTER_PRESETS) {
+      if (preset.status !== "available" || !preset.test) continue;
+      let count = 0;
+      for (const stock of stocks) if (preset.test(stock)) count += 1;
+      map.set(preset.id, count);
+    }
+    return map;
+  }, [stocks]);
+
+  const selected = useMemo(
+    () => STOCK_FILTER_PRESETS.find((preset) => preset.id === selectedId),
+    [selectedId],
+  );
+
+  const totalMatches = selected ? counts.get(selected.id) ?? 0 : 0;
+  const matches = useMemo(() => {
+    if (!selected || selected.status !== "available") return [];
+    return sortByMarketCap(filterStocksByPreset(stocks, selected)).slice(0, limit);
+  }, [stocks, selected, limit]);
+
+  const visiblePresets = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const base = q
+      ? STOCK_FILTER_PRESETS.filter(
+          (preset) =>
+            preset.label.toLowerCase().includes(q) ||
+            preset.group.toLowerCase().includes(q),
+        )
+      : showCatalog
+        ? STOCK_FILTER_PRESETS
+        : STOCK_FILTER_PRESETS.filter(
+            (preset) => preset.status === "available" && FEATURED_LABELS.has(preset.label),
+          );
+
+    return [...base].sort((a, b) => {
+      if (a.status !== b.status) return a.status === "available" ? -1 : 1;
+      return a.label.localeCompare(b.label);
+    });
+  }, [query, showCatalog]);
+
+  const groups = useMemo(() => {
+    const map = new Map<string, StockFilterPreset[]>();
+    for (const preset of visiblePresets) {
+      const list = map.get(preset.group);
+      if (list) list.push(preset);
+      else map.set(preset.group, [preset]);
+    }
+    return [...map.entries()].sort(([a], [b]) => a.localeCompare(b));
+  }, [visiblePresets]);
+
+  const choose = (preset: StockFilterPreset) => {
+    if (preset.status !== "available") return;
+    setSelectedId((current) => (current === preset.id ? null : preset.id));
+    setLimit(100);
+  };
+
+  return (
+    <section className="rounded-xl border border-border bg-panel p-4 sm:p-5">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+          <div className="flex items-center gap-2">
+            <SlidersHorizontal className="size-4 text-primary" />
+            <h2 className="text-base font-semibold">{title}</h2>
+          </div>
+          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+            Search the full category catalog and open a data-backed preset. A stock can belong to
+            multiple categories at the same time. Category rules use existing DeepScreen directory
+            fields only; filters that need missing ownership, technical, event or historical data
+            are listed but disabled rather than guessed.
+          </p>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {STOCK_FILTER_PRESETS.length.toLocaleString()} requested category names ·{" "}
+            {availableCount.toLocaleString()} currently classifiable ·{" "}
+            {needsDataCount.toLocaleString()} protected from unsupported classification
+          </p>
+        </div>
+
+        <div className="w-full lg:max-w-sm">
+          <label className="relative block">
+            <span className="sr-only">Search stock filters</span>
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search value, ROCE, dividend, Nifty..."
+              className="w-full rounded-lg border border-border bg-background py-2 pl-9 pr-3 text-sm outline-none transition focus:border-primary"
+            />
+          </label>
+          <button
+            type="button"
+            onClick={() => setShowCatalog((value) => !value)}
+            className="mt-2 text-xs font-medium text-primary hover:underline"
+          >
+            {showCatalog
+              ? "Show featured filters"
+              : `Browse all ${STOCK_FILTER_PRESETS.length} filters`}
+          </button>
+        </div>
+      </div>
+
+      <div
+        className={cn(
+          "mt-5 space-y-5",
+          (showCatalog || query) && "max-h-[34rem] overflow-y-auto pr-1",
+        )}
+      >
+        {groups.map(([group, presets]) => (
+          <div key={group}>
+            <p className="num mb-2 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+              {group}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {presets.map((preset) => {
+                const active = selectedId === preset.id;
+                const disabled = preset.status !== "available";
+                const count = counts.get(preset.id);
+                return (
+                  <button
+                    type="button"
+                    key={preset.id}
+                    disabled={disabled}
+                    onClick={() => choose(preset)}
+                    title={disabled ? preset.missingData : preset.description}
+                    className={cn(
+                      "rounded-full border px-3 py-1.5 text-left text-xs transition-colors",
+                      active
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : disabled
+                          ? "cursor-not-allowed border-border/70 bg-background/30 text-muted-foreground/50"
+                          : "border-border bg-background text-muted-foreground hover:border-primary/60 hover:text-foreground",
+                    )}
+                  >
+                    {preset.label}
+                    {!disabled && typeof count === "number" && (
+                      <span
+                        className={cn(
+                          "ml-1.5",
+                          active ? "text-primary-foreground/75" : "text-muted-foreground/70",
+                        )}
+                      >
+                        {count.toLocaleString()}
+                      </span>
+                    )}
+                    {disabled && <span className="ml-1.5">· needs data</span>}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {selected && selected.status === "available" && (
+        <div className="mt-6 border-t border-border pt-5">
+          <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h3 className="text-lg font-semibold">{selected.label}</h3>
+              <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
+                {selected.description}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {totalMatches.toLocaleString()} of {stocks.length.toLocaleString()} companies match
+                this rule. Directory ratios and classifications can be modeled or inferred; verify
+                live/provider-backed values on the company page before making decisions.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSelectedId(null)}
+              className="rounded border border-border px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground"
+            >
+              Clear category
+            </button>
+          </div>
+
+          {totalMatches > 0 ? (
+            <>
+              <StockTable stocks={matches} />
+              {totalMatches > limit && (
+                <div className="mt-4 flex items-center justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setLimit((value) => value + 100)}
+                    className="rounded border border-border px-4 py-2 text-xs uppercase tracking-wide text-muted-foreground hover:border-primary/60 hover:text-foreground"
+                  >
+                    Load 100 more
+                  </button>
+                  <span className="num text-xs text-muted-foreground">
+                    showing {Math.min(limit, totalMatches).toLocaleString()} of{" "}
+                    {totalMatches.toLocaleString()}
+                  </span>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="rounded-lg border border-dashed border-border p-6 text-sm text-muted-foreground">
+              No companies in this universe currently match the selected rule.
+            </div>
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
