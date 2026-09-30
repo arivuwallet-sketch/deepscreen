@@ -92,10 +92,8 @@ function StockFilterPage() {
   const preset = findStockFilterPreset(loaded.id);
   const [limit, setLimit] = useState(INITIAL_LIMIT);
 
-  if (!preset) return null;
-
   const matches = useMemo(() => {
-    if (preset.status !== "available") return [];
+    if (!preset || preset.status !== "available") return [];
     return filterStocksByPreset(STOCKS, preset).sort(
       (a, b) =>
         b.marketCap - a.marketCap ||
@@ -103,6 +101,8 @@ function StockFilterPage() {
         a.symbol.localeCompare(b.symbol),
     );
   }, [preset]);
+
+  if (!preset) return null;
 
   const related = STOCK_FILTER_PRESETS.filter(
     (item) => item.id !== preset.id && item.group === preset.group,
