@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { createSnapshotLoader } from '../src/lib/market/snapshot-cache.ts';
 import { directoryPage, exchangePath, stockPath } from '../src/lib/seo/directory.ts';
 import { canonicalRedirect } from '../src/lib/seo/canonical.ts';
@@ -116,6 +117,50 @@ test('sitemaps allow real directory pagination and reject arbitrary query varian
   for (const path of ['/exchange/BSE?page=1', '/exchange/BSE?page=2&sort=score', '/exchange/BSE?page=02', '/stock/NSE/TCS?x=1', '//elsewhere.test', '/exchange/BSE?page=2#x']) {
     assert.throws(() => sitemapXML('https://deepscreen.online', [{ path }]), path);
   }
+});
+
+test('public crawler policy allows major search and AI crawlers', async () => {
+  const robots = await readFile(new URL('../public/robots.txt', import.meta.url), 'utf8');
+  for (const agent of [
+    'Googlebot',
+    'Bingbot',
+    'OAI-SearchBot',
+    'ChatGPT-User',
+    'GPTBot',
+    'Claude-SearchBot',
+    'Claude-User',
+    'ClaudeBot',
+    'PerplexityBot',
+    'Google-Extended',
+    'Applebot-Extended',
+    'meta-externalagent',
+  ]) {
+    assert.match(robots, new RegExp(`User-agent: ${agent.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
+  }
+  assert.ok(!robots.includes('User-agent: GPTBot\nDisallow: /\n'));
+  assert.ok(!robots.includes('User-agent: ClaudeBot\nDisallow: /\n'));
+  assert.ok(!robots.includes('User-agent: Google-Extended\nDisallow: /\n'));
+  assert.match(robots, /User-agent: \*\nAllow: \//);
+  assert.match(robots, /Sitemap: https:\/\/deepscreen\.online\/sitemap\.xml/);
+});
+
+test('all public stock-filter pages remain indexable and sitemap-discoverable', async () => {
+  const filterRoute = await readFile(
+    new URL('../src/routes/stock-filters.$slug.tsx', import.meta.url),
+    'utf8',
+  );
+  const sitemapSections = await readFile(
+    new URL('../src/lib/deepscreen/sitemap-sections.ts', import.meta.url),
+    'utf8',
+  );
+
+  assert.doesNotMatch(filterRoute, /noindex\s*,?\s*follow/i);
+  assert.match(filterRoute, /index,follow,max-image-preview:large/);
+  assert.match(sitemapSections, /STOCK_FILTER_PRESETS\.map\(\(preset\) => \(\{ slug: preset\.id \}\)\)/);
+  assert.doesNotMatch(
+    sitemapSections,
+    /STOCK_FILTER_PRESETS\.filter\(\(preset\) => preset\.status === ["']available["']\)/,
+  );
 });
 
 test('HTTP and www consolidate to HTTPS apex without losing encoded paths or attribution', () => {
