@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { LandingPage } from "@/components/landing/LandingPage";
 import { buildGraph, buildWebApplicationSchema, jsonLd } from "@/lib/seo/json-ld";
+import { metaKeywords, screenerKeywords, stocksKeywords, learnKeywords, optionsKeywords, calendarKeywords, ipoKeywords, portfolioKeywords, indiaKeywords, usKeywords, ukKeywords } from "@/lib/seo/keywords";
 
 const title = "DeepScreen — See the Signal. Beyond the Noise.";
 const description =
@@ -10,6 +11,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title },
+      { name: "keywords", content: metaKeywords(screenerKeywords, stocksKeywords, learnKeywords, optionsKeywords, calendarKeywords, ipoKeywords, portfolioKeywords, indiaKeywords, usKeywords, ukKeywords) },
       { name: "description", content: description },
       { property: "og:title", content: title },
       { property: "og:description", content: description },
