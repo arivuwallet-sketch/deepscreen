@@ -10,6 +10,7 @@ import { SearchBar } from "@/components/ds/SearchBar";
 import { LiveNewsFeed } from "@/components/ds/LiveNewsFeed";
 import { EconomicCalendar } from "@/components/ds/EconomicCalendar";
 import { StockTable } from "@/components/ds/StockTable";
+import { StockCategoryScreener } from "@/components/ds/StockCategoryScreener";
 import { EXCHANGES } from "@/lib/deepscreen/exchanges";
 import { STOCKS } from "@/lib/deepscreen/stocks";
 import { NewsletterForm } from "@/components/ds/NewsletterForm";
@@ -167,6 +168,8 @@ function Home() {
         </div>
 
         <MarketMovers stocks={liveMoverUniverse} title="Live global market movers" />
+
+        <StockCategoryScreener stocks={STOCKS} />
 
         <section>
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide">
