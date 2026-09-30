@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="DeepScreen">
+  <rect width="1024" height="1024" fill="#C5F984"/>
+  <rect x="88" y="77" width="848" height="870" rx="220" fill="#080F0B"/>
+  <path
+    d="M292 522 H364 C390 522 403 510 412 480 L463 303 C472 270 488 269 498 304 L604 718 C613 753 627 754 638 718 L682 557 C691 526 704 522 729 522 H758"
+    fill="none"
+    stroke="#C5F984"
+    stroke-width="62"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>
