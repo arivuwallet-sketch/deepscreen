@@ -333,7 +333,10 @@ function buildPreset(label: string): StockFilterPreset {
   };
 }
 
-export const STOCK_FILTER_PRESETS: StockFilterPreset[] = REQUESTED_STOCK_FILTER_LABELS.map(buildPreset);
+const ALL_STOCK_FILTER_PRESETS: StockFilterPreset[] = REQUESTED_STOCK_FILTER_LABELS.map(buildPreset);
+export const STOCK_FILTER_PRESETS: StockFilterPreset[] = ALL_STOCK_FILTER_PRESETS.filter(
+  (preset) => preset.status === "available" && typeof preset.test === "function",
+);
 const BY_ID = new Map(STOCK_FILTER_PRESETS.map((preset) => [preset.id, preset]));
 
 export const findStockFilterPreset = (id: string | null | undefined) => (id ? BY_ID.get(id) : undefined);

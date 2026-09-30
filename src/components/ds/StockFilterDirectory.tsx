@@ -3,22 +3,18 @@ import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { STOCK_FILTER_PRESETS } from "@/lib/deepscreen/stock-filter-presets";
-import { cn } from "@/lib/utils";
 
 export function StockFilterDirectory() {
   const [query, setQuery] = useState("");
-  const [showNeedsData, setShowNeedsData] = useState(true);
 
   const groups = useMemo(() => {
     const q = query.trim().toLowerCase();
     const filtered = STOCK_FILTER_PRESETS.filter((preset) => {
-      if (!showNeedsData && preset.status === "needs-data") return false;
       if (!q) return true;
       return (
         preset.label.toLowerCase().includes(q) ||
         preset.group.toLowerCase().includes(q) ||
-        preset.description.toLowerCase().includes(q) ||
-        preset.missingData?.toLowerCase().includes(q)
+        preset.description.toLowerCase().includes(q)
       );
     });
 
@@ -35,10 +31,7 @@ export function StockFilterDirectory() {
         [...presets].sort((a, b) => a.label.localeCompare(b.label)),
       ] as const)
       .sort(([a], [b]) => a.localeCompare(b));
-  }, [query, showNeedsData]);
-
-  const available = STOCK_FILTER_PRESETS.filter((preset) => preset.status === "available").length;
-  const needsData = STOCK_FILTER_PRESETS.length - available;
+  }, [query]);
 
   return (
     <section>
@@ -47,13 +40,12 @@ export function StockFilterDirectory() {
           <div>
             <p className="num text-xs uppercase tracking-[0.18em] text-primary">Filter directory</p>
             <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-              Every category below has its own permanent URL. Data-backed filters open a live stock
-              list; categories that require unavailable historical, ownership, technical or event
-              data remain accessible as transparent reference pages instead of being populated with
-              guessed companies.
+              Every category below has a live, data-backed DeepScreen rule and its own permanent URL.
+              Categories that cannot be classified reliably from the current dataset are not published
+              in this directory.
             </p>
             <p className="mt-2 text-xs text-muted-foreground">
-              {STOCK_FILTER_PRESETS.length.toLocaleString()} category URLs · {available.toLocaleString()} data-backed · {needsData.toLocaleString()} awaiting additional verified data
+              {STOCK_FILTER_PRESETS.length.toLocaleString()} live stock-filter category URLs
             </p>
           </div>
 
@@ -67,14 +59,6 @@ export function StockFilterDirectory() {
                 placeholder="Search value, growth, ROCE, dividend, Nifty..."
                 className="w-full rounded-lg border border-border bg-background py-2.5 pl-9 pr-3 text-sm outline-none transition focus:border-primary"
               />
-            </label>
-            <label className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
-              <input
-                type="checkbox"
-                checked={showNeedsData}
-                onChange={(event) => setShowNeedsData(event.target.checked)}
-              />
-              Show categories awaiting additional data
             </label>
           </div>
         </div>
@@ -98,30 +82,18 @@ export function StockFilterDirectory() {
                   key={preset.id}
                   to="/stock-filters/$slug"
                   params={{ slug: preset.id }}
-                  className={cn(
-                    "group rounded-lg border p-3 transition-colors",
-                    preset.status === "available"
-                      ? "border-border bg-card/40 hover:border-primary/60 hover:bg-card"
-                      : "border-border/70 bg-background/30 hover:border-border",
-                  )}
+                  className="group rounded-lg border border-border bg-card/40 p-3 transition-colors hover:border-primary/60 hover:bg-card"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="text-sm font-medium leading-snug group-hover:text-primary">
                       {preset.label}
                     </h3>
-                    <span
-                      className={cn(
-                        "shrink-0 rounded-full border px-1.5 py-0.5 text-[10px] uppercase tracking-wide",
-                        preset.status === "available"
-                          ? "border-primary/30 text-primary"
-                          : "border-border text-muted-foreground",
-                      )}
-                    >
-                      {preset.status === "available" ? "live" : "needs data"}
+                    <span className="shrink-0 rounded-full border border-primary/30 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-primary">
+                      live
                     </span>
                   </div>
                   <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
-                    {preset.status === "available" ? preset.description : preset.missingData}
+                    {preset.description}
                   </p>
                   <p className="mt-3 text-[11px] text-primary">/stock-filters/{preset.id}</p>
                 </Link>

@@ -13,7 +13,7 @@ export const Route = createFileRoute("/stock-filters/")({
   staticData: { sitemap: true },
   head: () => {
     const title = "Stock Filters & Screener Categories | DeepScreen";
-    const description = `Browse ${STOCK_FILTER_PRESETS.length.toLocaleString()} stock-screening categories across value, growth, income, quality, momentum, valuation, dividends, financial strength, market-cap, sectors and indices.`;
+    const description = `Browse ${STOCK_FILTER_PRESETS.length.toLocaleString()} live stock-screening categories across value, growth, income, quality, momentum, valuation, dividends, financial strength, market-cap, sectors and indices.`;
     return {
       meta: [
         { title },
@@ -62,8 +62,6 @@ export const Route = createFileRoute("/stock-filters/")({
 });
 
 function StockFiltersIndexPage() {
-  const available = STOCK_FILTER_PRESETS.filter((preset) => preset.status === "available").length;
-
   return (
     <Shell>
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -77,15 +75,14 @@ function StockFiltersIndexPage() {
             Stock filters and screener categories
           </h1>
           <p className="mt-4 text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Explore {STOCK_FILTER_PRESETS.length.toLocaleString()} dedicated stock-filter pages for
-            value, growth, income, quality, momentum, valuation, financial strength, dividends,
-            market-cap, indices, sectors and more. Each category has a stable shareable URL.
+            Explore {STOCK_FILTER_PRESETS.length.toLocaleString()} dedicated, data-backed stock-filter
+            pages for value, growth, income, quality, momentum, valuation, financial strength,
+            dividends, market-cap, indices, sectors and more. Each category has a stable shareable URL.
           </p>
           <p className="mt-3 rounded-lg border border-border bg-card/40 p-4 text-sm text-muted-foreground">
-            <strong>{available.toLocaleString()} filters currently have data-backed rules.</strong>{" "}
-            Categories that need ownership, technical, historical, event or other unavailable data
-            are still documented, but DeepScreen does not assign companies to them until a defensible
-            dataset exists. This avoids fabricated classifications.
+            <strong>Every published filter has a working classification rule.</strong>{" "}
+            Categories that require unavailable ownership, technical, historical, event or other
+            unsupported data are not included in the public filter catalog.
           </p>
         </header>
 
