@@ -1,7 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import type { Tier } from "@/hooks/useSubscription";
-
 interface CashfreeOrderWebhook {
   type?: string;
   data?: {
@@ -50,28 +48,32 @@ export const Route = createFileRoute("/api/public/cashfree-webhook")({
         }
         if (remote.status !== "PAID") return new Response("ok");
 
-        const { getAdmin, grantSubscription } = await import("@/lib/billing/activate.server");
+        const { activatePaidOrder, getAdmin } = await import("@/lib/billing/activate.server");
         const admin = await getAdmin();
         const { data: order } = await admin
           .from("payment_orders")
-          .select("user_id, tier, status, amount, currency")
+          .select("status, amount, currency")
           .eq("link_id", orderId)
           .maybeSingle();
         if (!order) return new Response("ok");
-        if (order.status === "paid") return new Response("ok");
 
         if (
           order.currency !== "INR" ||
           remote.currency !== "INR" ||
           remote.amount + 0.01 < Number(order.amount)
         ) {
-          await admin.from("payment_orders").update({ status: "underpaid" }).eq("link_id", orderId);
+          await admin
+            .from("payment_orders")
+            .update({ status: "underpaid" })
+            .eq("link_id", orderId)
+            .neq("status", "paid");
           return new Response("ok");
         }
 
-        const granted = await grantSubscription(admin, order.user_id, order.tier as Tier);
-        if (!granted.ok) return new Response("Activation failed", { status: 500 });
-        await admin.from("payment_orders").update({ status: "paid" }).eq("link_id", orderId);
+        // This RPC is idempotent and row-locked. Cashfree webhook retries and
+        // browser confirmation can both arrive, but one payment can add time once.
+        const activation = await activatePaidOrder(admin, orderId);
+        if (!activation.ok) return new Response("Activation failed", { status: 500 });
         return new Response("ok");
       },
     },
