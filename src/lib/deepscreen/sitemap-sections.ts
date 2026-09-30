@@ -9,6 +9,7 @@ import {
 import { EXCHANGES } from "@/lib/deepscreen/exchanges";
 import { GUIDES } from "@/lib/deepscreen/guides";
 import { SECTORS, STOCKS, stocksByExchange } from "@/lib/deepscreen/stocks";
+import { STOCK_FILTER_PRESETS } from "@/lib/deepscreen/stock-filter-presets";
 import {
   COMPARISONS,
   RANKINGS,
@@ -116,7 +117,7 @@ function sectorParams(): Array<Record<string, string>> {
 
 /** Returns the stable list of child sitemap names without building all URLs. */
 export function sitemapSectionNames(): string[] {
-  const names = ["core", "markets", "learn", "directories"];
+  const names = ["core", "markets", "learn", "filters", "directories"];
 
   for (let index = 0; index * STOCK_CHUNK_SIZE < STOCKS.length; index += 1) {
     names.push("stocks-" + (index + 1));
@@ -186,6 +187,18 @@ export function buildSitemapSections(router: AnyRouter): Map<string, SitemapEntr
     ),
   ];
 
+  // Only data-backed filter pages are submitted for indexing. Reference URLs
+  // that still need verified ownership, technical, historical or event data
+  // remain accessible from the hub but carry noindex and are omitted here.
+  const filters = collectDynamic(
+    router,
+    "/stock-filters/$slug",
+    "/stock-filters/$slug",
+    STOCK_FILTER_PRESETS.filter((preset) => preset.status === "available").map((preset) => ({
+      slug: preset.id,
+    })),
+  );
+
   const stocks = collectDynamic(
     router,
     "/stock/$exchange/$symbol",
@@ -199,6 +212,7 @@ export function buildSitemapSections(router: AnyRouter): Map<string, SitemapEntr
   if (core.length) sections.set("core", core);
   if (markets.length) sections.set("markets", markets);
   if (learn.length) sections.set("learn", learn);
+  if (filters.length) sections.set("filters", filters);
   if (directories.length) sections.set("directories", directories);
 
   for (let index = 0; index * STOCK_CHUNK_SIZE < stocks.length; index += 1) {
