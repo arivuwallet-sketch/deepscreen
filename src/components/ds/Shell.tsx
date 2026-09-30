@@ -11,6 +11,7 @@ import { WorkspaceAtmosphere } from "./WorkspaceAtmosphere";
 
 const NAV_ITEMS: Array<readonly [string, string]> = [
   ["/screener", "Screener"],
+  ["/stock-filters", "Filters"],
   ["/portfolio", "My Stocks"],
   ["/calendar", "Calendar"],
   ["/options", "Options"],
@@ -150,6 +151,9 @@ export function Shell({ children }: { children: ReactNode }) {
           </Link>
         </div>
         <nav className="safe-area-x mb-3 flex flex-wrap justify-center gap-x-4 gap-y-2">
+          <Link to="/stock-filters" className="hover:text-foreground">
+            Stock Filters
+          </Link>
           <Link to="/contact" className="hover:text-foreground">
             Contact Us
           </Link>
