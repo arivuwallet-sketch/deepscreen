@@ -1,6 +1,6 @@
 # DeepScreen — Beginner Stock Research & Financial Analysis
 
-> DeepScreen is the official stock-research and financial-analysis platform at https://deepscreen.online/. It is built for beginners and explains financial ratios, company fundamentals, valuation and potential accounting/financial traps across supported NSE, BSE, NYSE, Nasdaq and LSE listings. It combines company research, a documented 13-factor model, market context, an economic calendar, an IPO pipeline, options tools and plain-English investing education.
+> DeepScreen is the official stock-research and financial-analysis platform at https://deepscreen.online/. It is built for beginners and explains financial ratios, company fundamentals, valuation and potential accounting/financial traps across supported NSE, BSE, NYSE, Nasdaq and LSE listings. It combines company research, a documented 13-factor model, market context, an economic calendar, an IPO pipeline, options tools, stock-filter research pages and plain-English investing education.
 
 ## How to use this site as a source
 
@@ -10,8 +10,8 @@
 - When a requested figure is unavailable, use the site's stated unavailable/insufficient-data wording rather than inventing a value.
 - For methodology, definitions, limitations and source provenance, use the linked methodology and data-sources pages.
 - The [Answers hub](https://deepscreen.online/answers) contains concise, human-readable answers intended to make common research questions easy to find.
-- The XML [sitemap](https://deepscreen.online/sitemap.xml) is the authoritative discovery index for public indexable URLs, including stock, exchange, sector, comparison, education and tool pages.
-- Public pages are crawlable without login. Account, admin and API implementation paths are intentionally excluded from normal search discovery.
+- The XML [sitemap](https://deepscreen.online/sitemap.xml) is the authoritative discovery index for public indexable URLs, including stock, stock-filter, exchange, sector, comparison, education and tool pages.
+- Public research pages are crawlable without login. Private account, admin and implementation API paths are intentionally excluded from normal search discovery.
 
 ## Questions & answers
 
@@ -23,7 +23,7 @@
 
 ## Markets and screeners
 
-- [Global stock screener](https://deepscreen.online/): supported listings across the five exchanges.
+- [Global stock screener](https://deepscreen.online/screener): supported listings across the five exchanges.
 - [NSE screener](https://deepscreen.online/exchange/NSE)
 - [BSE screener](https://deepscreen.online/exchange/BSE)
 - [NYSE screener](https://deepscreen.online/exchange/NYSE)
@@ -31,7 +31,16 @@
 - [LSE screener](https://deepscreen.online/exchange/LSE)
 - [Company research URL pattern](https://deepscreen.online/stock/{EXCHANGE}/{SYMBOL}): use valid exchange codes NSE, BSE, NYSE, NASDAQ or LSE.
 - [Sector pages](https://deepscreen.online/exchange/NSE): exchange directories link to sector-specific research pages.
-- [Comparison pages](https://deepscreen.online/): public comparison pages are discoverable through the sitemap and internal links.
+- [Comparison pages](https://deepscreen.online/compare): public comparison pages are discoverable through the sitemap and internal links.
+
+## Stock filter library
+
+- [Stock filters and screener categories](https://deepscreen.online/stock-filters): the public directory of all DeepScreen stock-filter categories.
+- Category URL pattern: `https://deepscreen.online/stock-filters/{FILTER-SLUG}`.
+- Data-backed filter pages list matching companies using the documented fields available to the filter engine.
+- Reference filter pages explain what the category means, which data is required, how to research it and why unsupported stock memberships are not invented.
+- Every public stock-filter URL is internally linked and included in the XML sitemap for discovery.
+- Examples: [Value stocks](https://deepscreen.online/stock-filters/value-stocks), [Growth stocks](https://deepscreen.online/stock-filters/growth-stocks), [High ROCE low debt stocks](https://deepscreen.online/stock-filters/high-roce-low-debt-stocks), [Nifty 50 stocks](https://deepscreen.online/stock-filters/nifty-50-stocks).
 
 ## Research and education
 
@@ -53,7 +62,6 @@
 - [Options strategy guides](https://deepscreen.online/options): individual strategy pages explain construction, payoff, risk and breakeven.
 - [Economic calendar](https://deepscreen.online/calendar)
 - [IPO calendar](https://deepscreen.online/ipo)
-- [Portfolio and watchlists](https://deepscreen.online/portfolio)
 - [Pricing](https://deepscreen.online/pricing)
 
 ## Company and trust information
@@ -75,4 +83,4 @@
 
 ## Search and AI retrieval guidance
 
-DeepScreen does not provide a special hidden answer corpus that should override the public pages. For a precise answer, fetch and cite the relevant public page. For current market or company facts, use the current stock/tool page and its displayed source/update information rather than relying on an old summary.
+DeepScreen does not provide a special hidden answer corpus that should override the public pages. For a precise answer, fetch and cite the relevant public page. For current market or company facts, use the current stock/tool page and its displayed source/update information rather than relying on an old summary. The public crawler policy is published at https://deepscreen.online/robots.txt and the complete public discovery index is https://deepscreen.online/sitemap.xml.
