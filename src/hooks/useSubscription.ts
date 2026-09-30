@@ -77,8 +77,12 @@ export function useSubscription(): SubscriptionState {
   const [loading, setLoading] = useState(true);
   const [nonce, setNonce] = useState(0);
 
-  const refresh = useCallback(() => setNonce((n) => n + 1), []);
-
+  // Keep this hook's top-level hook sequence stable. Stock pages also call
+  // React Query hooks immediately after useSubscription(), and changing the
+  // number/order of hooks inside this custom hook can corrupt an already-mounted
+  // Vite/React Fast Refresh tree (the updateReducerImpl "reading next" crash).
+  // Expiry timing, focus revalidation and the database read therefore live in
+  // this single effect rather than adding/removing separate hooks over time.
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
@@ -88,9 +92,47 @@ export function useSubscription(): SubscriptionState {
     }
 
     let active = true;
+    let expiryTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const clearExpiryTimer = () => {
+      if (expiryTimer) {
+        clearTimeout(expiryTimer);
+        expiryTimer = undefined;
+      }
+    };
+
+    const armExpiry = (expiresAt: string) => {
+      clearExpiryTimer();
+      const remaining = subscriptionExpiryDelay(expiresAt);
+      if (remaining <= 0) {
+        setRow(null);
+        return;
+      }
+
+      expiryTimer = setTimeout(() => {
+        if (!active) return;
+        const nextRemaining = subscriptionExpiryDelay(expiresAt);
+        if (nextRemaining <= 0) {
+          setRow(null);
+          // Re-read once at the boundary in case a legitimate extension was
+          // purchased on another device while this tab stayed open.
+          setNonce((n) => n + 1);
+          return;
+        }
+        armExpiry(expiresAt);
+      }, Math.min(remaining + 25, MAX_EXPIRY_TIMER_MS));
+    };
+
+    const revalidate = () => setNonce((n) => n + 1);
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") revalidate();
+    };
+
+    window.addEventListener("focus", revalidate);
+    document.addEventListener("visibilitychange", onVisibility);
+
     setLoading(true);
     const nowIso = new Date().toISOString();
-
     supabase
       .from("subscriptions")
       .select("tier, expires_at, status")
@@ -107,57 +149,27 @@ export function useSubscription(): SubscriptionState {
               status: data.status,
             }
           : null;
-        setRow(isSubscriptionActive(candidate) ? candidate : null);
+        const nextRow = isSubscriptionActive(candidate) ? candidate : null;
+        setRow(nextRow);
         setLoading(false);
+        if (nextRow) armExpiry(nextRow.expires_at);
       });
 
     return () => {
       active = false;
+      clearExpiryTimer();
+      window.removeEventListener("focus", revalidate);
+      document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [user, authLoading, nonce]);
 
-  // Lock paid features at the exact end time even if the user leaves a page
-  // open continuously. Long plans are re-armed in browser-safe timer chunks.
-  useEffect(() => {
-    if (!row) return;
-
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    const arm = () => {
-      const remaining = subscriptionExpiryDelay(row.expires_at);
-      if (remaining <= 0) {
-        setRow(null);
-        return;
-      }
-      timer = setTimeout(arm, Math.min(remaining + 25, MAX_EXPIRY_TIMER_MS));
-    };
-    arm();
-
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [row]);
-
-  // Revalidate against the database whenever the tab becomes active again.
-  // This catches server-side cancellations and expiries that happened while
-  // the browser was asleep/suspended.
-  useEffect(() => {
-    if (!user) return;
-    const onFocus = () => refresh();
-    const onVisibility = () => {
-      if (document.visibilityState === "visible") refresh();
-    };
-    window.addEventListener("focus", onFocus);
-    document.addEventListener("visibilitychange", onVisibility);
-    return () => {
-      window.removeEventListener("focus", onFocus);
-      document.removeEventListener("visibilitychange", onVisibility);
-    };
-  }, [user, refresh]);
+  const refresh = useCallback(() => setNonce((n) => n + 1), []);
+  const active = isSubscriptionActive(row);
 
   return {
-    isPro: isSubscriptionActive(row),
-    tier: isSubscriptionActive(row) ? row?.tier ?? null : null,
-    expiresAt: isSubscriptionActive(row) ? row?.expires_at ?? null : null,
+    isPro: active,
+    tier: active ? row?.tier ?? null : null,
+    expiresAt: active ? row?.expires_at ?? null : null,
     loading: authLoading || loading,
     signedIn: !!user,
     refresh,
