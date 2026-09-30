@@ -168,6 +168,7 @@
   html {
     width: 100%;
     min-width: 0;
+    overflow-x: hidden;
     overflow-x: clip;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
@@ -179,6 +180,7 @@
     min-width: 0;
     max-width: 100%;
     margin: 0;
+    overflow-x: hidden;
     overflow-x: clip;
   }
 
@@ -311,6 +313,7 @@
   .overflow-x-auto {
     min-width: 0;
     max-width: 100%;
+    overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-inline: contain;
     scrollbar-width: thin;
@@ -323,6 +326,82 @@
 
   .overflow-x-auto > pre,
   .overflow-x-auto > code {
+    max-width: 100%;
+  }
+}
+
+/* First-paint containment for the shared workspace. These explicit widths are
+   intentionally duplicated from the critical head CSS so a cold load, font
+   load, auth hydration or WebGL mount cannot temporarily widen the document. */
+@layer components {
+  .ds-workspace,
+  .ds-workspace-header,
+  .ds-workspace-content,
+  .ds-workspace-masthead,
+  .ds-workspace-footer {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .ds-workspace {
+    overflow-x: hidden;
+    overflow-x: clip;
+  }
+
+  .ds-workspace-topbar,
+  .ds-workspace-navrow,
+  .ds-workspace-masthead-inner {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .ds-workspace-topbar > *,
+  .ds-workspace-navrow > *,
+  .ds-workspace-masthead-inner > * {
+    min-width: 0;
+  }
+
+  .ds-workspace-search,
+  .ds-workspace-search > *,
+  .ds-workspace-search form,
+  .ds-workspace-search input {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .ds-workspace-orbit,
+  .ds-scene,
+  .ds-scene-canvas,
+  .ds-scene-canvas canvas {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 959px) {
+  .ds-workspace-topbar {
+    max-width: 100%;
+  }
+
+  .ds-workspace-search {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 639px) {
+  .ds-workspace-topbar {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .ds-workspace-brand,
+  .ds-workspace-auth,
+  .ds-workspace-menu {
+    max-width: 100%;
+  }
+
+  .ds-workspace-search {
+    width: 100%;
     max-width: 100%;
   }
 }
