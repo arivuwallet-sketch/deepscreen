@@ -86,7 +86,11 @@ $$;
 
 -- Expired rows are not readable as active entitlements. This uses database
 -- time, so changing a browser clock cannot keep Pro access unlocked.
+DROP POLICY IF EXISTS "Users manage their own subscription" ON public.subscriptions;
 DROP POLICY IF EXISTS "Users view their own subscription" ON public.subscriptions;
+DROP POLICY IF EXISTS "Users view active own subscription" ON public.subscriptions;
+REVOKE INSERT, UPDATE, DELETE ON public.subscriptions FROM authenticated;
+GRANT SELECT ON public.subscriptions TO authenticated;
 CREATE POLICY "Users view active own subscription" ON public.subscriptions
   FOR SELECT TO authenticated
   USING (
@@ -157,8 +161,8 @@ BEGIN
 
   SELECT *
   INTO v_existing
-  FROM public.subscriptions
-  WHERE subscriptions.user_id = v_order.user_id
+  FROM public.subscriptions s
+  WHERE s.user_id = v_order.user_id
   FOR UPDATE;
 
   IF FOUND AND v_existing.status = 'active' AND v_existing.expires_at > v_now THEN
