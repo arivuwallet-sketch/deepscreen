@@ -11,17 +11,13 @@ const locs = xml => [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map(m => m[1].replac
 const hrefs = html => [...html.matchAll(/href="([^"]+)"/g)].map(m => m[1].replaceAll('&amp;', '&'));
 const canonical = html => [...html.matchAll(/<link\b[^>]*rel="canonical"[^>]*href="([^"]+)"[^>]*>/g)].map(m => m[1].replaceAll('&amp;', '&'));
 try {
-  const index = await get('/sitemap.xml');
-  assert.equal(index.status, 200);
-  const children = locs(await index.text());
-  assert.ok(children.includes('https://deepscreen.online/sitemaps/directories.xml'));
-  const urls = [];
-  for (const child of children) {
-    const response = await get(new URL(child).pathname);
-    assert.equal(response.status, 200, child);
-    assert.match(response.headers.get('content-type') || '', /xml/);
-    urls.push(...locs(await response.text()));
-  }
+  const sitemap = await get('/sitemap.xml');
+  assert.equal(sitemap.status, 200);
+  assert.match(sitemap.headers.get('content-type') || '', /xml/);
+  const sitemapXml = await sitemap.text();
+  assert.match(sitemapXml, /<urlset\b/);
+  assert.ok(!sitemapXml.includes('<sitemapindex'));
+  const urls = locs(sitemapXml);
   assert.equal(new Set(urls).size, urls.length, 'Sitemap URLs must be unique');
   assert.ok(urls.every(url => url.startsWith('https://deepscreen.online/')));
   assert.ok(urls.every(url => !/\/auth|\/portfolio/.test(url)));
@@ -50,7 +46,7 @@ try {
     }
   }));
   assert.deepEqual([...stocks].filter(path => !found.has(path)), [], 'Every stock in the sitemap must have an SSR directory link');
-  console.log(`PASS ${children.length} child sitemaps, ${urls.length} unique URLs, ${stocks.size} stocks reachable through ${directories.length} directory pages`);
+  console.log(`PASS flat sitemap, ${urls.length} unique URLs, ${stocks.size} stocks reachable through ${directories.length} directory pages`);
 
   for (const query of ['0', '-1', '1.5', 'abc', 'Infinity', '999999']) {
     assert.equal((await get(`/exchange/NSE?page=${query}`)).status, 404, query);
