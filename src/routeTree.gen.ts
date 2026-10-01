@@ -18,6 +18,7 @@ import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DataSourcesRouteImport } from './routes/data-sources'
 import { Route as DevelopersRouteImport } from './routes/developers'
+import { Route as InvestmentsRouteImport } from './routes/investments'
 import { Route as IpoRouteImport } from './routes/ipo'
 import { Route as MethodologyRouteImport } from './routes/methodology'
 import { Route as OpenapiDotjsonRouteImport } from './routes/openapi[.]json'
@@ -48,6 +49,7 @@ import { Route as ApiPublicCashfreeWebhookRouteImport } from './routes/api/publi
 import { Route as ApiV1ResourceRouteImport } from './routes/api.v1.$resource'
 import { Route as SectorExchangeSectorRouteImport } from './routes/sector.$exchange.$sector'
 import { Route as StockExchangeSymbolRouteImport } from './routes/stock.$exchange.$symbol'
+import { Route as InvestmentMarketTypeCodeRouteImport } from './routes/investment.$market.$type.$code'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -92,6 +94,11 @@ const DataSourcesRoute = DataSourcesRouteImport.update({
 const DevelopersRoute = DevelopersRouteImport.update({
   id: '/developers',
   path: '/developers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvestmentsRoute = InvestmentsRouteImport.update({
+  id: '/investments',
+  path: '/investments',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IpoRoute = IpoRouteImport.update({
@@ -246,6 +253,12 @@ const StockExchangeSymbolRoute = StockExchangeSymbolRouteImport.update({
   path: '/stock/$exchange/$symbol',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InvestmentMarketTypeCodeRoute =
+  InvestmentMarketTypeCodeRouteImport.update({
+    id: '/investment/$market/$type/$code',
+    path: '/investment/$market/$type/$code',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -257,6 +270,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/data-sources': typeof DataSourcesRoute
   '/developers': typeof DevelopersRoute
+  '/investments': typeof InvestmentsRoute
   '/ipo': typeof IpoRoute
   '/methodology': typeof MethodologyRoute
   '/openapi.json': typeof OpenapiDotjsonRoute
@@ -287,6 +301,7 @@ export interface FileRoutesByFullPath {
   '/api/v1/$resource': typeof ApiV1ResourceRoute
   '/sector/$exchange/$sector': typeof SectorExchangeSectorRoute
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
+  '/investment/$market/$type/$code': typeof InvestmentMarketTypeCodeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -298,6 +313,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/data-sources': typeof DataSourcesRoute
   '/developers': typeof DevelopersRoute
+  '/investments': typeof InvestmentsRoute
   '/ipo': typeof IpoRoute
   '/methodology': typeof MethodologyRoute
   '/openapi.json': typeof OpenapiDotjsonRoute
@@ -328,6 +344,7 @@ export interface FileRoutesByTo {
   '/api/v1/$resource': typeof ApiV1ResourceRoute
   '/sector/$exchange/$sector': typeof SectorExchangeSectorRoute
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
+  '/investment/$market/$type/$code': typeof InvestmentMarketTypeCodeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -340,6 +357,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/data-sources': typeof DataSourcesRoute
   '/developers': typeof DevelopersRoute
+  '/investments': typeof InvestmentsRoute
   '/ipo': typeof IpoRoute
   '/methodology': typeof MethodologyRoute
   '/openapi.json': typeof OpenapiDotjsonRoute
@@ -370,6 +388,7 @@ export interface FileRoutesById {
   '/api/v1/$resource': typeof ApiV1ResourceRoute
   '/sector/$exchange/$sector': typeof SectorExchangeSectorRoute
   '/stock/$exchange/$symbol': typeof StockExchangeSymbolRoute
+  '/investment/$market/$type/$code': typeof InvestmentMarketTypeCodeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -383,6 +402,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/data-sources'
     | '/developers'
+    | '/investments'
     | '/ipo'
     | '/methodology'
     | '/openapi.json'
@@ -413,6 +433,7 @@ export interface FileRouteTypes {
     | '/api/v1/$resource'
     | '/sector/$exchange/$sector'
     | '/stock/$exchange/$symbol'
+    | '/investment/$market/$type/$code'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -424,6 +445,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/data-sources'
     | '/developers'
+    | '/investments'
     | '/ipo'
     | '/methodology'
     | '/openapi.json'
@@ -454,6 +476,7 @@ export interface FileRouteTypes {
     | '/api/v1/$resource'
     | '/sector/$exchange/$sector'
     | '/stock/$exchange/$symbol'
+    | '/investment/$market/$type/$code'
   id:
     | '__root__'
     | '/'
@@ -465,6 +488,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/data-sources'
     | '/developers'
+    | '/investments'
     | '/ipo'
     | '/methodology'
     | '/openapi.json'
@@ -495,6 +519,7 @@ export interface FileRouteTypes {
     | '/api/v1/$resource'
     | '/sector/$exchange/$sector'
     | '/stock/$exchange/$symbol'
+    | '/investment/$market/$type/$code'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -507,6 +532,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DataSourcesRoute: typeof DataSourcesRoute
   DevelopersRoute: typeof DevelopersRoute
+  InvestmentsRoute: typeof InvestmentsRoute
   IpoRoute: typeof IpoRoute
   MethodologyRoute: typeof MethodologyRoute
   OpenapiDotjsonRoute: typeof OpenapiDotjsonRoute
@@ -537,6 +563,7 @@ export interface RootRouteChildren {
   ApiV1ResourceRoute: typeof ApiV1ResourceRoute
   SectorExchangeSectorRoute: typeof SectorExchangeSectorRoute
   StockExchangeSymbolRoute: typeof StockExchangeSymbolRoute
+  InvestmentMarketTypeCodeRoute: typeof InvestmentMarketTypeCodeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -602,6 +629,13 @@ declare module '@tanstack/react-router' {
       path: '/developers'
       fullPath: '/developers'
       preLoaderRoute: typeof DevelopersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/investments': {
+      id: '/investments'
+      path: '/investments'
+      fullPath: '/investments'
+      preLoaderRoute: typeof InvestmentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ipo': {
@@ -814,6 +848,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StockExchangeSymbolRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/investment/$market/$type/$code': {
+      id: '/investment/$market/$type/$code'
+      path: '/investment/$market/$type/$code'
+      fullPath: '/investment/$market/$type/$code'
+      preLoaderRoute: typeof InvestmentMarketTypeCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -827,6 +868,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DataSourcesRoute: DataSourcesRoute,
   DevelopersRoute: DevelopersRoute,
+  InvestmentsRoute: InvestmentsRoute,
   IpoRoute: IpoRoute,
   MethodologyRoute: MethodologyRoute,
   OpenapiDotjsonRoute: OpenapiDotjsonRoute,
@@ -857,6 +899,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiV1ResourceRoute: ApiV1ResourceRoute,
   SectorExchangeSectorRoute: SectorExchangeSectorRoute,
   StockExchangeSymbolRoute: StockExchangeSymbolRoute,
+  InvestmentMarketTypeCodeRoute: InvestmentMarketTypeCodeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

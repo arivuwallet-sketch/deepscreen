@@ -11,6 +11,7 @@ import { WorkspaceAtmosphere } from "./WorkspaceAtmosphere";
 
 const NAV_ITEMS: Array<readonly [string, string]> = [
   ["/screener", "Screener"],
+  ["/investments", "Investments"],
   ["/stock-filters", "Filters"],
   ["/portfolio", "My Stocks"],
   ["/calendar", "Calendar"],
@@ -54,7 +55,7 @@ export function Shell({ children }: { children: ReactNode }) {
             INFORMED INVESTING.
           </span>
           <div className="ds-workspace-search">
-            <SearchBar placeholder="Search companies, symbols…" />
+            <SearchBar placeholder="Search stocks, funds, ETFs…" />
           </div>
           <div className="ds-workspace-auth">
             <AuthButton />

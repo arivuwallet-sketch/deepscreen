@@ -3,10 +3,12 @@ import { Search } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { searchStocks } from "@/lib/deepscreen/stocks";
+import { searchInvestments, type Investment } from "@/lib/deepscreen/investments";
 import { formatPrice } from "@/lib/deepscreen/format";
 import { quoteKey, useLiveQuotes } from "@/hooks/useLiveQuotes";
 import { cn } from "@/lib/utils";
 import type { Stock } from "@/lib/deepscreen/types";
+import { Button } from "@/components/ui/button";
 
 export function SearchBar({ className, placeholder }: { className?: string; placeholder?: string }) {
   const navigate = useNavigate();
@@ -15,6 +17,7 @@ export function SearchBar({ className, placeholder }: { className?: string; plac
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
   const results = useMemo(() => searchStocks(query), [query]);
+  const investments = useMemo(() => searchInvestments(query), [query]);
   const { data: live } = useLiveQuotes(open ? results : []);
 
   useEffect(() => setActive(0), [query]);
@@ -36,6 +39,11 @@ export function SearchBar({ className, placeholder }: { className?: string; plac
       params: { exchange: s.exchange, symbol: s.symbol },
     });
   };
+  const goInvestment = (item: Investment) => {
+    setOpen(false);
+    setQuery("");
+    void navigate({ to: "/investment/$market/$type/$code", params: { market: item.market, type: item.type, code: item.code } });
+  };
 
   return (
     <div ref={rootRef} className={cn("relative w-full", className)}>
@@ -48,7 +56,7 @@ export function SearchBar({ className, placeholder }: { className?: string; plac
         }}
         onFocus={() => setOpen(true)}
         onKeyDown={(e) => {
-          if (!results.length) return;
+          if (!results.length && !investments.length) return;
           if (e.key === "ArrowDown") {
             e.preventDefault();
             setActive((i) => (i + 1) % results.length);
@@ -59,28 +67,30 @@ export function SearchBar({ className, placeholder }: { className?: string; plac
             e.preventDefault();
             const pick = results[active] ?? results[0];
             if (pick) go(pick);
+            else if (investments[0]) goInvestment(investments[0]);
           } else if (e.key === "Escape") {
             setOpen(false);
           }
         }}
-        placeholder={placeholder ?? "Search any stock — RELIANCE, AAPL, Shell plc…"}
+        placeholder={placeholder ?? "Search stocks, funds, ETFs and REITs…"}
         className="h-11 w-full rounded-md border border-border bg-panel pl-10 pr-4 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary/60"
-        aria-label="Search stocks"
+        aria-label="Search stocks and investments"
         autoComplete="off"
       />
-      {open && results.length > 0 && (
+      {open && (results.length > 0 || investments.length > 0) && (
         <ul className="absolute left-0 right-0 z-50 mt-2 max-h-80 overflow-y-auto overflow-x-hidden rounded-lg border border-border bg-popover p-1 shadow-xl">
           {results.map((s, i) => (
             <li key={`${s.exchange}-${s.symbol}`}>
-              <button
+              <Button
                 type="button"
                 onPointerDown={(e) => {
                   e.preventDefault();
                   go(s);
                 }}
                 onMouseEnter={() => setActive(i)}
+                variant="ghost"
                 className={cn(
-                  "grid w-full min-w-0 grid-cols-[4.5rem_minmax(0,1fr)_7rem] items-center gap-3 rounded px-3 py-2 text-left text-sm hover:bg-accent",
+                  "grid h-auto w-full min-w-0 grid-cols-[4.5rem_minmax(0,1fr)_7rem] justify-items-start gap-3 rounded px-3 py-2 text-left text-sm",
                   i === active && "bg-accent",
                 )}
               >
@@ -91,7 +101,16 @@ export function SearchBar({ className, placeholder }: { className?: string; plac
                     ? formatPrice(live[quoteKey(s)]!.price, s.exchange)
                     : "—"}
                 </span>
-              </button>
+              </Button>
+            </li>
+          ))}
+          {investments.map((item) => (
+            <li key={`${item.market}-${item.type}-${item.code}`}>
+              <Button type="button" variant="ghost" onPointerDown={(event) => { event.preventDefault(); goInvestment(item); }} className="grid h-auto w-full min-w-0 grid-cols-[4.5rem_minmax(0,1fr)_7rem] justify-items-start gap-3 px-3 py-2 text-left text-sm">
+                <span className="min-w-0 truncate font-mono font-semibold text-primary">{item.code}</span>
+                <span className="min-w-0 truncate text-muted-foreground">{item.name}</span>
+                <span className="justify-self-end text-xs text-muted-foreground">{item.market} · {item.type}</span>
+              </Button>
             </li>
           ))}
         </ul>

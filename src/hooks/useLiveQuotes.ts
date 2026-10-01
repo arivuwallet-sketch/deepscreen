@@ -55,6 +55,7 @@ export function useLiveQuote(
   return useQuery({
     queryKey: ["live-quote", exchange, symbol],
     queryFn: () => fetchQuote({ data: { exchange, symbol } }),
+    enabled: Boolean(exchange && symbol),
     ...(initial?.data ? { initialData: initial.data, initialDataUpdatedAt: initial.at } : {}),
     refetchInterval: 10_000,
     refetchOnWindowFocus: true,
