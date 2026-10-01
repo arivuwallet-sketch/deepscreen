@@ -1,3 +1,4 @@
+import type { MutualFundMetadata } from "@/lib/deepscreen/investment-analysis";
 import type { InvestmentType } from "@/lib/deepscreen/investments";
 import type { EnhancedFundProfileAnalysis, EnhancedInvestmentAnalysisData } from "@/lib/deepscreen/investment-official";
 import { fetchAmfiOfficialFundAnalytics } from "./amfi-official.server";
@@ -91,7 +92,7 @@ async function fetchYahooFundExtras(market: string, code: string): Promise<Parti
   const session = await getYahooSession();
   if (!session) return null;
   try {
-    const modules = "fundProfile,fundPerformance,defaultKeyStatistics,summaryDetail";
+    const modules = "fundProfile,fundPerformance,defaultKeyStatistics,summaryDetail,price";
     const response = await fetch(
       `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(symbol)}?modules=${modules}&crumb=${encodeURIComponent(session.crumb)}`,
       { headers: { "User-Agent": UA, Cookie: session.cookie }, signal: AbortSignal.timeout(9000) },
@@ -108,6 +109,7 @@ async function fetchYahooFundExtras(market: string, code: string): Promise<Parti
     const inceptionTimestamp = findNumber(result, [["fund", "inception"], ["inceptiondate"]]);
     const toDate = (timestamp: number | null) => timestamp && timestamp > 100_000_000 ? new Date(timestamp * 1000).toISOString().slice(0, 10) : null;
     const data: Partial<EnhancedFundProfileAnalysis> = {
+      providerName: findString(result, [["longname"], ["shortname"]]),
       managerName: findString(result, [["manager", "name"]]),
       managerStartDate: toDate(startTimestamp),
       inceptionDate: toDate(inceptionTimestamp),
@@ -130,27 +132,42 @@ export async function fetchEnhancedInvestmentAnalysis(request: Request): Promise
   let officialFund = null;
   let extras: Partial<EnhancedFundProfileAnalysis> | null = null;
 
-  if (request.type === "FUND" && request.market.toUpperCase() === "IN" && base.mutualFund) {
-    officialFund = await fetchAmfiOfficialFundAnalytics(request.code, request.name, base.mutualFund);
-    if (officialFund) sources.add("AMFI official TER, tracking, risk and fund-performance disclosures");
-  }
-
   if (request.type === "ETF" || (request.type === "FUND" && request.market.toUpperCase() !== "IN")) {
     extras = await fetchYahooFundExtras(request.market, request.code);
     if (extras && Object.values(extras).some((value) => value !== null)) sources.add("Yahoo Finance fund risk/management statistics");
   }
 
+  if (request.type === "FUND" && request.market.toUpperCase() === "IN" && base.mutualFund) {
+    officialFund = await fetchAmfiOfficialFundAnalytics(request.code, request.name, base.mutualFund);
+    if (officialFund) sources.add("AMFI official scheme, TER, tracking and fund-performance disclosures");
+  }
+
+  if (request.type === "ETF" && ["NSE", "BSE"].includes(request.market.toUpperCase())) {
+    const providerName = extras?.providerName ?? request.name;
+    const meta: MutualFundMetadata = {
+      fundHouse: base.fundProfile?.family ?? null,
+      schemeType: "Open Ended",
+      schemeCategory: "Other Scheme - ETFs",
+      schemeName: providerName,
+      planType: "Unclear",
+      optionType: "Other",
+    };
+    officialFund = await fetchAmfiOfficialFundAnalytics(request.code, providerName, meta);
+    if (officialFund) sources.add("AMFI official ETF TER and tracking disclosures");
+  }
+
   const fundProfile: EnhancedFundProfileAnalysis | null = base.fundProfile
     ? {
         ...base.fundProfile,
+        providerName: extras?.providerName ?? null,
         managerName: extras?.managerName ?? null,
         managerStartDate: extras?.managerStartDate ?? null,
-        inceptionDate: extras?.inceptionDate ?? null,
-        alpha3Year: extras?.alpha3Year ?? null,
-        sharpe3Year: extras?.sharpe3Year ?? null,
-        stdDev3Year: extras?.stdDev3Year ?? null,
+        inceptionDate: extras?.inceptionDate ?? officialFund?.launchDate ?? null,
+        alpha3Year: extras?.alpha3Year ?? officialFund?.jensensAlphaPct ?? null,
+        sharpe3Year: extras?.sharpe3Year ?? officialFund?.sharpe ?? null,
+        stdDev3Year: extras?.stdDev3Year ?? officialFund?.standardDeviationPct ?? null,
         rSquared3Year: extras?.rSquared3Year ?? null,
-        treynor3Year: extras?.treynor3Year ?? null,
+        treynor3Year: extras?.treynor3Year ?? officialFund?.treynor ?? null,
       }
     : null;
 
