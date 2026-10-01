@@ -12,12 +12,28 @@ export interface OfficialFundAnalytics {
   standardDeviationPct: number | null;
   beta: number | null;
   sharpe: number | null;
+  treynor: number | null;
+  jensensAlphaPct: number | null;
   informationRatio: number | null;
   riskometer: string | null;
+  launchDate: string | null;
+  exitLoad: string | null;
+  minimumInvestment: number | null;
+  objective: string | null;
+  amcWebsite: string | null;
+  schemeCode: string | null;
+  isin: string | null;
+  returns1yPct: number | null;
+  returns3yPct: number | null;
+  returns5yPct: number | null;
+  benchmarkReturns1yPct: number | null;
+  benchmarkReturns3yPct: number | null;
+  benchmarkReturns5yPct: number | null;
   sourceDate: string | null;
 }
 
 export interface EnhancedFundProfileAnalysis extends FundProfileAnalysis {
+  providerName: string | null;
   managerName: string | null;
   managerStartDate: string | null;
   inceptionDate: string | null;
