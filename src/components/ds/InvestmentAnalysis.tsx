@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import { useInvestmentAnalysis } from "@/hooks/useInvestmentAnalysis";
 import type { Investment } from "@/lib/deepscreen/investments";
-import type { InvestmentAnalysisData } from "@/lib/deepscreen/investment-analysis";
+import type { EnhancedInvestmentAnalysisData } from "@/lib/deepscreen/investment-official";
 
 interface Metric {
   label: string;
@@ -19,7 +19,7 @@ interface Section {
 const pct = (value: number | null | undefined, digits = 2) =>
   value === null || value === undefined || !Number.isFinite(value)
     ? null
-    : `${value.toLocaleString("en-IN", { maximumFractionDigits: digits, minimumFractionDigits: 0 })}%`;
+    : `${value.toLocaleString("en-IN", { maximumFractionDigits: digits })}%`;
 
 const number = (value: number | null | undefined, digits = 2) =>
   value === null || value === undefined || !Number.isFinite(value)
@@ -42,13 +42,13 @@ const money = (value: number | null | undefined, currency: string | null | undef
         maximumFractionDigits: 2,
       }).format(value);
     } catch {
-      // Some provider currency labels are not valid ISO-4217 codes.
+      // Fall through to compact formatting.
     }
   }
   return compact(value);
 };
 
-const unavailable = (why: string): Metric["note"] => why;
+const unavailable = (why: string) => why;
 
 function MetricGrid({ metrics }: { metrics: Metric[] }) {
   return (
@@ -87,7 +87,7 @@ function AnalysisSections({ sections }: { sections: Section[] }) {
   );
 }
 
-function etfSections(data: InvestmentAnalysisData): Section[] {
+function etfSections(data: EnhancedInvestmentAnalysisData): Section[] {
   const fund = data.fundProfile;
   const quality = data.holdingQuality;
   const history = data.history;
@@ -100,21 +100,23 @@ function etfSections(data: InvestmentAnalysisData): Section[] {
       title: "Business — what the basket actually owns",
       description: "Treat the ETF as a portfolio rather than a company. Verify the tracked index, methodology and replication method before relying on the rest of the numbers.",
       metrics: [
-        { label: "Index / category", value: fund?.category ?? null, note: fund?.category ? "Provider classification; verify the exact tracked index in the issuer factsheet." : unavailable("The current market feed does not identify the tracked index.") },
+        { label: "Index / category", value: fund?.category ?? null, note: fund?.category ? "Provider classification; verify the exact tracked index in the issuer factsheet." : unavailable("The live fund feed did not identify the tracked index.") },
         { label: "Fund family", value: fund?.family ?? null },
         { label: "Legal structure", value: fund?.legalType ?? null },
-        { label: "Replication", value: null, note: unavailable("Physical vs synthetic replication must be verified from the current prospectus/factsheet; DeepScreen does not infer it from the ticker.") },
-        { label: "Index methodology", value: null, note: unavailable("Requires the issuer/index-provider methodology document. No methodology is fabricated when that document is unavailable.") },
+        { label: "Manager", value: fund?.managerName ?? null },
+        { label: "Manager start", value: fund?.managerStartDate ?? null },
+        { label: "Fund inception", value: fund?.inceptionDate ?? null },
+        { label: "Replication", value: null, note: unavailable("Physical vs synthetic replication requires the issuer prospectus/factsheet and is not inferred from the ticker.") },
       ],
     },
     {
       title: "Quality and growth — weighted holding fundamentals",
-      description: "Where top-holding fundamentals are available, DeepScreen weights them by reported ETF holding weight. The coverage figure shows how much of the basket was actually represented.",
+      description: "Top-holding fundamentals are weighted by reported ETF holding weight. Coverage is shown so a partial holding sample is never presented as the whole basket.",
       metrics: [
-        { label: "Weighted ROE", value: pct(quality?.weightedRoePct), note: quality ? `Based on ${quality.holdingsAnalyzed} reported holdings covering ${pct(quality.coveredWeightPct, 1) ?? "an unknown share"} of fund weight.` : unavailable("Top-holding fundamentals were not available from the provider.") },
-        { label: "Weighted earnings growth", value: pct(quality?.weightedEarningsGrowthPct), note: "Weighted across holdings with usable earnings-growth data." },
-        { label: "Weighted debt / equity", value: number(quality?.weightedDebtToEquity), note: "Weighted across holdings with usable balance-sheet data." },
-        { label: "Fundamental coverage", value: quality ? pct(quality.coveredWeightPct, 1) : null, note: "Coverage is shown so a partial top-holdings sample is never presented as the whole ETF." },
+        { label: "Weighted ROE", value: pct(quality?.weightedRoePct), note: quality ? `Based on ${quality.holdingsAnalyzed} holdings covering ${pct(quality.coveredWeightPct, 1) ?? "an unknown share"}.` : undefined },
+        { label: "Weighted earnings growth", value: pct(quality?.weightedEarningsGrowthPct) },
+        { label: "Weighted debt / equity", value: number(quality?.weightedDebtToEquity) },
+        { label: "Fundamental coverage", value: quality ? pct(quality.coveredWeightPct, 1) : null },
       ],
     },
     {
@@ -124,33 +126,35 @@ function etfSections(data: InvestmentAnalysisData): Section[] {
         { label: "Portfolio P/E", value: number(fund?.portfolioPe) },
         { label: "Portfolio P/B", value: number(fund?.portfolioPb) },
         { label: "Earnings yield", value: pct(earningsYield), note: fund?.portfolioPe ? "Calculated as 1 ÷ portfolio P/E." : undefined },
-        { label: "Own valuation history", value: null, note: unavailable("A reliable historical portfolio P/E/P/B series is not available from the current feed.") },
-        { label: "Comparable-index valuation", value: null, note: unavailable("Requires a verified benchmark/index mapping rather than a name-based guess.") },
+        { label: "Own valuation history", value: null, note: unavailable("A verified historical portfolio P/E/P/B series is not available from the connected feed.") },
       ],
     },
     {
-      title: "Risk — concentration, drawdown and volatility",
-      description: "Concentration and realized market risk are shown separately so a diversified-looking ticker is not assumed to be diversified in practice.",
+      title: "Risk — concentration, drawdown and risk-adjusted returns",
+      description: "Concentration and realized market risk are shown separately, with provider-published fund statistics used when available.",
       metrics: [
         { label: "Top-10 weight", value: pct(fund?.top10WeightPct, 1) },
         { label: "Largest sector", value: topSector ? `${topSector.name} · ${pct(topSector.weightPct, 1)}` : null },
         { label: "Top-3 sector weight", value: top3SectorWeight > 0 ? pct(top3SectorWeight, 1) : null },
-        { label: "3Y max drawdown", value: pct(history?.maxDrawdown3yPct), note: "Calculated from adjusted weekly market-price history." },
-        { label: "5Y max drawdown", value: pct(history?.maxDrawdown5yPct), note: "Calculated from adjusted weekly market-price history." },
-        { label: "3Y annualized volatility", value: pct(history?.volatility3yPct), note: "Weekly return volatility annualized with √52." },
-        { label: "5Y annualized volatility", value: pct(history?.volatility5yPct) },
-        { label: "3Y beta", value: number(fund?.beta3Year), note: "Provider-reported beta where available." },
+        { label: "3Y max drawdown", value: pct(history?.maxDrawdown3yPct) },
+        { label: "5Y max drawdown", value: pct(history?.maxDrawdown5yPct) },
+        { label: "3Y volatility", value: pct(fund?.stdDev3Year ?? history?.volatility3yPct), note: fund?.stdDev3Year !== null && fund?.stdDev3Year !== undefined ? "Provider-published 3-year standard deviation." : "Calculated from weekly price history." },
+        { label: "3Y beta", value: number(fund?.beta3Year) },
+        { label: "3Y alpha", value: number(fund?.alpha3Year) },
+        { label: "3Y Sharpe", value: number(fund?.sharpe3Year) },
+        { label: "3Y R-squared", value: number(fund?.rSquared3Year) },
+        { label: "3Y Treynor", value: number(fund?.treynor3Year) },
       ],
     },
     {
       title: "Cost and execution — what ownership and trading really cost",
       description: "Expense ratio alone is not enough. Trading friction, NAV premium/discount, liquidity and tracking quality matter too.",
       metrics: [
-        { label: "Expense ratio", value: pct(fund?.expenseRatioPct), note: "Provider-reported annual expense ratio where available." },
-        { label: "Tracking difference", value: null, note: unavailable("Needs a verified benchmark total-return series. DeepScreen will not substitute tracking error or guess an index from the ETF name.") },
-        { label: "Current bid/ask spread", value: pct(fund?.currentSpreadPct, 3), note: "Current indicative spread only; this is not the median midday spread." },
-        { label: "Median midday spread", value: null, note: unavailable("Requires intraday quote history across many sessions; a single live spread is not presented as a median.") },
-        { label: "Premium / discount to NAV", value: pct(fund?.premiumDiscountPct, 3), note: fund?.navPrice ? `Provider NAV ${number(fund.navPrice, 4)} vs market price ${number(fund.marketPrice, 4) ?? "unavailable"}.` : unavailable("NAV and market price were not both available at the same time.") },
+        { label: "Expense ratio", value: pct(fund?.expenseRatioPct) },
+        { label: "Tracking difference", value: null, note: unavailable("A verified benchmark total-return series or official tracking-difference disclosure is required for this ETF.") },
+        { label: "Current bid/ask spread", value: pct(fund?.currentSpreadPct, 3), note: "Current indicative spread; not a median midday spread." },
+        { label: "Median midday spread", value: null, note: unavailable("Requires intraday quote history across many sessions.") },
+        { label: "Premium / discount to NAV", value: pct(fund?.premiumDiscountPct, 3) },
         { label: "AUM", value: money(fund?.totalAssets, fund?.currency) },
         { label: "Average volume", value: compact(fund?.averageVolume) },
       ],
@@ -158,83 +162,89 @@ function etfSections(data: InvestmentAnalysisData): Section[] {
   ];
 }
 
-function mutualFundSections(item: Investment, data: InvestmentAnalysisData): Section[] {
+function mutualFundSections(item: Investment, data: EnhancedInvestmentAnalysisData): Section[] {
   const fund = data.fundProfile;
   const meta = data.mutualFund;
   const history = data.history;
+  const official = data.officialFund;
   const directNote = meta?.planType === "Regular"
-    ? "This is identified as a Regular plan. Compare the equivalent Direct plan because distributor commission can compound against long-run returns."
+    ? "This is a Regular plan. Compare the equivalent Direct plan because distributor commission compounds against long-run returns."
     : meta?.planType === "Direct"
-      ? "This is identified as a Direct plan from the scheme name."
+      ? "This is identified as a Direct plan."
       : "Plan type could not be determined confidently from the scheme name.";
 
   return [
     {
       title: "Process — is the portfolio following the stated style?",
-      description: "The scheme category and plan identity establish what the fund says it is. Style drift still requires portfolio-history data, so it is not guessed from the name.",
+      description: "The scheme category and plan identity establish what the fund says it is. Style drift still needs historical portfolio exposures, so it is not guessed from the name.",
       metrics: [
         { label: "Fund house", value: meta?.fundHouse ?? fund?.family ?? null },
         { label: "Scheme type", value: meta?.schemeType ?? fund?.legalType ?? null },
         { label: "Category / stated style", value: meta?.schemeCategory ?? fund?.category ?? null },
+        { label: "Benchmark", value: official?.benchmark ?? null, note: official?.benchmark ? "AMFI fund-performance disclosure." : undefined },
+        { label: "Riskometer", value: official?.riskometer ?? null, note: official?.riskometer ? "AMFI disclosure." : undefined },
         { label: "Plan", value: meta?.planType ?? "Unclear", note: directNote },
         { label: "Option", value: meta?.optionType ?? null },
-        { label: "Style drift", value: null, note: unavailable("Requires historical portfolio exposures versus the stated mandate; the current NAV feed alone cannot prove style consistency.") },
+        { label: "Style drift", value: null, note: unavailable("Requires historical portfolio exposures versus the stated mandate.") },
       ],
     },
     {
       title: "Performance — consistency over 3, 5 and 10 years",
-      description: "Trailing and rolling returns use NAV history where available. NAV-based fund returns reflect ongoing fund expenses, but benchmark/category comparisons are only shown when a verified comparison series exists.",
+      description: "Returns and rolling consistency use NAV history. Benchmark-relative return comparisons are only calculated when a verified benchmark return series is connected.",
       metrics: [
+        { label: "1Y return", value: pct(history?.return1yPct) },
         { label: "3Y annualized return", value: pct(history?.return3yAnnualizedPct) },
         { label: "5Y annualized return", value: pct(history?.return5yAnnualizedPct) },
         { label: "10Y annualized return", value: pct(history?.return10yAnnualizedPct) },
-        { label: "3Y rolling median", value: pct(history?.rolling3yMedianPct), note: history?.rolling3yPositivePct !== null && history?.rolling3yPositivePct !== undefined ? `${pct(history.rolling3yPositivePct, 1)} of sampled 3-year rolling periods were positive.` : undefined },
-        { label: "5Y rolling median", value: pct(history?.rolling5yMedianPct), note: history?.rolling5yPositivePct !== null && history?.rolling5yPositivePct !== undefined ? `${pct(history.rolling5yPositivePct, 1)} of sampled 5-year rolling periods were positive.` : undefined },
-        { label: "Benchmark / category comparison", value: null, note: unavailable("A verified benchmark and category return series is not connected for this scheme, so DeepScreen does not manufacture relative performance.") },
+        { label: "3Y rolling median", value: pct(history?.rolling3yMedianPct), note: history?.rolling3yPositivePct !== null && history?.rolling3yPositivePct !== undefined ? `${pct(history.rolling3yPositivePct, 1)} of sampled 3-year periods were positive.` : undefined },
+        { label: "5Y rolling median", value: pct(history?.rolling5yMedianPct), note: history?.rolling5yPositivePct !== null && history?.rolling5yPositivePct !== undefined ? `${pct(history.rolling5yPositivePct, 1)} of sampled 5-year periods were positive.` : undefined },
+        { label: "Tracking difference", value: pct(official?.trackingDifferencePct), note: official?.trackingDifferencePct !== null && official?.trackingDifferencePct !== undefined ? "Official AMFI tracking-difference disclosure." : unavailable("Only published for applicable passive schemes.") },
       ],
     },
     {
       title: "Risk-adjusted quality — returns in relation to downside",
-      description: "Drawdown and realized volatility are calculated from the available NAV/price history. Benchmark-dependent statistics stay unavailable until the correct benchmark series is verified.",
+      description: "AMFI risk disclosures are preferred where matched. Historical drawdown and volatility remain calculated from NAV history.",
       metrics: [
         { label: "3Y max drawdown", value: pct(history?.maxDrawdown3yPct) },
         { label: "5Y max drawdown", value: pct(history?.maxDrawdown5yPct) },
-        { label: "3Y annualized volatility", value: pct(history?.volatility3yPct) },
+        { label: "3Y annualized volatility", value: pct(official?.standardDeviationPct ?? history?.volatility3yPct), note: official?.standardDeviationPct !== null && official?.standardDeviationPct !== undefined ? "Official AMFI risk-parameter disclosure." : undefined },
         { label: "5Y annualized volatility", value: pct(history?.volatility5yPct) },
-        { label: "Beta", value: number(fund?.beta3Year), note: fund?.beta3Year !== null && fund?.beta3Year !== undefined ? "Provider-reported 3-year beta." : unavailable("Needs a verified benchmark return series.") },
-        { label: "Sharpe / Sortino", value: null, note: unavailable("Requires a defined risk-free/minimum-acceptable return and consistent return frequency. DeepScreen does not silently assume one.") },
-        { label: "Alpha / up-down capture", value: null, note: unavailable("Requires the correct benchmark return series.") },
+        { label: "Beta", value: number(official?.beta ?? fund?.beta3Year), note: official?.beta !== null && official?.beta !== undefined ? "Official AMFI risk-parameter disclosure." : undefined },
+        { label: "Sharpe ratio", value: number(official?.sharpe ?? fund?.sharpe3Year), note: official?.sharpe !== null && official?.sharpe !== undefined ? "Official AMFI risk-parameter disclosure." : undefined },
+        { label: "Information ratio", value: number(official?.informationRatio), note: official?.informationRatio !== null && official?.informationRatio !== undefined ? "AMFI fund-performance disclosure." : undefined },
+        { label: "Tracking error", value: pct(official?.trackingErrorPct), note: official?.trackingErrorPct !== null && official?.trackingErrorPct !== undefined ? "Official AMFI tracking-error disclosure." : unavailable("Only published for applicable passive schemes.") },
+        { label: "Sortino / alpha / capture", value: null, note: unavailable("These need a verified benchmark and risk-free/minimum-return series on the same dates; DeepScreen does not invent them.") },
       ],
     },
     {
       title: "Portfolio — valuation, concentration and activeness",
-      description: "Portfolio ratios help explain what is driving the fund. Active share must be considered together with tracking error; neither is inferred when benchmark holdings are unavailable.",
+      description: "Portfolio ratios explain what drives returns. Active share still needs complete fund and benchmark holdings.",
       metrics: [
         { label: "Portfolio P/E", value: number(fund?.portfolioPe) },
         { label: "Portfolio P/B", value: number(fund?.portfolioPb) },
-        { label: "Number of holdings", value: fund?.holdingsCount ?? null, note: fund?.holdings.length ? `${fund.holdings.length} top holdings are reported by the provider; that is not treated as the fund's total holding count.` : undefined },
+        { label: "Number of holdings", value: fund?.holdingsCount ?? null },
         { label: "Top-10 weight", value: pct(fund?.top10WeightPct, 1) },
         { label: "Cash level", value: pct(fund?.cashPositionPct, 1) },
-        { label: "Active share + tracking error", value: null, note: unavailable("Needs complete fund and benchmark holdings plus a return series for the same benchmark.") },
+        { label: "Active share", value: null, note: unavailable("Requires complete fund and benchmark holdings for the same date.") },
       ],
     },
     {
       title: "People and capacity — who is running the process?",
       description: "A fund's historical return should not automatically be credited to a manager who was not running it at the time.",
       metrics: [
-        { label: "Manager tenure", value: null, note: unavailable("Current manager and start date are not available from the connected scheme feed.") },
-        { label: "Current-manager track record", value: null, note: unavailable("Needs dated manager-history records before returns can be attributed to the current team.") },
-        { label: "AUM", value: money(fund?.totalAssets, fund?.currency) },
+        { label: "Manager", value: fund?.managerName ?? null },
+        { label: "Manager start", value: fund?.managerStartDate ?? null },
+        { label: "AUM", value: official?.aumCrore !== null && official?.aumCrore !== undefined ? `₹${number(official.aumCrore)} Cr` : money(fund?.totalAssets, fund?.currency), note: official?.aumCrore !== null && official?.aumCrore !== undefined ? "AMFI fund-performance disclosure." : undefined },
         { label: "Capacity pressure", value: null, note: unavailable("Requires strategy-specific liquidity/capacity analysis and AUM history, not simply current AUM.") },
       ],
     },
     {
       title: "Cost — what the investor actually pays",
-      description: "For Indian schemes, Direct and Regular plans should be compared separately. Costs that are not present in the source are left blank rather than estimated.",
+      description: "For Indian schemes, AMFI TER is used when the exact scheme can be matched. Direct and Regular plans remain separate cost comparisons.",
       metrics: [
-        { label: "Expense ratio", value: pct(fund?.expenseRatioPct) },
+        { label: "Expense ratio / TER", value: pct(official?.terPct ?? fund?.expenseRatioPct), note: official?.terPct !== null && official?.terPct !== undefined ? "Official AMFI TER disclosure." : undefined },
         { label: "Portfolio turnover", value: pct(fund?.turnoverPct) },
-        { label: "Exit load", value: null, note: unavailable("Exit-load schedules can vary by scheme and holding period and need the current scheme document.") },
+        { label: "Exit load", value: null, note: unavailable("Exit-load schedules vary by scheme and holding period and require the current scheme document.") },
         { label: "Plan-cost check", value: meta?.planType ?? null, note: directNote },
         { label: "Current NAV", value: item.nav !== null ? `₹${item.nav.toLocaleString("en-IN", { maximumFractionDigits: 4 })}` : fund?.navPrice ? number(fund.navPrice, 4) : null, note: item.date ? `Directory NAV date: ${item.date}.` : undefined },
       ],
@@ -242,55 +252,51 @@ function mutualFundSections(item: Investment, data: InvestmentAnalysisData): Sec
   ];
 }
 
-function reitSections(item: Investment, data: InvestmentAnalysisData): Section[] {
+function reitSections(item: Investment, data: EnhancedInvestmentAnalysisData): Section[] {
   const reit = data.reit;
   const history = data.history;
   const indian = item.market === "NSE" || item.market === "BSE" || item.market === "IN";
-  const netDebt = reit?.totalDebt !== null && reit?.totalDebt !== undefined
-    ? reit.totalDebt - (reit.totalCash ?? 0)
-    : null;
+  const netDebt = reit?.totalDebt !== null && reit?.totalDebt !== undefined ? reit.totalDebt - (reit.totalCash ?? 0) : null;
 
   return [
     {
       title: "Asset quality — durability of the property cash flows",
-      description: "Occupancy, lease duration, tenant concentration and tenant credit are core REIT operating metrics. They require REIT disclosures and are never replaced with generic stock ratios.",
+      description: "Occupancy, lease duration, tenant concentration and tenant credit are REIT operating metrics and must come from REIT disclosures rather than generic stock ratios.",
       metrics: [
         { label: "Property / industry type", value: reit?.industry ?? reit?.sector ?? null },
         { label: "Country", value: reit?.country ?? null },
         { label: "Occupancy", value: null, note: unavailable("Requires the latest REIT operating supplement/filing.") },
-        { label: "WALE", value: null, note: unavailable("Weighted average lease expiry is filing-specific and not available from the market-price feed.") },
+        { label: "WALE", value: null, note: unavailable("Requires lease disclosure from the REIT.") },
         { label: "Tenant concentration", value: null, note: unavailable("Requires the current tenant rent/revenue schedule.") },
         { label: "Tenant credit quality", value: null, note: unavailable("Requires tenant disclosures and credit information.") },
       ],
     },
     {
       title: "Growth — NOI, escalators and capital allocation",
-      description: "REIT growth should come from property-level NOI, contractual rent growth, development and accretive acquisitions rather than a generic revenue-growth number alone.",
+      description: "REIT growth should come from property-level NOI, contractual rent growth, development and accretive acquisitions.",
       metrics: [
-        { label: "Revenue growth", value: pct(reit?.revenueGrowthPct), note: "Market-provider company growth; use as a secondary cross-check, not a substitute for same-property NOI." },
-        { label: "Earnings growth", value: pct(reit?.earningsGrowthPct), note: "Accounting earnings can diverge materially from REIT cash economics." },
-        { label: "Same-property NOI growth", value: null, note: unavailable("Requires current and comparable prior-period property disclosures.") },
+        { label: "Revenue growth", value: pct(reit?.revenueGrowthPct) },
+        { label: "Earnings growth", value: pct(reit?.earningsGrowthPct) },
+        { label: "Same-property NOI growth", value: null, note: unavailable("Requires comparable property disclosures.") },
         { label: "Built-in rent escalators", value: null, note: unavailable("Requires lease disclosures.") },
         { label: "Development pipeline", value: null, note: unavailable("Requires the latest investor presentation/filing.") },
-        { label: "Acquisition yield vs cost of capital", value: null, note: unavailable("Needs disclosed acquisition cap rates and a contemporaneous cost-of-capital estimate.") },
+        { label: "Acquisition yield vs cost of capital", value: null, note: unavailable("Needs disclosed acquisition cap rates and contemporaneous financing cost.") },
       ],
     },
     {
       title: "Cash flow — AFFO or NDCF before headline earnings",
-      description: indian
-        ? "For Indian REITs, DeepScreen prioritizes NDCF per unit and distribution coverage when filing data is available; the statutory distribution framework makes accounting EPS a poor primary cash-flow measure."
-        : "For REITs, AFFO/FFO and distribution coverage are more decision-useful than company-style EPS alone.",
+      description: indian ? "For Indian REITs, NDCF per unit and distribution coverage are the primary cash-flow checks." : "For REITs, AFFO/FFO and distribution coverage are more useful than company-style EPS alone.",
       metrics: [
         { label: "Operating cash flow", value: money(reit?.operatingCashflow, reit?.currency) },
-        { label: "Free cash flow", value: money(reit?.freeCashflow, reit?.currency), note: "Provider-reported FCF is a cross-check; it is not automatically equivalent to AFFO or NDCF." },
+        { label: "Free cash flow", value: money(reit?.freeCashflow, reit?.currency), note: "Provider FCF is a cross-check; it is not automatically AFFO or NDCF." },
         { label: indian ? "NDCF per unit trend" : "AFFO per share trend", value: null, note: unavailable("Requires REIT-specific filing data and unit/share reconciliation.") },
-        { label: "Payout ratio", value: pct(reit?.payoutRatioPct), note: "Provider payout ratio is secondary; distribution coverage should be checked against AFFO/NDCF." },
+        { label: "Payout ratio", value: pct(reit?.payoutRatioPct) },
         { label: "Distribution / dividend yield", value: pct(reit?.dividendYieldPct) },
       ],
     },
     {
       title: "Balance sheet — leverage, coverage and refinancing risk",
-      description: "A REIT can look inexpensive while carrying refinancing risk. Leverage and the debt maturity structure therefore sit at the center of the analysis.",
+      description: "A REIT can look inexpensive while carrying refinancing risk, so leverage and debt structure are central to the analysis.",
       metrics: [
         { label: "Debt / equity", value: number(reit?.debtToEquity) },
         { label: "Total debt", value: money(reit?.totalDebt, reit?.currency) },
@@ -305,13 +311,12 @@ function reitSections(item: Investment, data: InvestmentAnalysisData): Section[]
     },
     {
       title: "Valuation — cash-flow multiple, NAV and cap rate",
-      description: "P/AFFO, NAV discount/premium and implied cap rate are the primary REIT valuation checks. Generic P/E and P/B are shown only as secondary market-provider context.",
+      description: "P/AFFO, NAV discount/premium and implied cap rate are the primary REIT valuation checks; generic P/E and P/B are secondary context.",
       metrics: [
         { label: "P / AFFO", value: null, note: unavailable("Requires verified AFFO per share/unit.") },
-        { label: "Discount / premium to NAV", value: null, note: unavailable("Requires a current REIT NAV estimate based on property values and net debt.") },
+        { label: "Discount / premium to NAV", value: null, note: unavailable("Requires a current REIT NAV based on property values and net debt.") },
         { label: "Implied cap rate", value: null, note: unavailable("Requires NOI and enterprise/property value on compatible dates.") },
         { label: "Dividend yield", value: pct(reit?.dividendYieldPct), note: "A high yield is only useful if AFFO/NDCF covers it." },
-        { label: "Yield vs risk-free rate", value: null, note: unavailable("A current matching-currency sovereign yield is not connected to this page, so no spread is invented.") },
         { label: "P/E (secondary)", value: number(reit?.pe) },
         { label: "P/B (secondary)", value: number(reit?.pb) },
         { label: "Market cap", value: money(reit?.marketCap, reit?.currency) },
@@ -321,23 +326,23 @@ function reitSections(item: Investment, data: InvestmentAnalysisData): Section[]
       title: "Governance — sponsor alignment and capital issuance",
       description: "Sponsor quality and related-party discipline can change the value of an otherwise attractive property portfolio.",
       metrics: [
-        { label: "Sponsor quality", value: null, note: unavailable("Requires sponsor history, balance sheet and operating record review.") },
+        { label: "Sponsor quality", value: null, note: unavailable("Requires sponsor history and operating-record review.") },
         { label: "Related-party transactions", value: null, note: unavailable("Requires filing-level related-party disclosure review.") },
         { label: "Equity raises at fair prices", value: null, note: unavailable("Requires historical issuance prices compared with NAV/market value at each raise.") },
-        { label: "3Y max drawdown", value: pct(history?.maxDrawdown3yPct), note: "Market-price risk cross-check." },
-        { label: "5Y annualized volatility", value: pct(history?.volatility5yPct), note: "Market-price risk cross-check; not a substitute for property-level operating risk." },
+        { label: "3Y max drawdown", value: pct(history?.maxDrawdown3yPct) },
+        { label: "5Y annualized volatility", value: pct(history?.volatility5yPct) },
       ],
     },
   ];
 }
 
-function TopHoldings({ data }: { data: InvestmentAnalysisData }) {
+function TopHoldings({ data }: { data: EnhancedInvestmentAnalysisData }) {
   const holdings = data.fundProfile?.holdings.slice(0, 10) ?? [];
   if (!holdings.length) return null;
   return (
     <section className="mt-10 border-t border-border pt-8">
       <h3 className="text-lg font-semibold">Top reported holdings</h3>
-      <p className="mt-1 text-sm text-muted-foreground">Provider-reported top holdings only. This table is not treated as a complete portfolio when the provider exposes only a subset.</p>
+      <p className="mt-1 text-sm text-muted-foreground">Provider-reported top holdings only; this is not treated as a complete portfolio when the provider exposes only a subset.</p>
       <div className="mt-4 overflow-x-auto rounded-lg border border-border">
         <table className="w-full min-w-[540px] text-left text-sm">
           <thead className="border-b border-border bg-card/40 text-xs uppercase text-muted-foreground">
@@ -377,7 +382,7 @@ export function InvestmentAnalysis({ item }: { item: Investment }) {
         {item.type === "ETF"
           ? "This page analyzes the basket, concentration, valuation, realized risk and trading costs instead of applying a single-company score."
           : item.type === "FUND"
-            ? "This page focuses on process, rolling performance, downside risk, portfolio construction, manager/capacity evidence and cost rather than treating the scheme as a stock."
+            ? "This page focuses on process, rolling performance, downside risk, portfolio construction, people/capacity evidence and cost rather than treating the scheme as a stock."
             : "This page treats the REIT as a property operating business, emphasizing leases, NOI/AFFO or NDCF, leverage, NAV/cap-rate valuation and sponsor governance."}
       </p>
 
@@ -398,7 +403,7 @@ export function InvestmentAnalysis({ item }: { item: Investment }) {
       )}
 
       <p className="mt-10 border-t border-border pt-6 text-xs leading-relaxed text-muted-foreground">
-        Missing values are intentionally shown as unavailable. DeepScreen does not substitute company DCF/P/E scoring for pooled funds, infer an ETF benchmark from its name, or manufacture REIT operating metrics that require current filings.
+        Missing values are intentionally shown as unavailable. DeepScreen now prefers AMFI official TER/tracking/risk disclosures for Indian mutual funds and provider-published fund statistics for ETFs; filing-only REIT operating metrics remain blank until a current filing source can be verified.
       </p>
     </section>
   );
