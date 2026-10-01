@@ -10,11 +10,13 @@ type Raw = Record<string, unknown>;
 const cache = new Map<string, { at: number; value: unknown }>();
 const pending = new Map<string, Promise<unknown>>();
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 function normalize(value: string): string {
   return value
     .toLowerCase()
     .replace(/&/g, " and ")
-    .replace(/\b(mutual fund|fund|scheme|plan|option|idcw|income distribution cum capital withdrawal)\b/g, " ")
+    .replace(/\b(mutual fund|fund|scheme|plan|option|idcw|growth|regular|direct|income distribution cum capital withdrawal|permitted)\b/g, " ")
     .replace(/[^a-z0-9]+/g, " ")
     .trim()
     .replace(/\s+/g, " ");
@@ -60,6 +62,15 @@ function numberValue(value: unknown): number | null {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+function exact(row: Raw | null, key: string): unknown {
+  if (!row) return null;
+  const wanted = key.toLowerCase().replace(/[^a-z0-9]/g, "");
+  for (const [candidate, value] of Object.entries(row)) {
+    if (candidate.toLowerCase().replace(/[^a-z0-9]/g, "") === wanted) return value;
+  }
+  return null;
+}
+
 function keyMatches(key: string, alternatives: string[][]): boolean {
   const clean = key.toLowerCase().replace(/[^a-z0-9]/g, "");
   return alternatives.some((parts) => parts.every((part) => clean.includes(part)));
@@ -91,16 +102,16 @@ function bestRow(records: Raw[], code: string, name: string): Raw | null {
     for (const [key, value] of scalarEntries(row)) {
       const text = String(value).trim();
       const lowerKey = key.toLowerCase();
-      if (text === String(code) && (lowerKey.includes("code") || lowerKey.includes("id"))) score = Math.max(score, 100);
-      if (typeof value === "string" && value.length > 5) {
+      if (code && text === String(code) && (lowerKey.includes("code") || lowerKey.includes("id"))) score = Math.max(score, 100);
+      if (typeof value === "string" && value.length > 4) {
         const candidate = normalize(value);
-        if (candidate === normalizedName) score = Math.max(score, 95);
-        else score = Math.max(score, tokenSimilarity(candidate, normalizedName) * 80);
+        if (candidate && candidate === normalizedName) score = Math.max(score, 96);
+        else score = Math.max(score, tokenSimilarity(candidate, normalizedName) * 85);
       }
     }
     if (!best || score > best.score) best = { score, row };
   }
-  return best && best.score >= 46 ? best.row : null;
+  return best && best.score >= 42 ? best.row : null;
 }
 
 async function json(key: string, url: string, init?: RequestInit): Promise<unknown> {
@@ -109,21 +120,27 @@ async function json(key: string, url: string, init?: RequestInit): Promise<unkno
   const active = pending.get(key);
   if (active) return active;
 
-  const requestHeaders = new Headers(init?.headers);
-  requestHeaders.set("Accept", "application/json, text/plain, */*");
-  requestHeaders.set("User-Agent", UA);
-  requestHeaders.set("Referer", `${BASE}/`);
+  const promise = (async () => {
+    let lastError: unknown = null;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      try {
+        const headers = new Headers(init?.headers);
+        headers.set("Accept", "application/json, text/plain, */*");
+        headers.set("User-Agent", UA);
+        const response = await fetch(url, { ...init, headers, signal: AbortSignal.timeout(15_000) });
+        if (!response.ok) throw new Error(`AMFI ${response.status}`);
+        const text = await response.text();
+        const value = JSON.parse(text) as unknown;
+        cache.set(key, { at: Date.now(), value });
+        return value;
+      } catch (error) {
+        lastError = error;
+        if (attempt < 2) await sleep(350 * 2 ** attempt);
+      }
+    }
+    throw lastError instanceof Error ? lastError : new Error("AMFI request failed");
+  })().finally(() => pending.delete(key));
 
-  const promise = fetch(url, { ...init, headers: requestHeaders, signal: AbortSignal.timeout(12_000) })
-    .then(async (response) => {
-      if (!response.ok) throw new Error(`AMFI ${response.status}`);
-      return response.json();
-    })
-    .then((value) => {
-      cache.set(key, { at: Date.now(), value });
-      return value;
-    })
-    .finally(() => pending.delete(key));
   pending.set(key, promise);
   return promise;
 }
@@ -151,11 +168,15 @@ function previousMonthStart(): Date {
   return new Date(Date.UTC(end.getUTCFullYear(), end.getUTCMonth(), 1));
 }
 
-function lastBusinessDay(): Date {
-  const now = new Date();
-  const date = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  while ([0, 6].includes(date.getUTCDay())) date.setUTCDate(date.getUTCDate() - 1);
-  return date;
+function businessDates(count = 8): Date[] {
+  const out: Date[] = [];
+  const date = new Date();
+  date.setUTCHours(0, 0, 0, 0);
+  while (out.length < count) {
+    if (![0, 6].includes(date.getUTCDay())) out.push(new Date(date));
+    date.setUTCDate(date.getUTCDate() - 1);
+  }
+  return out;
 }
 
 function categoryId(category: string | null): number {
@@ -170,7 +191,7 @@ function categoryId(category: string | null): number {
 function rowId(row: Raw): number | null {
   for (const [key, value] of scalarEntries(row)) {
     const clean = key.toLowerCase();
-    if (!(clean.endsWith("id") || clean.includes("subcategoryid") || clean.includes("catid"))) continue;
+    if (!(clean.endsWith("id") || clean.includes("subcategoryid") || clean.includes("schemeid") || clean.includes("catid"))) continue;
     const parsed = numberValue(value);
     if (parsed !== null) return parsed;
   }
@@ -186,42 +207,97 @@ function rowName(row: Raw): string | null {
   return null;
 }
 
-async function latestTer(code: string, name: string) {
+async function amcId(meta: MutualFundMetadata, name: string): Promise<number | null> {
   try {
-    const fy = financialYear();
-    const monthPayload = await json(`ter-month:${fy}`, `${BASE}/api/populate-ter-month?year=${encodeURIComponent(fy)}`);
-    const monthRows = rows(monthPayload);
-    const first = monthRows[0];
-    const month = first ? stringByKey(first, [["monthnumber"], ["month"]]) : null;
-    if (!month) return { row: null as Raw | null, date: null as string | null };
-    const payload = await json(`ter:${month}`, `${BASE}/api/populate-te-rdata-revised?MF_ID=All&Month=${encodeURIComponent(month)}&strCat=-1&strType=-1`);
-    return { row: bestRow(rows(payload), code, name), date: month };
+    const payload = await json("amfi:amcs", `${BASE}/api/populate-mf`);
+    const target = meta.fundHouse || name;
+    let best: { id: number; score: number } | null = null;
+    for (const row of rows(payload)) {
+      const id = numberValue(exact(row, "mfId")) ?? rowId(row);
+      const label = stringByKey(row, [["mfname"], ["name"]]);
+      if (id === null || !label) continue;
+      const score = tokenSimilarity(label, target);
+      if (!best || score > best.score) best = { id, score };
+    }
+    return best && best.score >= 0.35 ? best.id : null;
   } catch {
-    return { row: null as Raw | null, date: null as string | null };
+    return null;
   }
 }
 
-async function tracking(kind: "error" | "difference", code: string, name: string) {
+async function schemeIdentity(mfId: number | null, name: string): Promise<{ id: number | null; row: Raw | null }> {
+  if (mfId === null) return { id: null, row: null };
+  try {
+    const payload = await json(`amfi:schemes:${mfId}`, `${BASE}/api/populate-scheme?MF_ID=${mfId}`);
+    const row = bestRow(rows(payload), "", name);
+    return { id: row ? rowId(row) : null, row };
+  } catch {
+    return { id: null, row: null };
+  }
+}
+
+async function schemeDetails(mfId: number | null, schemeId: number | null): Promise<Raw | null> {
+  if (mfId === null || schemeId === null) return null;
+  try {
+    const payload = await json(
+      `amfi:scheme-details:${mfId}:${schemeId}`,
+      `${BASE}/api/scheme-details?MF_ID=${mfId}&scheme_id=${schemeId}`,
+    );
+    return rows(payload)[0] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function terFromRow(row: Raw | null, planType: MutualFundMetadata["planType"]): number | null {
+  if (!row) return null;
+  const normalized = numberValue(exact(row, "TER_total")) ?? numberValue(exact(row, "TER"));
+  if (normalized !== null) return normalized;
+  const direct = numberValue(exact(row, "D_TER"));
+  const regular = numberValue(exact(row, "R_TER"));
+  if (planType === "Direct") return direct ?? regular;
+  if (planType === "Regular") return regular ?? direct;
+  return regular ?? direct;
+}
+
+async function latestTer(mfId: number | null, name: string, meta: MutualFundMetadata) {
+  try {
+    const fy = financialYear();
+    const monthPayload = await json(`ter-month:${fy}`, `${BASE}/api/populate-ter-month?year=${encodeURIComponent(fy)}`);
+    const first = rows(monthPayload)[0];
+    const month = first ? stringByKey(first, [["monthnumber"], ["month"]]) : null;
+    if (!month) return { row: null as Raw | null, date: null as string | null };
+    const id = mfId ?? "All";
+    const payload = await json(
+      `ter:${id}:${month}`,
+      `${BASE}/api/populate-te-rdata-revised?MF_ID=${encodeURIComponent(String(id))}&Month=${encodeURIComponent(month)}&strCat=-1&strType=-1&page=1&pageSize=10000`,
+    );
+    return { row: bestRow(rows(payload), "", name), date: month, planType: meta.planType };
+  } catch {
+    return { row: null as Raw | null, date: null as string | null, planType: meta.planType };
+  }
+}
+
+async function tracking(kind: "error" | "difference", mfId: number | null, code: string, name: string) {
   const date = kind === "error" ? fmt(previousMonthEnd(), true) : fmt(previousMonthStart());
   const endpoint = kind === "error"
-    ? `${BASE}/api/tracking-error-data?MF_ID=all&strdt=${encodeURIComponent(date)}`
-    : `${BASE}/api/tracking-difference?MF_ID=all&date=${encodeURIComponent(date)}`;
+    ? `${BASE}/api/tracking-error-data?MF_ID=${encodeURIComponent(String(mfId ?? "all"))}&strdt=${encodeURIComponent(date)}`
+    : `${BASE}/api/tracking-difference?MF_ID=${encodeURIComponent(String(mfId ?? "all"))}&date=${encodeURIComponent(date)}`;
   try {
-    const payload = await json(`tracking:${kind}:${date}`, endpoint);
+    const payload = await json(`tracking:${kind}:${mfId ?? "all"}:${date}`, endpoint);
     return { row: bestRow(rows(payload), code, name), date };
   } catch {
     return { row: null as Raw | null, date };
   }
 }
 
-async function performance(meta: MutualFundMetadata, code: string, name: string) {
+async function performance(meta: MutualFundMetadata, mfId: number | null, code: string, name: string) {
   const category = categoryId(meta.schemeCategory);
-  const reportDate = fmt(lastBusinessDay());
   try {
     const subPayload = await json(
       `subcat:${category}`,
       `${POLLING}/api/amfi/getsubcategory`,
-      { method: "POST", headers: { "Content-Type": "application/json", Origin: BASE }, body: JSON.stringify({ category }) },
+      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ category }) },
     );
     const desired = (meta.schemeCategory ?? "").split("-").slice(1).join("-").trim() || meta.schemeCategory || name;
     let chosen: { id: number; score: number } | null = null;
@@ -232,32 +308,44 @@ async function performance(meta: MutualFundMetadata, code: string, name: string)
       const score = tokenSimilarity(label, desired);
       if (!chosen || score > chosen.score) chosen = { id, score };
     }
-    if (!chosen) return { row: null as Raw | null, subCategoryId: null as number | null, date: reportDate };
-    const body = {
-      maturityType: (meta.schemeType ?? "").toLowerCase().includes("close") ? 2 : 1,
-      category,
-      subCategory: chosen.id,
-      mfid: 0,
-      reportDate,
-    };
-    const payload = await json(
-      `performance:${body.maturityType}:${category}:${chosen.id}:${reportDate}`,
-      `${POLLING}/api/amfi/fundperformance`,
-      { method: "POST", headers: { "Content-Type": "application/json", Origin: BASE }, body: JSON.stringify(body) },
-    );
-    return { row: bestRow(rows(payload), code, name), subCategoryId: chosen.id, date: reportDate };
+    if (!chosen) return { row: null as Raw | null, date: null as string | null };
+
+    for (const day of businessDates(8)) {
+      const reportDate = fmt(day);
+      const body = {
+        maturityType: (meta.schemeType ?? "").toLowerCase().includes("close") ? 2 : 1,
+        category,
+        subCategory: chosen.id,
+        mfid: mfId ?? 0,
+        reportDate,
+      };
+      try {
+        const payload = await json(
+          `performance:${body.maturityType}:${category}:${chosen.id}:${body.mfid}:${reportDate}`,
+          `${POLLING}/api/amfi/fundperformance`,
+          { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) },
+        );
+        const row = bestRow(rows(payload), code, name);
+        if (row) return { row, date: reportDate };
+      } catch {
+        // Try the previous business date; AMFI does not publish every calendar day.
+      }
+    }
+    return { row: null as Raw | null, date: null as string | null };
   } catch {
-    return { row: null as Raw | null, subCategoryId: null as number | null, date: reportDate };
+    return { row: null as Raw | null, date: null as string | null };
   }
 }
 
-async function risk(subCategoryId: number | null, code: string, name: string): Promise<Raw | null> {
-  if (subCategoryId === null) return null;
+async function risk(meta: MutualFundMetadata, code: string, name: string): Promise<Raw | null> {
+  // AMFI's risk-parameter disclosure currently applies to selected categories.
+  // Mid-cap is documented by AMFI's public endpoint as category 17. Do not guess other IDs.
+  if (!(meta.schemeCategory ?? "").toLowerCase().includes("mid cap")) return null;
   const date = fmt(previousMonthStart());
   try {
     const payload = await json(
-      `risk:${date}:${subCategoryId}`,
-      `${BASE}/api/risk-parameter-data-revised?date=${encodeURIComponent(date)}&strCatId=${encodeURIComponent(String(subCategoryId))}`,
+      `risk:${date}:17`,
+      `${BASE}/api/risk-parameter-data-revised?date=${encodeURIComponent(date)}&strCatId=17`,
     );
     return bestRow(rows(payload), code, name);
   } catch {
@@ -265,31 +353,61 @@ async function risk(subCategoryId: number | null, code: string, name: string): P
   }
 }
 
+function trackingErrorPercent(row: Raw | null): number | null {
+  const raw = numberValue(exact(row, "Tracking_Error")) ?? numberByKey(row, [["tracking", "error"]]);
+  if (raw === null) return null;
+  return Math.abs(raw) <= 1 ? Number((raw * 100).toFixed(4)) : raw;
+}
+
 export async function fetchAmfiOfficialFundAnalytics(
   code: string,
   name: string,
   meta: MutualFundMetadata,
 ): Promise<OfficialFundAnalytics | null> {
-  const [ter, error, difference, perf] = await Promise.all([
-    latestTer(code, name),
-    tracking("error", code, name),
-    tracking("difference", code, name),
-    performance(meta, code, name),
+  const mfId = await amcId(meta, name);
+  const scheme = await schemeIdentity(mfId, name);
+  const [details, ter, error, difference, perf, riskRow] = await Promise.all([
+    schemeDetails(mfId, scheme.id),
+    latestTer(mfId, name, meta),
+    tracking("error", mfId, code, name),
+    tracking("difference", mfId, code, name),
+    performance(meta, mfId, code, name),
+    risk(meta, code, name),
   ]);
-  const riskRow = await risk(perf.subCategoryId, code, name);
 
+  const trackingBenchmark = stringByKey(error.row, [["benchmark"]]) ?? stringByKey(difference.row, [["benchmark"]]);
   const result: OfficialFundAnalytics = {
-    terPct: numberByKey(ter.row, [["ter"], ["expense", "ratio"]]),
-    trackingErrorPct: numberByKey(error.row, [["tracking", "error"], ["trackingerror"]]),
-    trackingDifferencePct: numberByKey(difference.row, [["tracking", "difference"], ["trackingdifference"]]),
-    benchmark: stringByKey(perf.row, [["benchmark"]]),
+    terPct: terFromRow(ter.row, meta.planType),
+    trackingErrorPct: trackingErrorPercent(error.row),
+    trackingDifferencePct: numberValue(exact(difference.row, "Tracking_Difference")) ?? numberByKey(difference.row, [["tracking", "difference"]]),
+    benchmark: trackingBenchmark ?? stringByKey(perf.row, [["benchmark"]]),
     aumCrore: numberByKey(perf.row, [["aum"], ["asset", "management"]]),
-    standardDeviationPct: numberByKey(riskRow, [["standard", "deviation"], ["std", "dev"]]),
-    beta: numberByKey(riskRow, [["beta"]]),
-    sharpe: numberByKey(riskRow, [["sharpe"]]),
-    informationRatio: numberByKey(perf.row, [["information", "ratio"], ["inforatio"]]),
+    standardDeviationPct: numberValue(exact(riskRow, "Standard_Deviation")) ?? numberByKey(riskRow, [["standard", "deviation"]]),
+    beta: numberValue(exact(riskRow, "Beta")) ?? numberByKey(riskRow, [["beta"]]),
+    sharpe: numberValue(exact(riskRow, "Sharpe_Ratio")) ?? numberByKey(riskRow, [["sharpe"]]),
+    treynor: numberValue(exact(riskRow, "Treynor_Ratio")) ?? numberByKey(riskRow, [["treynor"]]),
+    jensensAlphaPct: numberValue(exact(riskRow, "Jensens_Alpha")) ?? numberByKey(riskRow, [["jensen", "alpha"], ["alpha"]]),
+    informationRatio: numberByKey(perf.row, [["information", "ratio"]]),
     riskometer: stringByKey(perf.row, [["riskometer"], ["risk", "meter"]]),
-    sourceDate: perf.date || ter.date || error.date || difference.date || null,
+    launchDate: stringByKey(details, [["launch", "date"]]) ?? stringByKey(perf.row, [["launch", "date"]]),
+    exitLoad: stringByKey(details, [["scheme", "load"], ["exit", "load"]]),
+    minimumInvestment: numberByKey(details, [["scheme", "min", "amt"], ["minimum", "amount"]]),
+    objective: stringByKey(details, [["scheme", "objective"], ["objective"]]),
+    amcWebsite: stringByKey(details, [["amc", "website"], ["website"]]),
+    schemeCode: stringByKey(perf.row, [["scheme", "code"]]) ?? stringByKey(error.row, [["scheme", "code"]]) ?? (code || null),
+    isin: stringByKey(error.row, [["isin"]]) ?? stringByKey(difference.row, [["isin"]]),
+    returns1yPct: numberValue(exact(perf.row, "Returns_1yr")) ?? numberByKey(perf.row, [["returns", "1yr"]]),
+    returns3yPct: numberValue(exact(perf.row, "Returns_3yr")) ?? numberByKey(perf.row, [["returns", "3yr"]]),
+    returns5yPct: numberValue(exact(perf.row, "Returns_5yr")) ?? numberByKey(perf.row, [["returns", "5yr"]]),
+    benchmarkReturns1yPct: numberValue(exact(perf.row, "Benchmark_Returns_1yr")) ?? numberByKey(perf.row, [["benchmark", "returns", "1yr"]]),
+    benchmarkReturns3yPct: numberValue(exact(perf.row, "Benchmark_Returns_3yr")) ?? numberByKey(perf.row, [["benchmark", "returns", "3yr"]]),
+    benchmarkReturns5yPct: numberValue(exact(perf.row, "Benchmark_Returns_5yr")) ?? numberByKey(perf.row, [["benchmark", "returns", "5yr"]]),
+    sourceDate:
+      stringByKey(error.row, [["report", "date"]]) ??
+      stringByKey(difference.row, [["report", "month"]]) ??
+      perf.date ??
+      ter.date ??
+      null,
   };
 
   return Object.entries(result).some(([key, value]) => key !== "sourceDate" && value !== null) ? result : null;
