@@ -23,9 +23,9 @@ const FONT_CSS =
 // when the main CSS/font assets are still cold. The full design system replaces
 // these declarations as soon as styles.css is available.
 const CRITICAL_RESPONSIVE_CSS = `
-html,body{width:100%;min-width:0;max-width:100%;margin:0;overflow-x:hidden;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html,body,#root{width:100%;min-width:0;max-width:100%;margin:0;overflow-x:hidden;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 @supports (overflow:clip){html,body{overflow-x:clip}}
-*,*::before,*::after{box-sizing:border-box}
+*,*::before,*::after{box-sizing:border-box;min-width:0}
 img,svg,video,canvas{max-width:100%}
 .ds-workspace,.ds-workspace-header,.ds-workspace-content{width:100%;min-width:0;max-width:100%}
 .ds-workspace{overflow-x:hidden}
@@ -33,8 +33,11 @@ img,svg,video,canvas{max-width:100%}
 .ds-workspace-topbar,.ds-workspace-navrow{width:100%;min-width:0;max-width:1440px;margin-inline:auto}
 .ds-workspace-topbar>*{min-width:0}
 .ds-workspace-search{min-width:0;max-width:100%}
+.ds-landing{width:100%;min-width:0;max-width:100%;overflow-x:hidden}
+@supports (overflow:clip){.ds-landing{overflow-x:clip}}
 @media(max-width:959px){.ds-workspace-navrow{display:none}.ds-workspace-search{flex:1;width:auto}}
-@media(max-width:639px){.ds-workspace-topbar{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto auto}.ds-workspace-search{grid-column:1/-1;width:100%;margin:0}}
+@media(max-width:767px){.ds-nav{height:75px;padding-inline:6%;gap:12px}.ds-nav>nav{display:none}.ds-menu{display:block}.ds-chapter{padding-inline:6%}.ds-hero-copy,.ds-chapter-copy{width:100%}}
+@media(max-width:639px){.ds-workspace-topbar{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto auto}.ds-workspace-brand-note{display:none}.ds-workspace-search{grid-column:1/-1;width:100%;margin:0}}
 `;
 
 function NotFoundComponent() {
