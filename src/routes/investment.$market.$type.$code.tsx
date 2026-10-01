@@ -1,7 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
-import { InvestmentAnalysis } from "@/components/ds/InvestmentAnalysis";
-import { OfficialInvestmentMetrics } from "@/components/ds/OfficialInvestmentMetrics";
+import { InvestmentAnalysisAvailable } from "@/components/ds/InvestmentAnalysisAvailable";
 import { findInvestment } from "@/lib/deepscreen/investments";
 import { useLiveQuote } from "@/hooks/useLiveQuotes";
 import { formatPrice } from "@/lib/deepscreen/format";
@@ -74,21 +73,21 @@ function InvestmentPage() {
             <p className="mt-2 text-3xl font-semibold">
               {item.type === "FUND"
                 ? item.nav === null
-                  ? "Not available"
+                  ? "NAV pending"
                   : `₹${item.nav.toLocaleString("en-IN", { maximumFractionDigits: 4 })}`
                 : quote
                   ? formatPrice(quote.price, item.market)
-                  : "Quote unavailable"}
+                  : "Quote pending"}
             </p>
           </div>
           <div>
             <p className="text-xs uppercase text-muted-foreground">Source / date</p>
             <p className="mt-2 text-sm">
               {item.type === "FUND"
-                ? `AMFI · ${item.date || "date unavailable"}`
+                ? `AMFI · ${item.date || "latest directory snapshot"}`
                 : quote
                   ? `Yahoo Finance · ${new Date(quote.asOf).toLocaleString()}`
-                  : "Exchange directory listing · price not available"}
+                  : "Exchange directory listing"}
             </p>
           </div>
         </div>
@@ -100,8 +99,7 @@ function InvestmentPage() {
           Company P/E-based scores, DCF valuation and forensic analysis do not apply to this listing; the analysis below uses the framework appropriate to its investment type.
         </p>
 
-        <OfficialInvestmentMetrics item={item} />
-        <InvestmentAnalysis item={item} />
+        <InvestmentAnalysisAvailable item={item} />
       </div>
     </Shell>
   );
