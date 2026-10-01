@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
 import { InvestmentAnalysis } from "@/components/ds/InvestmentAnalysis";
+import { OfficialInvestmentMetrics } from "@/components/ds/OfficialInvestmentMetrics";
 import { findInvestment } from "@/lib/deepscreen/investments";
 import { useLiveQuote } from "@/hooks/useLiveQuotes";
 import { formatPrice } from "@/lib/deepscreen/format";
@@ -99,6 +100,7 @@ function InvestmentPage() {
           Company P/E-based scores, DCF valuation and forensic analysis do not apply to this listing; the analysis below uses the framework appropriate to its investment type.
         </p>
 
+        <OfficialInvestmentMetrics item={item} />
         <InvestmentAnalysis item={item} />
       </div>
     </Shell>
