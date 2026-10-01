@@ -40,17 +40,17 @@ function InvestmentsPage() {
         <p className="text-xs font-semibold uppercase text-primary">Investment directory</p>
         <h1 className="mt-2 text-3xl font-bold">Mutual funds, ETFs & REITs</h1>
         <p className="mt-3 max-w-3xl text-sm text-muted-foreground">{INVESTMENTS.length.toLocaleString()} listings across India and the US, plus identified London REITs. Mutual fund NAVs are from AMFI; exchange-traded prices appear when a live quote is available. These investments are not assessed with the company stock score.</p>
-        <div className="mt-8 flex flex-wrap items-end gap-3">
-          <label className="min-w-60 flex-1 text-xs text-muted-foreground">Search name or symbol
+        <div className="mt-8 grid grid-cols-2 items-end gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto]">
+          <label className="col-span-2 min-w-0 text-xs text-muted-foreground sm:col-span-1">Search name or symbol
             <input aria-label="Search investments" className="mt-1 block h-10 w-full rounded border border-border bg-panel px-3 text-sm text-foreground outline-none focus:border-primary" value={query} onChange={(e) => change(() => setQuery(e.target.value))} placeholder="Scheme, ETF or REIT" />
           </label>
-          <label className="text-xs text-muted-foreground">Type
-            <select aria-label="Investment type" className="mt-1 block h-10 rounded border border-border bg-panel px-3 text-sm text-foreground" value={type} onChange={(e) => change(() => setType(e.target.value as InvestmentType | "ALL"))}>
+          <label className="min-w-0 text-xs text-muted-foreground">Type
+            <select aria-label="Investment type" className="mt-1 block h-10 w-full rounded border border-border bg-panel px-3 text-sm text-foreground" value={type} onChange={(e) => change(() => setType(e.target.value as InvestmentType | "ALL"))}>
               <option value="ALL">All types</option><option value="FUND">Mutual funds</option><option value="ETF">ETFs</option><option value="REIT">REITs</option>
             </select>
           </label>
-          <label className="text-xs text-muted-foreground">Market
-            <select aria-label="Market" className="mt-1 block h-10 rounded border border-border bg-panel px-3 text-sm text-foreground" value={market} onChange={(e) => change(() => setMarket(e.target.value))}>
+          <label className="min-w-0 text-xs text-muted-foreground">Market
+            <select aria-label="Market" className="mt-1 block h-10 w-full rounded border border-border bg-panel px-3 text-sm text-foreground" value={market} onChange={(e) => change(() => setMarket(e.target.value))}>
               <option value="ALL">All markets</option>{["IN", "NSE", "BSE", "NYSE", "NASDAQ", "US", "LSE"].map((m) => <option key={m} value={m}>{m === "IN" ? "India · AMFI" : m === "US" ? "US · Cboe" : m}</option>)}
             </select>
           </label>
