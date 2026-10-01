@@ -79,7 +79,7 @@ export function PeerAnalysisPanel({
     ? "Peer fundamentals are still loading. The comparison will populate automatically when comparable company data arrives."
     : scoreDelta === null
       ? "DeepScreen is comparing " + stock.symbol + " with " + peers.length + " closest available listed peers."
-      : stock.symbol + " scores " + analysis.score + "/100 versus a " + scoreMedian.toFixed(0) +
+      : stock.symbol + " scores " + analysis.score + "/100 versus a " + (scoreMedian ?? 0).toFixed(0) +
         "/100 peer median (" + (scoreDelta >= 0 ? "+" : "") + scoreDelta.toFixed(0) + " points). " +
         (exactCount > 0
           ? exactCount + " peer" + (exactCount === 1 ? "" : "s") + " match" + (exactCount === 1 ? "s" : "") + " the same provider-reported industry."

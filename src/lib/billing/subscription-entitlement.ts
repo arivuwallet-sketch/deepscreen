@@ -7,6 +7,8 @@ export type PaidSubscriptionOrder = {
   tier: string;
   status: string;
   created_at: string;
+  paid_at?: string | null;
+  entitlement_expires_at?: string | null;
 };
 
 export type PaidOrderEntitlement = SubscriptionEntitlement & {
@@ -49,13 +51,8 @@ export function hasPaidOrderHistory(orders: PaidSubscriptionOrder[] | null | und
 }
 
 /**
- * Reconstruct the paid entitlement from immutable payment-order history.
- *
- * This deliberately does not trust subscriptions.expires_at when paid orders
- * exist. Older checkout code could process the same Cashfree order twice when
- * webhook and browser confirmation raced, which could over-extend that row.
- * Every distinct payment_orders row is unique by link_id, so each real paid
- * purchase contributes its duration exactly once here.
+ * Resolve access from the latest paid order. Every plan ends relative to that
+ * purchase's payment timestamp; earlier orders never stack extra time onto it.
  */
 export function entitlementFromPaidOrders(
   orders: PaidSubscriptionOrder[] | null | undefined,
@@ -69,24 +66,27 @@ export function entitlementFromPaidOrders(
         Number.isFinite(Date.parse(order.created_at)),
     )
     .slice()
-    .sort((a, b) => Date.parse(a.created_at) - Date.parse(b.created_at));
+    .sort((a, b) => {
+      const aTime = Date.parse(a.paid_at ?? a.created_at);
+      const bTime = Date.parse(b.paid_at ?? b.created_at);
+      return bTime - aTime;
+    });
 
   if (paid.length === 0) return null;
-
-  let expiresMs = 0;
-  let latestTier: PaidOrderEntitlement["tier"] = paid[0].tier;
-
-  for (const order of paid) {
-    const orderMs = Date.parse(order.created_at);
-    const baseMs = Math.max(expiresMs, orderMs);
-    expiresMs = baseMs + PLAN_DAYS[order.tier] * 86_400_000;
-    latestTier = order.tier;
-  }
+  const latest = paid[0];
+  if (!latest) return null;
+  const recordedExpiry = latest.entitlement_expires_at
+    ? Date.parse(latest.entitlement_expires_at)
+    : Number.NaN;
+  const purchasedMs = Date.parse(latest.paid_at ?? latest.created_at);
+  const expiresMs = Number.isFinite(recordedExpiry)
+    ? recordedExpiry
+    : purchasedMs + PLAN_DAYS[latest.tier] * 86_400_000;
 
   if (expiresMs <= nowMs) return null;
 
   return {
-    tier: latestTier,
+    tier: latest.tier,
     status: "active",
     expires_at: new Date(expiresMs).toISOString(),
   };

@@ -1,5 +1,5 @@
 import { directoryPage, exchangePath, DIRECTORY_PAGE_SIZE } from "@/lib/seo/directory";
-import { buildBreadcrumbSchema, buildExchangeCollectionSchema, buildGraph, jsonLd } from "@/lib/seo/json-ld";
+import { buildBreadcrumbSchema, buildExchangeCollectionSchema, buildGraph, jsonLd, type ExchangeCode } from "@/lib/seo/json-ld";
 import { createFileRoute, notFound, redirect, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 
@@ -91,7 +91,7 @@ export const Route = createFileRoute("/exchange/$code")({
           type: "application/ld+json",
           children: jsonLd(
             buildGraph(
-              buildExchangeCollectionSchema({ code, url }),
+               buildExchangeCollectionSchema({ code: code as ExchangeCode, url }),
               buildBreadcrumbSchema([
                 { name: "Home", url: "https://deepscreen.online/" },
                 { name: `${code} screener`, url },

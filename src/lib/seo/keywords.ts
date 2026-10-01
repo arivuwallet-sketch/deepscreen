@@ -875,8 +875,10 @@ function inferredStockContext(lists: string[][]): StockKeywordContext | null {
   const symbol = symbolEntry.replace(/ share price$/i, "").trim();
   const name = companyEntry.replace(/ stock$/i, "").trim();
   const match = exchangeEntry.trim().match(/^(NSE|BSE|NYSE|NASDAQ|LSE)\s+(.+)$/i);
-  if (!symbol || !name || !match || match[2].trim().toLowerCase() !== symbol.toLowerCase()) return null;
-  return { name, symbol, exchange: match[1].toUpperCase() };
+  const exchange = match?.[1];
+  const matchedSymbol = match?.[2];
+  if (!symbol || !name || !exchange || !matchedSymbol || matchedSymbol.trim().toLowerCase() !== symbol.toLowerCase()) return null;
+  return { name, symbol, exchange: exchange.toUpperCase() };
 }
 
 /**

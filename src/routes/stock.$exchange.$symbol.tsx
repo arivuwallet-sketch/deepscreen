@@ -484,12 +484,12 @@ function StockPage() {
           exchange={stock.exchange}
           symbol={stock.symbol}
           analysis={a}
-          liveFundamentals={liveFundamentals}
+          liveFundamentals={liveFundamentals ?? null}
         />
 
         <FundamentalSnapshotPanel
           stock={live}
-          liveFundamentals={liveFundamentals}
+          liveFundamentals={liveFundamentals ?? null}
           sources={sources}
           updatedAt={Math.max(fundUpdatedAt, screenerUpdatedAt)}
         />
@@ -497,7 +497,7 @@ function StockPage() {
         <ResearchAlertsPanel
           stock={live}
           analysis={a}
-          liveFundamentals={liveFundamentals}
+          liveFundamentals={liveFundamentals ?? null}
         />
 
                 <PeerAnalysisPanel

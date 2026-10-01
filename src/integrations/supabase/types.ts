@@ -85,8 +85,10 @@ export type Database = {
           amount: number
           created_at: string
           currency: string
+          entitlement_expires_at: string | null
           id: string
           link_id: string
+          paid_at: string | null
           status: string
           tier: string
           user_id: string
@@ -95,8 +97,10 @@ export type Database = {
           amount: number
           created_at?: string
           currency?: string
+          entitlement_expires_at?: string | null
           id?: string
           link_id: string
+          paid_at?: string | null
           status?: string
           tier: string
           user_id: string
@@ -105,8 +109,10 @@ export type Database = {
           amount?: number
           created_at?: string
           currency?: string
+          entitlement_expires_at?: string | null
           id?: string
           link_id?: string
+          paid_at?: string | null
           status?: string
           tier?: string
           user_id?: string
@@ -235,7 +241,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      activate_paid_order: {
+        Args: { p_link_id: string }
+        Returns: {
+          expires_at: string
+          outcome: string
+          tier: string
+          user_id: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

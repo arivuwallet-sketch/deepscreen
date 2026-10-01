@@ -94,7 +94,7 @@ function categoryDelta(
     const previousScore = previous.metrics[key];
     if (!Number.isFinite(currentScore) || !Number.isFinite(previousScore)) return sum;
     const weight = ANALYSIS_WEIGHTS[key] ?? 1;
-    return sum + ((currentScore - previousScore) * weight) / totalWeight;
+    return sum + (((currentScore ?? 0) - (previousScore ?? 0)) * weight) / totalWeight;
   }, 0);
 }
 
@@ -182,10 +182,8 @@ export function ScoreChangePanel({
     if (existing?.current?.quarter === now.quarter) {
       next = existing;
     } else {
-      next = {
-        previous: existing?.current ?? existing?.previous,
-        current: now,
-      };
+      const previousSnapshot = existing?.current ?? existing?.previous;
+      next = previousSnapshot ? { previous: previousSnapshot, current: now } : { current: now };
       writeStored(key, next);
     }
 
