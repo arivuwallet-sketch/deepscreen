@@ -16,5 +16,6 @@
 5. Maintain a public corrections process so researchers can confidently cite stable URLs.
 
 ## Deferred
+- Complete NSE/BSE/LSE ETF and REIT inventories and US mutual-fund coverage when verified, machine-readable exchange directories are available; current directory labels its source and coverage limits.
 - Read-only per-stock JSON endpoints, after versioning, rate limits, data licensing and cache policy are designed.
 - Never publish `/compare/deepscreen-vs-screener-in`; Indian filing ratios may rely on Screener.in, making that comparison misleading.
