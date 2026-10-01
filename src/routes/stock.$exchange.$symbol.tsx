@@ -497,7 +497,7 @@ function StockPage() {
         <ResearchAlertsPanel
           stock={live}
           analysis={a}
-          liveFundamentals={liveFundamentals}
+          liveFundamentals={liveFundamentals ?? null}
         />
 
                 <PeerAnalysisPanel
