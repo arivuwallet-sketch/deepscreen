@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Subscription entitlements are anchored to each order's verified payment time; the latest paid order replaces earlier access rather than stacking durations, so expiry is deterministic.
+- Browser viewport state uses `useSyncExternalStore` with CSS-first responsive rendering so cold loads never depend on a post-mount resize effect.
