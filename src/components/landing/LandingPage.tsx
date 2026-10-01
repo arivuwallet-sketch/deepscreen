@@ -163,9 +163,9 @@ function Brand() {
 }
 function StartButton({ small = false }: { small?: boolean }) {
   return (
-    <Link to="/screener" className={`ds-button ${small ? "ds-button-small" : ""}`}>
+    <a href="/screener" className={`ds-button ${small ? "ds-button-small" : ""}`}>
       Get started <ArrowUpRight size={small ? 16 : 20} />
-    </Link>
+    </a>
   );
 }
 function Eyebrow({ children }: { children: React.ReactNode }) {
@@ -197,7 +197,7 @@ function ValuationDemo() {
       <div className="ds-cashbars" aria-hidden="true">
         {cash.map((item, i) => (
           <div key={i}>
-            <i style={{ height: `${item * 3.5}px` }} />
+            <i style={{ height: `${(item * 3.5).toFixed(4)}px` }} />
             <span>Y{i + 1}</span>
           </div>
         ))}
@@ -507,9 +507,9 @@ export function LandingPage() {
                 peer comparisons and holding-plan context. Dig into the financial inputs and company
                 profile behind each result.
               </p>
-              <Link to="/screener" className="ds-text-link">
+              <a href="/screener" className="ds-text-link">
                 Open the research workspace <ArrowUpRight size={16} />
-              </Link>
+              </a>
               <small>
                 Model output supports research.
                 <br />
@@ -792,7 +792,7 @@ export function LandingPage() {
           </p>
         </div>
         <nav aria-label="Footer navigation">
-          <Link to="/screener">Screener</Link>
+          <a href="/screener">Screener</a>
           <Link to="/pricing">Pricing</Link>
           <Link to="/methodology">Methodology</Link>
           <Link to="/data-sources">Data sources</Link>
