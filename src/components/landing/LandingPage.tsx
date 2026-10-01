@@ -492,8 +492,8 @@ export function LandingPage() {
               <br />A complete set of tools for your own research process.
             </p>
           </div>
-          <div className="ds-workspace" data-reveal>
-            <div className="ds-workspace-copy">
+          <div className="ds-toolkit-workspace" data-reveal>
+            <div className="ds-toolkit-workspace-copy">
               <span className="ds-icon-box">
                 <Layers3 size={22} />
               </span>

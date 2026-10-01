@@ -550,7 +550,7 @@
 .ds-section-heading .ds-eyebrow {
   margin-bottom: 24px !important;
 }
-.ds-workspace {
+.ds-toolkit-workspace {
   display: grid;
   grid-template-columns: 0.8fr 1.2fr;
   gap: 60px;
@@ -561,7 +561,7 @@
   margin-bottom: 24px;
   overflow: hidden;
 }
-.ds-workspace-copy {
+.ds-toolkit-workspace-copy {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -578,23 +578,23 @@
   color: var(--ds-lime);
   margin-bottom: 24px;
 }
-.ds-workspace h3 {
+.ds-toolkit-workspace h3 {
   font-size: 34px;
   line-height: 1.2;
   letter-spacing: -1px;
   font-weight: 400;
 }
-.ds-workspace-copy p {
+.ds-toolkit-workspace-copy p {
   max-width: 350px;
   margin-top: 18px;
   font-size: 13px;
   line-height: 1.8;
   color: var(--ds-muted);
 }
-.ds-workspace-copy .ds-text-link {
+.ds-toolkit-workspace-copy .ds-text-link {
   margin-top: 25px;
 }
-.ds-workspace-copy small {
+.ds-toolkit-workspace-copy small {
   font-size: 9px;
   color: #799080;
   margin-top: 25px;
@@ -1241,11 +1241,11 @@
   .ds-market-stats {
     gap: 22px;
   }
-  .ds-workspace {
+  .ds-toolkit-workspace {
     gap: 25px;
     padding: 30px;
   }
-  .ds-workspace h3 {
+  .ds-toolkit-workspace h3 {
     font-size: 29px;
   }
   .ds-terminal-body {
@@ -1557,22 +1557,22 @@
     margin-top: 22px;
     font-size: 12px;
   }
-  .ds-workspace {
+  .ds-toolkit-workspace {
     grid-template-columns: 1fr;
     gap: 32px;
     padding: 27px 22px;
   }
-  .ds-workspace h3 {
+  .ds-toolkit-workspace h3 {
     font-size: 30px;
   }
-  .ds-workspace-copy p {
+  .ds-toolkit-workspace-copy p {
     max-width: 100%;
     font-size: 12px;
   }
   .ds-icon-box {
     margin-bottom: 20px;
   }
-  .ds-workspace-copy small {
+  .ds-toolkit-workspace-copy small {
     font-size: 8px;
     margin-top: 16px;
   }
