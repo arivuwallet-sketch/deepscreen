@@ -42,6 +42,8 @@ import { Route as OptionsSlugRouteImport } from './routes/options.$slug'
 import { Route as RatiosIndexRouteImport } from './routes/ratios.index'
 import { Route as RatiosSlugRouteImport } from './routes/ratios.$slug'
 import { Route as SitemapsChar123nameChar125DotxmlRouteImport } from './routes/sitemaps.{$name}[.]xml'
+import { Route as StockFiltersIndexRouteImport } from './routes/stock-filters.index'
+import { Route as StockFiltersSlugRouteImport } from './routes/stock-filters.$slug'
 import { Route as ApiPublicCashfreeWebhookRouteImport } from './routes/api/public/cashfree-webhook'
 import { Route as ApiV1ResourceRouteImport } from './routes/api.v1.$resource'
 import { Route as SectorExchangeSectorRouteImport } from './routes/sector.$exchange.$sector'
@@ -213,6 +215,16 @@ const SitemapsChar123nameChar125DotxmlRoute =
     path: '/sitemaps/{$name}.xml',
     getParentRoute: () => rootRouteImport,
   } as any)
+const StockFiltersIndexRoute = StockFiltersIndexRouteImport.update({
+  id: '/stock-filters/',
+  path: '/stock-filters/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StockFiltersSlugRoute = StockFiltersSlugRouteImport.update({
+  id: '/stock-filters/$slug',
+  path: '/stock-filters/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicCashfreeWebhookRoute =
   ApiPublicCashfreeWebhookRouteImport.update({
     id: '/api/public/cashfree-webhook',
@@ -265,10 +277,12 @@ export interface FileRoutesByFullPath {
   '/options/$slug': typeof OptionsSlugRoute
   '/ratios/$slug': typeof RatiosSlugRoute
   '/sitemaps/{$name}.xml': typeof SitemapsChar123nameChar125DotxmlRoute
+  '/stock-filters/$slug': typeof StockFiltersSlugRoute
   '/compare/': typeof CompareIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/options/': typeof OptionsIndexRoute
   '/ratios/': typeof RatiosIndexRoute
+  '/stock-filters/': typeof StockFiltersIndexRoute
   '/api/public/cashfree-webhook': typeof ApiPublicCashfreeWebhookRoute
   '/api/v1/$resource': typeof ApiV1ResourceRoute
   '/sector/$exchange/$sector': typeof SectorExchangeSectorRoute
@@ -304,10 +318,12 @@ export interface FileRoutesByTo {
   '/options/$slug': typeof OptionsSlugRoute
   '/ratios/$slug': typeof RatiosSlugRoute
   '/sitemaps/{$name}.xml': typeof SitemapsChar123nameChar125DotxmlRoute
+  '/stock-filters/$slug': typeof StockFiltersSlugRoute
   '/compare': typeof CompareIndexRoute
   '/learn': typeof LearnIndexRoute
   '/options': typeof OptionsIndexRoute
   '/ratios': typeof RatiosIndexRoute
+  '/stock-filters': typeof StockFiltersIndexRoute
   '/api/public/cashfree-webhook': typeof ApiPublicCashfreeWebhookRoute
   '/api/v1/$resource': typeof ApiV1ResourceRoute
   '/sector/$exchange/$sector': typeof SectorExchangeSectorRoute
@@ -344,10 +360,12 @@ export interface FileRoutesById {
   '/options/$slug': typeof OptionsSlugRoute
   '/ratios/$slug': typeof RatiosSlugRoute
   '/sitemaps/{$name}.xml': typeof SitemapsChar123nameChar125DotxmlRoute
+  '/stock-filters/$slug': typeof StockFiltersSlugRoute
   '/compare/': typeof CompareIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/options/': typeof OptionsIndexRoute
   '/ratios/': typeof RatiosIndexRoute
+  '/stock-filters/': typeof StockFiltersIndexRoute
   '/api/public/cashfree-webhook': typeof ApiPublicCashfreeWebhookRoute
   '/api/v1/$resource': typeof ApiV1ResourceRoute
   '/sector/$exchange/$sector': typeof SectorExchangeSectorRoute
@@ -385,10 +403,12 @@ export interface FileRouteTypes {
     | '/options/$slug'
     | '/ratios/$slug'
     | '/sitemaps/{$name}.xml'
+    | '/stock-filters/$slug'
     | '/compare/'
     | '/learn/'
     | '/options/'
     | '/ratios/'
+    | '/stock-filters/'
     | '/api/public/cashfree-webhook'
     | '/api/v1/$resource'
     | '/sector/$exchange/$sector'
@@ -424,10 +444,12 @@ export interface FileRouteTypes {
     | '/options/$slug'
     | '/ratios/$slug'
     | '/sitemaps/{$name}.xml'
+    | '/stock-filters/$slug'
     | '/compare'
     | '/learn'
     | '/options'
     | '/ratios'
+    | '/stock-filters'
     | '/api/public/cashfree-webhook'
     | '/api/v1/$resource'
     | '/sector/$exchange/$sector'
@@ -463,10 +485,12 @@ export interface FileRouteTypes {
     | '/options/$slug'
     | '/ratios/$slug'
     | '/sitemaps/{$name}.xml'
+    | '/stock-filters/$slug'
     | '/compare/'
     | '/learn/'
     | '/options/'
     | '/ratios/'
+    | '/stock-filters/'
     | '/api/public/cashfree-webhook'
     | '/api/v1/$resource'
     | '/sector/$exchange/$sector'
@@ -503,10 +527,12 @@ export interface RootRouteChildren {
   OptionsSlugRoute: typeof OptionsSlugRoute
   RatiosSlugRoute: typeof RatiosSlugRoute
   SitemapsChar123nameChar125DotxmlRoute: typeof SitemapsChar123nameChar125DotxmlRoute
+  StockFiltersSlugRoute: typeof StockFiltersSlugRoute
   CompareIndexRoute: typeof CompareIndexRoute
   LearnIndexRoute: typeof LearnIndexRoute
   OptionsIndexRoute: typeof OptionsIndexRoute
   RatiosIndexRoute: typeof RatiosIndexRoute
+  StockFiltersIndexRoute: typeof StockFiltersIndexRoute
   ApiPublicCashfreeWebhookRoute: typeof ApiPublicCashfreeWebhookRoute
   ApiV1ResourceRoute: typeof ApiV1ResourceRoute
   SectorExchangeSectorRoute: typeof SectorExchangeSectorRoute
@@ -746,6 +772,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapsChar123nameChar125DotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/stock-filters/': {
+      id: '/stock-filters/'
+      path: '/stock-filters'
+      fullPath: '/stock-filters/'
+      preLoaderRoute: typeof StockFiltersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stock-filters/$slug': {
+      id: '/stock-filters/$slug'
+      path: '/stock-filters/$slug'
+      fullPath: '/stock-filters/$slug'
+      preLoaderRoute: typeof StockFiltersSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/cashfree-webhook': {
       id: '/api/public/cashfree-webhook'
       path: '/api/public/cashfree-webhook'
@@ -807,10 +847,12 @@ const rootRouteChildren: RootRouteChildren = {
   OptionsSlugRoute: OptionsSlugRoute,
   RatiosSlugRoute: RatiosSlugRoute,
   SitemapsChar123nameChar125DotxmlRoute: SitemapsChar123nameChar125DotxmlRoute,
+  StockFiltersSlugRoute: StockFiltersSlugRoute,
   CompareIndexRoute: CompareIndexRoute,
   LearnIndexRoute: LearnIndexRoute,
   OptionsIndexRoute: OptionsIndexRoute,
   RatiosIndexRoute: RatiosIndexRoute,
+  StockFiltersIndexRoute: StockFiltersIndexRoute,
   ApiPublicCashfreeWebhookRoute: ApiPublicCashfreeWebhookRoute,
   ApiV1ResourceRoute: ApiV1ResourceRoute,
   SectorExchangeSectorRoute: SectorExchangeSectorRoute,

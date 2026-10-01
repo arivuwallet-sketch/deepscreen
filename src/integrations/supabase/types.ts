@@ -63,9 +63,21 @@ export type Database = {
         Relationships: []
       }
       newsletter_subscribers: {
-        Row: { email: string; source: string; subscribed_at: string }
-        Insert: { email: string; source?: string; subscribed_at?: string }
-        Update: { email?: string; source?: string; subscribed_at?: string }
+        Row: {
+          email: string
+          source: string
+          subscribed_at: string
+        }
+        Insert: {
+          email: string
+          source?: string
+          subscribed_at?: string
+        }
+        Update: {
+          email?: string
+          source?: string
+          subscribed_at?: string
+        }
         Relationships: []
       }
       payment_orders: {
