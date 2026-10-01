@@ -30,14 +30,29 @@ test("failed and merely-created checkout orders never grant access", () => {
   assert.equal(entitlementFromPaidOrders(orders, Date.parse("2026-09-19T00:00:00Z")), null);
 });
 
-test("separate paid orders stack once per paid order", () => {
+test("the latest purchase replaces an earlier entitlement instead of stacking it", () => {
   const orders = [
     { tier: "weekly", status: "paid", created_at: "2026-09-17T10:00:00.000Z" },
     { tier: "weekly", status: "paid", created_at: "2026-09-20T10:00:00.000Z" },
   ];
   assert.equal(hasPaidOrderHistory(orders), true);
   const row = entitlementFromPaidOrders(orders, Date.parse("2026-09-25T00:00:00Z"));
-  assert.equal(row?.expires_at, "2026-10-01T10:00:00.000Z");
+  assert.equal(row?.expires_at, "2026-09-27T10:00:00.000Z");
+});
+
+test("a recorded payment timestamp is the exact start of the plan", () => {
+  const orders = [{
+    tier: "weekly",
+    status: "paid",
+    created_at: "2026-09-17T09:00:00.000Z",
+    paid_at: "2026-09-17T10:00:00.000Z",
+    entitlement_expires_at: "2026-09-24T10:00:00.000Z",
+  }];
+  assert.equal(
+    entitlementFromPaidOrders(orders, Date.parse("2026-09-24T09:59:59.999Z"))?.expires_at,
+    "2026-09-24T10:00:00.000Z",
+  );
+  assert.equal(entitlementFromPaidOrders(orders, Date.parse("2026-09-24T10:00:00.000Z")), null);
 });
 
 test("an old over-extended subscription row cannot override an expired paid ledger", () => {

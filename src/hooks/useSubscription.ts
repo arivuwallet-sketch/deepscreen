@@ -151,7 +151,7 @@ export function useSubscription(): SubscriptionState {
         .maybeSingle(),
       supabase
         .from("payment_orders")
-        .select("tier, status, created_at")
+        .select("tier, status, created_at, paid_at, entitlement_expires_at")
         .eq("user_id", user.id)
         .eq("status", "paid")
         .order("created_at", { ascending: true }),

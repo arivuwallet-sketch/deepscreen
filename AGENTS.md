@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Subscription entitlements are anchored to each order's verified payment time; the latest paid order replaces earlier access rather than stacking durations, so expiry is deterministic.
