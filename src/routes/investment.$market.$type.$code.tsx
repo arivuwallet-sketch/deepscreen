@@ -44,6 +44,7 @@ export const Route = createFileRoute("/investment/$market/$type/$code")({
       meta: [
         { title },
         { name: "description", content: description },
+        ...(item ? [{ name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" }] : []),
         ...(item ? [{ name: "keywords", content: `${item.name}, ${item.code}, ${typeKeywords}` }] : []),
         { property: "og:title", content: title },
         { property: "og:description", content: description },
@@ -53,7 +54,7 @@ export const Route = createFileRoute("/investment/$market/$type/$code")({
       ],
       ...(item
         ? {
-            links: [{ rel: "canonical", href: canonical }],
+            links: [{ rel: "canonical", href: canonical }, { rel: "describedby", href: "https://deepscreen.online/llms.txt" }],
             scripts: [{
               type: "application/ld+json",
               children: jsonLd(buildGraph(
