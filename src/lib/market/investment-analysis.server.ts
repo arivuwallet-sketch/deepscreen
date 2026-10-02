@@ -145,6 +145,8 @@ async function fetchYahooHistory(symbol: string): Promise<{ points: HistoricalPo
       const price = num(meta?.["regularMarketPrice"]);
       const marketTime = num(meta?.["regularMarketTime"]);
       const firstTrade = num(meta?.["firstTradeDate"]);
+      const high = num(meta?.["fiftyTwoWeekHigh"]);
+      const low = num(meta?.["fiftyTwoWeekLow"]);
       const rawCurrency = str(meta?.["currency"]) ?? "USD";
       const scale = rawCurrency === "GBp" || rawCurrency === "GBX" ? 100 : 1;
       const snapshot: InvestmentMarketSnapshot | null = price !== null && price > 0
@@ -154,8 +156,8 @@ async function fetchYahooHistory(symbol: string): Promise<{ points: HistoricalPo
             asOf: new Date((marketTime ?? timestamps[timestamps.length - 1] ?? Date.now() / 1000) * 1000).toISOString(),
             providerName: str(meta?.["longName"]) ?? str(meta?.["shortName"]),
             volume: num(meta?.["regularMarketVolume"]),
-            fiftyTwoWeekHigh: num(meta?.["fiftyTwoWeekHigh"]) === null ? null : num(meta?.["fiftyTwoWeekHigh"])! / scale,
-            fiftyTwoWeekLow: num(meta?.["fiftyTwoWeekLow"]) === null ? null : num(meta?.["fiftyTwoWeekLow"])! / scale,
+            fiftyTwoWeekHigh: high === null ? null : high / scale,
+            fiftyTwoWeekLow: low === null ? null : low / scale,
             inceptionDate: firstTrade && firstTrade > 0 ? new Date(firstTrade * 1000).toISOString().slice(0, 10) : null,
           }
         : null;
