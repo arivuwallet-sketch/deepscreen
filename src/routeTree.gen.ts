@@ -18,20 +18,25 @@ import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DataSourcesRouteImport } from './routes/data-sources'
 import { Route as DevelopersRouteImport } from './routes/developers'
+import { Route as EtfsRouteImport } from './routes/etfs'
 import { Route as InvestmentsRouteImport } from './routes/investments'
 import { Route as IpoRouteImport } from './routes/ipo'
 import { Route as MethodologyRouteImport } from './routes/methodology'
+import { Route as MutualFundsRouteImport } from './routes/mutual-funds'
 import { Route as OpenapiDotjsonRouteImport } from './routes/openapi[.]json'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as PressRouteImport } from './routes/press'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
+import { Route as ReitsRouteImport } from './routes/reits'
 import { Route as ResearchChecklistRouteImport } from './routes/research-checklist'
 import { Route as ScreenerRouteImport } from './routes/screener'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as BestSlugRouteImport } from './routes/best.$slug'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
+import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as CompareIndexRouteImport } from './routes/compare.index'
 import { Route as CompareSlugRouteImport } from './routes/compare.$slug'
 import { Route as ExchangeCodeRouteImport } from './routes/exchange.$code'
@@ -96,6 +101,11 @@ const DevelopersRoute = DevelopersRouteImport.update({
   path: '/developers',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EtfsRoute = EtfsRouteImport.update({
+  id: '/etfs',
+  path: '/etfs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InvestmentsRoute = InvestmentsRouteImport.update({
   id: '/investments',
   path: '/investments',
@@ -109,6 +119,11 @@ const IpoRoute = IpoRouteImport.update({
 const MethodologyRoute = MethodologyRouteImport.update({
   id: '/methodology',
   path: '/methodology',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MutualFundsRoute = MutualFundsRouteImport.update({
+  id: '/mutual-funds',
+  path: '/mutual-funds',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OpenapiDotjsonRoute = OpenapiDotjsonRouteImport.update({
@@ -141,6 +156,11 @@ const RefundPolicyRoute = RefundPolicyRouteImport.update({
   path: '/refund-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReitsRoute = ReitsRouteImport.update({
+  id: '/reits',
+  path: '/reits',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResearchChecklistRoute = ResearchChecklistRouteImport.update({
   id: '/research-checklist',
   path: '/research-checklist',
@@ -164,6 +184,16 @@ const TermsRoute = TermsRouteImport.update({
 const BestSlugRoute = BestSlugRouteImport.update({
   id: '/best/$slug',
   path: '/best/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompareIndexRoute = CompareIndexRouteImport.update({
@@ -270,20 +300,24 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/data-sources': typeof DataSourcesRoute
   '/developers': typeof DevelopersRoute
+  '/etfs': typeof EtfsRoute
   '/investments': typeof InvestmentsRoute
   '/ipo': typeof IpoRoute
   '/methodology': typeof MethodologyRoute
+  '/mutual-funds': typeof MutualFundsRoute
   '/openapi.json': typeof OpenapiDotjsonRoute
   '/portfolio': typeof PortfolioRoute
   '/press': typeof PressRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
+  '/reits': typeof ReitsRoute
   '/research-checklist': typeof ResearchChecklistRoute
   '/screener': typeof ScreenerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/best/$slug': typeof BestSlugRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/compare/$slug': typeof CompareSlugRoute
   '/exchange/$code': typeof ExchangeCodeRoute
   '/learn/$slug': typeof LearnSlugRoute
@@ -292,6 +326,7 @@ export interface FileRoutesByFullPath {
   '/ratios/$slug': typeof RatiosSlugRoute
   '/sitemaps/{$name}.xml': typeof SitemapsChar123nameChar125DotxmlRoute
   '/stock-filters/$slug': typeof StockFiltersSlugRoute
+  '/blog/': typeof BlogIndexRoute
   '/compare/': typeof CompareIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/options/': typeof OptionsIndexRoute
@@ -313,20 +348,24 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/data-sources': typeof DataSourcesRoute
   '/developers': typeof DevelopersRoute
+  '/etfs': typeof EtfsRoute
   '/investments': typeof InvestmentsRoute
   '/ipo': typeof IpoRoute
   '/methodology': typeof MethodologyRoute
+  '/mutual-funds': typeof MutualFundsRoute
   '/openapi.json': typeof OpenapiDotjsonRoute
   '/portfolio': typeof PortfolioRoute
   '/press': typeof PressRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
+  '/reits': typeof ReitsRoute
   '/research-checklist': typeof ResearchChecklistRoute
   '/screener': typeof ScreenerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/best/$slug': typeof BestSlugRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/compare/$slug': typeof CompareSlugRoute
   '/exchange/$code': typeof ExchangeCodeRoute
   '/learn/$slug': typeof LearnSlugRoute
@@ -335,6 +374,7 @@ export interface FileRoutesByTo {
   '/ratios/$slug': typeof RatiosSlugRoute
   '/sitemaps/{$name}.xml': typeof SitemapsChar123nameChar125DotxmlRoute
   '/stock-filters/$slug': typeof StockFiltersSlugRoute
+  '/blog': typeof BlogIndexRoute
   '/compare': typeof CompareIndexRoute
   '/learn': typeof LearnIndexRoute
   '/options': typeof OptionsIndexRoute
@@ -357,20 +397,24 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/data-sources': typeof DataSourcesRoute
   '/developers': typeof DevelopersRoute
+  '/etfs': typeof EtfsRoute
   '/investments': typeof InvestmentsRoute
   '/ipo': typeof IpoRoute
   '/methodology': typeof MethodologyRoute
+  '/mutual-funds': typeof MutualFundsRoute
   '/openapi.json': typeof OpenapiDotjsonRoute
   '/portfolio': typeof PortfolioRoute
   '/press': typeof PressRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
+  '/reits': typeof ReitsRoute
   '/research-checklist': typeof ResearchChecklistRoute
   '/screener': typeof ScreenerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/best/$slug': typeof BestSlugRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/compare/$slug': typeof CompareSlugRoute
   '/exchange/$code': typeof ExchangeCodeRoute
   '/learn/$slug': typeof LearnSlugRoute
@@ -379,6 +423,7 @@ export interface FileRoutesById {
   '/ratios/$slug': typeof RatiosSlugRoute
   '/sitemaps/{$name}.xml': typeof SitemapsChar123nameChar125DotxmlRoute
   '/stock-filters/$slug': typeof StockFiltersSlugRoute
+  '/blog/': typeof BlogIndexRoute
   '/compare/': typeof CompareIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/options/': typeof OptionsIndexRoute
@@ -402,20 +447,24 @@ export interface FileRouteTypes {
     | '/contact'
     | '/data-sources'
     | '/developers'
+    | '/etfs'
     | '/investments'
     | '/ipo'
     | '/methodology'
+    | '/mutual-funds'
     | '/openapi.json'
     | '/portfolio'
     | '/press'
     | '/pricing'
     | '/privacy'
     | '/refund-policy'
+    | '/reits'
     | '/research-checklist'
     | '/screener'
     | '/sitemap.xml'
     | '/terms'
     | '/best/$slug'
+    | '/blog/$slug'
     | '/compare/$slug'
     | '/exchange/$code'
     | '/learn/$slug'
@@ -424,6 +473,7 @@ export interface FileRouteTypes {
     | '/ratios/$slug'
     | '/sitemaps/{$name}.xml'
     | '/stock-filters/$slug'
+    | '/blog/'
     | '/compare/'
     | '/learn/'
     | '/options/'
@@ -445,20 +495,24 @@ export interface FileRouteTypes {
     | '/contact'
     | '/data-sources'
     | '/developers'
+    | '/etfs'
     | '/investments'
     | '/ipo'
     | '/methodology'
+    | '/mutual-funds'
     | '/openapi.json'
     | '/portfolio'
     | '/press'
     | '/pricing'
     | '/privacy'
     | '/refund-policy'
+    | '/reits'
     | '/research-checklist'
     | '/screener'
     | '/sitemap.xml'
     | '/terms'
     | '/best/$slug'
+    | '/blog/$slug'
     | '/compare/$slug'
     | '/exchange/$code'
     | '/learn/$slug'
@@ -467,6 +521,7 @@ export interface FileRouteTypes {
     | '/ratios/$slug'
     | '/sitemaps/{$name}.xml'
     | '/stock-filters/$slug'
+    | '/blog'
     | '/compare'
     | '/learn'
     | '/options'
@@ -488,20 +543,24 @@ export interface FileRouteTypes {
     | '/contact'
     | '/data-sources'
     | '/developers'
+    | '/etfs'
     | '/investments'
     | '/ipo'
     | '/methodology'
+    | '/mutual-funds'
     | '/openapi.json'
     | '/portfolio'
     | '/press'
     | '/pricing'
     | '/privacy'
     | '/refund-policy'
+    | '/reits'
     | '/research-checklist'
     | '/screener'
     | '/sitemap.xml'
     | '/terms'
     | '/best/$slug'
+    | '/blog/$slug'
     | '/compare/$slug'
     | '/exchange/$code'
     | '/learn/$slug'
@@ -510,6 +569,7 @@ export interface FileRouteTypes {
     | '/ratios/$slug'
     | '/sitemaps/{$name}.xml'
     | '/stock-filters/$slug'
+    | '/blog/'
     | '/compare/'
     | '/learn/'
     | '/options/'
@@ -532,20 +592,24 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DataSourcesRoute: typeof DataSourcesRoute
   DevelopersRoute: typeof DevelopersRoute
+  EtfsRoute: typeof EtfsRoute
   InvestmentsRoute: typeof InvestmentsRoute
   IpoRoute: typeof IpoRoute
   MethodologyRoute: typeof MethodologyRoute
+  MutualFundsRoute: typeof MutualFundsRoute
   OpenapiDotjsonRoute: typeof OpenapiDotjsonRoute
   PortfolioRoute: typeof PortfolioRoute
   PressRoute: typeof PressRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
+  ReitsRoute: typeof ReitsRoute
   ResearchChecklistRoute: typeof ResearchChecklistRoute
   ScreenerRoute: typeof ScreenerRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   BestSlugRoute: typeof BestSlugRoute
+  BlogSlugRoute: typeof BlogSlugRoute
   CompareSlugRoute: typeof CompareSlugRoute
   ExchangeCodeRoute: typeof ExchangeCodeRoute
   LearnSlugRoute: typeof LearnSlugRoute
@@ -554,6 +618,7 @@ export interface RootRouteChildren {
   RatiosSlugRoute: typeof RatiosSlugRoute
   SitemapsChar123nameChar125DotxmlRoute: typeof SitemapsChar123nameChar125DotxmlRoute
   StockFiltersSlugRoute: typeof StockFiltersSlugRoute
+  BlogIndexRoute: typeof BlogIndexRoute
   CompareIndexRoute: typeof CompareIndexRoute
   LearnIndexRoute: typeof LearnIndexRoute
   OptionsIndexRoute: typeof OptionsIndexRoute
@@ -631,6 +696,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DevelopersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/etfs': {
+      id: '/etfs'
+      path: '/etfs'
+      fullPath: '/etfs'
+      preLoaderRoute: typeof EtfsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/investments': {
       id: '/investments'
       path: '/investments'
@@ -650,6 +722,13 @@ declare module '@tanstack/react-router' {
       path: '/methodology'
       fullPath: '/methodology'
       preLoaderRoute: typeof MethodologyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mutual-funds': {
+      id: '/mutual-funds'
+      path: '/mutual-funds'
+      fullPath: '/mutual-funds'
+      preLoaderRoute: typeof MutualFundsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/openapi.json': {
@@ -694,6 +773,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RefundPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reits': {
+      id: '/reits'
+      path: '/reits'
+      fullPath: '/reits'
+      preLoaderRoute: typeof ReitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/research-checklist': {
       id: '/research-checklist'
       path: '/research-checklist'
@@ -727,6 +813,20 @@ declare module '@tanstack/react-router' {
       path: '/best/$slug'
       fullPath: '/best/$slug'
       preLoaderRoute: typeof BestSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/compare/': {
@@ -868,20 +968,24 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DataSourcesRoute: DataSourcesRoute,
   DevelopersRoute: DevelopersRoute,
+  EtfsRoute: EtfsRoute,
   InvestmentsRoute: InvestmentsRoute,
   IpoRoute: IpoRoute,
   MethodologyRoute: MethodologyRoute,
+  MutualFundsRoute: MutualFundsRoute,
   OpenapiDotjsonRoute: OpenapiDotjsonRoute,
   PortfolioRoute: PortfolioRoute,
   PressRoute: PressRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   RefundPolicyRoute: RefundPolicyRoute,
+  ReitsRoute: ReitsRoute,
   ResearchChecklistRoute: ResearchChecklistRoute,
   ScreenerRoute: ScreenerRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   BestSlugRoute: BestSlugRoute,
+  BlogSlugRoute: BlogSlugRoute,
   CompareSlugRoute: CompareSlugRoute,
   ExchangeCodeRoute: ExchangeCodeRoute,
   LearnSlugRoute: LearnSlugRoute,
@@ -890,6 +994,7 @@ const rootRouteChildren: RootRouteChildren = {
   RatiosSlugRoute: RatiosSlugRoute,
   SitemapsChar123nameChar125DotxmlRoute: SitemapsChar123nameChar125DotxmlRoute,
   StockFiltersSlugRoute: StockFiltersSlugRoute,
+  BlogIndexRoute: BlogIndexRoute,
   CompareIndexRoute: CompareIndexRoute,
   LearnIndexRoute: LearnIndexRoute,
   OptionsIndexRoute: OptionsIndexRoute,
