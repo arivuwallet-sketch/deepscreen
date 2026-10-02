@@ -74,7 +74,7 @@ export function buildOrganizationSchema(): JsonLdNode {
       url: LOGO_URL,
     },
     description:
-      "Beginner-first stock research and financial-analysis platform covering supported listings across NSE, BSE, NYSE, Nasdaq and LSE. DeepScreen explains financial ratios, highlights potential traps and research questions, and documents the limits of its data and models.",
+      "Beginner-first stock and investment research platform covering supported equities across NSE, BSE, NYSE, Nasdaq and LSE plus mutual funds, ETFs and REITs. DeepScreen explains financial ratios, fund costs and tracking, REIT cash-flow metrics, research questions and data limitations.",
     founder: {
       "@type": "Person",
       name: "Sooraj",
@@ -97,6 +97,12 @@ export function buildOrganizationSchema(): JsonLdNode {
       "cash flow analysis",
       "debt and leverage analysis",
       "beginner investing education",
+      "mutual fund analysis",
+      "exchange-traded funds",
+      "ETF tracking error and tracking difference",
+      "mutual fund NAV and expense ratios",
+      "real estate investment trusts",
+      "REIT cash flow, leverage and valuation",
     ],
     // Add once you have real public profile URLs (X/LinkedIn/GitHub/etc.) —
     // sameAs is one of the stronger signals for entity disambiguation:
@@ -126,7 +132,7 @@ export function buildWebSiteSchema(): JsonLdNode {
     inLanguage: "en",
     alternateName: "DeepScreen Stock Research",
     description:
-      "The official DeepScreen website for beginner-first stock research, financial-ratio explanations, accounting-risk checks and fundamental analysis across supported Indian, US and UK listings.",
+      "The official DeepScreen website for beginner-first stock and investment research, including financial-ratio analysis, mutual funds, ETFs, REITs and supported Indian, US and UK listings.",
     about: { "@id": `${SITE_URL}/#organization` },
     keywords: [
       "DeepScreen",
@@ -136,6 +142,9 @@ export function buildWebSiteSchema(): JsonLdNode {
       "financial ratios",
       "accounting traps",
       "stock screener",
+      "mutual fund analysis",
+      "ETF analysis",
+      "REIT analysis",
     ],
     // Uncomment once a query-string-driven search page exists:
     // potentialAction: {

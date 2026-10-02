@@ -5,6 +5,9 @@ import { findInvestment } from "@/lib/deepscreen/investments";
 import { useLiveQuote } from "@/hooks/useLiveQuotes";
 import { formatPrice } from "@/lib/deepscreen/format";
 import { getInvestmentAnalysis } from "@/lib/market/investment-analysis.functions";
+import { InvestmentFaqSection } from "@/components/ds/InvestmentFaqSection";
+import { investmentDetailFaq } from "@/lib/seo/investment-faq";
+import { buildBreadcrumbSchema, buildFAQSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 
 export const Route = createFileRoute("/investment/$market/$type/$code")({
   staticData: { sitemap: true },
@@ -30,10 +33,18 @@ export const Route = createFileRoute("/investment/$market/$type/$code")({
           ? `Analyze ${item.name} as a mutual fund: process, rolling returns, downside risk, portfolio construction, people/capacity evidence and costs where available.`
           : `Analyze ${item?.name ?? "this REIT"} as a REIT operating business: asset quality, growth, cash flow, leverage, valuation and governance evidence where available.`
       : "Investment not found.";
+    const canonical = item ? `https://deepscreen.online/investment/${encodeURIComponent(item.market)}/${encodeURIComponent(item.type)}/${encodeURIComponent(item.code)}` : "";
+    const faqs = item ? investmentDetailFaq(item) : [];
+    const typeKeywords = item?.type === "FUND"
+      ? "mutual fund analysis, mutual fund NAV, expense ratio, TER, direct vs regular plan, rolling returns, mutual fund risk"
+      : item?.type === "ETF"
+        ? "ETF analysis, ETF holdings, tracking error, tracking difference, ETF expense ratio, bid ask spread, premium discount NAV"
+        : "REIT analysis, REIT occupancy, WALE, NDCF, AFFO, REIT LTV, REIT NAV, cap rate";
     return {
       meta: [
         { title },
         { name: "description", content: description },
+        ...(item ? [{ name: "keywords", content: `${item.name}, ${item.code}, ${typeKeywords}` }] : []),
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:type", content: "article" },
@@ -42,12 +53,21 @@ export const Route = createFileRoute("/investment/$market/$type/$code")({
       ],
       ...(item
         ? {
-            links: [
-              {
-                rel: "canonical",
-                href: `https://deepscreen.online/investment/${encodeURIComponent(item.market)}/${encodeURIComponent(item.type)}/${encodeURIComponent(item.code)}`,
-              },
-            ],
+            links: [{ rel: "canonical", href: canonical }],
+            scripts: [{
+              type: "application/ld+json",
+              children: jsonLd(buildGraph(
+                buildOrganizationSchema(),
+                buildWebSiteSchema(),
+                buildWebPageSchema({ name: title, description, url: canonical }),
+                buildBreadcrumbSchema([
+                  { name: "DeepScreen", url: "https://deepscreen.online/" },
+                  { name: "Investments", url: "https://deepscreen.online/investments" },
+                  { name: item.name, url: canonical },
+                ]),
+                buildFAQSchema(faqs.map((faq) => ({ question: faq.question, answer: faq.answer }))),
+              )),
+            }],
           }
         : {}),
     };
@@ -118,6 +138,7 @@ function InvestmentPage() {
         </p>
 
         <InvestmentAnalysisAvailable item={item} {...(analysis ? { initialData: analysis } : {})} />
+        <InvestmentFaqSection faqs={investmentDetailFaq(item)} title={`Questions about ${item.name}`} description={`Research answers for ${item.name} (${item.code}) using the analysis framework appropriate to a ${item.type === "FUND" ? "mutual fund" : item.type}.`} />
       </div>
     </Shell>
   );

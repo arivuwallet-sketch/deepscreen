@@ -179,3 +179,41 @@ These first-party research pages explain repeatable analysis methods. Each page 
 - Free cash flow analysis guide: https://deepscreen.online/learn/free-cash-flow-analysis-guide
 - Promoter pledging risk analysis: https://deepscreen.online/learn/promoter-pledging-risk-analysis
 - 10-year compounder analysis framework: https://deepscreen.online/learn/10-year-compounder-analysis-framework
+
+## Mutual fund, ETF and REIT research Q&A
+
+Canonical investment directory:
+https://deepscreen.online/investments
+
+Canonical investment detail pattern:
+https://deepscreen.online/investment/{MARKET}/{TYPE}/{CODE}
+
+DeepScreen does not apply its company stock score to mutual funds, ETFs or REITs. Each investment type uses a purpose-built research framework, and missing specialist data is not replaced with synthetic values.
+
+### What is the difference between a mutual fund, an ETF and a REIT?
+A mutual fund pools investor money into a managed portfolio and is normally transacted at a calculated NAV. An ETF is also a pooled portfolio, but its units trade on an exchange during market hours, so its market price can differ from NAV. A REIT gives investors listed exposure to income-producing real estate and is analyzed through property cash flow, leases, leverage and valuation.
+
+### What should I check when analyzing a mutual fund?
+Review the mandate and benchmark, multi-year and rolling returns, drawdown, volatility, risk-adjusted measures, portfolio concentration, manager tenure and costs. For Indian schemes, compare the correct Direct or Regular plan and check TER and exit load where disclosed.
+
+### What is mutual fund NAV?
+NAV is the per-unit value of the fund after valuing assets and subtracting liabilities and scheme expenses. The absolute NAV level does not by itself tell you whether a fund is cheap, expensive, good or bad.
+
+### What should I check when analyzing an ETF?
+Treat the ETF as a basket. Review its benchmark or strategy, holdings, concentration, portfolio valuation, drawdown, volatility, expense ratio, tracking difference, tracking error, bid-ask spread, AUM, trading volume and premium or discount to NAV where verified data is available.
+
+### What are ETF tracking error and tracking difference?
+Tracking difference is the return gap between an ETF and its benchmark over a period. Tracking error measures how variable that gap is over time. Fees, implementation costs, cash holdings and rebalancing can affect both.
+
+### What should I check when analyzing a REIT?
+Review occupancy, WALE, tenant concentration, rent growth and property mix; then examine NOI and distributable cash flow such as AFFO or NDCF where reported, distribution coverage, LTV or debt to EBITDA, interest coverage, debt maturities, NAV and implied cap rates.
+
+### What are NDCF and AFFO?
+They are REIT-oriented cash-flow measures used to understand cash generation and distribution capacity. AFFO is common in several international REIT markets, while Indian REIT disclosures focus on NDCF. Definitions vary, so they should be reconciled with operating cash flow, debt and actual distributions.
+
+### How much cash flow must an Indian REIT distribute?
+Under the SEBI REIT framework, at least 90% of net distributable cash flows must be distributed to unit holders, subject to the applicable regulations and distribution mechanics. Distribution yield should still be checked against cash-flow sustainability, leverage and property fundamentals.
+
+For the full visible FAQ, definitions and primary source links, use:
+https://deepscreen.online/investments
+
