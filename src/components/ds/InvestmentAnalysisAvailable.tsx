@@ -81,7 +81,7 @@ function Sections({ sections }: { sections: Section[] }) {
   );
 }
 
-function etfSections(data: EnhancedInvestmentAnalysisData): Section[] {
+function etfSections(item: Investment, data: EnhancedInvestmentAnalysisData): Section[] {
   const fund = data.fundProfile;
   const official = data.officialFund;
   const quality = data.holdingQuality;
@@ -107,7 +107,7 @@ function etfSections(data: EnhancedInvestmentAnalysisData): Section[] {
     },
     {
       title: "Price history",
-      description: "Returns and risk calculated from the available adjusted-price history, not a benchmark comparison.",
+      description: `Returns and risk calculated from available adjusted-price history${data.historyVenue && data.historyVenue !== item.market ? ` (${data.historyVenue} cross-listing)` : ""}, not a benchmark comparison.`,
       metrics: [
         { label: "1Y return", value: pct(history?.return1yPct) },
         { label: "3Y annualized return", value: pct(history?.return3yAnnualizedPct) },
@@ -314,7 +314,7 @@ export function InvestmentAnalysisAvailable({ item, initialData }: { item: Inves
   const { data, isLoading, isError } = useInvestmentAnalysis(item, initialData);
   const sections = data
     ? item.type === "ETF"
-      ? etfSections(data)
+      ? etfSections(item, data)
       : item.type === "FUND"
         ? fundSections(item, data)
         : reitSections(data)
@@ -342,7 +342,7 @@ export function InvestmentAnalysisAvailable({ item, initialData }: { item: Inves
           <div className="mt-6 rounded-lg border border-border bg-card/30 p-4 text-xs leading-relaxed text-muted-foreground">
             <span className="font-semibold text-foreground">Sources used:</span>{" "}
             {data.sources.length ? data.sources.join(" · ") : "Price/NAV history only"}
-            {data.history ? ` · History ${data.history.startDate} to ${data.history.endDate}` : ""}
+            {data.history ? ` · ${data.historyVenue ?? "Market"} history ${data.history.startDate} to ${data.history.endDate}` : ""}
           </div>
           {hasMetrics ? (
             <Sections sections={sections} />
