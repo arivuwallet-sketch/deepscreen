@@ -43,6 +43,17 @@ function Answers() {
         </section>
 
         <section className="rounded-lg border border-border p-5">
+          <h2 className="font-semibold">Mutual fund, ETF and REIT answers</h2>
+          <p className="mt-2 text-sm text-muted-foreground">DeepScreen also publishes crawlable, plain-English research Q&amp;A for pooled investments and listed real-estate trusts.</p>
+          <div className="mt-3 flex flex-wrap gap-5 text-sm text-primary">
+            <Link to="/mutual-funds">Mutual fund FAQ</Link>
+            <Link to="/etfs">ETF FAQ</Link>
+            <Link to="/reits">REIT FAQ</Link>
+            <Link to="/investments">Investment directory</Link>
+          </div>
+        </section>
+
+        <section className="rounded-lg border border-border p-5">
           <h2 className="font-semibold">More research resources</h2>
           <p className="mt-2 text-sm text-muted-foreground">Review the methodology, source notes and printable checklist before relying on any research output.</p>
           <div className="mt-3 flex flex-wrap gap-5 text-sm text-primary"><Link to="/research-checklist">Research checklist</Link><a href="/methodology">Methodology</a><a href="/contact">Contact the team</a></div>
