@@ -399,6 +399,7 @@ function mapReitFundamentals(fundamentals: LiveFundamentals | null): ReitAnalysi
 async function buildAnalysis(request: Request): Promise<InvestmentAnalysisData> {
   const sources = new Set<string>();
   let historyPoints: HistoricalPoint[] = [];
+  let historyVenue: string | null = null;
   let marketSnapshot: InvestmentMarketSnapshot | null = null;
   let fundProfile: FundProfileAnalysis | null = null;
   let holdingQuality: HoldingQualityAnalysis | null = null;
@@ -410,6 +411,7 @@ async function buildAnalysis(request: Request): Promise<InvestmentAnalysisData> 
   if (request.type === "FUND" && request.market.toUpperCase() === "IN" && /^\d+$/.test(request.code)) {
     const indian = await fetchIndianMutualFund(request.code, request.name);
     historyPoints = indian.history;
+    if (indian.history.length) historyVenue = "IN";
     mutualFund = indian.meta ?? mutualFund;
     if (indian.history.length || indian.meta) sources.add("MFAPI (AMFI-sourced NAV history)");
   } else {
@@ -419,9 +421,27 @@ async function buildAnalysis(request: Request): Promise<InvestmentAnalysisData> 
       request.type === "ETF" || request.type === "FUND" ? fetchYahooFundProfile(symbol) : Promise.resolve(null),
     ]);
     historyPoints = history.points;
+    if (history.points.length) historyVenue = request.market.toUpperCase();
     marketSnapshot = history.snapshot;
     fundProfile = profile;
     if (history.points.length || profile) sources.add("Yahoo Finance");
+
+    // Some BSE ETF feeds contain only a single print even while the very same
+    // ticker has years of history on NSE. Use that history only when the live
+    // prices and currency corroborate the cross-listing; retain the BSE quote.
+    if (request.type === "ETF" && request.market.toUpperCase() === "BSE" && history.points.length < 52 && history.snapshot) {
+      const nseHistory = await fetchYahooHistory(yahooSymbol("NSE", request.code));
+      const nsePrice = nseHistory.snapshot?.price;
+      const bsePrice = history.snapshot.price;
+      if (nseHistory.points.length > history.points.length &&
+          nsePrice !== undefined && nsePrice > 0 &&
+          nseHistory.snapshot?.currency === history.snapshot.currency &&
+          Math.abs(nsePrice - bsePrice) / bsePrice <= 0.05) {
+        historyPoints = nseHistory.points;
+        historyVenue = "NSE";
+        sources.add("Yahoo Finance NSE cross-listing history");
+      }
+    }
 
     if (request.type === "ETF" && profile?.holdings.length) {
       holdingQuality = await fetchHoldingQuality(profile.holdings);
@@ -437,6 +457,7 @@ async function buildAnalysis(request: Request): Promise<InvestmentAnalysisData> 
     fetchedAt: new Date().toISOString(),
     sources: [...sources],
     history: computeHistoricalMetrics(historyPoints),
+    historyVenue,
     marketSnapshot,
     fundProfile,
     holdingQuality,

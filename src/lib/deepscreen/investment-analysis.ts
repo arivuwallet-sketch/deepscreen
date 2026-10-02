@@ -115,6 +115,7 @@ export interface InvestmentAnalysisData {
   fetchedAt: string;
   sources: string[];
   history: HistoricalMetrics | null;
+  historyVenue: string | null;
   marketSnapshot: InvestmentMarketSnapshot | null;
   fundProfile: FundProfileAnalysis | null;
   holdingQuality: HoldingQualityAnalysis | null;
