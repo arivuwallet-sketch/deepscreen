@@ -3,6 +3,17 @@ export interface HistoricalPoint {
   value: number;
 }
 
+export interface InvestmentMarketSnapshot {
+  price: number;
+  currency: string;
+  asOf: string;
+  providerName: string | null;
+  volume: number | null;
+  fiftyTwoWeekHigh: number | null;
+  fiftyTwoWeekLow: number | null;
+  inceptionDate: string | null;
+}
+
 export interface HistoricalMetrics {
   startDate: string;
   endDate: string;
@@ -104,6 +115,7 @@ export interface InvestmentAnalysisData {
   fetchedAt: string;
   sources: string[];
   history: HistoricalMetrics | null;
+  marketSnapshot: InvestmentMarketSnapshot | null;
   fundProfile: FundProfileAnalysis | null;
   holdingQuality: HoldingQualityAnalysis | null;
   mutualFund: MutualFundMetadata | null;

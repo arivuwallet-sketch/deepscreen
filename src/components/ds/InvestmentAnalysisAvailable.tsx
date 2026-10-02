@@ -86,6 +86,7 @@ function etfSections(data: EnhancedInvestmentAnalysisData): Section[] {
   const official = data.officialFund;
   const quality = data.holdingQuality;
   const history = data.history;
+  const market = data.marketSnapshot;
   const topSector = fund?.topSectors[0];
   const top3Sector = fund?.topSectors.slice(0, 3).reduce((sum, row) => sum + row.weightPct, 0) ?? 0;
   const earningsYield = fund?.portfolioPe && fund.portfolioPe > 0 ? 100 / fund.portfolioPe : null;
@@ -96,10 +97,26 @@ function etfSections(data: EnhancedInvestmentAnalysisData): Section[] {
       metrics: [
         { label: "Benchmark / index", value: official?.benchmark ?? fund?.category },
         { label: "Fund family", value: fund?.family },
+        { label: "Provider listing name", value: market?.providerName, note: "Market listing label; not a verified fund-family disclosure." },
         { label: "Legal structure", value: fund?.legalType },
         { label: "Manager", value: fund?.managerName },
         { label: "Manager start", value: fund?.managerStartDate },
         { label: "Inception", value: official?.launchDate ?? fund?.inceptionDate },
+        { label: "First recorded trade", value: market?.inceptionDate, note: "Provider's first available trade, not necessarily fund launch." },
+      ],
+    },
+    {
+      title: "Price history",
+      description: "Returns and risk calculated from the available adjusted-price history, not a benchmark comparison.",
+      metrics: [
+        { label: "1Y return", value: pct(history?.return1yPct) },
+        { label: "3Y annualized return", value: pct(history?.return3yAnnualizedPct) },
+        { label: "5Y annualized return", value: pct(history?.return5yAnnualizedPct) },
+        { label: "10Y annualized return", value: pct(history?.return10yAnnualizedPct) },
+        { label: "3Y rolling median", value: pct(history?.rolling3yMedianPct) },
+        { label: "5Y rolling median", value: pct(history?.rolling5yMedianPct) },
+        { label: "52-week high", value: money(market?.fiftyTwoWeekHigh, market?.currency) },
+        { label: "52-week low", value: money(market?.fiftyTwoWeekLow, market?.currency) },
       ],
     },
     {
@@ -142,6 +159,7 @@ function etfSections(data: EnhancedInvestmentAnalysisData): Section[] {
         { label: "Premium / discount to NAV", value: pct(fund?.premiumDiscountPct, 3) },
         { label: "AUM", value: official?.aumCrore !== null && official?.aumCrore !== undefined ? `₹${number(official.aumCrore)} Cr` : money(fund?.totalAssets, fund?.currency) },
         { label: "Average volume", value: compact(fund?.averageVolume) },
+        { label: "Latest session volume", value: compact(market?.volume), note: "Not an average." },
       ],
     },
   ];
@@ -333,6 +351,11 @@ export function InvestmentAnalysisAvailable({ item, initialData }: { item: Inves
               No verified supplemental metrics were returned for this listing. Its directory NAV or market quote remains available above; DeepScreen will not substitute stock ratios or estimated fund data.
             </div>
           )}
+          {item.type === "ETF" && !data.fundProfile?.holdings.length ? (
+            <p className="mt-6 text-sm leading-relaxed text-muted-foreground">
+              Holdings, fund fees, tracking and portfolio valuation are not supplied for this listing by the current sources. Price-history analysis remains available; bid / ask spread alone does not describe the fund's costs.
+            </p>
+          ) : null}
           {data.officialFund?.objective ? (
             <section className="mt-8 border-t border-border pt-7">
               <h3 className="text-lg font-semibold">Scheme objective</h3>
