@@ -58,7 +58,7 @@ export const Route = createFileRoute("/investment/$market/$type/$code")({
 function InvestmentPage() {
   const { item, analysis } = Route.useLoaderData();
   const verifiedNav = item.type === "FUND" && analysis?.history &&
-    (!item.date || analysis.history.endDate >= item.date)
+    (!item.date || !Number.isFinite(Date.parse(item.date)) || Date.parse(analysis.history.endDate) >= Date.parse(item.date))
     ? analysis.history : null;
   const { data: quote } = useLiveQuote(
     item.type === "FUND" ? "" : item.market,

@@ -208,7 +208,8 @@ function fundSections(item: Investment, data: EnhancedInvestmentAnalysisData): S
         { label: "Exit load", value: official?.exitLoad },
         { label: "Minimum investment", value: official?.minimumInvestment !== null && official?.minimumInvestment !== undefined ? `₹${number(official.minimumInvestment, 0)}` : null },
         { label: "Portfolio turnover", value: pct(fund?.turnoverPct) },
-        { label: "Current NAV", value: item.nav !== null ? `₹${item.nav.toLocaleString("en-IN", { maximumFractionDigits: 4 })}` : null },
+        { label: "Latest NAV", value: history?.latestValue !== undefined ? `₹${history.latestValue.toLocaleString("en-IN", { maximumFractionDigits: 4 })}` : item.nav !== null ? `₹${item.nav.toLocaleString("en-IN", { maximumFractionDigits: 4 })}` : null,
+          note: history ? `NAV history date: ${history.endDate}` : `Directory snapshot: ${item.date || "date unavailable"}` },
       ],
     },
   ];
