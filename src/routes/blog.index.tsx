@@ -54,7 +54,7 @@ export const Route = createFileRoute("/blog/")({
 function BlogIndex() {
   return (
     <Shell>
-      <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
         <header className="max-w-4xl">
           <p className="text-xs font-semibold uppercase tracking-wide text-primary">DeepScreen research</p>
           <h1 className="mt-3 text-3xl font-bold sm:text-4xl">Investment research blog</h1>
@@ -97,7 +97,7 @@ function BlogIndex() {
             <Link to="/data-sources" className="text-primary hover:underline">Data sources</Link>
           </div>
         </section>
-      </main>
+      </div>
     </Shell>
   );
 }
