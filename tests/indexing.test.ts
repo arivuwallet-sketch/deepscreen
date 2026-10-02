@@ -176,3 +176,38 @@ test('HTTP and www consolidate to HTTPS apex without losing encoded paths or att
   }
   assert.equal(canonicalRedirect(new Request('http://www.deepscreen.online/api/payment', { method: 'POST' })), null);
 });
+
+
+test('investment Q&A hubs stay indexable, visible and AI-discoverable', async () => {
+  const routeFiles = [
+    '../src/routes/mutual-funds.tsx',
+    '../src/routes/etfs.tsx',
+    '../src/routes/reits.tsx',
+  ];
+
+  for (const routeFile of routeFiles) {
+    const route = await readFile(new URL(routeFile, import.meta.url), 'utf8');
+    assert.match(route, /staticData:\s*\{\s*sitemap:\s*true\s*\}/);
+    assert.match(route, /index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1/);
+    assert.match(route, /buildFAQSchema/);
+    assert.match(route, /InvestmentTopicGuide/);
+    assert.doesNotMatch(route, /noindex/i);
+  }
+
+  const directory = await readFile(new URL('../src/routes/investments.tsx', import.meta.url), 'utf8');
+  assert.match(directory, /<Link to="\/mutual-funds"/);
+  assert.match(directory, /<Link to="\/etfs"/);
+  assert.match(directory, /<Link to="\/reits"/);
+  assert.match(directory, /InvestmentFaqSection/);
+  assert.match(directory, /buildFAQSchema/);
+
+  const detail = await readFile(new URL('../src/routes\/investment.\$market.\$type.\$code.tsx', import.meta.url), 'utf8');
+  assert.match(detail, /investmentDetailFaq/);
+  assert.match(detail, /buildFAQSchema/);
+  assert.match(detail, /index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1/);
+
+  const llms = await readFile(new URL('../public/llms.txt', import.meta.url), 'utf8');
+  for (const path of ['/investments', '/mutual-funds', '/etfs', '/reits']) {
+    assert.match(llms, new RegExp('https://deepscreen\\.online' + path.replace('/', '\\/')));
+  }
+});
