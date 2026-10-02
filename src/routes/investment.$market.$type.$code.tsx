@@ -89,7 +89,9 @@ function InvestmentPage() {
                 : `₹${(verifiedNav?.latestValue ?? item.nav).toLocaleString("en-IN", { maximumFractionDigits: 4 })}`
                 : quote
                   ? formatPrice(quote.price, item.market)
-                  : "Quote pending"}
+                  : analysis?.marketSnapshot
+                    ? formatPrice(analysis.marketSnapshot.price, item.market)
+                    : "Quote pending"}
             </p>
           </div>
           <div>
@@ -101,7 +103,9 @@ function InvestmentPage() {
                   : `AMFI directory snapshot · ${item.date || "date unavailable"}`
                 : quote
                   ? `Yahoo Finance · ${new Date(quote.asOf).toLocaleString()}`
-                  : "Exchange directory listing"}
+                  : analysis?.marketSnapshot
+                    ? `Yahoo Finance chart · ${new Date(analysis.marketSnapshot.asOf).toLocaleString()}`
+                    : "Exchange directory listing"}
             </p>
           </div>
         </div>

@@ -7,6 +7,7 @@ import {
   type HistoricalPoint,
   type InvestmentAnalysisData,
   type InvestmentHolding,
+  type InvestmentMarketSnapshot,
   type MutualFundMetadata,
   type ReitAnalysis,
   type SectorWeight,
@@ -114,7 +115,7 @@ async function getSession(): Promise<Session | null> {
   }
 }
 
-async function fetchYahooHistory(symbol: string): Promise<HistoricalPoint[]> {
+async function fetchYahooHistory(symbol: string): Promise<{ points: HistoricalPoint[]; snapshot: InvestmentMarketSnapshot | null }> {
   for (const host of ["query2.finance.yahoo.com", "query1.finance.yahoo.com"]) try {
     const response = await fetch(
       `https://${host}/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1wk&range=10y&events=div%2Csplits`,
@@ -125,11 +126,13 @@ async function fetchYahooHistory(symbol: string): Promise<HistoricalPoint[]> {
       chart?: {
         result?: Array<{
           timestamp?: number[];
+          meta?: Record<string, unknown>;
           indicators?: { adjclose?: Array<{ adjclose?: Array<number | null> }>; quote?: Array<{ close?: Array<number | null> }> };
         }>;
       };
     };
     const result = json.chart?.result?.[0];
+    const meta = result?.meta;
     const timestamps = result?.timestamp ?? [];
     const values = result?.indicators?.adjclose?.[0]?.adjclose ?? result?.indicators?.quote?.[0]?.close ?? [];
     const points: HistoricalPoint[] = [];
@@ -138,11 +141,30 @@ async function fetchYahooHistory(symbol: string): Promise<HistoricalPoint[]> {
       if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) continue;
       points.push({ at: timestamps[index]! * 1000, value });
     }
-    if (points.length) return points;
+    if (points.length) {
+      const price = num(meta?.["regularMarketPrice"]);
+      const marketTime = num(meta?.["regularMarketTime"]);
+      const firstTrade = num(meta?.["firstTradeDate"]);
+      const rawCurrency = str(meta?.["currency"]) ?? "USD";
+      const scale = rawCurrency === "GBp" || rawCurrency === "GBX" ? 100 : 1;
+      const snapshot: InvestmentMarketSnapshot | null = price !== null && price > 0
+        ? {
+            price: price / scale,
+            currency: scale === 100 ? "GBP" : rawCurrency,
+            asOf: new Date((marketTime ?? timestamps[timestamps.length - 1] ?? Date.now() / 1000) * 1000).toISOString(),
+            providerName: str(meta?.["longName"]) ?? str(meta?.["shortName"]),
+            volume: num(meta?.["regularMarketVolume"]),
+            fiftyTwoWeekHigh: num(meta?.["fiftyTwoWeekHigh"]) === null ? null : num(meta?.["fiftyTwoWeekHigh"])! / scale,
+            fiftyTwoWeekLow: num(meta?.["fiftyTwoWeekLow"]) === null ? null : num(meta?.["fiftyTwoWeekLow"])! / scale,
+            inceptionDate: firstTrade && firstTrade > 0 ? new Date(firstTrade * 1000).toISOString().slice(0, 10) : null,
+          }
+        : null;
+      return { points, snapshot };
+    }
   } catch {
     // The chart hosts have independent rate limits; try the other one.
   }
-  return [];
+  return { points: [], snapshot: null };
 }
 
 function objectAt(value: unknown, key: string): Raw {
@@ -375,6 +397,7 @@ function mapReitFundamentals(fundamentals: LiveFundamentals | null): ReitAnalysi
 async function buildAnalysis(request: Request): Promise<InvestmentAnalysisData> {
   const sources = new Set<string>();
   let historyPoints: HistoricalPoint[] = [];
+  let marketSnapshot: InvestmentMarketSnapshot | null = null;
   let fundProfile: FundProfileAnalysis | null = null;
   let holdingQuality: HoldingQualityAnalysis | null = null;
   let mutualFund: MutualFundMetadata | null = request.type === "FUND"
@@ -393,9 +416,10 @@ async function buildAnalysis(request: Request): Promise<InvestmentAnalysisData> 
       fetchYahooHistory(symbol),
       request.type === "ETF" || request.type === "FUND" ? fetchYahooFundProfile(symbol) : Promise.resolve(null),
     ]);
-    historyPoints = history;
+    historyPoints = history.points;
+    marketSnapshot = history.snapshot;
     fundProfile = profile;
-    if (history.length || profile) sources.add("Yahoo Finance");
+    if (history.points.length || profile) sources.add("Yahoo Finance");
 
     if (request.type === "ETF" && profile?.holdings.length) {
       holdingQuality = await fetchHoldingQuality(profile.holdings);
@@ -411,6 +435,7 @@ async function buildAnalysis(request: Request): Promise<InvestmentAnalysisData> 
     fetchedAt: new Date().toISOString(),
     sources: [...sources],
     history: computeHistoricalMetrics(historyPoints),
+    marketSnapshot,
     fundProfile,
     holdingQuality,
     mutualFund,
