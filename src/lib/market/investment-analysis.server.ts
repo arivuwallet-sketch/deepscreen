@@ -203,7 +203,7 @@ async function fetchYahooFundProfile(symbol: string): Promise<FundProfileAnalysi
     const currentSpreadPct = midpoint && bid !== null && ask !== null ? Number((((ask - bid) / midpoint) * 100).toFixed(3)) : null;
     const premiumDiscountPct = navPrice && marketPrice ? Number((((marketPrice - navPrice) / navPrice) * 100).toFixed(3)) : null;
 
-    return {
+    const parsed: FundProfileAnalysis = {
       family: str(profile["family"]),
       category: str(profile["categoryName"]),
       legalType: str(profile["legalType"]),
@@ -230,6 +230,9 @@ async function fetchYahooFundProfile(symbol: string): Promise<FundProfileAnalysi
       topSectors: parseSectorWeights(holdingsRaw["sectorWeightings"]),
       holdings,
     };
+    const hasUsefulData = parsed.category !== null || parsed.family !== null || parsed.expenseRatioPct !== null ||
+      parsed.totalAssets !== null || parsed.marketPrice !== null || parsed.navPrice !== null || parsed.holdings.length > 0;
+    return hasUsefulData ? parsed : null;
   } catch {
     return null;
   }

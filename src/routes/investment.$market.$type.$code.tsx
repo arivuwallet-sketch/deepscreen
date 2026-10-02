@@ -4,22 +4,31 @@ import { InvestmentAnalysisAvailable } from "@/components/ds/InvestmentAnalysisA
 import { findInvestment } from "@/lib/deepscreen/investments";
 import { useLiveQuote } from "@/hooks/useLiveQuotes";
 import { formatPrice } from "@/lib/deepscreen/format";
+import { getInvestmentAnalysis } from "@/lib/market/investment-analysis.functions";
 
 export const Route = createFileRoute("/investment/$market/$type/$code")({
   staticData: { sitemap: true },
-  loader: ({ params }) => {
+  loader: async ({ params }) => {
     const item = findInvestment(params.market, params.type, params.code);
     if (!item) throw notFound();
-    return item;
+    try {
+      const analysis = await getInvestmentAnalysis({
+        data: { market: item.market, type: item.type, code: item.code, name: item.name },
+      });
+      return { item, analysis };
+    } catch {
+      return { item, analysis: undefined };
+    }
   },
   head: ({ loaderData }) => {
-    const title = loaderData ? `${loaderData.name} (${loaderData.code}) | DeepScreen` : "Investment not found | DeepScreen";
+    const item = loaderData?.item;
+    const title = item ? `${item.name} (${item.code}) | DeepScreen` : "Investment not found | DeepScreen";
     const description = loaderData
-      ? loaderData.type === "ETF"
-        ? `Analyze ${loaderData.name} as an ETF basket: holdings quality, valuation, concentration, drawdown, volatility, costs and execution data where available.`
-        : loaderData.type === "FUND"
-          ? `Analyze ${loaderData.name} as a mutual fund: process, rolling returns, downside risk, portfolio construction, people/capacity evidence and costs where available.`
-          : `Analyze ${loaderData.name} as a REIT operating business: asset quality, growth, cash flow, leverage, valuation and governance evidence where available.`
+      ? item?.type === "ETF"
+        ? `Analyze ${item.name} as an ETF basket: holdings quality, valuation, concentration, drawdown, volatility, costs and execution data where available.`
+        : item?.type === "FUND"
+          ? `Analyze ${item.name} as a mutual fund: process, rolling returns, downside risk, portfolio construction, people/capacity evidence and costs where available.`
+          : `Analyze ${item?.name ?? "this REIT"} as a REIT operating business: asset quality, growth, cash flow, leverage, valuation and governance evidence where available.`
       : "Investment not found.";
     return {
       meta: [
@@ -31,12 +40,12 @@ export const Route = createFileRoute("/investment/$market/$type/$code")({
         { name: "twitter:card", content: "summary" },
         ...(!loaderData ? [{ name: "robots", content: "noindex" }] : []),
       ],
-      ...(loaderData
+      ...(item
         ? {
             links: [
               {
                 rel: "canonical",
-                href: `https://deepscreen.online/investment/${encodeURIComponent(loaderData.market)}/${encodeURIComponent(loaderData.type)}/${encodeURIComponent(loaderData.code)}`,
+                href: `https://deepscreen.online/investment/${encodeURIComponent(item.market)}/${encodeURIComponent(item.type)}/${encodeURIComponent(item.code)}`,
               },
             ],
           }
@@ -47,7 +56,7 @@ export const Route = createFileRoute("/investment/$market/$type/$code")({
 });
 
 function InvestmentPage() {
-  const item = Route.useLoaderData();
+  const { item, analysis } = Route.useLoaderData();
   const { data: quote } = useLiveQuote(
     item.type === "FUND" ? "" : item.market,
     item.type === "FUND" ? "" : item.code,
@@ -99,7 +108,7 @@ function InvestmentPage() {
           Company P/E-based scores, DCF valuation and forensic analysis do not apply to this listing; the analysis below uses the framework appropriate to its investment type.
         </p>
 
-        <InvestmentAnalysisAvailable item={item} />
+        <InvestmentAnalysisAvailable item={item} initialData={analysis} />
       </div>
     </Shell>
   );
