@@ -1,6 +1,15 @@
 import { Link } from "@tanstack/react-router";
 import type { BlogParagraph, BlogPost, BlogTable } from "@/lib/content/investment-blog";
 
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(value + "T00:00:00Z"));
+}
+
 function SourceRefs({ ids, post }: { ids: string[] | undefined; post: BlogPost }) {
   if (!ids?.length) return null;
   const index = new Map(post.sources.map((source, i) => [source.id, i + 1]));
@@ -71,7 +80,8 @@ export function InvestmentBlogArticle({ post }: { post: BlogPost }) {
         <p className="mt-4 max-w-4xl text-base leading-7 text-muted-foreground">{post.excerpt}</p>
         <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-xs text-muted-foreground">
           <span>By <strong className="text-foreground">Sooraj</strong> · Founder, DeepScreen</span>
-          <span>Published <time dateTime={post.published}>2 October 2026</time></span>
+          <span>Published <time dateTime={post.published}>{formatDate(post.published)}</time></span>
+          {post.updated !== post.published ? <span>Updated <time dateTime={post.updated}>{formatDate(post.updated)}</time></span> : null}
           <span>{post.readingMinutes} min read</span>
         </div>
       </header>
