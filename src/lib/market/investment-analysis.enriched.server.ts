@@ -132,13 +132,29 @@ export async function fetchEnhancedInvestmentAnalysis(request: Request): Promise
   let officialFund = null;
   let extras: Partial<EnhancedFundProfileAnalysis> | null = null;
 
+  // AMFI's supplementary disclosure endpoints can stall for minutes when their
+  // gateway is unreachable. Never hold the verified NAV/history or page behind them.
+  const within = async <T,>(work: Promise<T>, milliseconds: number): Promise<T | null> => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      return await Promise.race([
+        work,
+        new Promise<null>((resolve) => { timer = setTimeout(() => resolve(null), milliseconds); }),
+      ]);
+    } catch {
+      return null;
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  };
+
   if (request.type === "ETF" || (request.type === "FUND" && request.market.toUpperCase() !== "IN")) {
-    extras = await fetchYahooFundExtras(request.market, request.code);
+    extras = await within(fetchYahooFundExtras(request.market, request.code), 3500);
     if (extras && Object.values(extras).some((value) => value !== null)) sources.add("Yahoo Finance fund risk/management statistics");
   }
 
   if (request.type === "FUND" && request.market.toUpperCase() === "IN" && base.mutualFund) {
-    officialFund = await fetchAmfiOfficialFundAnalytics(request.code, request.name, base.mutualFund);
+    officialFund = await within(fetchAmfiOfficialFundAnalytics(request.code, request.name, base.mutualFund), 3500);
     if (officialFund) sources.add("AMFI official scheme, TER, tracking and fund-performance disclosures");
   }
 
@@ -152,7 +168,7 @@ export async function fetchEnhancedInvestmentAnalysis(request: Request): Promise
       planType: "Unclear",
       optionType: "Other",
     };
-    officialFund = await fetchAmfiOfficialFundAnalytics(request.code, providerName, meta);
+    officialFund = await within(fetchAmfiOfficialFundAnalytics(request.code, providerName, meta), 3500);
     if (officialFund) sources.add("AMFI official ETF TER and tracking disclosures");
   }
 

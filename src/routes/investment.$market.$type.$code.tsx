@@ -57,6 +57,9 @@ export const Route = createFileRoute("/investment/$market/$type/$code")({
 
 function InvestmentPage() {
   const { item, analysis } = Route.useLoaderData();
+  const verifiedNav = item.type === "FUND" && analysis?.history &&
+    (!item.date || !Number.isFinite(Date.parse(item.date)) || Date.parse(analysis.history.endDate) >= Date.parse(item.date))
+    ? analysis.history : null;
   const { data: quote } = useLiveQuote(
     item.type === "FUND" ? "" : item.market,
     item.type === "FUND" ? "" : item.code,
@@ -83,7 +86,7 @@ function InvestmentPage() {
               {item.type === "FUND"
                 ? item.nav === null
                   ? "NAV pending"
-                  : `₹${item.nav.toLocaleString("en-IN", { maximumFractionDigits: 4 })}`
+                : `₹${(verifiedNav?.latestValue ?? item.nav).toLocaleString("en-IN", { maximumFractionDigits: 4 })}`
                 : quote
                   ? formatPrice(quote.price, item.market)
                   : "Quote pending"}
@@ -93,7 +96,9 @@ function InvestmentPage() {
             <p className="text-xs uppercase text-muted-foreground">Source / date</p>
             <p className="mt-2 text-sm">
               {item.type === "FUND"
-                ? `AMFI · ${item.date || "latest directory snapshot"}`
+                ? verifiedNav
+                  ? `MFAPI (AMFI-sourced NAV) · ${verifiedNav.endDate}`
+                  : `AMFI directory snapshot · ${item.date || "date unavailable"}`
                 : quote
                   ? `Yahoo Finance · ${new Date(quote.asOf).toLocaleString()}`
                   : "Exchange directory listing"}
