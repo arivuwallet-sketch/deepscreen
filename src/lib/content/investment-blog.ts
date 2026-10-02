@@ -57,7 +57,7 @@ export const INVESTMENT_BLOG_POSTS: BlogPost[] = [
   {
     slug: "direct-vs-regular-mutual-funds-india",
     category: "Mutual funds",
-    title: "Direct vs Regular Mutual Funds: Cost, NAV & Returns | DeepScreen",
+    title: "Direct vs Regular Mutual Funds: Cost & NAV | DeepScreen",
     h1: "Direct vs regular mutual funds: what actually changes?",
     description:
       "Compare Direct and Regular mutual fund plans in India: portfolio, TER, NAV, distributor cost, long-term compounding and what to check before switching.",
@@ -313,7 +313,7 @@ export const INVESTMENT_BLOG_POSTS: BlogPost[] = [
     title: "ETF Tracking Error vs Tracking Difference | DeepScreen",
     h1: "ETF tracking error vs tracking difference: what each metric tells you",
     description:
-      "Tracking difference is the ETF-index return gap; tracking error measures how variable that gap is. Learn the formulas, drivers and a practical ETF comparison framework.",
+      "Tracking difference is the ETF-index return gap; tracking error measures its variability. Learn the formulas, drivers and a practical comparison framework.",
     excerpt:
       "Two ETFs can follow the same index and still deliver different investor outcomes. Tracking difference measures the return gap; tracking error measures how consistently the ETF stays near its benchmark.",
     primaryKeyword: "ETF tracking error vs tracking difference",
@@ -575,7 +575,7 @@ export const INVESTMENT_BLOG_POSTS: BlogPost[] = [
   {
     slug: "ndcf-vs-affo-reit-analysis-india",
     category: "REITs",
-    title: "NDCF vs AFFO: How to Analyze Indian REIT Cash Flow | DeepScreen",
+    title: "NDCF vs AFFO for Indian REITs: Cash Flow | DeepScreen",
     h1: "NDCF vs AFFO: which REIT cash-flow metric should you use in India?",
     description:
       "Understand NDCF, AFFO, FFO and NOI for REIT analysis. Learn why Indian REIT distributions use SEBI's NDCF framework and how to compare cash-flow quality.",
@@ -625,8 +625,8 @@ export const INVESTMENT_BLOG_POSTS: BlogPost[] = [
         paragraphs: [
           {
             text:
-              "Nareit describes AFFO as a calculation used by analysts and investors to estimate recurring or normalized FFO after adjustments such as recurring capital improvements and straight-line rent. Nareit also explicitly says there is no standardized definition of AFFO.",
-            sources: ["nareit-affo"],
+              "Nareit defines FFO as a supplemental REIT operating-performance measure that adjusts net income for specified real-estate depreciation, property-sale and impairment effects. Nareit describes AFFO as a further recurring or normalized adjustment to FFO and explicitly says there is no standardized definition of AFFO.",
+            sources: ["nareit-ffo", "nareit-affo"],
           },
           {
             text:
@@ -801,6 +801,13 @@ export const INVESTMENT_BLOG_POSTS: BlogPost[] = [
         publisher: "SEBI",
         date: "6 December 2023",
         href: "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2023/1701864866797.PDF",
+      },
+      {
+        id: "nareit-ffo",
+        title: "Funds From Operations (FFO)",
+        publisher: "Nareit",
+        date: "accessed October 2026",
+        href: "https://www.reit.com/glossary/funds-operation-ffo",
       },
       {
         id: "nareit-affo",
