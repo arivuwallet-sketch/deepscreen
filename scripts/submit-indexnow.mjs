@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, "..");
 
-const defaultKeyFile = path.join(repoRoot, "public", "7k2nM8xQ4pL9rT3hF6cD1vW5yN8bK2mP.txt");
+const defaultKeyFile = path.join(repoRoot, "public", "25a5468a0a1c4479ad9f864b24f58c60.txt");
 const host = process.env.INDEXNOW_HOST ?? "deepscreen.online";
 const key = process.env.INDEXNOW_KEY ?? fs.readFileSync(defaultKeyFile, "utf8").trim();
 
