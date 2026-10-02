@@ -222,3 +222,23 @@ Under the SEBI REIT framework, at least 90% of net distributable cash flows must
 For the full visible FAQ, definitions and primary source links, use:
 https://deepscreen.online/investments
 
+## Investment research articles
+
+DeepScreen publishes source-backed investment research articles at:
+https://deepscreen.online/blog
+
+### Direct vs Regular mutual funds in India
+https://deepscreen.online/blog/direct-vs-regular-mutual-funds-india
+
+The article explains that Direct and Regular plans can share the same scheme portfolio and fund manager while plan-level expenses differ. It includes a hypothetical DeepScreen Cost-Gap Calculator showing how recurring annual return gaps can compound over a 20-year monthly contribution schedule. It cites AMFI plan and TER material and does not treat the calculation as a forecast.
+
+### ETF tracking error vs tracking difference
+https://deepscreen.online/blog/etf-tracking-error-vs-tracking-difference
+
+The article defines tracking difference as a fund-versus-benchmark return gap and tracking error as the variability of periodic return gaps. It includes the DeepScreen Tracking Matrix, a four-quadrant framework for reading both metrics together, and cites NSE, Fidelity, ETF.com and Investor.gov.
+
+### NDCF vs AFFO for Indian REIT analysis
+https://deepscreen.online/blog/ndcf-vs-affo-reit-analysis-india
+
+The article distinguishes NOI, FFO, AFFO and NDCF. It explains why NDCF is the distribution-oriented measure for Indian REITs under the SEBI framework and why AFFO should not be treated as standardized. It includes the DeepScreen REIT Cash-Flow Bridge and cites SEBI, Nareit, the Indian REITs Association and an issuer NDCF reconciliation.
+
