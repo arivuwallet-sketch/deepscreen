@@ -46,6 +46,17 @@ function str(value: unknown): string | null {
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
+function ratio(value: unknown): number | null {
+  if (value && typeof value === "object") {
+    const formatted = str((value as Raw)["fmt"]);
+    if (formatted) {
+      const parsed = Number(formatted.replaceAll(",", "").replace(/x$/i, ""));
+      if (Number.isFinite(parsed)) return parsed;
+    }
+  }
+  return num(value);
+}
+
 function pct(value: unknown): number | null {
   const valueNumber = num(value);
   return valueNumber === null ? null : Number((valueNumber * 100).toFixed(2));
@@ -225,8 +236,8 @@ async function fetchYahooFundProfile(symbol: string): Promise<FundProfileAnalysi
       holdingsCount: null,
       top10WeightPct: weightedTop10 > 0 ? Number(weightedTop10.toFixed(2)) : null,
       cashPositionPct: pct(holdingsRaw["cashPosition"]),
-      portfolioPe: num(equity["priceToEarnings"]),
-      portfolioPb: num(equity["priceToBook"]),
+      portfolioPe: ratio(equity["priceToEarnings"]),
+      portfolioPb: ratio(equity["priceToBook"]),
       topSectors: parseSectorWeights(holdingsRaw["sectorWeightings"]),
       holdings,
     };
