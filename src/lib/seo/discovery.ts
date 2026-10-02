@@ -34,7 +34,7 @@ export const SITE_GRAPH = {
       inLanguage: "en",
       publisher: { "@id": ORGANIZATION_ID },
       description:
-        "Stock screening and fundamental research across supported Indian, US and UK listings.",
+        "Stock screening and investment research across supported Indian, US and UK listings, including mutual funds, ETFs and REITs.",
     },
   ],
 };
