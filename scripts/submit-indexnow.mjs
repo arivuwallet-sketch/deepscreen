@@ -33,13 +33,29 @@ const envUrls = (process.env.INDEXNOW_URLS ?? "")
   .map(normalizeUrl)
   .filter(Boolean);
 
-const urls = argUrls.length > 0 ? argUrls : envUrls.length > 0 ? envUrls : [
+const defaultUrls = [
   `https://${host}/`,
   `https://${host}/sitemap.xml`,
+  `https://${host}/stock/`,
+  `https://${host}/sector/`,
+  `https://${host}/investment/`,
+  `https://${host}/stock-filters/`,
+  `https://${host}/learn/`,
+  `https://${host}/ratios/`,
+  `https://${host}/compare/`,
+  `https://${host}/options/`,
+  `https://${host}/blog/`,
 ];
 
+const urls = argUrls.length > 0 ? argUrls : envUrls.length > 0 ? envUrls : defaultUrls;
+
 const dryRun = args.includes("--dry-run");
-const payload = { host, key, urlList: [...new Set(urls)] };
+const payload = {
+  host,
+  key,
+  keyLocation: `https://${host}/25a5468a0a1c4479ad9f864b24f58c60.txt`,
+  urlList: [...new Set(urls)],
+};
 
 if (dryRun || args.includes("--help") || args.includes("-h")) {
   if (args.includes("--help") || args.includes("-h")) {
