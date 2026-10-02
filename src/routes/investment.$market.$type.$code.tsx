@@ -108,7 +108,7 @@ function InvestmentPage() {
           Company P/E-based scores, DCF valuation and forensic analysis do not apply to this listing; the analysis below uses the framework appropriate to its investment type.
         </p>
 
-        <InvestmentAnalysisAvailable item={item} initialData={analysis} />
+        <InvestmentAnalysisAvailable item={item} {...(analysis ? { initialData: analysis } : {})} />
       </div>
     </Shell>
   );
