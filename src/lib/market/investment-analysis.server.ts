@@ -134,10 +134,11 @@ async function fetchYahooHistory(symbol: string): Promise<{ points: HistoricalPo
     const result = json.chart?.result?.[0];
     const meta = result?.meta;
     const timestamps = result?.timestamp ?? [];
-    const values = result?.indicators?.adjclose?.[0]?.adjclose ?? result?.indicators?.quote?.[0]?.close ?? [];
+    const adjusted = result?.indicators?.adjclose?.[0]?.adjclose ?? [];
+    const closes = result?.indicators?.quote?.[0]?.close ?? [];
     const points: HistoricalPoint[] = [];
-    for (let index = 0; index < Math.min(timestamps.length, values.length); index += 1) {
-      const value = values[index];
+    for (let index = 0; index < timestamps.length; index += 1) {
+      const value = adjusted[index] ?? closes[index];
       if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) continue;
       points.push({ at: timestamps[index]! * 1000, value });
     }
