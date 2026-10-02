@@ -4,7 +4,7 @@ import { useInvestmentAnalysis } from "@/hooks/useInvestmentAnalysis";
 import type { Investment } from "@/lib/deepscreen/investments";
 import type { EnhancedInvestmentAnalysisData } from "@/lib/deepscreen/investment-official";
 
-type Metric = { label: string; value: ReactNode | null | undefined; note?: string };
+type Metric = { label: string; value: ReactNode | null | undefined; note?: string | undefined };
 type Section = { title: string; description: string; metrics: Metric[] };
 
 const pct = (value: number | null | undefined, digits = 2) =>
@@ -291,8 +291,8 @@ function TopHoldings({ data }: { data: EnhancedInvestmentAnalysisData }) {
   );
 }
 
-export function InvestmentAnalysisAvailable({ item }: { item: Investment }) {
-  const { data, isLoading, isError } = useInvestmentAnalysis(item);
+export function InvestmentAnalysisAvailable({ item, initialData }: { item: Investment; initialData?: EnhancedInvestmentAnalysisData }) {
+  const { data, isLoading, isError } = useInvestmentAnalysis(item, initialData);
   const sections = data
     ? item.type === "ETF"
       ? etfSections(data)
@@ -300,6 +300,7 @@ export function InvestmentAnalysisAvailable({ item }: { item: Investment }) {
         ? fundSections(item, data)
         : reitSections(data)
     : [];
+  const hasMetrics = sections.some((section) => section.metrics.some((metric) => hasValue(metric.value)));
 
   return (
     <section className="mt-12" aria-labelledby="investment-analysis-heading">
@@ -324,7 +325,13 @@ export function InvestmentAnalysisAvailable({ item }: { item: Investment }) {
             {data.sources.length ? data.sources.join(" · ") : "Price/NAV history only"}
             {data.history ? ` · History ${data.history.startDate} to ${data.history.endDate}` : ""}
           </div>
-          <Sections sections={sections} />
+          {hasMetrics ? (
+            <Sections sections={sections} />
+          ) : (
+            <div className="mt-6 rounded-lg border border-border bg-card/30 p-5 text-sm leading-relaxed text-muted-foreground">
+              No verified supplemental metrics were returned for this listing. Its directory NAV or market quote remains available above; DeepScreen will not substitute stock ratios or estimated fund data.
+            </div>
+          )}
           {data.officialFund?.objective ? (
             <section className="mt-8 border-t border-border pt-7">
               <h3 className="text-lg font-semibold">Scheme objective</h3>

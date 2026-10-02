@@ -13,7 +13,7 @@ function number(value: number | null | undefined, digits = 2) {
     : value.toLocaleString("en-IN", { maximumFractionDigits: digits });
 }
 
-function Metric({ label, value, note }: { label: string; value: string | null; note?: string }) {
+function Metric({ label, value, note }: { label: string; value: string | null; note?: string | undefined }) {
   if (!value) return null;
   return (
     <div className="rounded-lg border border-border bg-card/35 p-4">

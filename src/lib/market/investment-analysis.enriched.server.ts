@@ -14,7 +14,7 @@ const extraCache = new Map<string, { at: number; data: Partial<EnhancedFundProfi
 
 function num(value: unknown): number | null {
   if (typeof value === "number") return Number.isFinite(value) ? value : null;
-  if (value && typeof value === "object" && "raw" in (value as Raw)) return num((value as Raw).raw);
+  if (value && typeof value === "object" && "raw" in (value as Raw)) return num((value as Raw)["raw"]);
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
 }
@@ -48,7 +48,7 @@ function findString(value: unknown, alternatives: string[][]): string | null {
   for (const [key, child] of scalarEntries(value)) {
     const clean = key.toLowerCase().replace(/[^a-z0-9]/g, "");
     if (!alternatives.some((parts) => parts.every((part) => clean.includes(part)))) continue;
-    const parsed = child && typeof child === "object" && "fmt" in (child as Raw) ? str((child as Raw).fmt) : str(child);
+    const parsed = child && typeof child === "object" && "fmt" in (child as Raw) ? str((child as Raw)["fmt"]) : str(child);
     if (parsed) return parsed;
   }
   return null;

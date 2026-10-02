@@ -20,8 +20,8 @@ export const Route = createFileRoute("/sitemap.xml")({
             entries.push(...sectionEntries);
           }
 
-          // DeepScreen currently has roughly 13k public indexable URLs, which is
-          // comfortably below Google's 50,000-URL limit for a single sitemap.
+          // DeepScreen remains below Google's 50,000-URL limit for a single
+          // sitemap, including stocks and type-specific investment pages.
           // Serving one flat sitemap avoids child-sitemap discovery lag/failures
           // and lets Search Console see the complete URL inventory in one fetch.
           const xml = sitemapXML(BASE_URL, entries);
