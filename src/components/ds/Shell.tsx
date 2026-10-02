@@ -176,6 +176,9 @@ export function Shell({ children }: { children: ReactNode }) {
           <Link to="/developers" className="hover:text-foreground">
             Developers
           </Link>
+          <Link to="/blog" className="hover:text-foreground">
+            Blog
+          </Link>
           <Link to="/press" className="hover:text-foreground">
             Press
           </Link>

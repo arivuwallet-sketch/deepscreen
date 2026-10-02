@@ -63,6 +63,11 @@ export function InvestmentTopicGuide({ type }: { type: InvestmentType }) {
   const topic = TOPICS[type];
   const faqs = faqForType(type);
   const typeName = type === "FUND" ? "mutual funds" : type === "ETF" ? "ETFs" : "REITs";
+  const article = type === "FUND"
+    ? { href: "/blog/direct-vs-regular-mutual-funds-india", label: "Direct vs Regular mutual funds: cost, NAV and compounding" }
+    : type === "ETF"
+      ? { href: "/blog/etf-tracking-error-vs-tracking-difference", label: "ETF tracking error vs tracking difference" }
+      : { href: "/blog/ndcf-vs-affo-reit-analysis-india", label: "NDCF vs AFFO for Indian REIT analysis" };
 
   return (
     <article className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
@@ -88,6 +93,13 @@ export function InvestmentTopicGuide({ type }: { type: InvestmentType }) {
             </section>
           ))}
         </div>
+      </section>
+
+      <section className="mt-10 rounded-xl border border-primary/20 bg-primary/5 p-5" aria-labelledby="investment-deep-dive">
+        <p className="text-xs font-semibold uppercase tracking-wide text-primary">DeepScreen research article</p>
+        <h2 id="investment-deep-dive" className="mt-2 text-lg font-semibold">Go deeper on a high-impact research question</h2>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">This supporting article adds a worked example, original framework and primary-source references without repeating the topic hub.</p>
+        <a href={article.href} className="mt-3 inline-block text-sm font-medium text-primary hover:underline">{article.label} →</a>
       </section>
 
       <InvestmentFaqSection

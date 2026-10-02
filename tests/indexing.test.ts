@@ -211,3 +211,36 @@ test('investment Q&A hubs stay indexable, visible and AI-discoverable', async ()
     assert.match(llms, new RegExp('https://deepscreen\\.online' + path.replace('/', '\\/')));
   }
 });
+
+
+test('investment blog cluster remains indexable, sourced and sitemap-discoverable', async () => {
+  const blogIndex = await readFile(new URL('../src/routes/blog.index.tsx', import.meta.url), 'utf8');
+  const blogDetail = await readFile(new URL('../src/routes/blog.$slug.tsx', import.meta.url), 'utf8');
+  const blogContent = await readFile(new URL('../src/lib/content/investment-blog.ts', import.meta.url), 'utf8');
+  const sitemapSections = await readFile(new URL('../src/lib/deepscreen/sitemap-sections.ts', import.meta.url), 'utf8');
+  const llms = await readFile(new URL('../public/llms.txt', import.meta.url), 'utf8');
+
+  assert.match(blogIndex, /createFileRoute\("\/blog\/"\)/);
+  assert.match(blogIndex, /staticData:\s*\{\s*sitemap:\s*true\s*\}/);
+  assert.match(blogDetail, /createFileRoute\("\/blog\/\$slug"\)/);
+  assert.match(blogDetail, /BlogPosting/);
+  assert.match(blogDetail, /buildFAQSchema/);
+  assert.match(blogDetail, /index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1/);
+
+  for (const slug of [
+    'direct-vs-regular-mutual-funds-india',
+    'etf-tracking-error-vs-tracking-difference',
+    'ndcf-vs-affo-reit-analysis-india',
+  ]) {
+    assert.match(blogContent, new RegExp('slug: "' + slug + '"'));
+    assert.match(llms, new RegExp('https://deepscreen\\.online/blog/' + slug));
+  }
+
+  assert.match(sitemapSections, /INVESTMENT_BLOG_POSTS\.map\(\(post\) => \(\{ slug: post\.slug \}\)\)/);
+  assert.match(blogContent, /Association of Mutual Funds in India/);
+  assert.match(blogContent, /National Stock Exchange of India/);
+  assert.match(blogContent, /Securities and Exchange Board of India/);
+  assert.match(blogContent, /DeepScreen Tracking Matrix/);
+  assert.match(blogContent, /DeepScreen REIT Cash-Flow Bridge/);
+  assert.match(blogContent, /DeepScreen Cost-Gap Calculator/);
+});

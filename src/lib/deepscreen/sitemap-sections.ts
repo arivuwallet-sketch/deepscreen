@@ -9,6 +9,7 @@ import {
 import { EXCHANGES } from "@/lib/deepscreen/exchanges";
 import { GUIDES } from "@/lib/deepscreen/guides";
 import { INVESTMENTS } from "@/lib/deepscreen/investments";
+import { INVESTMENT_BLOG_POSTS } from "@/lib/content/investment-blog";
 import { SECTORS, STOCKS, stocksByExchange } from "@/lib/deepscreen/stocks";
 import { STOCK_FILTER_PRESETS } from "@/lib/deepscreen/stock-filter-presets";
 import {
@@ -119,7 +120,7 @@ function sectorParams(): Array<Record<string, string>> {
 
 /** Returns the stable list of child sitemap names without building all URLs. */
 export function sitemapSectionNames(): string[] {
-  const names = ["core", "markets", "learn", "filters", "directories"];
+  const names = ["core", "markets", "learn", "blog", "filters", "directories"];
 
   for (let index = 0; index * INVESTMENT_CHUNK_SIZE < INVESTMENTS.length; index += 1) {
     names.push("investments-" + (index + 1));
@@ -196,6 +197,13 @@ export function buildSitemapSections(router: AnyRouter): Map<string, SitemapEntr
   // Every public stock-filter URL is discoverable. Data-backed pages show
   // matching companies; reference pages explain the category and required
   // evidence without fabricating membership.
+  const blog = collectDynamic(
+    router,
+    "/blog/$slug",
+    "/blog/$slug",
+    INVESTMENT_BLOG_POSTS.map((post) => ({ slug: post.slug })),
+  );
+
   const filters = collectDynamic(
     router,
     "/stock-filters/$slug",
@@ -227,6 +235,7 @@ export function buildSitemapSections(router: AnyRouter): Map<string, SitemapEntr
   if (core.length) sections.set("core", core);
   if (markets.length) sections.set("markets", markets);
   if (learn.length) sections.set("learn", learn);
+  if (blog.length) sections.set("blog", blog);
   if (filters.length) sections.set("filters", filters);
   if (directories.length) sections.set("directories", directories);
 
