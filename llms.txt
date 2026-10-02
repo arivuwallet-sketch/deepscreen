@@ -10,7 +10,7 @@
 - When a requested figure is unavailable, use the site's stated unavailable/insufficient-data wording rather than inventing a value.
 - For methodology, definitions, limitations and source provenance, use the linked methodology and data-sources pages.
 - The [Answers hub](https://deepscreen.online/answers) contains concise, human-readable answers intended to make common research questions easy to find.
-- The XML [sitemap](https://deepscreen.online/sitemap.xml) is the authoritative discovery index for public indexable URLs, including stock, exchange, sector, comparison, education and tool pages.
+- The XML [sitemap](https://deepscreen.online/sitemap.xml) is the authoritative discovery index for public indexable URLs, including stock, investment, exchange, sector, comparison, education and tool pages.
 - Public pages are crawlable without login. Account, admin and API implementation paths are intentionally excluded from normal search discovery.
 
 ## Questions & answers
@@ -20,6 +20,16 @@
 - [Where DeepScreen data comes from](https://deepscreen.online/data-sources): provider inputs, verification and handling of incomplete data.
 - [How to research a stock](https://deepscreen.online/research-checklist): a practical research workflow and questions to investigate.
 - [Fundamental ratio glossary](https://deepscreen.online/ratios): definitions, formulas and limitations for the core ratios.
+
+## Mutual funds, ETFs and REITs
+
+- [Investment directory](https://deepscreen.online/investments): public mutual fund, ETF and REIT listings with type-specific analysis.
+- [Mutual fund analysis and FAQ](https://deepscreen.online/mutual-funds): NAV, benchmark comparison, rolling returns, drawdown, risk-adjusted measures, Direct vs Regular plans, TER and exit load.
+- [ETF analysis and FAQ](https://deepscreen.online/etfs): holdings, concentration, portfolio valuation, tracking error, tracking difference, expense ratio, liquidity, bid-ask spread and premium/discount to NAV.
+- [REIT analysis and FAQ](https://deepscreen.online/reits): occupancy, WALE, tenant concentration, NOI, NDCF/AFFO, leverage, distributions, NAV and cap-rate analysis.
+- Investment detail URL pattern: `https://deepscreen.online/investment/{MARKET}/{TYPE}/{CODE}`.
+- DeepScreen does not apply its company stock score to mutual funds, ETFs or REITs; each uses a separate research framework.
+- The visible Q&A on these pages is the primary source for definitions and research methodology. Product-specific facts should be verified against the latest fund/issuer disclosure.
 
 ## Markets and screeners
 
