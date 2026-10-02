@@ -185,6 +185,11 @@ These first-party research pages explain repeatable analysis methods. Each page 
 Canonical investment directory:
 https://deepscreen.online/investments
 
+Topic hubs with visible Q&A and matching structured data:
+- Mutual funds: https://deepscreen.online/mutual-funds
+- ETFs: https://deepscreen.online/etfs
+- REITs: https://deepscreen.online/reits
+
 Canonical investment detail pattern:
 https://deepscreen.online/investment/{MARKET}/{TYPE}/{CODE}
 
