@@ -43,6 +43,15 @@
 - [Sector pages](https://deepscreen.online/exchange/NSE): exchange directories link to sector-specific research pages.
 - [Comparison pages](https://deepscreen.online/): public comparison pages are discoverable through the sitemap and internal links.
 
+## Investment research blog
+
+- Blog hub: https://deepscreen.online/blog
+- Direct vs Regular mutual funds in India: https://deepscreen.online/blog/direct-vs-regular-mutual-funds-india
+- ETF tracking error vs tracking difference: https://deepscreen.online/blog/etf-tracking-error-vs-tracking-difference
+- NDCF vs AFFO for Indian REIT analysis: https://deepscreen.online/blog/ndcf-vs-affo-reit-analysis-india
+
+These articles are visible, indexable research pages with primary-source references, direct-answer summaries, original worked examples/frameworks and visible FAQ sections. They are educational, not personalized investment advice.
+
 ## Research and education
 
 - [Learn library](https://deepscreen.online/learn): plain-English guides for stock screening, valuation, exchanges, charts, IPOs, options and portfolios.
