@@ -137,6 +137,7 @@ export const INVESTMENT_SOURCE_LINKS = [
   { label: "Investor.gov — mutual funds", href: "https://www.investor.gov/introduction-investing/investing-basics/investment-products/mutual-funds-and-exchange-traded-funds-etfs/mutual-funds" },
   { label: "Investor.gov — ETFs", href: "https://www.investor.gov/introduction-investing/investing-basics/investment-products/mutual-funds-and-exchange-traded-2" },
   { label: "SEBI Investor — understanding REITs and InvITs", href: "https://investor.sebi.gov.in/understanding_reit_invit.html" },
+  { label: "SEBI — REIT Regulations (amended 18 Apr 2026)", href: "https://www.sebi.gov.in/legal/regulations/apr-2026/securities-and-exchange-board-of-india-real-estate-investment-trusts-regulations-2014-last-amended-on-april-18-2026-_101013.html" },
 ] as const;
 
 export function faqForType(type: InvestmentType): InvestmentFaqItem[] {
