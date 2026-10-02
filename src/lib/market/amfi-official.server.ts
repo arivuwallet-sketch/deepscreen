@@ -394,7 +394,7 @@ export async function fetchAmfiOfficialFundAnalytics(
     minimumInvestment: numberByKey(details, [["scheme", "min", "amt"], ["minimum", "amount"]]),
     objective: stringByKey(details, [["scheme", "objective"], ["objective"]]),
     amcWebsite: stringByKey(details, [["amc", "website"], ["website"]]),
-    schemeCode: stringByKey(perf.row, [["scheme", "code"]]) ?? stringByKey(error.row, [["scheme", "code"]]) ?? (code || null),
+    schemeCode: stringByKey(perf.row, [["scheme", "code"]]) ?? stringByKey(error.row, [["scheme", "code"]]),
     isin: stringByKey(error.row, [["isin"]]) ?? stringByKey(difference.row, [["isin"]]),
     returns1yPct: numberValue(exact(perf.row, "Returns_1yr")) ?? numberByKey(perf.row, [["returns", "1yr"]]),
     returns3yPct: numberValue(exact(perf.row, "Returns_3yr")) ?? numberByKey(perf.row, [["returns", "3yr"]]),

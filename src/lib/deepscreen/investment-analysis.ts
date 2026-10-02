@@ -6,6 +6,7 @@ export interface HistoricalPoint {
 export interface HistoricalMetrics {
   startDate: string;
   endDate: string;
+  latestValue: number;
   observations: number;
   return1yPct: number | null;
   return3yAnnualizedPct: number | null;
@@ -252,6 +253,7 @@ export function computeHistoricalMetrics(rawPoints: HistoricalPoint[]): Historic
   return {
     startDate: new Date(points[0]!.at).toISOString().slice(0, 10),
     endDate: new Date(points[points.length - 1]!.at).toISOString().slice(0, 10),
+    latestValue: points[points.length - 1]!.value,
     observations: points.length,
     return1yPct: oneYearReturn(points),
     return3yAnnualizedPct: annualizedReturn(points, 3),

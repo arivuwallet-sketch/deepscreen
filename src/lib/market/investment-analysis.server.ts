@@ -108,12 +108,12 @@ async function getSession(): Promise<Session | null> {
 }
 
 async function fetchYahooHistory(symbol: string): Promise<HistoricalPoint[]> {
-  try {
+  for (const host of ["query2.finance.yahoo.com", "query1.finance.yahoo.com"]) try {
     const response = await fetch(
-      `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1wk&range=10y&events=div%2Csplits`,
-      { headers: { "User-Agent": UA }, signal: AbortSignal.timeout(9000) },
+      `https://${host}/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1wk&range=10y&events=div%2Csplits`,
+      { headers: { "User-Agent": UA }, signal: AbortSignal.timeout(4500) },
     );
-    if (!response.ok) return [];
+    if (!response.ok) continue;
     const json = (await response.json()) as {
       chart?: {
         result?: Array<{
@@ -131,10 +131,11 @@ async function fetchYahooHistory(symbol: string): Promise<HistoricalPoint[]> {
       if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) continue;
       points.push({ at: timestamps[index]! * 1000, value });
     }
-    return points;
+    if (points.length) return points;
   } catch {
-    return [];
+    // The chart hosts have independent rate limits; try the other one.
   }
+  return [];
 }
 
 function objectAt(value: unknown, key: string): Raw {
