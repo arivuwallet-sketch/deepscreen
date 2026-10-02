@@ -8,6 +8,7 @@ import {
 } from "@/lib/sitemap";
 import { EXCHANGES } from "@/lib/deepscreen/exchanges";
 import { GUIDES } from "@/lib/deepscreen/guides";
+import { INVESTMENTS } from "@/lib/deepscreen/investments";
 import { SECTORS, STOCKS, stocksByExchange } from "@/lib/deepscreen/stocks";
 import { STOCK_FILTER_PRESETS } from "@/lib/deepscreen/stock-filter-presets";
 import {
@@ -22,6 +23,7 @@ import {
 // Topic-scoped child sitemaps keep individual responses small and make
 // coverage easier to diagnose. Sitemap inclusion does not guarantee indexing.
 export const STOCK_CHUNK_SIZE = 2000;
+export const INVESTMENT_CHUNK_SIZE = 2000;
 
 const SAFE_SITEMAP_PATH = /^\/[A-Za-z0-9\-._~/=%&'()]*$/;
 
@@ -119,6 +121,10 @@ function sectorParams(): Array<Record<string, string>> {
 export function sitemapSectionNames(): string[] {
   const names = ["core", "markets", "learn", "filters", "directories"];
 
+  for (let index = 0; index * INVESTMENT_CHUNK_SIZE < INVESTMENTS.length; index += 1) {
+    names.push("investments-" + (index + 1));
+  }
+
   for (let index = 0; index * STOCK_CHUNK_SIZE < STOCKS.length; index += 1) {
     names.push("stocks-" + (index + 1));
   }
@@ -207,11 +213,29 @@ export function buildSitemapSections(router: AnyRouter): Map<string, SitemapEntr
     })),
   );
 
+  const investments = collectDynamic(
+    router,
+    "/investment/$market/$type/$code",
+    "/investment/$market/$type/$code",
+    INVESTMENTS.map((investment) => ({
+      market: investment.market,
+      type: investment.type,
+      code: investment.code,
+    })),
+  );
+
   if (core.length) sections.set("core", core);
   if (markets.length) sections.set("markets", markets);
   if (learn.length) sections.set("learn", learn);
   if (filters.length) sections.set("filters", filters);
   if (directories.length) sections.set("directories", directories);
+
+  for (let index = 0; index * INVESTMENT_CHUNK_SIZE < investments.length; index += 1) {
+    sections.set(
+      "investments-" + (index + 1),
+      investments.slice(index * INVESTMENT_CHUNK_SIZE, (index + 1) * INVESTMENT_CHUNK_SIZE),
+    );
+  }
 
   for (let index = 0; index * STOCK_CHUNK_SIZE < stocks.length; index += 1) {
     sections.set(

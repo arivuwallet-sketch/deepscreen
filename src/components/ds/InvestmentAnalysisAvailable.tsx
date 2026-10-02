@@ -4,7 +4,7 @@ import { useInvestmentAnalysis } from "@/hooks/useInvestmentAnalysis";
 import type { Investment } from "@/lib/deepscreen/investments";
 import type { EnhancedInvestmentAnalysisData } from "@/lib/deepscreen/investment-official";
 
-type Metric = { label: string; value: ReactNode | null | undefined; note?: string };
+type Metric = { label: string; value: ReactNode | null | undefined; note?: string | undefined };
 type Section = { title: string; description: string; metrics: Metric[] };
 
 const pct = (value: number | null | undefined, digits = 2) =>

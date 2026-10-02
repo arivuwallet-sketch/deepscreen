@@ -6,7 +6,7 @@ import { useLiveQuote } from "@/hooks/useLiveQuotes";
 import { formatPrice } from "@/lib/deepscreen/format";
 
 export const Route = createFileRoute("/investment/$market/$type/$code")({
-  staticData: { sitemap: false },
+  staticData: { sitemap: true },
   loader: ({ params }) => {
     const item = findInvestment(params.market, params.type, params.code);
     if (!item) throw notFound();

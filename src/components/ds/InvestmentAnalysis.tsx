@@ -7,7 +7,7 @@ import type { EnhancedInvestmentAnalysisData } from "@/lib/deepscreen/investment
 interface Metric {
   label: string;
   value: ReactNode | null;
-  note?: string;
+  note?: string | undefined;
 }
 
 interface Section {
