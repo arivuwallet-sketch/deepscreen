@@ -3,7 +3,7 @@ import { Shell } from "@/components/ds/Shell";
 import { INVESTMENT_BLOG_POSTS } from "@/lib/content/investment-blog";
 import { buildBreadcrumbSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 
-const title = "Investment Research Blog: Mutual Funds, ETFs & REITs | DeepScreen";
+const title = "Investment Research: Mutual Funds, ETFs & REITs | DeepScreen";
 const description = "DeepScreen research guides for mutual funds, ETFs and REITs, with primary sources, worked examples and practical analysis frameworks.";
 const url = "https://deepscreen.online/blog";
 
