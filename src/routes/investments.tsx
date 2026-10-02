@@ -20,6 +20,7 @@ export const Route = createFileRoute("/investments")({
     meta: [
       { title },
       { name: "description", content: description },
+      { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" },
       { name: "keywords", content: "mutual fund analysis, ETF analysis, REIT analysis, mutual fund NAV, expense ratio, TER, direct vs regular mutual fund, ETF tracking error, tracking difference, ETF premium discount NAV, ETF holdings, REIT occupancy, WALE, AFFO, NDCF, REIT LTV, REIT NAV" },
       { property: "og:title", content: title },
       { property: "og:description", content: description },
@@ -27,7 +28,7 @@ export const Route = createFileRoute("/investments")({
       { property: "og:url", content: canonical },
       { name: "twitter:card", content: "summary" },
     ],
-    links: [{ rel: "canonical", href: canonical }],
+    links: [{ rel: "canonical", href: canonical }, { rel: "describedby", href: "https://deepscreen.online/llms.txt" }],
     scripts: [{
       type: "application/ld+json",
       children: jsonLd(buildGraph(
@@ -67,9 +68,9 @@ function InvestmentsPage() {
         <h1 className="mt-2 text-3xl font-bold">Mutual funds, ETFs & REITs</h1>
         <p className="mt-3 max-w-4xl text-sm leading-6 text-muted-foreground">{INVESTMENTS.length.toLocaleString()} listings across India and the US, plus identified London REITs. Mutual fund NAVs are from AMFI; exchange-traded prices appear when a live quote is available. DeepScreen analyzes each product with the framework that fits it: mutual-fund process and costs, ETF basket quality and tracking, and REIT property cash flow and leverage. These investments are not assessed with the company stock score.</p>
         <div className="mt-7 grid gap-3 md:grid-cols-3">
-          <div className="rounded-lg border border-border bg-card/30 p-4"><h2 className="font-semibold">Mutual fund analysis</h2><p className="mt-2 text-sm leading-6 text-muted-foreground">Compare NAV history, rolling returns, drawdown, benchmark-relative performance, risk measures, portfolio structure, manager evidence and TER. Indian Direct and Regular plans are treated separately when the scheme data identifies them.</p></div>
-          <div className="rounded-lg border border-border bg-card/30 p-4"><h2 className="font-semibold">ETF analysis</h2><p className="mt-2 text-sm leading-6 text-muted-foreground">Analyze the basket, not just the ticker: holdings, concentration, portfolio valuation, drawdown, volatility, expense ratio, tracking quality, liquidity, spread and premium or discount to NAV where data is available.</p></div>
-          <div className="rounded-lg border border-border bg-card/30 p-4"><h2 className="font-semibold">REIT analysis</h2><p className="mt-2 text-sm leading-6 text-muted-foreground">Focus on property economics: occupancy and WALE where disclosed, tenant concentration, NOI or distributable cash flow, leverage, debt maturity, distribution coverage, NAV and cap-rate valuation.</p></div>
+          <Link to="/mutual-funds" className="rounded-lg border border-border bg-card/30 p-4 transition-colors hover:border-primary/40"><h2 className="font-semibold">Mutual fund analysis</h2><p className="mt-2 text-sm leading-6 text-muted-foreground">Compare NAV history, rolling returns, drawdown, benchmark-relative performance, risk measures, portfolio structure, manager evidence and TER. Indian Direct and Regular plans are treated separately when the scheme data identifies them.</p><span className="mt-3 inline-block text-sm text-primary">Read mutual fund Q&amp;A →</span></Link>
+          <Link to="/etfs" className="rounded-lg border border-border bg-card/30 p-4 transition-colors hover:border-primary/40"><h2 className="font-semibold">ETF analysis</h2><p className="mt-2 text-sm leading-6 text-muted-foreground">Analyze the basket, not just the ticker: holdings, concentration, portfolio valuation, drawdown, volatility, expense ratio, tracking quality, liquidity, spread and premium or discount to NAV where data is available.</p><span className="mt-3 inline-block text-sm text-primary">Read ETF Q&amp;A →</span></Link>
+          <Link to="/reits" className="rounded-lg border border-border bg-card/30 p-4 transition-colors hover:border-primary/40"><h2 className="font-semibold">REIT analysis</h2><p className="mt-2 text-sm leading-6 text-muted-foreground">Focus on property economics: occupancy and WALE where disclosed, tenant concentration, NOI or distributable cash flow, leverage, debt maturity, distribution coverage, NAV and cap-rate valuation.</p><span className="mt-3 inline-block text-sm text-primary">Read REIT Q&amp;A →</span></Link>
         </div>
         <div className="mt-8 grid grid-cols-2 items-end gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto]">
           <label className="col-span-2 min-w-0 text-xs text-muted-foreground sm:col-span-1">Search name or symbol
