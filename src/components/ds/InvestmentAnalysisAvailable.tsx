@@ -81,7 +81,7 @@ function Sections({ sections }: { sections: Section[] }) {
   );
 }
 
-function etfSections(data: EnhancedInvestmentAnalysisData): Section[] {
+function etfSections(item: Investment, data: EnhancedInvestmentAnalysisData): Section[] {
   const fund = data.fundProfile;
   const official = data.officialFund;
   const quality = data.holdingQuality;
@@ -107,7 +107,7 @@ function etfSections(data: EnhancedInvestmentAnalysisData): Section[] {
     },
     {
       title: "Price history",
-      description: `Returns and risk calculated from available adjusted-price history${data.historyVenue && data.historyVenue !== "BSE" ? ` (${data.historyVenue} listing)` : ""}, not a benchmark comparison.`,
+      description: `Returns and risk calculated from available adjusted-price history${data.historyVenue && data.historyVenue !== item.market ? ` (${data.historyVenue} cross-listing)` : ""}, not a benchmark comparison.`,
       metrics: [
         { label: "1Y return", value: pct(history?.return1yPct) },
         { label: "3Y annualized return", value: pct(history?.return3yAnnualizedPct) },
@@ -314,7 +314,7 @@ export function InvestmentAnalysisAvailable({ item, initialData }: { item: Inves
   const { data, isLoading, isError } = useInvestmentAnalysis(item, initialData);
   const sections = data
     ? item.type === "ETF"
-      ? etfSections(data)
+      ? etfSections(item, data)
       : item.type === "FUND"
         ? fundSections(item, data)
         : reitSections(data)

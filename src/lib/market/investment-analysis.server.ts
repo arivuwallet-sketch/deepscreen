@@ -434,7 +434,7 @@ async function buildAnalysis(request: Request): Promise<InvestmentAnalysisData> 
       const nsePrice = nseHistory.snapshot?.price;
       const bsePrice = history.snapshot.price;
       if (nseHistory.points.length > history.points.length &&
-          nsePrice !== undefined && nsePrice > 0 &&
+          typeof nsePrice === "number" && nsePrice > 0 &&
           nseHistory.snapshot?.currency === history.snapshot.currency &&
           Math.abs(nsePrice - bsePrice) / bsePrice <= 0.05) {
         historyPoints = nseHistory.points;
