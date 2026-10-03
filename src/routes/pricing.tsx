@@ -133,6 +133,7 @@ function PricingPage() {
   const [orderId, setOrderId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
+  const [verificationAttempt, setVerificationAttempt] = useState(0);
   const [checkoutPlan, setCheckoutPlan] = useState<Plan | null>(null);
   const [phoneCountry, setPhoneCountry] = useState(DEFAULT_PHONE_COUNTRY);
   const [phone, setPhone] = useState("");
@@ -151,27 +152,35 @@ function PricingPage() {
     confirmed.current = orderId;
     setVerifying(true);
     void (async () => {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData.session?.access_token;
-      if (!accessToken) {
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const accessToken = sessionData.session?.access_token;
+        if (!accessToken) {
+          toast.error("Please sign in again, then retry payment verification.");
+          return;
+        }
+        const res = await confirm({ data: { orderId, accessToken } });
+        if (!res.ok) {
+          toast.error(res.error);
+          return;
+        }
+        if (res.paid) {
+          const url = new URL(window.location.href);
+          url.searchParams.delete("cf_order_id");
+          window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
+          setOrderId(null);
+          refresh();
+          toast.success("Payment received — DeepScreen Pro is unlocked.");
+        } else {
+          toast.info(`Payment is not confirmed yet (${res.status}). If you already paid, retry verification; do not pay again.`);
+        }
+      } catch {
+        toast.error("Payment verification is temporarily unavailable. If you already paid, retry verification; do not pay again.");
+      } finally {
         setVerifying(false);
-        return;
-      }
-      const res = await confirm({ data: { orderId, accessToken } });
-      setVerifying(false);
-      window.history.replaceState({}, "", "/pricing");
-      if (!res.ok) {
-        toast.error(res.error);
-        return;
-      }
-      if (res.paid) {
-        refresh();
-        toast.success("Payment received — DeepScreen Pro is unlocked.");
-      } else {
-        toast.error(`Payment not completed (${res.status}). Nothing was charged.`);
       }
     })();
-  }, [orderId, user, confirm, refresh]);
+  }, [orderId, user, confirm, refresh, verificationAttempt]);
 
   const start = (plan: Plan) => {
     if (!user) {
@@ -278,6 +287,18 @@ function PricingPage() {
           </p>
           {verifying && (
             <p className="num mt-4 text-xs text-muted-foreground">Verifying your payment…</p>
+          )}
+          {orderId && user && !verifying && (
+            <Button
+              className="mt-4"
+              variant="outline"
+              onClick={() => {
+                confirmed.current = null;
+                setVerificationAttempt((attempt) => attempt + 1);
+              }}
+            >
+              Retry payment verification
+            </Button>
           )}
           {isPro && (
             <p className="num mt-4 inline-block rounded border border-primary/40 bg-primary/10 px-3 py-1 text-xs text-primary">

@@ -29,7 +29,9 @@ export async function activatePaidOrder(
 ): Promise<ActivationResult> {
   // The checked-in generated Supabase types intentionally lag migrations.
   // Keep this one RPC typed locally until the next schema type regeneration.
-  const rpc = admin.rpc as unknown as (
+  // SupabaseClient.rpc reads this.rest; extracting it without binding loses
+  // the client and breaks both checkout confirmation and webhook activation.
+  const rpc = admin.rpc.bind(admin) as unknown as (
     fn: "activate_paid_order",
     args: { p_link_id: string },
   ) => PromiseLike<{
