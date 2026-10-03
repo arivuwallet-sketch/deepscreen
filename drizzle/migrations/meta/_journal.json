@@ -8,6 +8,13 @@
       "when": 1790817261512,
       "tag": "0000_anchor_subscription_expiry_to_purchase_time",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791025200000,
+      "tag": "0001_fix_payment_activation_user_id_ambiguity",
+      "breakpoints": true
     }
   ]
 }
