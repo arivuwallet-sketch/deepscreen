@@ -837,7 +837,7 @@ export const INVESTMENT_BLOG_POSTS: BlogPost[] = [
       { label: "DeepScreen data sources", href: "/data-sources" },
       { label: "ETF tracking error vs tracking difference", href: "/blog/etf-tracking-error-vs-tracking-difference" },
     ],
-  },,
+  },
   {
     slug: "how-to-read-commodity-prices-india",
     category: "Commodities",
