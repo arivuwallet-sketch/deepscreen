@@ -23,6 +23,7 @@ import { Route as EtfsRouteImport } from './routes/etfs'
 import { Route as GiftNiftyRouteImport } from './routes/gift-nifty'
 import { Route as InvestmentsRouteImport } from './routes/investments'
 import { Route as IpoRouteImport } from './routes/ipo'
+import { Route as IpoGmpRouteImport } from './routes/ipo-gmp'
 import { Route as MethodologyRouteImport } from './routes/methodology'
 import { Route as MutualFundsRouteImport } from './routes/mutual-funds'
 import { Route as OpenapiDotjsonRouteImport } from './routes/openapi[.]json'
@@ -126,6 +127,11 @@ const InvestmentsRoute = InvestmentsRouteImport.update({
 const IpoRoute = IpoRouteImport.update({
   id: '/ipo',
   path: '/ipo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IpoGmpRoute = IpoGmpRouteImport.update({
+  id: '/ipo-gmp',
+  path: '/ipo-gmp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MethodologyRoute = MethodologyRouteImport.update({
@@ -317,6 +323,7 @@ export interface FileRoutesByFullPath {
   '/gift-nifty': typeof GiftNiftyRoute
   '/investments': typeof InvestmentsRoute
   '/ipo': typeof IpoRoute
+  '/ipo-gmp': typeof IpoGmpRoute
   '/methodology': typeof MethodologyRoute
   '/mutual-funds': typeof MutualFundsRoute
   '/openapi.json': typeof OpenapiDotjsonRoute
@@ -367,6 +374,7 @@ export interface FileRoutesByTo {
   '/gift-nifty': typeof GiftNiftyRoute
   '/investments': typeof InvestmentsRoute
   '/ipo': typeof IpoRoute
+  '/ipo-gmp': typeof IpoGmpRoute
   '/methodology': typeof MethodologyRoute
   '/mutual-funds': typeof MutualFundsRoute
   '/openapi.json': typeof OpenapiDotjsonRoute
@@ -418,6 +426,7 @@ export interface FileRoutesById {
   '/gift-nifty': typeof GiftNiftyRoute
   '/investments': typeof InvestmentsRoute
   '/ipo': typeof IpoRoute
+  '/ipo-gmp': typeof IpoGmpRoute
   '/methodology': typeof MethodologyRoute
   '/mutual-funds': typeof MutualFundsRoute
   '/openapi.json': typeof OpenapiDotjsonRoute
@@ -470,6 +479,7 @@ export interface FileRouteTypes {
     | '/gift-nifty'
     | '/investments'
     | '/ipo'
+    | '/ipo-gmp'
     | '/methodology'
     | '/mutual-funds'
     | '/openapi.json'
@@ -520,6 +530,7 @@ export interface FileRouteTypes {
     | '/gift-nifty'
     | '/investments'
     | '/ipo'
+    | '/ipo-gmp'
     | '/methodology'
     | '/mutual-funds'
     | '/openapi.json'
@@ -570,6 +581,7 @@ export interface FileRouteTypes {
     | '/gift-nifty'
     | '/investments'
     | '/ipo'
+    | '/ipo-gmp'
     | '/methodology'
     | '/mutual-funds'
     | '/openapi.json'
@@ -621,6 +633,7 @@ export interface RootRouteChildren {
   GiftNiftyRoute: typeof GiftNiftyRoute
   InvestmentsRoute: typeof InvestmentsRoute
   IpoRoute: typeof IpoRoute
+  IpoGmpRoute: typeof IpoGmpRoute
   MethodologyRoute: typeof MethodologyRoute
   MutualFundsRoute: typeof MutualFundsRoute
   OpenapiDotjsonRoute: typeof OpenapiDotjsonRoute
@@ -755,6 +768,13 @@ declare module '@tanstack/react-router' {
       path: '/ipo'
       fullPath: '/ipo'
       preLoaderRoute: typeof IpoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ipo-gmp': {
+      id: '/ipo-gmp'
+      path: '/ipo-gmp'
+      fullPath: '/ipo-gmp'
+      preLoaderRoute: typeof IpoGmpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/methodology': {
@@ -1013,6 +1033,7 @@ const rootRouteChildren: RootRouteChildren = {
   GiftNiftyRoute: GiftNiftyRoute,
   InvestmentsRoute: InvestmentsRoute,
   IpoRoute: IpoRoute,
+  IpoGmpRoute: IpoGmpRoute,
   MethodologyRoute: MethodologyRoute,
   MutualFundsRoute: MutualFundsRoute,
   OpenapiDotjsonRoute: OpenapiDotjsonRoute,
