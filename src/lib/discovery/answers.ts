@@ -363,11 +363,15 @@ export const ANSWERS = [
 ] as const;
 
 export const HOME_ANSWERS = DEEPSCREEN_ANSWERS.slice(0, 4);
-export const SCREENER_ANSWERS = [
-  DEEPSCREEN_ANSWERS[0],
-  DEEPSCREEN_ANSWERS[1],
-  DEEPSCREEN_ANSWERS[2],
-  DEEPSCREEN_ANSWERS[4],
-  DEEPSCREEN_ANSWERS[9],
-  DEEPSCREEN_ANSWERS[11],
-] as const;
+const SCREENER_ANSWER_IDS = new Set([
+  "what-is-deepscreen",
+  "what-does-deepscreen-do",
+  "markets",
+  "how-score",
+  "data-sources",
+  "investment-advice",
+]);
+
+export const SCREENER_ANSWERS = DEEPSCREEN_ANSWERS.filter((answer) =>
+  SCREENER_ANSWER_IDS.has(answer.id),
+);
