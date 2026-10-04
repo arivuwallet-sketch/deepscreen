@@ -15,6 +15,13 @@
       "when": 1791025200000,
       "tag": "0001_fix_payment_activation_user_id_ambiguity",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791082652710,
+      "tag": "0002_fix_payment_activation_user_id_ambiguity",
+      "breakpoints": true
     }
   ]
 }
