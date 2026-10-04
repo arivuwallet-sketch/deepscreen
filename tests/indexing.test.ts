@@ -333,3 +333,24 @@ test('commodities route does not render escaped newline artifacts', async () => 
   assert.ok(!route.includes('\\n<'), 'JSX must not contain literal \\n text before an element');
 });
 
+test('DeepScreen and stock-market FAQ remains canonical visible and AI-discoverable', async () => {
+  const answersData = await readFile(new URL('../src/lib/discovery/answers.ts', import.meta.url), 'utf8');
+  const answersRoute = await readFile(new URL('../src/routes/answers.tsx', import.meta.url), 'utf8');
+  const screenerRoute = await readFile(new URL('../src/routes/screener.tsx', import.meta.url), 'utf8');
+  const llms = await readFile(new URL('../public/llms.txt', import.meta.url), 'utf8');
+
+  const questionCount = (answersData.match(/^\s{4}question:\s*"/gm) ?? []).length;
+  assert.equal(questionCount, 38, 'The canonical FAQ should contain the reviewed 38-answer set');
+
+  assert.match(answersRoute, /ANSWER_GROUPS\.map/);
+  assert.match(answersRoute, /resourceHead\([\s\S]*ANSWERS/);
+  assert.match(answersRoute, /DeepScreen and stock market questions, answered/);
+
+  assert.match(screenerRoute, /SCREENER_ANSWERS\.map/);
+  assert.match(screenerRoute, /buildFAQSchema\([\s\S]*SCREENER_ANSWERS\.map/);
+  assert.match(screenerRoute, /Browse all stock-market Q&amp;A/);
+
+  assert.match(llms, /DeepScreen & stock market FAQ/);
+  assert.match(llms, /38 visible, canonical answers/);
+});
+
