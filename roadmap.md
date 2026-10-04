@@ -7,9 +7,7 @@
 - About, methodology, crawler policy, sitemap and `llms.txt`
 - Newsletter capture and a non-blocking repeat-visitor account prompt
 - Five-day refund policy and founder contact details
-
-## In progress
-- Publish original commodities, Gift Nifty and IPO GMP pages with site navigation; do not alter stock or IPO pages, scores, verdicts, checkout or pricing.
+- Original commodities, Gift Nifty and IPO GMP pages with navigation; no stock or IPO page changes
 
 ## Backlink plan (low budget)
 1. Publish one data-led exchange or sector study monthly and pitch its findings to finance newsletters and market-data journalists.
