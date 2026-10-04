@@ -2,11 +2,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { ArrowRight, ArrowUpRight, Droplets, Flame, Gem, Zap } from "lucide-react";
 import { Shell } from "@/components/ds/Shell";
+import { MarketGuideFaqSection } from "@/components/ds/MarketGuideFaqSection";
 import { getCommodityQuotes } from "@/lib/market/commodity-quotes.functions";
+import { MARKET_GUIDE_SOURCES, marketGuideFaq } from "@/lib/seo/market-guide-faq";
+import { buildBreadcrumbSchema, buildFAQSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 
 const URL = "https://deepscreen.online/commodities";
 const title = "Commodity Prices: Gold, Silver, Crude Oil, Gas & Copper | DeepScreen";
-const description = "Follow gold, silver, crude oil, natural gas and copper futures, and understand what global commodity prices mean for Indian investors.";
+const description = "Follow gold, silver, crude oil, natural gas and copper futures, then learn how commodity prices, futures, MCX context, currency and local basis fit together.";
+const faqs = marketGuideFaq("COMMODITIES");
 const commodities = [
   { symbol: "GC=F", name: "Gold", contract: "COMEX gold futures", unit: "troy ounce", icon: Gem, context: "Gold is often sensitive to real interest rates, the US dollar and demand for a store of value. A dollar-denominated futures quote is not the same as an Indian retail gold rate." },
   { symbol: "SI=F", name: "Silver", contract: "COMEX silver futures", unit: "troy ounce", icon: Gem, context: "Silver combines precious-metal demand with industrial use in electronics and solar equipment. It can move more sharply than gold." },
@@ -28,11 +32,25 @@ export const Route = createFileRoute("/commodities")({
   head: () => ({
     meta: [
       { title }, { name: "description", content: description },
+      { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" },
       { property: "og:title", content: title }, { property: "og:description", content: description },
       { property: "og:type", content: "website" }, { property: "og:url", content: URL },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: URL }],
+    links: [{ rel: "canonical", href: URL }, { rel: "describedby", href: "https://deepscreen.online/llms.txt" }],
+    scripts: [{
+      type: "application/ld+json",
+      children: jsonLd(buildGraph(
+        buildOrganizationSchema(),
+        buildWebSiteSchema(),
+        buildWebPageSchema({ name: title, description, url: URL }),
+        buildBreadcrumbSchema([
+          { name: "DeepScreen", url: "https://deepscreen.online/" },
+          { name: "Commodities", url: URL },
+        ]),
+        buildFAQSchema(faqs.map((faq) => ({ question: faq.question, answer: faq.answer }))),
+      )),
+    }],
   }),
   component: CommoditiesPage,
   errorComponent: () => <Shell><div className="mx-auto max-w-5xl px-5 py-16"><h1 className="text-3xl font-bold">Commodities</h1><p className="mt-4 text-muted-foreground">Prices could not be loaded right now. Please try again shortly.</p></div></Shell>,
@@ -69,7 +87,28 @@ function CommoditiesPage() {
         <div><p className="font-mono text-xs uppercase text-primary">Reading the market</p><h2 className="mt-3 text-2xl font-semibold">A benchmark is not a bill.</h2><p className="mt-3 text-sm leading-relaxed text-muted-foreground">The price you pay or receive can differ because of currency, taxes, transport, contract month, location and retail margins.</p></div>
         <div className="grid gap-6 sm:grid-cols-2">{commodities.map((item) => <article key={item.symbol} className="border-l border-border pl-4"><h3 className="font-semibold">{item.name}</h3><p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.context}</p></article>)}</div>
       </div>
-      <div className="mt-14 flex flex-wrap gap-6 border-t border-border pt-8 text-sm"><Link to="/gift-nifty" className="inline-flex items-center gap-2 text-primary hover:underline">Gift Nifty <ArrowRight size={16}/></Link><Link to="/calendar" className="inline-flex items-center gap-2 text-primary hover:underline">Economic calendar <ArrowUpRight size={16}/></Link></div>
+      <section className="mt-14 rounded-xl border border-primary/20 bg-primary/5 p-5">
+        <p className="font-mono text-xs uppercase text-primary">DeepScreen research</p>
+        <h2 className="mt-2 text-xl font-semibold">How to read commodity prices without mixing benchmarks</h2>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">Our supporting guide builds a five-layer translation framework from global futures benchmarks to an Indian market context and explains the main drivers of gold, silver, crude oil, natural gas and copper.</p>
+        <a href="/blog/how-to-read-commodity-prices-india" className="mt-3 inline-block text-sm font-medium text-primary hover:underline">Read the commodity price guide →</a>
+      </section>
+
+      <MarketGuideFaqSection
+        faqs={faqs}
+        title="Commodity prices and futures: common questions"
+        description="Answer-first explanations of spot versus futures, global versus Indian prices, commodity price drivers, hedging and risk."
+      />
+
+      <section className="mt-10 rounded-xl border border-border bg-panel p-5" aria-labelledby="commodity-sources">
+        <h2 id="commodity-sources" className="font-semibold">Primary educational sources</h2>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">Definitions and risk concepts are grounded in SEBI investor education. Live benchmark quotes on this page are separate market-data inputs and may be delayed.</p>
+        <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+          {MARKET_GUIDE_SOURCES.COMMODITIES.map((source) => <a key={source.href} href={source.href} target="_blank" rel="noreferrer" className="text-primary hover:underline">{source.label}</a>)}
+        </div>
+      </section>
+
+      <div className="mt-14 flex flex-wrap gap-6 border-t border-border pt-8 text-sm"><Link to="/gift-nifty" className="inline-flex items-center gap-2 text-primary hover:underline">GIFT Nifty <ArrowRight size={16}/></Link><Link to="/calendar" className="inline-flex items-center gap-2 text-primary hover:underline">Economic calendar <ArrowUpRight size={16}/></Link></div>
     </div>
   </Shell>;
 }
