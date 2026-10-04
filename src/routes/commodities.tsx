@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { ArrowRight, ArrowUpRight, Droplets, Flame, Gem, Zap } from "lucide-react";
 import { Shell } from "@/components/ds/Shell";
+import { LiveNewsFeed } from "@/components/ds/LiveNewsFeed";
 import { getCommodityQuotes } from "@/lib/market/commodity-quotes.functions";
 
 const URL = "https://deepscreen.online/commodities";
@@ -64,6 +65,11 @@ function CommoditiesPage() {
         })}
       </div>
       <p className="mt-3 text-xs leading-relaxed text-muted-foreground">Yahoo Finance futures chart quotes. Prices may be delayed and contracts roll; the displayed values are global benchmark futures, not Indian spot, MCX, jewellery or pump prices. A dash means the source returned no current quote. Check the contract and quote date before using any figure.</p>
+
+      <div className="mt-14">
+        <LiveNewsFeed query="gold OR silver OR crude oil OR natural gas OR copper commodities when:7d" title="Commodities news" limit={12} />
+        <p className="mt-3 text-xs text-muted-foreground">Headlines refresh every minute while this page is open. Publication times come from news providers and may lag events.</p>
+      </div>
 
       <div className="mt-14 grid gap-10 border-t border-border pt-10 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
         <div><p className="font-mono text-xs uppercase text-primary">Reading the market</p><h2 className="mt-3 text-2xl font-semibold">A benchmark is not a bill.</h2><p className="mt-3 text-sm leading-relaxed text-muted-foreground">The price you pay or receive can differ because of currency, taxes, transport, contract month, location and retail margins.</p></div>
