@@ -183,10 +183,10 @@ export function InvestmentBlogArticle({ post }: { post: BlogPost }) {
       <section className="mt-10 rounded-xl border border-border bg-panel p-5" aria-labelledby="editorial-disclosure">
         <h2 id="editorial-disclosure" className="font-semibold">Editorial disclosure</h2>
         <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          DeepScreen is a financial-research platform. This article is educational and is not personalized investment, tax or legal advice. Product data, regulations and fund disclosures can change; verify the latest issuer and regulator material before acting.
+          DeepScreen is a financial-research platform. This article is educational and is not personalized investment, tax or legal advice. Market data, regulations, contract specifications and issuer disclosures can change; verify the latest exchange, issuer and regulator material before acting.
         </p>
         <p className="mt-3 text-xs leading-5 text-muted-foreground">
-          Author: Sooraj, Founder of DeepScreen. Facts were checked against the cited regulator, exchange, industry-association and issuer sources on 2 October 2026. No independent credentialed reviewer has been claimed.
+          Author: Sooraj, Founder of DeepScreen. Facts were checked against the cited regulator, exchange, industry-association and issuer sources on {formatDate(post.updated)}. No independent credentialed reviewer has been claimed.
         </p>
       </section>
     </article>
