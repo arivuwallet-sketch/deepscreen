@@ -2,20 +2,38 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowRight, ArrowUpRight, Calculator, CircleHelp, ShieldAlert } from "lucide-react";
 import { Shell } from "@/components/ds/Shell";
+import { MarketGuideFaqSection } from "@/components/ds/MarketGuideFaqSection";
 import { Button } from "@/components/ui/button";
+import { MARKET_GUIDE_SOURCES, marketGuideFaq } from "@/lib/seo/market-guide-faq";
+import { buildBreadcrumbSchema, buildFAQSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 
 const URL = "https://deepscreen.online/ipo-gmp";
 const title = "IPO GMP Explained: Grey Market Premium & Calculation | DeepScreen";
-const description = "What IPO grey market premium means, how to calculate an indicative premium over the issue price, and why GMP is not an official or reliable listing-price forecast.";
+const description = "Learn IPO GMP meaning, formula, negative GMP, GMP vs subscription, why grey market premium is unofficial, and how to research an IPO beyond listing-day hype.";
+const faqs = marketGuideFaq("IPO_GMP");
 
 export const Route = createFileRoute("/ipo-gmp")({
   staticData: { sitemap: true },
   head: () => ({ meta: [
     { title }, { name: "description", content: description },
+    { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" },
     { property: "og:title", content: title }, { property: "og:description", content: description },
     { property: "og:type", content: "article" }, { property: "og:url", content: URL },
     { name: "twitter:card", content: "summary_large_image" },
-  ], links: [{ rel: "canonical", href: URL }] }),
+  ], links: [{ rel: "canonical", href: URL }, { rel: "describedby", href: "https://deepscreen.online/llms.txt" }],
+  scripts: [{
+    type: "application/ld+json",
+    children: jsonLd(buildGraph(
+      buildOrganizationSchema(),
+      buildWebSiteSchema(),
+      buildWebPageSchema({ name: title, description, url: URL }),
+      buildBreadcrumbSchema([
+        { name: "DeepScreen", url: "https://deepscreen.online/" },
+        { name: "IPO GMP", url: URL },
+      ]),
+      buildFAQSchema(faqs.map((faq) => ({ question: faq.question, answer: faq.answer }))),
+    )),
+  }] }),
   component: IpoGmpPage,
 });
 
@@ -40,6 +58,28 @@ function IpoGmpPage() {
     <section className="mt-14 grid gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]"><div><CircleHelp className="text-primary" size={22}/><h2 className="mt-4 text-2xl font-semibold">How should you read GMP?</h2></div><div className="space-y-5 text-sm leading-relaxed text-muted-foreground"><p>The grey market is an informal, off-exchange market in applications or anticipated shares. A quoted premium is not an exchange trade, not a company valuation and not an assured profit for an applicant.</p><p>Premiums can change quickly as subscription demand, market sentiment and the listing date approach. Different sites or dealers can report different numbers because there is no single regulated consolidated feed.</p><p>An indicated gain can be wiped out by a lower actual listing price, transaction costs or a lack of allotment. Evaluate the prospectus, financials, use of proceeds, valuation and risks rather than treating GMP as an investment thesis.</p></div></section>
     <section className="mt-14 border-t border-border pt-10"><div className="flex items-center gap-2 text-warn"><ShieldAlert size={20}/><span className="font-mono text-xs uppercase">Before applying</span></div><div className="mt-6 grid gap-6 sm:grid-cols-3"><div className="border-l border-border pl-4"><h3 className="font-semibold">Read the offer document</h3><p className="mt-2 text-sm text-muted-foreground">Check revenue quality, debt, promoter holdings and where the proceeds go.</p></div><div className="border-l border-border pl-4"><h3 className="font-semibold">Check the issue terms</h3><p className="mt-2 text-sm text-muted-foreground">Compare the price band, lot size, opening and closing dates on official exchange filings.</p></div><div className="border-l border-border pl-4"><h3 className="font-semibold">Treat rumours as rumours</h3><p className="mt-2 text-sm text-muted-foreground">No unofficial premium can verify allotment, guarantee a listing gain or replace due diligence.</p></div></div></section>
     <p className="mt-10 text-xs text-muted-foreground">DeepScreen does not publish scraped or unverifiable current GMP quotes. Browse official offering information on the <Link to="/ipo" className="text-primary underline">IPO calendar <ArrowUpRight size={12} className="inline"/></Link>.</p>
-    <div className="mt-10 flex flex-wrap gap-6 border-t border-border pt-8 text-sm"><Link to="/ipo" className="inline-flex items-center gap-2 text-primary hover:underline">IPO calendar <ArrowRight size={16}/></Link><Link to="/gift-nifty" className="inline-flex items-center gap-2 text-primary hover:underline">Gift Nifty <ArrowRight size={16}/></Link></div>
+
+    <section className="mt-14 rounded-xl border border-primary/20 bg-primary/5 p-5">
+      <p className="font-mono text-xs uppercase text-primary">DeepScreen research</p>
+      <h2 className="mt-2 text-xl font-semibold">IPO GMP vs listing price: what the number can and cannot tell you</h2>
+      <p className="mt-2 text-sm leading-6 text-muted-foreground">Our deeper guide separates GMP sentiment from official demand, valuation and listing-price formation, then gives a six-check IPO research framework to use before treating an unofficial premium as meaningful.</p>
+      <a href="/blog/ipo-gmp-vs-listing-price-reliability" className="mt-3 inline-block text-sm font-medium text-primary hover:underline">Read the IPO GMP reliability guide →</a>
+    </section>
+
+    <MarketGuideFaqSection
+      faqs={faqs}
+      title="IPO GMP questions answered"
+      description="Direct answers on grey market premium meaning, formula, negative GMP, official versus unofficial data, subscription status and safer IPO research."
+    />
+
+    <section className="mt-10 rounded-xl border border-border bg-panel p-5" aria-labelledby="ipo-gmp-sources">
+      <h2 id="ipo-gmp-sources" className="font-semibold">Official IPO research sources</h2>
+      <p className="mt-2 text-sm leading-6 text-muted-foreground">GMP itself is not an official exchange series. Use SEBI and exchange material for the IPO's offer document, issue terms, book-building process and investor-protection information.</p>
+      <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+        {MARKET_GUIDE_SOURCES.IPO_GMP.map((source) => <a key={source.href} href={source.href} target="_blank" rel="noreferrer" className="text-primary hover:underline">{source.label}</a>)}
+      </div>
+    </section>
+
+    <div className="mt-10 flex flex-wrap gap-6 border-t border-border pt-8 text-sm"><Link to="/ipo" className="inline-flex items-center gap-2 text-primary hover:underline">IPO calendar <ArrowRight size={16}/></Link><Link to="/gift-nifty" className="inline-flex items-center gap-2 text-primary hover:underline">GIFT Nifty <ArrowRight size={16}/></Link></div>
   </div></Shell>;
 }
