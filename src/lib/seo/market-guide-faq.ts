@@ -169,7 +169,7 @@ export const MARKET_GUIDE_SOURCES: Record<MarketGuideTopic, readonly { label: st
   ],
   IPO_GMP: [
     { label: "SEBI Investor — IPO education material", href: "https://investor.sebi.gov.in/iematerial.html" },
-    { label: "SEBI Investor — book-building process", href: "https://investor.sebi.gov.in/book_building.html" },
+    { label: "SEBI Investor — How to invest in an IPO (Feb 2025)", href: "https://investor.sebi.gov.in/pdf/reference-material/ppt/PPT-3%20How%20to%20invest%20in%20Intial%20Public%20Offer_%20Feb%202025.pdf" },
     { label: "NSE — public offer documents", href: "https://www.nseindia.com/static/products-services/public-offer-documents" },
     { label: "NSE — investor education", href: "https://www.nseindia.com/static/invest/how-to-invest-in-capital-market" },
   ],
