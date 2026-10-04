@@ -8,7 +8,7 @@ import { MARKET_GUIDE_SOURCES, marketGuideFaq } from "@/lib/seo/market-guide-faq
 import { buildBreadcrumbSchema, buildFAQSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 
 const URL = "https://deepscreen.online/commodities";
-const title = "Commodity Prices: Gold, Silver, Crude Oil, Gas & Copper | DeepScreen";
+const title = "Commodity Prices: Gold, Oil, Silver & Copper | DeepScreen";
 const description = "Follow gold, silver, crude oil, natural gas and copper futures, then learn how commodity prices, futures, MCX context, currency and local basis fit together.";
 const faqs = marketGuideFaq("COMMODITIES");
 const commodities = [
