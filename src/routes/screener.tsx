@@ -15,6 +15,7 @@ import { EXCHANGES } from "@/lib/deepscreen/exchanges";
 import { STOCKS } from "@/lib/deepscreen/stocks";
 import { NewsletterForm } from "@/components/ds/NewsletterForm";
 import { MarketMovers } from "@/components/ds/MarketMovers";
+import { SCREENER_ANSWERS } from "@/lib/discovery/answers";
 
 export const Route = createFileRoute("/screener")({
   staticData: { sitemap: true },
@@ -63,28 +64,12 @@ export const Route = createFileRoute("/screener")({
                 "Options Greeks and strategy payoffs",
               ],
             }),
-            buildFAQSchema([
-              {
-                question: "What is DeepScreen?",
-                answer:
-                  `DeepScreen is a stock screener that scores listed companies on ${EXCHANGES.length} exchanges — NSE, BSE, NYSE, Nasdaq and LSE — using a 13-factor valuation and quality model covering P/E, PEG, P/S, P/B, EV/Revenue, EV/EBITDA, ROE, ROA, ROCE, leverage, payout and operating leverage.`,
-              },
-              {
-                question: "Which markets does it cover?",
-                answer:
-                  "Indian markets through the NSE and BSE, US markets through the NYSE and Nasdaq, and UK markets through the LSE.",
-              },
-              {
-                question: "Can I use it free?",
-                answer:
-                  "Yes. Search, raw fundamental ratios, the IPO pipeline, news and the economic calendar are free. The full verdict, valuation models and alerts are part of Pro — see pricing.",
-              },
-              {
-                question: "Is this investment advice?",
-                answer:
-                  "No. DeepScreen publishes analytical model output for research and education only, not investment advice. Questions? Reach the team on the contact page.",
-              },
-            ]),
+            buildFAQSchema(
+              SCREENER_ANSWERS.map((answer) => ({
+                question: answer.question,
+                answer: answer.answer,
+              })),
+            ),
           ),
         ),
       },
@@ -179,67 +164,25 @@ function Home() {
         </section>
 
         <section aria-labelledby="answers-heading">
-          <h2 id="answers-heading" className="mb-3 text-sm font-semibold uppercase tracking-wide">
-            Common questions about DeepScreen
-          </h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-lg border border-border bg-panel p-4">
-              <h3 className="text-sm font-semibold">What is DeepScreen?</h3>
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 id="answers-heading" className="text-sm font-semibold uppercase tracking-wide">
+                Common questions about DeepScreen
+              </h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                DeepScreen is a stock screener that scores listed companies on {EXCHANGES.length}{" "}
-                 exchanges — NSE, BSE, NYSE, Nasdaq and LSE — using a 13-factor valuation and
-                quality model covering P/E, PEG, P/S, P/B, EV/Revenue, EV/EBITDA, ROE, ROA, ROCE,
-                leverage, payout and operating leverage.
+                Canonical answers about the platform, supported markets, methodology, data and research limits.
               </p>
             </div>
-            <div className="rounded-lg border border-border bg-panel p-4">
-              <h3 className="text-sm font-semibold">Which markets does it cover?</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Indian markets through the{" "}
-                <Link to="/exchange/$code" params={{ code: "NSE" }} className="text-primary hover:underline">
-                  NSE
-                </Link>{" "}
-                and{" "}
-                <Link to="/exchange/$code" params={{ code: "BSE" }} className="text-primary hover:underline">
-                  BSE
-                </Link>
-                , US markets through the{" "}
-                <Link to="/exchange/$code" params={{ code: "NYSE" }} className="text-primary hover:underline">
-                  NYSE
-                </Link>{" "}
-                and{" "}
-                <Link to="/exchange/$code" params={{ code: "NASDAQ" }} className="text-primary hover:underline">
-                  Nasdaq
-                </Link>
-                , and UK markets through the{" "}
-                <Link to="/exchange/$code" params={{ code: "LSE" }} className="text-primary hover:underline">
-                  LSE
-                </Link>
-                .
-              </p>
-            </div>
-            <div className="rounded-lg border border-border bg-panel p-4">
-              <h3 className="text-sm font-semibold">Can I use it free?</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Yes. Search, raw fundamental ratios, the IPO pipeline, news and the economic calendar
-                are free. The full verdict, valuation models and alerts are part of Pro — see{" "}
-                <Link to="/pricing" className="text-primary hover:underline">
-                  pricing
-                </Link>
-                .
-              </p>
-            </div>
-            <div className="rounded-lg border border-border bg-panel p-4">
-              <h3 className="text-sm font-semibold">Is this investment advice?</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                No. DeepScreen publishes analytical model output for research and education only, not
-                investment advice. Questions? Reach the team on the{" "}
-                <Link to="/contact" className="text-primary hover:underline">
-                  contact page
-                </Link>
-                .
-              </p>
-            </div>
+            <Link to="/answers" className="text-sm text-primary hover:underline">Browse all stock-market Q&amp;A →</Link>
+          </div>
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            {SCREENER_ANSWERS.map((answer) => (
+              <article key={answer.id} className="rounded-lg border border-border bg-panel p-4">
+                <h3 className="text-sm font-semibold">{answer.question}</h3>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">{answer.answer}</p>
+                <a href={answer.href} className="mt-3 inline-block text-xs text-primary hover:underline">{answer.label} →</a>
+              </article>
+            ))}
           </div>
         </section>
         <section className="rounded-lg border border-border bg-panel p-6 sm:p-8">
