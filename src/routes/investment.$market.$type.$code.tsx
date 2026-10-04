@@ -1,3 +1,4 @@
+import { investmentQuoteCode } from "@/lib/deepscreen/investment-symbol";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
 import { InvestmentAnalysisAvailable } from "@/components/ds/InvestmentAnalysisAvailable";
@@ -84,7 +85,7 @@ function InvestmentPage() {
     ? analysis.history : null;
   const { data: quote } = useLiveQuote(
     item.type === "FUND" ? "" : item.market,
-    item.type === "FUND" ? "" : item.code,
+    item.type === "FUND" ? "" : investmentQuoteCode(item.market, item.type, item.code),
   );
 
   return (
@@ -106,9 +107,9 @@ function InvestmentPage() {
             </p>
             <p className="mt-2 text-3xl font-semibold">
               {item.type === "FUND"
-                ? item.nav === null
+                ? item.nav === null && !verifiedNav
                   ? "NAV pending"
-                : `₹${(verifiedNav?.latestValue ?? item.nav).toLocaleString("en-IN", { maximumFractionDigits: 4 })}`
+                : `₹${(verifiedNav?.latestValue ?? item.nav!).toLocaleString("en-IN", { maximumFractionDigits: 4 })}`
                 : quote
                   ? formatPrice(quote.price, item.market)
                   : analysis?.marketSnapshot

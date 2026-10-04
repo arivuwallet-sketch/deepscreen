@@ -1,3 +1,5 @@
+import type { EnhancedInvestmentAnalysisData } from "@/lib/deepscreen/investment-official";
+import { InvestmentExplorer } from "@/components/research/InvestmentExplorer";
 import { Link } from "@tanstack/react-router";
 import { InvestmentFaqSection } from "@/components/ds/InvestmentFaqSection";
 import { INVESTMENT_SOURCE_LINKS, faqForType } from "@/lib/seo/investment-faq";
@@ -59,7 +61,7 @@ const TOPICS: Record<InvestmentType, Topic> = {
   },
 };
 
-export function InvestmentTopicGuide({ type }: { type: InvestmentType }) {
+export function InvestmentTopicGuide({ type, initialData }: { type: InvestmentType; initialData?: EnhancedInvestmentAnalysisData | null }) {
   const topic = TOPICS[type];
   const faqs = faqForType(type);
   const typeName = type === "FUND" ? "mutual funds" : type === "ETF" ? "ETFs" : "REITs";
@@ -81,6 +83,7 @@ export function InvestmentTopicGuide({ type }: { type: InvestmentType }) {
           <a href="/methodology" className="text-primary hover:underline">DeepScreen methodology</a>
         </div>
       </header>
+      <InvestmentExplorer type={type} initialData={initialData ?? null} />
 
       <section className="mt-10 border-t border-border pt-8" aria-labelledby="investment-topic-checklist">
         <h2 id="investment-topic-checklist" className="text-2xl font-bold">{topic.checklistTitle}</h2>

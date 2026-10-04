@@ -1,3 +1,4 @@
+import { OptionsMarketContext, useOptionsContext } from "@/components/research/OptionsMarketContext";
 import { jsonLd } from "@/lib/seo/json-ld";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
@@ -15,7 +16,6 @@ import {
 import { Shell } from "@/components/ds/Shell";
 import { TopicIndex } from "@/components/ds/TopicIndex";
 import { metaKeywords, optionsKeywords, screenerKeywords } from "@/lib/seo/keywords";
-import { useLiveQuote } from "@/hooks/useLiveQuotes";
 import { formatPrice } from "@/lib/deepscreen/format";
 import { searchStocks, findStock } from "@/lib/deepscreen/stocks";
 import { buildStrategies, type StrategyResult } from "@/lib/options/greeks";
@@ -75,24 +75,27 @@ function OptionsPage() {
   const [query, setQuery] = useState("RELIANCE");
   const [picked, setPicked] = useState<Stock>(() => findStock("NSE", "RELIANCE") ?? searchStocks("A", 1)[0]!);
   const [volPct, setVolPct] = useState(28);
+  const [manualSpot, setManualSpot] = useState("");
+  const [dividendPct, setDividendPct] = useState(0);
   const [ratePct, setRatePct] = useState(6.5);
   const [days, setDays] = useState(30);
   const [outlook, setOutlook] = useState<"all" | StrategyResult["outlook"]>("all");
 
   const matches = useMemo(() => (query.length >= 2 ? searchStocks(query, 6) : []), [query]);
-  const { data: quote } = useLiveQuote(picked.exchange, picked.symbol);
-  const spot = quote?.price ?? picked.price;
+  const { data: marketData } = useOptionsContext(picked.exchange, picked.symbol);
+  const enteredSpot = Number(manualSpot);
+  const spot = manualSpot.trim() ? (Number.isFinite(enteredSpot) && enteredSpot > 0 ? enteredSpot : 0) : marketData?.price ?? 0;
 
   const strategies = useMemo(
     () =>
-      buildStrategies({
+      spot > 0 ? buildStrategies({
         spot,
         vol: volPct / 100,
         rate: ratePct / 100,
         days,
-        dividendYield: picked.fundamentals.dividendYield / 100,
-      }),
-    [spot, volPct, ratePct, days, picked],
+        dividendYield: dividendPct / 100,
+      }) : [],
+    [spot, volPct, ratePct, days, dividendPct],
   );
   const shown = strategies.filter((s) => outlook === "all" || s.outlook === outlook);
 
@@ -102,7 +105,7 @@ function OptionsPage() {
         <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Options strategy calculator: payoffs and Greeks</h1>
         <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
           Black-Scholes-Merton pricing with dividend yield, exact Greeks per leg, payoff scan and
-          lognormal probability of profit — compare 12 theoretical strategies. The calculator uses an available provider spot quote or a modeled fallback, with user-selected volatility, rate and expiry assumptions. Premiums are calculated estimates, not executable option-chain quotes.
+          lognormal probability of profit — compare 12 theoretical strategies. The calculator uses a dated provider spot quote or your explicitly entered scenario price, with user-selected volatility, rate, dividend yield and expiry assumptions. Premiums are calculated estimates, not executable option-chain quotes.
         </p>
 
         <div className="mt-6 grid gap-4 rounded-lg border border-border p-4 md:grid-cols-4">
@@ -122,6 +125,7 @@ function OptionsPage() {
                       type="button"
                       onPointerDown={() => {
                         setPicked(m);
+                        setManualSpot("");
                         setQuery(m.symbol);
                       }}
                       className="block w-full px-3 py-2 text-left text-xs hover:bg-accent"
@@ -136,14 +140,17 @@ function OptionsPage() {
               </ul>
             ) : null}
             <div className="num mt-2 text-xs text-muted-foreground">
-              Spot {formatPrice(spot, picked.exchange)} · {picked.exchange}
+              {manualSpot.trim() ? "Scenario spot" : "Provider spot"} {spot > 0 ? formatPrice(spot, picked.exchange) : "Unavailable"} · {picked.exchange}
             </div>
           </div>
-          <SliderField label="Implied volatility" value={volPct} min={5} max={120} step={1} suffix="%" onChange={setVolPct} />
+          <SliderField label="Assumed volatility" value={volPct} min={5} max={120} step={1} suffix="%" onChange={setVolPct} />
           <SliderField label="Risk-free rate" value={ratePct} min={0} max={15} step={0.1} suffix="%" onChange={setRatePct} />
           <SliderField label="Days to expiry" value={days} min={1} max={365} step={1} suffix="d" onChange={setDays} />
         </div>
 
+        <div className="mt-4 grid gap-4 sm:grid-cols-2"><label className="text-xs text-muted-foreground">Optional scenario spot (leave blank for provider price)<input type="number" min="0.0001" step="any" value={manualSpot} onChange={e=>setManualSpot(e.target.value)} className="mt-2 w-full rounded-lg border border-border bg-background p-3 text-sm" placeholder="Use provider quote" /></label><SliderField label="Assumed dividend yield" value={dividendPct} min={0} max={20} step={0.1} suffix="%" onChange={setDividendPct}/></div>
+        <OptionsMarketContext market={picked.exchange} code={picked.symbol} days={days} assumedVol={volPct} onUseVol={setVolPct}/>
+        {spot <= 0 && <p role="status" className="my-4 rounded-lg border border-border p-4 text-sm">Waiting for a verified spot quote. Enter a scenario price to run the model while the provider is unavailable.</p>}
         <div className="mt-4 flex flex-wrap gap-2 text-xs">
           {(["all", "bullish", "bearish", "neutral", "volatility"] as const).map((o) => (
             <button

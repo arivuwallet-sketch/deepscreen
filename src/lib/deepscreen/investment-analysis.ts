@@ -112,6 +112,8 @@ export interface ReitAnalysis {
 }
 
 export interface InvestmentAnalysisData {
+  historyPoints?: HistoricalPoint[];
+  historyBasis?: "NAV" | "adjusted" | "close";
   fetchedAt: string;
   sources: string[];
   history: HistoricalMetrics | null;

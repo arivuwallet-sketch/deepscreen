@@ -1,3 +1,4 @@
+import { investmentQuoteCode } from "@/lib/deepscreen/investment-symbol";
 import type { InvestmentType } from "@/lib/deepscreen/investments";
 import {
   computeHistoricalMetrics,
@@ -115,7 +116,7 @@ async function getSession(): Promise<Session | null> {
   }
 }
 
-async function fetchYahooHistory(symbol: string): Promise<{ points: HistoricalPoint[]; snapshot: InvestmentMarketSnapshot | null }> {
+async function fetchYahooHistory(symbol: string): Promise<{ points: HistoricalPoint[]; snapshot: InvestmentMarketSnapshot | null; basis?: "adjusted" | "close" }> {
   for (const host of ["query2.finance.yahoo.com", "query1.finance.yahoo.com"]) try {
     const response = await fetch(
       `https://${host}/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1wk&range=10y&events=div%2Csplits`,
@@ -136,9 +137,10 @@ async function fetchYahooHistory(symbol: string): Promise<{ points: HistoricalPo
     const timestamps = result?.timestamp ?? [];
     const adjusted = result?.indicators?.adjclose?.[0]?.adjclose ?? [];
     const closes = result?.indicators?.quote?.[0]?.close ?? [];
+    const useAdjusted = adjusted.some(v => typeof v === "number" && Number.isFinite(v) && v > 0);
     const points: HistoricalPoint[] = [];
     for (let index = 0; index < timestamps.length; index += 1) {
-      const value = adjusted[index] ?? closes[index];
+      const value = useAdjusted ? adjusted[index] : closes[index];
       if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) continue;
       points.push({ at: timestamps[index]! * 1000, value });
     }
@@ -162,7 +164,8 @@ async function fetchYahooHistory(symbol: string): Promise<{ points: HistoricalPo
             inceptionDate: firstTrade && firstTrade > 0 ? new Date(firstTrade * 1000).toISOString().slice(0, 10) : null,
           }
         : null;
-      return { points, snapshot };
+      if (scale === 100) for (const point of points) point.value /= scale;
+      return { points, snapshot, basis: useAdjusted ? "adjusted" : "close" };
     }
   } catch {
     // The chart hosts have independent rate limits; try the other one.
@@ -401,6 +404,7 @@ async function buildAnalysis(request: Request): Promise<InvestmentAnalysisData> 
   const sources = new Set<string>();
   let historyPoints: HistoricalPoint[] = [];
   let historyVenue: string | null = null;
+  let historyBasis: "NAV" | "adjusted" | "close" = "close";
   let marketSnapshot: InvestmentMarketSnapshot | null = null;
   let fundProfile: FundProfileAnalysis | null = null;
   let holdingQuality: HoldingQualityAnalysis | null = null;
@@ -412,20 +416,35 @@ async function buildAnalysis(request: Request): Promise<InvestmentAnalysisData> 
   if (request.type === "FUND" && request.market.toUpperCase() === "IN" && /^\d+$/.test(request.code)) {
     const indian = await fetchIndianMutualFund(request.code, request.name);
     historyPoints = indian.history;
+    historyBasis = "NAV";
     if (indian.history.length) historyVenue = "IN";
     mutualFund = indian.meta ?? mutualFund;
     if (indian.history.length || indian.meta) sources.add("MFAPI (AMFI-sourced NAV history)");
   } else {
-    const symbol = yahooSymbol(request.market, request.code);
+    const symbol = yahooSymbol(request.market, investmentQuoteCode(request.market, request.type, request.code));
     const [history, profile] = await Promise.all([
       fetchYahooHistory(symbol),
       request.type === "ETF" || request.type === "FUND" ? fetchYahooFundProfile(symbol) : Promise.resolve(null),
     ]);
     historyPoints = history.points;
+    historyBasis = history.basis ?? "close";
     if (history.points.length) historyVenue = request.market.toUpperCase();
     marketSnapshot = history.snapshot;
     fundProfile = profile;
     if (history.points.length || profile) sources.add("Yahoo Finance");
+
+    // RR symbols supply current REIT quotes, while Yahoo may retain the historical
+    // series under the legacy NSE code. Accept only recent, price-matched history.
+    if (request.type === "REIT" && request.market.toUpperCase() === "NSE" && symbol.includes("-RR.") && historyPoints.length < 52 && marketSnapshot) {
+      const legacy = await fetchYahooHistory(yahooSymbol(request.market, request.code));
+      const last = legacy.points.at(-1);
+      if (last && legacy.points.length > historyPoints.length && legacy.snapshot?.currency === marketSnapshot.currency &&
+          Date.now() - last.at < 14 * 86400000 && Math.abs(last.value - marketSnapshot.price) / marketSnapshot.price < 0.05) {
+        historyPoints = legacy.points;
+        historyBasis = legacy.basis ?? "close";
+        sources.add(`Yahoo Finance legacy history: ${yahooSymbol(request.market, request.code)}`);
+      }
+    }
 
     // Some BSE ETF feeds contain only a single print even while the very same
     // ticker has years of history on NSE. Use that history only when the live
@@ -439,6 +458,7 @@ async function buildAnalysis(request: Request): Promise<InvestmentAnalysisData> 
           nseHistory.snapshot?.currency === history.snapshot.currency &&
           Math.abs(nsePrice - bsePrice) / bsePrice <= 0.05) {
         historyPoints = nseHistory.points;
+        historyBasis = nseHistory.basis ?? "close";
         historyVenue = "NSE";
         sources.add("Yahoo Finance NSE cross-listing history");
       }
@@ -458,7 +478,9 @@ async function buildAnalysis(request: Request): Promise<InvestmentAnalysisData> 
     fetchedAt: new Date().toISOString(),
     sources: [...sources],
     history: computeHistoricalMetrics(historyPoints),
+    historyPoints: historyPoints.filter(p => Number.isFinite(p.at) && p.at <= Date.now()).sort((a,b) => a.at-b.at),
     historyVenue,
+    historyBasis,
     marketSnapshot,
     fundProfile,
     holdingQuality,
