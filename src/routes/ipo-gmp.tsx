@@ -8,7 +8,7 @@ import { MARKET_GUIDE_SOURCES, marketGuideFaq } from "@/lib/seo/market-guide-faq
 import { buildBreadcrumbSchema, buildFAQSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 
 const URL = "https://deepscreen.online/ipo-gmp";
-const title = "IPO GMP Explained: Grey Market Premium & Calculation | DeepScreen";
+const title = "IPO GMP: Meaning, Formula, Risks & Reliability | DeepScreen";
 const description = "Learn IPO GMP meaning, formula, negative GMP, GMP vs subscription, why grey market premium is unofficial, and how to research an IPO beyond listing-day hype.";
 const faqs = marketGuideFaq("IPO_GMP");
 
