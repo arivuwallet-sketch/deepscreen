@@ -67,7 +67,7 @@ function CommoditiesPage() {
       <p className="mt-3 text-xs leading-relaxed text-muted-foreground">Yahoo Finance futures chart quotes. Prices may be delayed and contracts roll; the displayed values are global benchmark futures, not Indian spot, MCX, jewellery or pump prices. A dash means the source returned no current quote. Check the contract and quote date before using any figure.</p>
 
       <div className="mt-14">
-        <LiveNewsFeed query="gold silver crude oil natural gas copper commodities" title="Commodities news" limit={12} />
+        <LiveNewsFeed query="gold OR silver OR crude oil OR natural gas OR copper commodities when:7d" title="Commodities news" limit={12} />
         <p className="mt-3 text-xs text-muted-foreground">Headlines refresh every minute while this page is open. Publication times come from news providers and may lag events.</p>
       </div>
 
