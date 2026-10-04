@@ -23,6 +23,12 @@ const NAV_ITEMS: Array<readonly [string, string]> = [
   ["/pricing", "Pricing"],
 ];
 
+const MARKET_GUIDES: Array<readonly [string, string]> = [
+  ["/commodities", "Commodities"],
+  ["/gift-nifty", "Gift Nifty"],
+  ["/ipo-gmp", "IPO GMP"],
+];
+
 export function Shell({ children }: { children: ReactNode }) {
   const path = useLocation({ select: (location) => location.pathname });
   const root = useRef<HTMLDivElement>(null);
@@ -89,6 +95,11 @@ export function Shell({ children }: { children: ReactNode }) {
                     <ArrowUpRight size={14} />
                   </Link>
                 ))}
+                {MARKET_GUIDES.map(([to, label]) => (
+                  <Link key={to} to={to} activeProps={{ className: "is-active" }}>
+                    {label}<ArrowUpRight size={14} />
+                  </Link>
+                ))}
               </div>
               <p className="ds-eyebrow">Explore markets</p>
               <div className="ds-mobile-market-links">
@@ -113,6 +124,12 @@ export function Shell({ children }: { children: ReactNode }) {
                 {label}
               </Link>
             ))}
+            <details className="group relative flex items-stretch">
+              <summary className="flex cursor-pointer list-none items-center text-xs text-muted-foreground hover:text-primary [&::-webkit-details-marker]:hidden">More ▾</summary>
+              <div className="absolute left-0 top-full z-50 min-w-36 border border-border bg-panel p-2 shadow-lg">
+                {MARKET_GUIDES.map(([to, label]) => <Link key={to} to={to} className="block px-3 py-2 text-xs" activeProps={{ className: "is-active" }}>{label}</Link>)}
+              </div>
+            </details>
           </nav>
           <nav aria-label="Market navigation">
             {EXCHANGES.map((exchange) => (
@@ -152,6 +169,9 @@ export function Shell({ children }: { children: ReactNode }) {
           </Link>
         </div>
         <nav className="safe-area-x mb-3 flex flex-wrap justify-center gap-x-4 gap-y-2">
+          <Link to="/commodities" className="hover:text-foreground">Commodities</Link>
+          <Link to="/gift-nifty" className="hover:text-foreground">Gift Nifty</Link>
+          <Link to="/ipo-gmp" className="hover:text-foreground">IPO GMP</Link>
           <Link to="/stock-filters" className="hover:text-foreground">
             Stock Filters
           </Link>

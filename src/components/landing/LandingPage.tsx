@@ -794,6 +794,9 @@ export function LandingPage() {
         <nav aria-label="Footer navigation">
           <a href="/screener">Screener</a>
           <Link to="/pricing">Pricing</Link>
+          <Link to="/commodities">Commodities</Link>
+          <Link to="/gift-nifty">Gift Nifty</Link>
+          <Link to="/ipo-gmp">IPO GMP</Link>
           <Link to="/methodology">Methodology</Link>
           <Link to="/data-sources">Data sources</Link>
           <Link to="/about">About</Link>
