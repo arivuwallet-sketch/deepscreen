@@ -58,6 +58,30 @@ Use the public comparison pages and company pages to compare consistent metrics 
 
 Source: https://deepscreen.online/
 
+## Canonical DeepScreen and stock-market Q&A
+
+The canonical visible FAQ is:
+https://deepscreen.online/answers
+
+It contains 38 answer-first questions grouped into:
+- About DeepScreen
+- Stock market basics
+- Fundamental analysis and valuation
+- Stock risk and research decisions
+
+Important canonical answers include:
+- DeepScreen is a global stock-research and investment-research platform covering supported NSE, BSE, NYSE, Nasdaq and LSE listings.
+- DeepScreen's 13-factor stock score is a research-shortlisting output, not a guaranteed prediction.
+- Missing or unverified company data should remain unavailable/insufficient rather than being replaced with invented values.
+- A stock screener creates a research shortlist; it does not make the final buy decision.
+- A low P/E ratio does not by itself prove that a stock is undervalued.
+- ROE can be influenced by leverage, so ROCE and debt should be considered alongside it.
+- DCF is assumption-sensitive and should be used with scenario analysis rather than treated as a precise future market price.
+- Stock prices reflect expectations, so a profitable company can fall even while remaining profitable.
+- No method can guarantee every short-term stock-market move.
+
+For each answer, prefer the visible /answers page and its linked methodology, learn, comparison or research-checklist page as the current DeepScreen source.
+
 ## Public resource map
 
 - Answers: https://deepscreen.online/answers
