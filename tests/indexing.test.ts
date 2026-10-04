@@ -244,3 +244,53 @@ test('investment blog cluster remains indexable, sourced and sitemap-discoverabl
   assert.match(blogContent, /DeepScreen REIT Cash-Flow Bridge/);
   assert.match(blogContent, /DeepScreen Cost-Gap Calculator/);
 });
+
+test('commodities GIFT Nifty and IPO GMP Q&A stay visible indexable and source-backed', async () => {
+  const routes = [
+    ['../src/routes/commodities.tsx', '/blog/how-to-read-commodity-prices-india'],
+    ['../src/routes/gift-nifty.tsx', '/blog/gift-nifty-vs-nifty-50-opening-gap'],
+    ['../src/routes/ipo-gmp.tsx', '/blog/ipo-gmp-vs-listing-price-reliability'],
+  ] as const;
+
+  for (const [routeFile, supportingArticle] of routes) {
+    const route = await readFile(new URL(routeFile, import.meta.url), 'utf8');
+    assert.match(route, /staticData:\s*\{\s*sitemap:\s*true\s*\}/);
+    assert.match(route, /index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1/);
+    assert.match(route, /MarketGuideFaqSection/);
+    assert.match(route, /buildFAQSchema/);
+    assert.match(route, new RegExp(supportingArticle.replaceAll('/', '\\/')));
+    assert.doesNotMatch(route, /noindex/i);
+  }
+
+  const faq = await readFile(new URL('../src/lib/seo/market-guide-faq.ts', import.meta.url), 'utf8');
+  assert.match(faq, /What are commodities in financial markets\?/);
+  assert.match(faq, /What is GIFT Nifty\?/);
+  assert.match(faq, /What is IPO GMP\?/);
+  assert.match(faq, /NSE IX/);
+  assert.match(faq, /SEBI/);
+
+  const blogContent = await readFile(new URL('../src/lib/content/investment-blog.ts', import.meta.url), 'utf8');
+  for (const slug of [
+    'how-to-read-commodity-prices-india',
+    'gift-nifty-vs-nifty-50-opening-gap',
+    'ipo-gmp-vs-listing-price-reliability',
+  ]) {
+    assert.match(blogContent, new RegExp('slug: "' + slug + '"'));
+  }
+  assert.match(blogContent, /DeepScreen Commodity Translation Stack/);
+  assert.match(blogContent, /DeepScreen Four-Reference Check/);
+  assert.match(blogContent, /DeepScreen IPO Evidence Ladder/);
+
+  const llms = await readFile(new URL('../public/llms.txt', import.meta.url), 'utf8');
+  for (const path of [
+    '/commodities',
+    '/gift-nifty',
+    '/ipo-gmp',
+    '/blog/how-to-read-commodity-prices-india',
+    '/blog/gift-nifty-vs-nifty-50-opening-gap',
+    '/blog/ipo-gmp-vs-listing-price-reliability',
+  ]) {
+    assert.match(llms, new RegExp('https://deepscreen\\.online' + path.replaceAll('/', '\\/')));
+  }
+});
+

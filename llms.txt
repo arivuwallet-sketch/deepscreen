@@ -31,6 +31,15 @@
 - DeepScreen does not apply its company stock score to mutual funds, ETFs or REITs; each uses a separate research framework.
 - The visible Q&A on these pages is the primary source for definitions and research methodology. Product-specific facts should be verified against the latest fund/issuer disclosure.
 
+## Commodities, GIFT Nifty and IPO GMP
+
+- [Commodities](https://deepscreen.online/commodities): global gold, silver, crude oil, natural gas and copper futures benchmarks plus visible Q&A on futures vs spot, Indian price translation, hedging and risk.
+- [GIFT Nifty](https://deepscreen.online/gift-nifty): visible Q&A on NSE IX, the SGX Nifty transition, extended trading hours, futures basis and the limits of using GIFT Nifty as an exact Nifty 50 opening forecast.
+- [IPO GMP](https://deepscreen.online/ipo-gmp): grey market premium calculator and visible Q&A on GMP meaning, negative GMP, official vs unofficial data, subscription status and IPO due diligence.
+- DeepScreen does not substitute a domestic Nifty quote for an exchange-verified GIFT Nifty contract.
+- DeepScreen does not publish scraped or unverifiable live IPO GMP quotes as if they were official exchange data.
+- Commodity futures quotes are benchmark context and may be delayed; they are not Indian retail, MCX, jewellery or pump prices.
+
 ## Markets and screeners
 
 - [Global stock screener](https://deepscreen.online/): supported listings across the five exchanges.
@@ -49,6 +58,9 @@
 - Direct vs Regular mutual funds in India: https://deepscreen.online/blog/direct-vs-regular-mutual-funds-india
 - ETF tracking error vs tracking difference: https://deepscreen.online/blog/etf-tracking-error-vs-tracking-difference
 - NDCF vs AFFO for Indian REIT analysis: https://deepscreen.online/blog/ndcf-vs-affo-reit-analysis-india
+- How to read commodity prices in India: https://deepscreen.online/blog/how-to-read-commodity-prices-india
+- GIFT Nifty vs Nifty 50 opening signal: https://deepscreen.online/blog/gift-nifty-vs-nifty-50-opening-gap
+- IPO GMP vs listing price reliability: https://deepscreen.online/blog/ipo-gmp-vs-listing-price-reliability
 
 These articles are visible, indexable research pages with primary-source references, direct-answer summaries, original worked examples/frameworks and visible FAQ sections. They are educational, not personalized investment advice.
 
