@@ -305,3 +305,30 @@ Primary references:
 Supporting article:
 https://deepscreen.online/blog/ipo-gmp-vs-listing-price-reliability
 
+## Personal finance daily series — 4 October 2026
+
+DeepScreen publishes practical personal-finance education across three recurring pillars: saving money, protecting money and making more money. Each daily edition should use a different subtopic or framework so the site does not publish near-duplicate pages.
+
+### Save money
+https://deepscreen.online/blog/how-to-save-money-every-month-india
+
+The article prioritizes large recurring costs, automated saving, sinking funds and emergency liquidity. Its original framework is the DeepScreen Savings Ladder: stop expensive leaks, smooth irregular bills, automate saving, build resilience, optimize major fixed costs, then fine-tune discretionary spending.
+
+RBI financial-education material says an emergency fund should generally cover at least three months of living expenses, with six months or more potentially appropriate for self-employed people or less-secure income.
+
+### Protect money
+https://deepscreen.online/blog/how-to-protect-your-money-india
+
+The article uses the DeepScreen Financial Fortress: liquidity, banking, health, income/life, fraud, investment concentration and legal/transfer risk.
+
+DICGC currently insures eligible bank deposits up to ₹5 lakh per depositor per bank in the same right and same capacity, including principal and interest within the limit. This bank-deposit insurance does not cover mutual funds, stocks, bonds, ETFs or cryptocurrencies.
+
+### Make more money
+https://deepscreen.online/blog/how-to-make-more-money-income-paths-india
+
+The article uses the DeepScreen Income Engine Map to compare eight broad paths: career income, freelancing/services, small business, digital products/intellectual property, real estate/physical assets, financial assets, ownership/partnerships and monetization of underused assets.
+
+The article deliberately separates earned income from investment returns and treats business, property and securities as different risk/effort/capital trade-offs rather than promising a universal passive-income formula.
+
+Primary-source families used across the series include RBI financial education, SEBI Investor, DICGC, IRDAI and the official Ministry of MSME Udyam portal.
+
