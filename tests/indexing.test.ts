@@ -318,3 +318,12 @@ test('daily personal finance posts remain indexable sourced and AI-discoverable'
   assert.match(blogIndex, /Personal finance: save it, protect it, then grow it/);
 });
 
+test('investment blog registry has no sparse array entries', async () => {
+  const blogContent = await readFile(new URL('../src/lib/content/investment-blog.ts', import.meta.url), 'utf8');
+  assert.doesNotMatch(
+    blogContent,
+    /\},\s*,\s*\{/,
+    'A double comma between blog-post objects creates a sparse array entry and breaks new Map() at runtime',
+  );
+});
+
