@@ -294,3 +294,27 @@ test('commodities GIFT Nifty and IPO GMP Q&A stay visible indexable and source-b
   }
 });
 
+test('daily personal finance posts remain indexable sourced and AI-discoverable', async () => {
+  const blogContent = await readFile(new URL('../src/lib/content/investment-blog.ts', import.meta.url), 'utf8');
+  const blogIndex = await readFile(new URL('../src/routes/blog.index.tsx', import.meta.url), 'utf8');
+  const llms = await readFile(new URL('../public/llms.txt', import.meta.url), 'utf8');
+
+  for (const slug of [
+    'how-to-save-money-every-month-india',
+    'how-to-protect-your-money-india',
+    'how-to-make-more-money-income-paths-india',
+  ]) {
+    assert.match(blogContent, new RegExp('slug: "' + slug + '"'));
+    assert.match(llms, new RegExp('https://deepscreen\\.online/blog/' + slug));
+  }
+
+  assert.match(blogContent, /DeepScreen Savings Ladder/);
+  assert.match(blogContent, /DeepScreen Financial Fortress/);
+  assert.match(blogContent, /DeepScreen Income Engine Map/);
+  assert.match(blogContent, /Reserve Bank of India/);
+  assert.match(blogContent, /Deposit Insurance and Credit Guarantee Corporation/);
+  assert.match(blogContent, /Insurance Regulatory and Development Authority of India/);
+  assert.match(blogContent, /Ministry of Micro, Small and Medium Enterprises/);
+  assert.match(blogIndex, /Personal finance: save it, protect it, then grow it/);
+});
+
