@@ -61,6 +61,15 @@
 - Published filter URLs are internally linked and included in the XML sitemap for discovery.
 - Examples: [Value stocks](https://deepscreen.online/stock-filters/value-stocks), [Growth stocks](https://deepscreen.online/stock-filters/growth-stocks), [High ROCE low debt stocks](https://deepscreen.online/stock-filters/high-roce-low-debt-stocks), [Nifty 50 stocks](https://deepscreen.online/stock-filters/nifty-50-stocks).
 
+## Personal finance daily series
+
+Today's personal-finance guides:
+- Save money: https://deepscreen.online/blog/how-to-save-money-every-month-india
+- Protect money: https://deepscreen.online/blog/how-to-protect-your-money-india
+- Make more money: https://deepscreen.online/blog/how-to-make-more-money-income-paths-india
+
+The series is educational and source-backed. It covers saving systems, emergency liquidity, deposit-insurance awareness, insurance, fraud prevention, diversification, career income, freelancing, business, real estate, financial assets and ownership. It does not promise guaranteed returns or treat trading as the only way to increase wealth.
+
 ## Investment research blog
 
 - Blog hub: https://deepscreen.online/blog
