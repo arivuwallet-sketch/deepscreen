@@ -3,8 +3,8 @@ import { Shell } from "@/components/ds/Shell";
 import { INVESTMENT_BLOG_POSTS } from "@/lib/content/investment-blog";
 import { buildBreadcrumbSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 
-const title = "Market & Investment Research Blog | DeepScreen";
-const description = "DeepScreen research on mutual funds, ETFs, REITs, commodities, GIFT Nifty and IPO GMP, with primary sources, worked examples and original analysis frameworks.";
+const title = "Market, Investing & Personal Finance Blog | DeepScreen";
+const description = "DeepScreen research on markets, investing and personal finance: saving money, protecting wealth, increasing income, funds, ETFs, REITs, commodities, GIFT Nifty and IPOs.";
 const url = "https://deepscreen.online/blog";
 
 export const Route = createFileRoute("/blog/")({
@@ -57,9 +57,9 @@ function BlogIndex() {
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
         <header className="max-w-4xl">
           <p className="text-xs font-semibold uppercase tracking-wide text-primary">DeepScreen research</p>
-          <h1 className="mt-3 text-3xl font-bold sm:text-4xl">Market and investment research blog</h1>
+          <h1 className="mt-3 text-3xl font-bold sm:text-4xl">Market, investing and personal finance research</h1>
           <p className="mt-4 text-base leading-7 text-muted-foreground">
-            Original, source-backed guides for mutual funds, ETFs, REITs, commodities, GIFT Nifty and IPO research. Each article answers the search question first, shows the calculation or framework behind it, states the limits, and links to primary sources.
+            Original, source-backed guides for saving money, protecting wealth, increasing income, mutual funds, ETFs, REITs, commodities, GIFT Nifty and IPO research. Each article answers the search question first, shows the framework behind it, states the limits, and links to primary sources.
           </p>
         </header>
 
@@ -82,6 +82,17 @@ function BlogIndex() {
               </Link>
             </article>
           ))}
+        </section>
+
+        <section className="mt-12 rounded-xl border border-primary/20 bg-primary/5 p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-primary">Today · 4 October 2026</p>
+          <h2 className="mt-2 text-lg font-semibold">Personal finance: save it, protect it, then grow it</h2>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">Today's three-part series covers the full money cycle: creating surplus, protecting against financial shocks, and expanding income through work, business, real estate and financial assets.</p>
+          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+            <a href="/blog/how-to-save-money-every-month-india" className="text-primary hover:underline">How to save money every month</a>
+            <a href="/blog/how-to-protect-your-money-india" className="text-primary hover:underline">How to protect your money</a>
+            <a href="/blog/how-to-make-more-money-income-paths-india" className="text-primary hover:underline">How to make more money</a>
+          </div>
         </section>
 
         <section className="mt-12 rounded-xl border border-border bg-panel p-5">
