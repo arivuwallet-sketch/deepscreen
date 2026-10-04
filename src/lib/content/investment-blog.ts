@@ -1495,8 +1495,8 @@ export const INVESTMENT_BLOG_POSTS: BlogPost[] = [
         id: "sebi-book-building",
         title: "Book-building Process",
         publisher: "SEBI Investor",
-        date: "accessed October 2026",
-        href: "https://investor.sebi.gov.in/book_building.html",
+        date: "February 2025; accessed October 2026",
+        href: "https://investor.sebi.gov.in/pdf/reference-material/ppt/PPT-3%20How%20to%20invest%20in%20Intial%20Public%20Offer_%20Feb%202025.pdf",
       },
       {
         id: "nse-offer-docs",
