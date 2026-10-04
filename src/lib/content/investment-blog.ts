@@ -34,7 +34,7 @@ export type BlogFaq = {
 
 export type BlogPost = {
   slug: string;
-  category: "Mutual funds" | "ETFs" | "REITs";
+  category: "Mutual funds" | "ETFs" | "REITs" | "Commodities" | "GIFT Nifty" | "IPO";
   title: string;
   h1: string;
   description: string;
@@ -837,7 +837,696 @@ export const INVESTMENT_BLOG_POSTS: BlogPost[] = [
       { label: "DeepScreen data sources", href: "/data-sources" },
       { label: "ETF tracking error vs tracking difference", href: "/blog/etf-tracking-error-vs-tracking-difference" },
     ],
+  },,
+  {
+    slug: "how-to-read-commodity-prices-india",
+    category: "Commodities",
+    title: "How to Read Commodity Prices in India | DeepScreen",
+    h1: "How to read commodity prices without mixing up the benchmark",
+    description:
+      "Learn how to read gold, silver, crude oil, natural gas and copper prices using futures, contract month, currency, basis and Indian market context.",
+    excerpt:
+      "A commodity quote is only useful after you identify the exact benchmark, contract, unit and currency. This guide gives Indian investors a five-layer framework for translating global futures prices into usable market context.",
+    primaryKeyword: "how to read commodity prices",
+    secondaryKeywords: [
+      "commodity prices India",
+      "commodity futures vs spot price",
+      "gold price drivers",
+      "silver price drivers",
+      "crude oil price drivers",
+      "natural gas price drivers",
+      "copper price drivers",
+      "MCX vs COMEX",
+    ],
+    published: "2026-10-04",
+    updated: "2026-10-04",
+    readingMinutes: 10,
+    directAnswer:
+      "To read a commodity price correctly, first identify the exact benchmark, contract month, unit and currency. Then separate futures basis from spot value, translate the global benchmark into the relevant Indian currency and contract context, and only then compare it with a local market or retail price. A COMEX, WTI or Henry Hub quote is not automatically an Indian spot, MCX or retail price.",
+    uniqueAngle:
+      "The DeepScreen Commodity Translation Stack separates five layers that are often mixed together: global benchmark, futures basis, currency, Indian market specification and local/retail basis.",
+    keyTakeaways: [
+      "A commodity name is not enough; identify the benchmark, expiry, unit and currency.",
+      "Spot and futures prices can differ even when both are correct.",
+      "Global futures benchmarks need currency and local-basis context before being compared with Indian prices.",
+      "Gold, silver, crude oil, natural gas and copper do not share one universal price driver.",
+      "Commodity derivatives are used for price discovery and hedging, but futures are leveraged and can create losses quickly.",
+    ],
+    sections: [
+      {
+        id: "identify-the-number",
+        heading: "Step 1: identify exactly what the commodity quote represents",
+        answer:
+          "Before interpreting direction, identify the instrument, exchange, contract month, unit, currency and timestamp.",
+        paragraphs: [
+          {
+            text:
+              "SEBI defines commodities as tangible goods or materials that can be bought and sold, and lists gold, crude oil, copper and natural gas among common examples. Commodity derivatives are standardized exchange-traded contracts linked to those underlying goods.",
+            sources: ["sebi-commodity-faq"],
+          },
+          {
+            text:
+              "A quote labelled only 'gold' or 'crude oil' is incomplete. Gold can mean a COMEX futures contract, an MCX contract, an Indian spot rate or a jewellery retail quote. Crude can mean WTI, Brent or another grade. The same commodity can therefore have several valid prices at the same time.",
+          },
+        ],
+        table: {
+          caption: "The minimum information DeepScreen checks before comparing commodity prices",
+          headers: ["Field", "Question to answer", "Why it matters"],
+          rows: [
+            ["Benchmark", "Which exchange/index/grade?", "Different benchmarks reflect different delivery locations and specifications"],
+            ["Contract", "Which expiry month?", "Near and far contracts can trade at different prices"],
+            ["Unit", "Ounce, barrel, MMBtu, pound, kilogram?", "A numerical price is meaningless without its unit"],
+            ["Currency", "USD, INR or another currency?", "FX can move the Indian price even when the global quote is flat"],
+            ["Timestamp", "When was the quote captured?", "Commodity markets can move materially between snapshots"],
+          ],
+        },
+      },
+      {
+        id: "spot-vs-futures",
+        heading: "Step 2: separate spot price from futures price",
+        answer:
+          "A spot price refers to near-immediate value; a futures price is for a standardized contract with a specified future expiry.",
+        paragraphs: [
+          {
+            text:
+              "SEBI's commodity-derivatives education distinguishes the physical/spot market from futures contracts traded on recognized exchanges. Futures help market participants discover prices for future dates and manage price risk.",
+            sources: ["sebi-commodity-faq", "sebi-financial-booklet"],
+          },
+          {
+            text:
+              "The difference between spot and futures is often called the basis. Financing, storage, insurance, expected availability, seasonality and time to expiry can all influence it. That is why subtracting one market's spot price from another market's futures price can create a false signal.",
+          },
+        ],
+      },
+      {
+        id: "translation-stack",
+        heading: "The DeepScreen Commodity Translation Stack",
+        answer:
+          "Translate a benchmark through five layers before deciding what it means for an Indian investor, company or consumer.",
+        table: {
+          caption: "DeepScreen Commodity Translation Stack",
+          headers: ["Layer", "What to check", "Typical mistake"],
+          rows: [
+            ["1. Global benchmark", "COMEX, WTI, Henry Hub or other named reference", "Calling every gold/oil quote the same price"],
+            ["2. Futures basis", "Expiry, curve and spot-versus-futures relationship", "Comparing a far-month future with today's local cash price"],
+            ["3. Currency", "USD/INR and quote currency", "Ignoring a rupee move when global price is unchanged"],
+            ["4. Indian market specification", "MCX/local contract unit, quality, location and settlement", "Assuming global contract specs equal Indian specs"],
+            ["5. Local or retail basis", "Freight, taxes, premiums, dealer margin or local shortage", "Expecting a benchmark future to equal a jewellery, fuel or factory invoice"],
+          ],
+        },
+        paragraphs: [
+          {
+            text:
+              "The stack is a comparison framework, not a pricing formula. The final local price depends on the product and market. Its purpose is to stop an apples-to-oranges comparison before it becomes an investment conclusion.",
+          },
+        ],
+      },
+      {
+        id: "precious-metals",
+        heading: "What usually moves gold and silver?",
+        answer:
+          "Gold and silver share precious-metal demand, but silver also has a stronger industrial-demand component, so their drivers can diverge.",
+        paragraphs: [
+          {
+            text:
+              "For both metals, global supply and demand, currency conditions, interest-rate expectations and investor positioning can matter. Silver can react more strongly to changes in manufacturing demand because it is also used in industrial applications.",
+          },
+          {
+            text:
+              "For an Indian investor, add the rupee-dollar rate and local market basis before translating a dollar-denominated futures move into an Indian price conclusion.",
+          },
+        ],
+      },
+      {
+        id: "energy",
+        heading: "What usually moves crude oil and natural gas?",
+        answer:
+          "Energy prices are shaped by supply, demand, inventories, weather, production, transport constraints and geopolitical events, but the importance of each driver changes over time.",
+        paragraphs: [
+          {
+            text:
+              "SEBI's investor booklet notes that commodity prices can be affected by political and regulatory changes, seasonal variation, weather, technology and market conditions. Energy contracts make these differences visible because a disruption can be specific to one region or delivery system.",
+            sources: ["sebi-financial-booklet"],
+          },
+          {
+            text:
+              "WTI crude and Henry Hub natural gas are US benchmarks. They provide global context, but an Indian importer or consumer may face a different crude grade, freight cost, currency rate and local contract structure.",
+          },
+        ],
+      },
+      {
+        id: "copper",
+        heading: "What usually moves copper?",
+        answer:
+          "Copper responds to industrial demand and mine/refining supply, so it is often watched alongside construction, electrical infrastructure and manufacturing activity.",
+        paragraphs: [
+          {
+            text:
+              "Copper is useful as an economic context signal because it is a widely used industrial input, but the price can also move because of mine disruptions, inventories, currency or speculative positioning. It should not be treated as a single-variable GDP or stock-market forecast.",
+          },
+        ],
+      },
+      {
+        id: "hedging",
+        heading: "Why do producers and consumers use commodity derivatives?",
+        answer:
+          "The core economic use is price discovery and price-risk management, not merely speculation.",
+        paragraphs: [
+          {
+            text:
+              "SEBI's financial-education material explains that a producer exposed to falling prices and a consumer exposed to rising prices can use commodity derivatives to hedge adverse price moves. Recognized commodity exchanges also provide standardized execution and clearing arrangements.",
+            sources: ["sebi-financial-booklet", "sebi-commodity-faq"],
+          },
+        ],
+      },
+      {
+        id: "mistakes",
+        heading: "Common mistakes when reading commodity prices",
+        answer:
+          "Most errors come from comparing different instruments as if they were identical.",
+        bullets: [
+          "Comparing a futures price with a retail cash price without adjusting for contract and local basis.",
+          "Ignoring the expiry month when the market is rolling from one contract to the next.",
+          "Forgetting that a USD benchmark must be translated through the rupee for Indian context.",
+          "Treating one day's commodity move as proof that every related stock will move the same way.",
+          "Assuming a delayed or stale quote is current.",
+          "Trading leveraged futures before understanding contract size, margin, settlement and delivery rules.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "Why is MCX gold different from COMEX gold?",
+        a: "They are different market contracts with different currencies, contract specifications and local basis. COMEX gold is a US-dollar global benchmark; an Indian MCX price also reflects INR conversion and Indian contract conditions. Compare equivalent units and expiries before interpreting the difference.",
+      },
+      {
+        q: "Is a commodity futures price the same as the spot price?",
+        a: "No. A futures price belongs to a contract expiring on a future date. Spot refers to near-immediate market value. Financing, storage, availability and time to expiry can make futures trade above or below spot.",
+      },
+      {
+        q: "Why can Indian gold rise when international gold is flat?",
+        a: "The rupee can weaken against the US dollar, local premiums or taxes can change, or the compared contracts may differ. A flat dollar gold benchmark does not guarantee a flat Indian rupee price.",
+      },
+      {
+        q: "Are commodity futures suitable for beginners?",
+        a: "They require care because futures are leveraged, expire and have contract-specific settlement rules. A beginner should first understand the contract specification, margin and maximum tolerable loss before considering a position.",
+      },
+      {
+        q: "What is the purpose of commodity derivatives?",
+        a: "SEBI describes two core functions: price discovery and price-risk management. Producers, consumers and other market participants can use exchange-traded derivatives to hedge adverse changes in commodity prices.",
+      },
+    ],
+    sources: [
+      {
+        id: "sebi-commodity-faq",
+        title: "FAQs on Commodity Derivatives",
+        publisher: "Securities and Exchange Board of India (SEBI)",
+        date: "updated December 2023; accessed October 2026",
+        href: "https://www.sebi.gov.in/sebi_data/faqfiles/feb-2024/1706788568782.pdf",
+      },
+      {
+        id: "sebi-financial-booklet",
+        title: "Financial Education Booklet",
+        publisher: "SEBI Investor",
+        date: "accessed October 2026",
+        href: "https://investor.sebi.gov.in/pdf/downloadable-documents/Financial%20Education%20Booklet%20-%20English.pdf",
+      },
+      {
+        id: "sebi-commodity-learning",
+        title: "Investor Education Reading Material — Introduction to Commodity Derivatives Market",
+        publisher: "SEBI Investor",
+        date: "accessed October 2026",
+        href: "https://investor.sebi.gov.in/iematerial.html",
+      },
+    ],
+    relatedLinks: [
+      { label: "Live commodity benchmark page", href: "/commodities" },
+      { label: "Economic calendar", href: "/calendar" },
+      { label: "GIFT Nifty vs Nifty 50 opening signal", href: "/blog/gift-nifty-vs-nifty-50-opening-gap" },
+      { label: "DeepScreen data sources", href: "/data-sources" },
+    ],
   },
+  {
+    slug: "gift-nifty-vs-nifty-50-opening-gap",
+    category: "GIFT Nifty",
+    title: "GIFT Nifty vs Nifty 50: Opening Signal Guide | DeepScreen",
+    h1: "GIFT Nifty vs Nifty 50: how to read the pre-market signal",
+    description:
+      "Understand GIFT Nifty vs Nifty 50, NSE IX timings, futures basis, SGX Nifty transition and why the overnight move is not a guaranteed opening gap.",
+    excerpt:
+      "GIFT Nifty is useful because it trades when India's cash market is closed, but it is still a futures contract. This guide shows how to separate overnight sentiment from futures basis and avoid the most common opening-gap mistake.",
+    primaryKeyword: "GIFT Nifty vs Nifty 50",
+    secondaryKeywords: [
+      "GIFT Nifty opening gap",
+      "GIFT Nifty meaning",
+      "GIFT Nifty timings",
+      "GIFT Nifty vs SGX Nifty",
+      "NSE IX GIFT Nifty",
+      "GIFT Nifty pre market indicator",
+      "GIFT Nifty futures basis",
+    ],
+    published: "2026-10-04",
+    updated: "2026-10-04",
+    readingMinutes: 9,
+    directAnswer:
+      "GIFT Nifty and Nifty 50 are related but not identical. Nifty 50 is the underlying Indian equity index; GIFT Nifty is a US-dollar-denominated derivative traded on NSE IX in GIFT City. Its overnight move can indicate sentiment before the Indian open, but futures basis, expiry, timestamp and new domestic orders mean it cannot guarantee the Nifty 50 opening level.",
+    uniqueAngle:
+      "The DeepScreen Four-Reference Check forces every GIFT Nifty headline to identify contract, prior reference, timestamp and basis before converting an overnight move into an opening-gap narrative.",
+    keyTakeaways: [
+      "GIFT Nifty is a derivative linked to Nifty 50, not the Nifty 50 spot index itself.",
+      "The SGX Nifty derivatives business transitioned to NSE IX in GIFT City on 3 July 2023.",
+      "NSE IX publishes extended trading hours that cover much of the period when the Indian cash market is closed.",
+      "A futures move is an indicator of sentiment, not a guaranteed Nifty opening price.",
+      "The cleanest comparison uses a compatible contract/reference and checks basis, expiry and timestamp.",
+    ],
+    sections: [
+      {
+        id: "what-is-different",
+        heading: "GIFT Nifty vs Nifty 50: what is actually different?",
+        answer:
+          "Nifty 50 is the underlying cash index; GIFT Nifty is a derivative contract linked to it and traded on NSE IX.",
+        table: {
+          caption: "GIFT Nifty and Nifty 50 are related but different instruments",
+          headers: ["Feature", "GIFT Nifty", "Nifty 50"],
+          rows: [
+            ["Instrument", "Index derivative", "Cash-market equity index"],
+            ["Venue", "NSE International Exchange, GIFT City", "National Stock Exchange of India"],
+            ["Currency context", "NSE IX contracts are traded and settled in US dollars", "Index level represents INR-traded constituent shares"],
+            ["Expiry", "Derivative contracts have expiry", "The index itself does not expire"],
+            ["Main use in the morning", "Overnight sentiment / futures reference", "Underlying domestic market benchmark"],
+          ],
+        },
+        paragraphs: [
+          {
+            text:
+              "NSE IX's Connect FAQ states that the exchange offers Nifty-linked index futures and options, with contracts traded and settled in US dollars.",
+            sources: ["nseix-connect"],
+          },
+        ],
+      },
+      {
+        id: "sgx-transition",
+        heading: "What happened to SGX Nifty?",
+        answer:
+          "The offshore Nifty derivatives business historically associated with SGX Nifty transitioned to the NSE IFSC-SGX Connect structure in GIFT City.",
+        paragraphs: [
+          {
+            text:
+              "NSE IX states that GIFT Nifty trading under the Connect became effective from 3 July 2023. That is why current market commentary refers to GIFT Nifty rather than SGX Nifty for this offshore Nifty-linked flow.",
+            sources: ["nseix-connect"],
+          },
+        ],
+      },
+      {
+        id: "hours",
+        heading: "When does GIFT Nifty trade?",
+        answer:
+          "NSE IX provides extended hours that cover much of the global trading day, but the current exchange timetable should be treated as authoritative.",
+        paragraphs: [
+          {
+            text:
+              "The NSE IX Connect FAQ states that market timings run from 06:30 a.m. to 02:45 a.m. the next day in Indian Standard Time and directs users to the exchange's trading-hours page for product-level details.",
+            sources: ["nseix-connect", "nseix-hours"],
+          },
+          {
+            text:
+              "That extended window is why GIFT Nifty can react to global events after the domestic NSE cash market has closed and before it reopens.",
+          },
+        ],
+      },
+      {
+        id: "four-reference-check",
+        heading: "The DeepScreen Four-Reference Check for an opening-gap headline",
+        answer:
+          "Before calling a move a 'gap-up' or 'gap-down' signal, identify four references so you know what is being compared.",
+        table: {
+          caption: "DeepScreen Four-Reference Check",
+          headers: ["Check", "Question", "What goes wrong if ignored"],
+          rows: [
+            ["1. Contract", "Which GIFT Nifty expiry?", "Near and next month can trade at different levels"],
+            ["2. Prior reference", "Prior close of the same contract, domestic future or Nifty spot?", "Mixed references can manufacture a false gap"],
+            ["3. Timestamp", "When was the quote captured?", "A stale print can miss new overnight information"],
+            ["4. Basis", "How far is futures from spot for carry/expiry reasons?", "Basis can be mistaken for market direction"],
+          ],
+        },
+      },
+      {
+        id: "basis",
+        heading: "Why can GIFT Nifty and Nifty 50 show different levels?",
+        answer:
+          "Futures and spot are different instruments, so a price difference can exist even when markets are behaving normally.",
+        paragraphs: [
+          {
+            text:
+              "The futures level can reflect financing/carry, expected dividends, time to expiry and market positioning. The gap typically changes as the contract moves toward expiry. This is why the current GIFT Nifty level should not be treated as a one-for-one prediction of the cash index.",
+          },
+        ],
+      },
+      {
+        id: "worked-example",
+        heading: "Worked example: sentiment signal versus exact opening forecast",
+        answer:
+          "A hypothetical positive overnight futures move can be directionally useful without being an exact Nifty opening prediction.",
+        table: {
+          caption: "Illustrative numbers only — not a market forecast",
+          headers: ["Reference", "Illustrative level", "Interpretation"],
+          rows: [
+            ["GIFT Nifty prior close", "25,000", "Same-contract reference"],
+            ["GIFT Nifty current", "25,120", "+120 points versus its own prior close"],
+            ["Previous Nifty 50 spot close", "24,980", "Different instrument"],
+            ["Naive subtraction", "+140", "Mixes current future with previous spot and includes basis"],
+          ],
+        },
+        paragraphs: [
+          {
+            text:
+              "The more defensible statement is that the futures contract is up 120 points from its own prior close. Calling the cash market's exact opening '+140' assumes the basis is irrelevant and that nothing changes in the domestic pre-open process.",
+          },
+        ],
+      },
+      {
+        id: "drivers",
+        heading: "What can move GIFT Nifty while India is closed?",
+        answer:
+          "Any new information that changes expectations for Indian equities can move the contract.",
+        bullets: [
+          "Large moves in US, European or Asian equity markets.",
+          "Central-bank decisions and changes in interest-rate expectations.",
+          "Currency and bond-market moves.",
+          "Geopolitical events or commodity shocks that affect India-sensitive sectors.",
+          "Company or sector news affecting large Nifty constituents.",
+          "Positioning and liquidity in the futures contract itself.",
+        ],
+      },
+      {
+        id: "mistakes",
+        heading: "Common GIFT Nifty interpretation mistakes",
+        answer:
+          "The most common error is treating a derivative signal as a guaranteed cash-market opening.",
+        bullets: [
+          "Comparing the current GIFT future with yesterday's Nifty spot close without checking basis.",
+          "Ignoring which contract month is active.",
+          "Quoting a price without a timestamp.",
+          "Using an old article's contract specification or market hours after an exchange change.",
+          "Assuming a positive GIFT Nifty session means every Indian stock or sector must open higher.",
+          "Confusing GIFT Nifty with domestic Nifty futures or the Nifty 50 index itself.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "Is GIFT Nifty the same as SGX Nifty?",
+        a: "GIFT Nifty is the successor to the offshore Nifty derivatives business historically associated with SGX Nifty. NSE IX states that the Connect's GIFT Nifty trading became effective on 3 July 2023.",
+      },
+      {
+        q: "Does GIFT Nifty accurately predict the Nifty opening?",
+        a: "It is useful as an overnight sentiment indicator, but it is not an exact prediction. Futures basis, expiry, new news and domestic pre-open orders can make the actual Nifty 50 opening different.",
+      },
+      {
+        q: "What time does GIFT Nifty trade?",
+        a: "NSE IX's Connect FAQ states 06:30 a.m. to 02:45 a.m. the next day IST, with product-specific timings maintained by the exchange. Always check the current NSE IX trading-hours page for changes and holidays.",
+      },
+      {
+        q: "Why is GIFT Nifty above or below Nifty 50?",
+        a: "Because GIFT Nifty is a futures contract, while Nifty 50 is the underlying spot index. Financing, expected dividends, time to expiry and positioning can create a normal futures basis.",
+      },
+      {
+        q: "Where should I check current GIFT Nifty contract information?",
+        a: "Use NSE International Exchange, or NSE IX, for current contract specifications, market timings and exchange information. DeepScreen avoids substituting a different Nifty quote for an exchange-verified GIFT Nifty contract.",
+      },
+    ],
+    sources: [
+      {
+        id: "nseix-connect",
+        title: "FAQs on NSE IX for Connect",
+        publisher: "NSE International Exchange (NSE IX)",
+        date: "accessed October 2026",
+        href: "https://www.nseix.com/nseixcms/sites/default/files/2024-04/FAQs%20on%20NSE%20IX%20for%20Connect.pdf",
+      },
+      {
+        id: "nseix-hours",
+        title: "Trading Hours",
+        publisher: "NSE International Exchange (NSE IX)",
+        date: "accessed October 2026",
+        href: "https://www.nseix.com/markets/trading/tradinghours",
+      },
+      {
+        id: "nseix-home",
+        title: "NSE IX",
+        publisher: "NSE International Exchange",
+        date: "accessed October 2026",
+        href: "https://www.nseix.com/",
+      },
+    ],
+    relatedLinks: [
+      { label: "GIFT Nifty explainer", href: "/gift-nifty" },
+      { label: "Commodity benchmarks", href: "/commodities" },
+      { label: "Economic calendar", href: "/calendar" },
+      { label: "DeepScreen data sources", href: "/data-sources" },
+    ],
+  },
+  {
+    slug: "ipo-gmp-vs-listing-price-reliability",
+    category: "IPO",
+    title: "IPO GMP vs Listing Price: Reliability & Risks | DeepScreen",
+    h1: "IPO GMP vs listing price: what grey market premium can really tell you",
+    description:
+      "Learn IPO GMP meaning, formula and limits; compare GMP with official subscription and offer documents, and use a six-check framework before an IPO decision.",
+    excerpt:
+      "GMP can summarize informal sentiment, but it is not an exchange price or a listing forecast. This guide separates the arithmetic from the evidence that actually belongs in an IPO research decision.",
+    primaryKeyword: "IPO GMP vs listing price",
+    secondaryKeywords: [
+      "IPO GMP reliability",
+      "IPO grey market premium",
+      "GMP meaning IPO",
+      "IPO GMP calculation",
+      "negative GMP",
+      "IPO GMP vs subscription",
+      "IPO listing price",
+      "IPO research India",
+    ],
+    published: "2026-10-04",
+    updated: "2026-10-04",
+    readingMinutes: 11,
+    directAnswer:
+      "IPO GMP is an unofficial grey-market indication, not an NSE, BSE or SEBI price series and not a guaranteed listing price. The formula issue price + GMP is only arithmetic. For an investment decision, official offer documents, the business, risk factors, use of proceeds, valuation and subscription data deserve more weight than an informal premium.",
+    uniqueAngle:
+      "The DeepScreen IPO Evidence Ladder ranks information by verifiability: offer document and exchange data first, business/valuation analysis next, subscription context after that, and GMP only as an unofficial sentiment layer.",
+    keyTakeaways: [
+      "GMP is an unofficial sentiment indication; the actual listing price forms in the regulated market.",
+      "Issue price + GMP is a calculation, not a forecast model.",
+      "Official subscription status and GMP are different data types and should not be mixed.",
+      "A high GMP does not prove the IPO is fairly valued or that allotment is likely.",
+      "Read the RHP/offer document, use of proceeds, risk factors and valuation before treating listing-day sentiment as meaningful.",
+    ],
+    sections: [
+      {
+        id: "what-is-gmp",
+        heading: "What does IPO GMP mean?",
+        answer:
+          "Grey market premium is the informal premium or discount quoted outside the exchange before an IPO lists.",
+        paragraphs: [
+          {
+            text:
+              "DeepScreen treats GMP as an unofficial sentiment input. It is not the issue price, not an exchange order-book price and not a valuation of the company. Official IPO terms are documented in the issuer's prospectus/RHP and exchange public-issue material.",
+            sources: ["sebi-ipo-material", "nse-offer-docs"],
+          },
+        ],
+      },
+      {
+        id: "formula",
+        heading: "How is IPO GMP calculated?",
+        answer:
+          "The common calculation adds the quoted premium to the issue price and expresses the premium as a percentage of the issue price.",
+        table: {
+          caption: "Illustrative GMP arithmetic — not a listing-price forecast",
+          headers: ["Input", "Example", "Calculation"],
+          rows: [
+            ["IPO issue price", "₹500", "Official issue price"],
+            ["Unofficial quoted GMP", "₹75", "Informal input"],
+            ["Indicative arithmetic price", "₹575", "₹500 + ₹75"],
+            ["GMP percentage", "15%", "₹75 ÷ ₹500 × 100"],
+          ],
+        },
+        paragraphs: [
+          {
+            text:
+              "The math is deterministic; the listing is not. A ₹75 GMP on a ₹500 issue does not create a contractual or exchange-backed right to a ₹575 listing price.",
+          },
+        ],
+      },
+      {
+        id: "evidence-ladder",
+        heading: "The DeepScreen IPO Evidence Ladder",
+        answer:
+          "Rank IPO information by how directly it can be verified before you let a fast-moving sentiment number influence the decision.",
+        table: {
+          caption: "DeepScreen IPO Evidence Ladder",
+          headers: ["Level", "Evidence", "How to use it"],
+          rows: [
+            ["1. Offer document", "RHP/prospectus, audited financials, risk factors, issue structure", "Primary basis for understanding the company and offer"],
+            ["2. Official issue data", "Price band, lot, dates, subscription, exchange notices", "Verify the mechanics and actual demand"],
+            ["3. Fundamental analysis", "Growth, margins, cash flow, debt, peer valuation, use of proceeds", "Judge business quality and price"],
+            ["4. Market context", "Index, sector, rates, liquidity, comparable listings", "Understand the environment"],
+            ["5. GMP", "Unofficial grey-market premium/discount", "Treat only as a sentiment observation, not as a target price"],
+          ],
+        },
+      },
+      {
+        id: "official-vs-unofficial",
+        heading: "What is official IPO data and what is not?",
+        answer:
+          "Offer documents, exchange notices and the regulated book-building process are official; GMP is not an official exchange series.",
+        paragraphs: [
+          {
+            text:
+              "SEBI's book-building education explains that investors bid within a price band and that the Red Herring Prospectus is issued before the IPO opens. NSE publishes public-offer documents and other issue information that can be independently checked.",
+            sources: ["sebi-book-building", "nse-offer-docs"],
+          },
+          {
+            text:
+              "DeepScreen therefore keeps GMP separate from official subscription and offer-document data. Combining them into one 'confidence score' would imply a level of verification that the grey-market input does not have.",
+          },
+        ],
+      },
+      {
+        id: "gmp-vs-subscription",
+        heading: "IPO GMP vs subscription status: what is the difference?",
+        answer:
+          "Subscription measures bids received in the regulated IPO process; GMP is an informal price indication outside that process.",
+        paragraphs: [
+          {
+            text:
+              "Strong subscription can show demand for the offered shares, but it does not prove that the issue is cheap or that the listing will rise. Likewise, a high GMP can reflect excitement without explaining the company's debt, cash flow, valuation or use of proceeds.",
+          },
+        ],
+      },
+      {
+        id: "why-gmp-can-fail",
+        heading: "Why can GMP and the actual listing price diverge?",
+        answer:
+          "The listing price is formed later, with different participants and potentially different information.",
+        bullets: [
+          "The broader market can move sharply between the grey-market quote and listing day.",
+          "Institutional and retail demand can differ from informal sentiment.",
+          "The final issue price or allocation mix can change the setup.",
+          "New company, sector, regulatory or macro news can arrive before listing.",
+          "The quoted GMP can vary between informal sources because there is no single official consolidated order book.",
+          "A small, illiquid informal market can give a noisy signal.",
+        ],
+      },
+      {
+        id: "six-check",
+        heading: "A six-check IPO research process before you look at GMP",
+        answer:
+          "Start with the company and offer, then use market sentiment only as a final context layer.",
+        bullets: [
+          "Business: explain in one paragraph how the company makes money and what can disrupt that model.",
+          "Financials: check multi-year revenue, profit, cash flow, margins and debt rather than one headline growth rate.",
+          "Issue structure: separate fresh issue from offer for sale and understand where new capital will go.",
+          "Valuation: compare the IPO valuation with relevant listed peers using like-for-like measures.",
+          "Risk factors: read the RHP sections on customer concentration, litigation, regulation, related parties and working-capital needs.",
+          "Official demand: check exchange subscription data by category, then look at GMP only as an unofficial sentiment observation.",
+        ],
+      },
+      {
+        id: "sebi-hype",
+        heading: "Why listing-day hype is a poor substitute for IPO research",
+        answer:
+          "Short-term excitement can disappear quickly, while the valuation and business risks remain.",
+        paragraphs: [
+          {
+            text:
+              "SEBI Investor's current education library includes IPO modules warning investors not to let FOMO or listing-day hype drive an IPO decision. Its broader guidance directs investors to study the offer document and understand the issue before subscribing.",
+            sources: ["sebi-ipo-material", "sebi-video-learning"],
+          },
+        ],
+      },
+      {
+        id: "mistakes",
+        heading: "Common IPO GMP mistakes",
+        answer:
+          "The biggest mistake is turning an unofficial sentiment number into a promise.",
+        bullets: [
+          "Calling issue price plus GMP an 'expected listing price' without a clear unofficial/illustrative label.",
+          "Assuming high GMP means high allotment probability.",
+          "Using a GMP screenshot without a timestamp.",
+          "Ignoring the RHP because subscription or GMP is strong.",
+          "Comparing GMP percentages across IPOs without considering issue size, liquidity and market conditions.",
+          "Treating a GMP source as if it were NSE, BSE or SEBI data.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "Is IPO GMP an official price?",
+        a: "No. GMP is an unofficial off-exchange indication. Official IPO information comes from the issuer's offer documents, SEBI filings and stock-exchange public-issue data.",
+      },
+      {
+        q: "Does high GMP guarantee listing gains?",
+        a: "No. GMP can reflect sentiment, but the actual listing price forms later in the regulated market and can be affected by valuation, demand, market conditions and new information.",
+      },
+      {
+        q: "Can IPO GMP be negative?",
+        a: "Yes. A negative GMP means the informal indication is below the issue price. It signals weak grey-market sentiment, not a guaranteed discounted listing.",
+      },
+      {
+        q: "Is IPO subscription the same as GMP?",
+        a: "No. Subscription status is based on bids in the official IPO process. GMP is an unofficial grey-market quote. They can move together, but one does not validate the other.",
+      },
+      {
+        q: "What should I read before applying for an IPO?",
+        a: "Start with the RHP or prospectus, especially the business model, risk factors, financial statements, use of proceeds, issue structure and peer valuation. Then verify price band, dates and subscription through official exchange sources.",
+      },
+      {
+        q: "Why does DeepScreen not show a live scraped GMP table?",
+        a: "There is no official consolidated GMP feed to verify against an exchange order book. DeepScreen keeps the calculator and education separate from official IPO data rather than presenting an unverifiable quote as if it were regulated market data.",
+      },
+    ],
+    sources: [
+      {
+        id: "sebi-ipo-material",
+        title: "Investor Education Reading Material — How to invest in Initial Public Offer",
+        publisher: "SEBI Investor",
+        date: "accessed October 2026",
+        href: "https://investor.sebi.gov.in/iematerial.html",
+      },
+      {
+        id: "sebi-book-building",
+        title: "Book-building Process",
+        publisher: "SEBI Investor",
+        date: "February 2025; accessed October 2026",
+        href: "https://investor.sebi.gov.in/pdf/reference-material/ppt/PPT-3%20How%20to%20invest%20in%20Intial%20Public%20Offer_%20Feb%202025.pdf",
+      },
+      {
+        id: "nse-offer-docs",
+        title: "Public Offer Documents",
+        publisher: "National Stock Exchange of India",
+        date: "accessed October 2026",
+        href: "https://www.nseindia.com/static/products-services/public-offer-documents",
+      },
+      {
+        id: "nse-investor-education",
+        title: "Investor Educational Material",
+        publisher: "National Stock Exchange of India",
+        date: "accessed October 2026",
+        href: "https://www.nseindia.com/static/invest/how-to-invest-in-capital-market",
+      },
+      {
+        id: "sebi-video-learning",
+        title: "Video Based Learning Modules — IPO investor education",
+        publisher: "SEBI Investor",
+        date: "accessed October 2026",
+        href: "https://investor.sebi.gov.in/inv_aware_edu_videos.html",
+      },
+    ],
+    relatedLinks: [
+      { label: "IPO GMP calculator and explainer", href: "/ipo-gmp" },
+      { label: "DeepScreen IPO calendar", href: "/ipo" },
+      { label: "GIFT Nifty pre-market guide", href: "/gift-nifty" },
+      { label: "DeepScreen data sources", href: "/data-sources" },
+    ],
+  }
 ];
 
 const BLOG_BY_SLUG = new Map(INVESTMENT_BLOG_POSTS.map((post) => [post.slug, post]));
