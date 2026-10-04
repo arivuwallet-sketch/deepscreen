@@ -17,6 +17,9 @@ const NAV_ITEMS: Array<readonly [string, string]> = [
   ["/calendar", "Calendar"],
   ["/options", "Options"],
   ["/ipo", "IPO"],
+  ["/commodities", "Commodities"],
+  ["/gift-nifty", "Gift Nifty"],
+  ["/ipo-gmp", "IPO GMP"],
   ["/learn", "Learn"],
   ["/ratios", "Ratios"],
   ["/compare", "Compare"],
@@ -152,6 +155,9 @@ export function Shell({ children }: { children: ReactNode }) {
           </Link>
         </div>
         <nav className="safe-area-x mb-3 flex flex-wrap justify-center gap-x-4 gap-y-2">
+          <Link to="/commodities" className="hover:text-foreground">Commodities</Link>
+          <Link to="/gift-nifty" className="hover:text-foreground">Gift Nifty</Link>
+          <Link to="/ipo-gmp" className="hover:text-foreground">IPO GMP</Link>
           <Link to="/stock-filters" className="hover:text-foreground">
             Stock Filters
           </Link>
