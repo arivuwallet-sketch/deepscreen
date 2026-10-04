@@ -1,16 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
 import { AnswerList } from "@/components/ds/AnswerList";
-import { ANSWERS, ANSWERS_REVIEWED } from "@/lib/discovery/answers";
+import { ANSWER_GROUPS, ANSWERS, ANSWERS_REVIEWED } from "@/lib/discovery/answers";
 import { resourceHead } from "@/lib/seo/discovery";
 
 export const Route = createFileRoute("/answers")({
   staticData: { sitemap: true },
   head: () => resourceHead(
     "/answers",
-    "Stock Research Questions & Answers | DeepScreen",
-    "Clear answers about stock research, fundamental analysis and DeepScreen market coverage.",
-    ["stock research questions", "stock research", "fundamental analysis", "fundamental analysis answers", "how to research a stock", "stock analysis explained", "financial ratios explained", "stock screener", "DeepScreen FAQ"],
+    "DeepScreen & Stock Market FAQ: 38 Questions Answered",
+    "Clear answers about DeepScreen, stock-market basics, fundamental analysis, valuation, financial ratios, stock screening and investment research.",
+    ["DeepScreen FAQ", "stock market questions and answers", "stock market FAQ", "fundamental analysis questions", "stock analysis explained", "financial ratios explained", "stock screener questions", "how to research a stock", "P/E ratio", "ROE", "ROCE", "DCF valuation"],
     ANSWERS,
   ),
   component: Answers,
@@ -21,13 +21,34 @@ function Answers() {
     <Shell>
       <article className="mx-auto max-w-5xl space-y-8 px-4 py-10">
         <header>
-          <p className="text-sm text-primary">Research help</p>
-          <h1 className="mt-2 text-3xl font-bold">Stock research questions, answered</h1>
-          <p className="mt-4 text-muted-foreground">Start with a concise answer, then follow the linked methodology or checklist.</p>
-          <p className="mt-3 text-xs text-muted-foreground">DeepScreen editorial team · Reviewed <time dateTime={ANSWERS_REVIEWED}>18 September 2026</time></p>
+          <p className="text-sm text-primary">DeepScreen knowledge hub</p>
+          <h1 className="mt-2 text-3xl font-bold">DeepScreen and stock market questions, answered</h1>
+          <p className="mt-4 max-w-4xl text-muted-foreground">
+            Concise, self-contained answers about DeepScreen, stock-market basics, fundamental analysis,
+            valuation, financial ratios and stock-research decisions. Each answer links to a deeper
+            guide, methodology page or research tool when more context is useful.
+          </p>
+          <p className="mt-3 text-xs text-muted-foreground">DeepScreen editorial team · Reviewed <time dateTime={ANSWERS_REVIEWED}>4 October 2026</time></p>
         </header>
-        <h2 className="text-xl font-semibold">Using DeepScreen and researching companies</h2>
-        <AnswerList answers={ANSWERS} />
+
+        <nav className="rounded-lg border border-border bg-panel p-5" aria-label="Questions and answers topics">
+          <h2 className="font-semibold">Browse Q&amp;A topics</h2>
+          <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+            {ANSWER_GROUPS.map((group) => (
+              <a key={group.id} href={"#" + group.id} className="text-primary hover:underline">{group.title}</a>
+            ))}
+          </div>
+        </nav>
+
+        {ANSWER_GROUPS.map((group) => (
+          <section key={group.id} id={group.id} className="scroll-mt-32 border-t border-border pt-8" aria-labelledby={group.id + "-heading"}>
+            <h2 id={group.id + "-heading"} className="text-2xl font-semibold">{group.title}</h2>
+            <p className="mt-2 max-w-4xl text-sm leading-6 text-muted-foreground">{group.description}</p>
+            <div className="mt-5">
+              <AnswerList answers={group.answers} />
+            </div>
+          </section>
+        ))}
         <section className="rounded-lg border border-border bg-panel p-5">
           <h2 className="font-semibold">For search and AI answer systems</h2>
           <p className="mt-2 text-sm text-muted-foreground">
