@@ -54,6 +54,16 @@ function Answers() {
         </section>
 
         <section className="rounded-lg border border-border p-5">
+          <h2 className="font-semibold">Personal finance: save, protect and make more money</h2>
+          <p className="mt-2 text-sm text-muted-foreground">DeepScreen's personal-finance series covers cash-flow discipline, financial protection and the major ways income and wealth can be expanded without treating stock trading as the only path.</p>
+          <div className="mt-3 flex flex-wrap gap-5 text-sm text-primary">
+            <a href="/blog/how-to-save-money-every-month-india">Save money</a>
+            <a href="/blog/how-to-protect-your-money-india">Protect money</a>
+            <a href="/blog/how-to-make-more-money-income-paths-india">Make more money</a>
+          </div>
+        </section>
+
+        <section className="rounded-lg border border-border p-5">
           <h2 className="font-semibold">Commodities, GIFT Nifty and IPO GMP answers</h2>
           <p className="mt-2 text-sm text-muted-foreground">DeepScreen publishes visible Q&amp;A for commodity benchmarks, GIFT Nifty interpretation and the limits of unofficial IPO grey market premium.</p>
           <div className="mt-3 flex flex-wrap gap-5 text-sm text-primary">
