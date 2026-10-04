@@ -41,11 +41,13 @@ export function LiveNewsFeed({
   query,
   title,
   limit = 12,
+  maxAgeHours,
   className,
 }: {
   query: string;
   title: string;
   limit?: number;
+  maxAgeHours?: number;
   className?: string;
 }) {
   const fetchNews = useServerFn(getNewsFeed);
@@ -55,24 +57,31 @@ export function LiveNewsFeed({
     refetchInterval: 60_000,
     staleTime: 30_000,
   });
+  const now = Date.now();
+  const items = maxAgeHours === undefined
+    ? data?.items ?? []
+    : (data?.items ?? []).filter((item) => {
+        const published = Date.parse(item.publishedAt);
+        return Number.isFinite(published) && published <= now + 10 * 60_000 && published >= now - maxAgeHours * 60 * 60_000;
+      });
 
   return (
     <section className={cn("rounded-lg border border-border bg-panel", className)}>
       <header className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
         <h2 className="text-sm font-semibold uppercase tracking-wide">{title}</h2>
         <span className="num flex items-center gap-1.5 text-xs text-muted-foreground">
-          <span className={cn("size-1.5 rounded-full", data?.stale ? "bg-warn" : "animate-pulse bg-bull")} />
+          <span className={cn("size-1.5 rounded-full", data?.stale || !items.length ? "bg-warn" : "animate-pulse bg-bull")} />
           {data?.stale
             ? `LAST GOOD · ${new Date(data.fetchedAt).toLocaleTimeString()}`
             : dataUpdatedAt
               ? new Date(data?.fetchedAt ?? dataUpdatedAt).toLocaleTimeString()
-              : "LIVE"}
+              : "UPDATING"}
         </span>
       </header>
       {isLoading ? (
         <p className="px-4 py-6 text-sm text-muted-foreground">Loading live headlines…</p>
       ) : (
-        <FeedList items={data?.items ?? []} empty="No headlines available right now." />
+        <FeedList items={items} empty={maxAgeHours === undefined ? "No headlines available right now." : `No verified publication times within the last ${maxAgeHours} hours.`} />
       )}
     </section>
   );

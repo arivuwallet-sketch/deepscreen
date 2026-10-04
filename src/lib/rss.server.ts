@@ -61,7 +61,8 @@ export async function fetchFeed(
         title,
         link,
         source: tag(block, "source") || source,
-        publishedAt: Number.isFinite(ts) ? new Date(ts).toISOString() : new Date().toISOString(),
+        // An undated story must not be presented as freshly published.
+        publishedAt: Number.isFinite(ts) ? new Date(ts).toISOString() : "",
         minutesAgo: Number.isFinite(ts) ? Math.max(0, Math.round((now - ts) / 60000)) : 0,
         category,
       });
@@ -114,14 +115,14 @@ export async function fetchYahooNews(query: string, limit = 12): Promise<FeedIte
       if (!item.title || !item.link) return [];
       const publishedMs = item.providerPublishTime
         ? item.providerPublishTime * 1000
-        : now;
+        : NaN;
       return [{
         id: item.uuid ?? `Yahoo-${index}-${item.title.slice(0, 40)}`,
         title: item.title,
         link: item.link,
         source: item.publisher ?? "Yahoo Finance",
-        publishedAt: new Date(publishedMs).toISOString(),
-        minutesAgo: Math.max(0, Math.round((now - publishedMs) / 60000)),
+        publishedAt: Number.isFinite(publishedMs) ? new Date(publishedMs).toISOString() : "",
+        minutesAgo: Number.isFinite(publishedMs) ? Math.max(0, Math.round((now - publishedMs) / 60000)) : 0,
         category: "market",
       }];
     });
