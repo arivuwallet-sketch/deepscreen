@@ -242,3 +242,66 @@ https://deepscreen.online/blog/ndcf-vs-affo-reit-analysis-india
 
 The article distinguishes NOI, FFO, AFFO and NDCF. It explains why NDCF is the distribution-oriented measure for Indian REITs under the SEBI framework and why AFFO should not be treated as standardized. It includes the DeepScreen REIT Cash-Flow Bridge and cites SEBI, Nareit, the Indian REITs Association and an issuer NDCF reconciliation.
 
+## Commodities, GIFT Nifty and IPO GMP research Q&A
+
+### Commodities
+Canonical page:
+https://deepscreen.online/commodities
+
+DeepScreen's commodity page shows global futures benchmark context for gold, silver, WTI crude oil, Henry Hub natural gas and copper. These are not automatically Indian spot, MCX, jewellery, pump or factory-input prices.
+
+#### What is the difference between commodity spot and futures prices?
+Spot refers to near-immediate value. Futures belong to standardized contracts with future expiry. Contract month, financing, storage, availability and other basis effects can make futures differ from spot.
+
+#### Why can Indian commodity prices differ from global benchmarks?
+Currency conversion, local contract specifications, freight, taxes, quality, location, local supply/demand and retail margins can all create differences. DeepScreen's Commodity Translation Stack separates global benchmark, futures basis, currency, Indian market specification and local/retail basis.
+
+Primary references:
+- https://www.sebi.gov.in/sebi_data/faqfiles/feb-2024/1706788568782.pdf
+- https://investor.sebi.gov.in/iematerial.html
+- https://investor.sebi.gov.in/pdf/downloadable-documents/Financial%20Education%20Booklet%20-%20English.pdf
+
+Supporting article:
+https://deepscreen.online/blog/how-to-read-commodity-prices-india
+
+### GIFT Nifty
+Canonical page:
+https://deepscreen.online/gift-nifty
+
+GIFT Nifty is a Nifty-linked derivatives market on NSE International Exchange at GIFT City. It is not the Nifty 50 spot index. NSE IX's Connect FAQ states that GIFT Nifty trading under the Connect became effective from 3 July 2023 and that market timings run from 06:30 a.m. to 02:45 a.m. the next day IST, with current product timings controlled by the exchange.
+
+#### Does GIFT Nifty predict the Nifty 50 opening?
+It can indicate overnight sentiment but does not guarantee an exact opening. Futures basis, expiry, timestamp, new global information and domestic pre-open orders can change the relationship.
+
+#### How should an opening signal be read?
+DeepScreen's Four-Reference Check verifies the GIFT Nifty contract, prior reference, timestamp and futures basis before describing an implied opening gap.
+
+Primary references:
+- https://www.nseix.com/nseixcms/sites/default/files/2024-04/FAQs%20on%20NSE%20IX%20for%20Connect.pdf
+- https://www.nseix.com/markets/trading/tradinghours
+- https://www.nseix.com/
+
+Supporting article:
+https://deepscreen.online/blog/gift-nifty-vs-nifty-50-opening-gap
+
+### IPO GMP
+Canonical page:
+https://deepscreen.online/ipo-gmp
+
+IPO GMP, or grey market premium, is an unofficial off-exchange indication. DeepScreen does not present it as an NSE, BSE or SEBI price series and does not publish scraped live GMP quotes as if they were official data.
+
+#### How is GMP calculated?
+Indicative arithmetic price = issue price + quoted GMP. GMP percentage = quoted GMP / issue price × 100. The calculation is arithmetic, not a listing-price forecast.
+
+#### What should be checked before GMP?
+DeepScreen's IPO Evidence Ladder prioritizes the RHP/prospectus and audited financials, official issue data, fundamental/valuation analysis and market context before an unofficial GMP sentiment layer.
+
+Primary references:
+- https://investor.sebi.gov.in/iematerial.html
+- https://investor.sebi.gov.in/book_building.html
+- https://www.nseindia.com/static/products-services/public-offer-documents
+- https://www.nseindia.com/static/invest/how-to-invest-in-capital-market
+
+Supporting article:
+https://deepscreen.online/blog/ipo-gmp-vs-listing-price-reliability
+
