@@ -3,8 +3,8 @@ import { Shell } from "@/components/ds/Shell";
 import { INVESTMENT_BLOG_POSTS } from "@/lib/content/investment-blog";
 import { buildBreadcrumbSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 
-const title = "Investment Research: Mutual Funds, ETFs & REITs | DeepScreen";
-const description = "DeepScreen research guides for mutual funds, ETFs and REITs, with primary sources, worked examples and practical analysis frameworks.";
+const title = "Market & Investment Research Blog | DeepScreen";
+const description = "DeepScreen research on mutual funds, ETFs, REITs, commodities, GIFT Nifty and IPO GMP, with primary sources, worked examples and original analysis frameworks.";
 const url = "https://deepscreen.online/blog";
 
 export const Route = createFileRoute("/blog/")({
@@ -37,7 +37,7 @@ export const Route = createFileRoute("/blog/")({
         {
           "@type": "ItemList",
           "@id": url + "#articles",
-          name: "DeepScreen investment research articles",
+          name: "DeepScreen market and investment research articles",
           itemListElement: INVESTMENT_BLOG_POSTS.map((post, index) => ({
             "@type": "ListItem",
             position: index + 1,
@@ -57,9 +57,9 @@ function BlogIndex() {
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
         <header className="max-w-4xl">
           <p className="text-xs font-semibold uppercase tracking-wide text-primary">DeepScreen research</p>
-          <h1 className="mt-3 text-3xl font-bold sm:text-4xl">Investment research blog</h1>
+          <h1 className="mt-3 text-3xl font-bold sm:text-4xl">Market and investment research blog</h1>
           <p className="mt-4 text-base leading-7 text-muted-foreground">
-            Original, source-backed guides for mutual funds, ETFs and REITs. Each article answers the search question first, shows the calculation or framework behind it, states the limits, and links to primary sources.
+            Original, source-backed guides for mutual funds, ETFs, REITs, commodities, GIFT Nifty and IPO research. Each article answers the search question first, shows the calculation or framework behind it, states the limits, and links to primary sources.
           </p>
         </header>
 
@@ -74,7 +74,7 @@ function BlogIndex() {
               </h2>
               <p className="mt-3 flex-1 text-sm leading-6 text-muted-foreground">{post.excerpt}</p>
               <div className="mt-5 flex items-center justify-between gap-3 text-xs text-muted-foreground">
-                <time dateTime={post.published}>2 Oct 2026</time>
+                <time dateTime={post.published}>{new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(post.published + "T00:00:00Z"))}</time>
                 <span>{post.readingMinutes} min read</span>
               </div>
               <Link to="/blog/$slug" params={{ slug: post.slug }} className="mt-4 text-sm font-medium text-primary hover:underline">
@@ -85,15 +85,18 @@ function BlogIndex() {
         </section>
 
         <section className="mt-12 rounded-xl border border-border bg-panel p-5">
-          <h2 className="text-lg font-semibold">Explore the investment research tools</h2>
+          <h2 className="text-lg font-semibold">Explore DeepScreen research tools and market guides</h2>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            The blog explains the concepts. DeepScreen's investment directory applies type-specific mutual-fund, ETF and REIT analysis to supported listings without forcing stock-only metrics onto pooled funds or property trusts.
+            The blog explains the concepts and decision frameworks. DeepScreen's live tools and market guides provide the current context for supported investments, commodity benchmarks, GIFT Nifty education and IPO research.
           </p>
           <div className="mt-4 flex flex-wrap gap-5 text-sm">
             <Link to="/investments" className="text-primary hover:underline">Investment directory</Link>
             <Link to="/mutual-funds" className="text-primary hover:underline">Mutual fund analysis</Link>
             <Link to="/etfs" className="text-primary hover:underline">ETF analysis</Link>
             <Link to="/reits" className="text-primary hover:underline">REIT analysis</Link>
+            <Link to="/commodities" className="text-primary hover:underline">Commodities</Link>
+            <Link to="/gift-nifty" className="text-primary hover:underline">GIFT Nifty</Link>
+            <Link to="/ipo-gmp" className="text-primary hover:underline">IPO GMP</Link>
             <Link to="/data-sources" className="text-primary hover:underline">Data sources</Link>
           </div>
         </section>
