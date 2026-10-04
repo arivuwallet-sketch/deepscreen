@@ -54,6 +54,17 @@ function Answers() {
         </section>
 
         <section className="rounded-lg border border-border p-5">
+          <h2 className="font-semibold">Commodities, GIFT Nifty and IPO GMP answers</h2>
+          <p className="mt-2 text-sm text-muted-foreground">DeepScreen publishes visible Q&amp;A for commodity benchmarks, GIFT Nifty interpretation and the limits of unofficial IPO grey market premium.</p>
+          <div className="mt-3 flex flex-wrap gap-5 text-sm text-primary">
+            <Link to="/commodities">Commodity FAQ</Link>
+            <Link to="/gift-nifty">GIFT Nifty FAQ</Link>
+            <Link to="/ipo-gmp">IPO GMP FAQ</Link>
+            <Link to="/blog">Research blog</Link>
+          </div>
+        </section>
+
+        <section className="rounded-lg border border-border p-5">
           <h2 className="font-semibold">More research resources</h2>
           <p className="mt-2 text-sm text-muted-foreground">Review the methodology, source notes and printable checklist before relying on any research output.</p>
           <div className="mt-3 flex flex-wrap gap-5 text-sm text-primary"><Link to="/research-checklist">Research checklist</Link><a href="/methodology">Methodology</a><a href="/contact">Contact the team</a></div>
