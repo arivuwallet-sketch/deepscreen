@@ -84,7 +84,12 @@ function CommoditiesPage() {
       </div>
       <p className="mt-3 text-xs leading-relaxed text-muted-foreground">Yahoo Finance futures chart quotes. Prices may be delayed and contracts roll; the displayed values are global benchmark futures, not Indian spot, MCX, jewellery or pump prices. A dash means the source returned no current quote. Check the contract and quote date before using any figure.</p>
 
-      <div className="mt-14">\n        <LiveNewsFeed query="gold OR silver OR crude oil OR natural gas OR copper commodities when:1d" title="Commodities news" limit={12} maxAgeHours={24} />\n        <p className="mt-3 text-xs text-muted-foreground">Only stories published in the last 24 hours appear here. Headlines refresh every minute while this page is open; publication times come from news providers.</p>\n      </div>\n\n      <div className="mt-14 grid gap-10 border-t border-border pt-10 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+      <div className="mt-14">
+        <LiveNewsFeed query="gold OR silver OR crude oil OR natural gas OR copper commodities when:1d" title="Commodities news" limit={12} maxAgeHours={24} />
+        <p className="mt-3 text-xs text-muted-foreground">Only stories published in the last 24 hours appear here. Headlines refresh every minute while this page is open; publication times come from news providers.</p>
+      </div>
+
+      <div className="mt-14 grid gap-10 border-t border-border pt-10 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
         <div><p className="font-mono text-xs uppercase text-primary">Reading the market</p><h2 className="mt-3 text-2xl font-semibold">A benchmark is not a bill.</h2><p className="mt-3 text-sm leading-relaxed text-muted-foreground">The price you pay or receive can differ because of currency, taxes, transport, contract month, location and retail margins.</p></div>
         <div className="grid gap-6 sm:grid-cols-2">{commodities.map((item) => <article key={item.symbol} className="border-l border-border pl-4"><h3 className="font-semibold">{item.name}</h3><p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.context}</p></article>)}</div>
       </div>
