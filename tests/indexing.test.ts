@@ -327,3 +327,9 @@ test('investment blog registry has no sparse array entries', async () => {
   );
 });
 
+test('commodities route does not render escaped newline artifacts', async () => {
+  const route = await readFile(new URL('../src/routes/commodities.tsx', import.meta.url), 'utf8');
+  assert.ok(!route.includes('>\\n'), 'JSX must not contain literal \\n text after an element');
+  assert.ok(!route.includes('\\n<'), 'JSX must not contain literal \\n text before an element');
+});
+
