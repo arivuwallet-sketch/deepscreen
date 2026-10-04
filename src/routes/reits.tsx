@@ -1,3 +1,5 @@
+import { featuredInvestment } from "@/lib/deepscreen/investment-featured";
+import { getInvestmentAnalysis } from "@/lib/market/investment-analysis.functions";
 import { createFileRoute } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
 import { InvestmentTopicGuide } from "@/components/ds/InvestmentTopicGuide";
@@ -11,6 +13,7 @@ const faqs = faqForType("REIT");
 
 export const Route = createFileRoute("/reits")({
   staticData: { sitemap: true },
+  loader: () => getInvestmentAnalysis({data: featuredInvestment("REIT")}).catch(() => null),
   head: () => ({
     meta: [
       { title },
@@ -48,7 +51,7 @@ export const Route = createFileRoute("/reits")({
 function TopicPage() {
   return (
     <Shell>
-      <InvestmentTopicGuide type="REIT" />
+      <InvestmentTopicGuide type="REIT" initialData={Route.useLoaderData()} />
     </Shell>
   );
 }

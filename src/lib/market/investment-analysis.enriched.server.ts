@@ -13,6 +13,7 @@ let yahooSession: { cookie: string; crumb: string; at: number } | null = null;
 const extraCache = new Map<string, { at: number; data: Partial<EnhancedFundProfileAnalysis> | null }>();
 
 function num(value: unknown): number | null {
+  if (value === null || value === undefined || value === "" || typeof value === "boolean") return null;
   if (typeof value === "number") return Number.isFinite(value) ? value : null;
   if (value && typeof value === "object" && "raw" in (value as Raw)) return num((value as Raw)["raw"]);
   const parsed = Number(value);

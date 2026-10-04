@@ -1,3 +1,4 @@
+import { InvestmentHistory } from "@/components/research/InvestmentHistory";
 import type { ReactNode } from "react";
 
 import { useInvestmentAnalysis } from "@/hooks/useInvestmentAnalysis";
@@ -107,7 +108,7 @@ function etfSections(item: Investment, data: EnhancedInvestmentAnalysisData): Se
     },
     {
       title: "Price history",
-      description: `Returns and risk calculated from available adjusted-price history${data.historyVenue && data.historyVenue !== item.market ? ` (${data.historyVenue} cross-listing)` : ""}, not a benchmark comparison.`,
+      description: `Returns and risk calculated from available ${data.historyBasis === "adjusted" ? "adjusted-price" : "closing-price"} history${data.historyVenue && data.historyVenue !== item.market ? ` (${data.historyVenue} cross-listing)` : ""}, not a benchmark comparison.`,
       metrics: [
         { label: "1Y return", value: pct(history?.return1yPct) },
         { label: "3Y annualized return", value: pct(history?.return3yAnnualizedPct) },
@@ -311,7 +312,7 @@ function TopHoldings({ data }: { data: EnhancedInvestmentAnalysisData }) {
 }
 
 export function InvestmentAnalysisAvailable({ item, initialData }: { item: Investment; initialData?: EnhancedInvestmentAnalysisData }) {
-  const { data, isLoading, isError } = useInvestmentAnalysis(item, initialData);
+  const { data, isLoading, isError, isFetching, refetch } = useInvestmentAnalysis(item, initialData);
   const sections = data
     ? item.type === "ETF"
       ? etfSections(item, data)
@@ -330,9 +331,11 @@ export function InvestmentAnalysisAvailable({ item, initialData }: { item: Inves
             {item.type === "ETF" ? "ETF basket analysis" : item.type === "FUND" ? "Mutual fund analysis" : "REIT operating-business analysis"}
           </h2>
         </div>
-        {data?.fetchedAt ? <p className="text-xs text-muted-foreground">Refreshed {new Date(data.fetchedAt).toLocaleString()}</p> : null}
+        {data?.fetchedAt ? <p className="text-xs text-muted-foreground">Refreshed {data.fetchedAt.replace("T", " ").slice(0, 19) + " UTC"}</p> : null}
       </div>
 
+      <button type="button" disabled={isFetching} onClick={() => void refetch()} className="mt-4 rounded-lg border border-border px-4 py-2 text-sm disabled:opacity-50">{isFetching ? "Loading data…" : "Refresh analysis"}</button>
+      <p className="mt-2 text-xs text-muted-foreground">Analysis is cached for up to 30 minutes; quote and disclosure dates can differ from retrieval time.</p>
       {isLoading ? (
         <div className="mt-8 rounded-lg border border-border bg-card/30 p-5 text-sm text-muted-foreground">Loading verified investment data…</div>
       ) : isError || !data ? (
@@ -344,6 +347,7 @@ export function InvestmentAnalysisAvailable({ item, initialData }: { item: Inves
             {data.sources.length ? data.sources.join(" · ") : "Price/NAV history only"}
             {data.history ? ` · ${data.historyVenue ?? "Market"} history ${data.history.startDate} to ${data.history.endDate}` : ""}
           </div>
+          <InvestmentHistory item={item} data={data} />
           {hasMetrics ? (
             <Sections sections={sections} />
           ) : (

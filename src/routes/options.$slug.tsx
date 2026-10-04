@@ -1,3 +1,4 @@
+import { OptionsMarketContext } from "@/components/research/OptionsMarketContext";
 import { jsonLd } from "@/lib/seo/json-ld";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
@@ -97,6 +98,8 @@ function StrategyPage() {
         <p className="mt-5 rounded-lg border border-border bg-panel p-5 leading-relaxed">
           {s.answer}
         </p>
+        <OptionsMarketContext market="NSE" code="RELIANCE" />
+        <p className="text-sm text-muted-foreground">RELIANCE is the illustrative underlying for this guide. <a href="/options" className="text-primary hover:underline">Choose another underlying and model this strategy in the strategy lab →</a></p>
         <dl className="mt-8 divide-y divide-border rounded-lg border border-border">
           {items.map(([term, value]) => (
             <div key={term} className="grid gap-1 p-4 sm:grid-cols-3">
