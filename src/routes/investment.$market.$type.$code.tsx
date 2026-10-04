@@ -6,6 +6,7 @@ import { useLiveQuote } from "@/hooks/useLiveQuotes";
 import { formatPrice } from "@/lib/deepscreen/format";
 import { getInvestmentAnalysis } from "@/lib/market/investment-analysis.functions";
 import { InvestmentFaqSection } from "@/components/ds/InvestmentFaqSection";
+import { LiveNewsFeed } from "@/components/ds/LiveNewsFeed";
 import { investmentDetailFaq } from "@/lib/seo/investment-faq";
 import { buildBreadcrumbSchema, buildFAQSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 
@@ -139,6 +140,15 @@ function InvestmentPage() {
         </p>
 
         <InvestmentAnalysisAvailable item={item} {...(analysis ? { initialData: analysis } : {})} />
+        <div className="mt-12">
+          <LiveNewsFeed
+            query={`"${item.name.replace(/"/g, "").slice(0, 110)}" when:1d`}
+            title={`${item.type === "FUND" ? "Mutual fund" : item.type} news · ${item.code}`}
+            limit={12}
+            maxAgeHours={24}
+          />
+          <p className="mt-3 text-xs text-muted-foreground">Stories mentioning this investment are shown only when the provider supplies a publication time within the past 24 hours. Headlines refresh every minute while this page is open.</p>
+        </div>
         <InvestmentFaqSection faqs={investmentDetailFaq(item)} title={`Questions about ${item.name}`} description={`Research answers for ${item.name} (${item.code}) using the analysis framework appropriate to a ${item.type === "FUND" ? "mutual fund" : item.type}.`} />
       </div>
     </Shell>
