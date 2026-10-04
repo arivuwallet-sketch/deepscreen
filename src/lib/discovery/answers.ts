@@ -133,7 +133,7 @@ export const STOCK_MARKET_BASICS_ANSWERS: readonly DiscoveryAnswer[] = [
     label: "Read the stock screener guide",
   },
   {
-    id: "fundamental-analysis",
+    id: "what-is-fundamental-analysis",
     question: "What is fundamental analysis?",
     answer:
       "Fundamental analysis studies a company's business economics, revenue, profits, cash flow, balance sheet, returns on capital, competitive position and valuation to judge financial quality and the assumptions embedded in its market price.",
