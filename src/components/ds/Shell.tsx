@@ -17,13 +17,16 @@ const NAV_ITEMS: Array<readonly [string, string]> = [
   ["/calendar", "Calendar"],
   ["/options", "Options"],
   ["/ipo", "IPO"],
-  ["/commodities", "Commodities"],
-  ["/gift-nifty", "Gift Nifty"],
-  ["/ipo-gmp", "IPO GMP"],
   ["/learn", "Learn"],
   ["/ratios", "Ratios"],
   ["/compare", "Compare"],
   ["/pricing", "Pricing"],
+];
+
+const MARKET_GUIDES: Array<readonly [string, string]> = [
+  ["/commodities", "Commodities"],
+  ["/gift-nifty", "Gift Nifty"],
+  ["/ipo-gmp", "IPO GMP"],
 ];
 
 export function Shell({ children }: { children: ReactNode }) {
@@ -92,6 +95,11 @@ export function Shell({ children }: { children: ReactNode }) {
                     <ArrowUpRight size={14} />
                   </Link>
                 ))}
+                {MARKET_GUIDES.map(([to, label]) => (
+                  <Link key={to} to={to} activeProps={{ className: "is-active" }}>
+                    {label}<ArrowUpRight size={14} />
+                  </Link>
+                ))}
               </div>
               <p className="ds-eyebrow">Explore markets</p>
               <div className="ds-mobile-market-links">
@@ -116,6 +124,12 @@ export function Shell({ children }: { children: ReactNode }) {
                 {label}
               </Link>
             ))}
+            <details className="group relative flex items-stretch">
+              <summary className="flex cursor-pointer list-none items-center text-xs text-muted-foreground hover:text-primary [&::-webkit-details-marker]:hidden">More ▾</summary>
+              <div className="absolute left-0 top-full z-50 min-w-36 border border-border bg-panel p-2 shadow-lg">
+                {MARKET_GUIDES.map(([to, label]) => <Link key={to} to={to} className="block px-3 py-2 text-xs" activeProps={{ className: "is-active" }}>{label}</Link>)}
+              </div>
+            </details>
           </nav>
           <nav aria-label="Market navigation">
             {EXCHANGES.map((exchange) => (
