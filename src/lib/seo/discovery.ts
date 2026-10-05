@@ -67,6 +67,7 @@ export function resourceHead(
     meta: [
       { title },
       { name: "description", content: description },
+      { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" },
       { name: "keywords", content: keywords.join(", ") },
       { property: "og:title", content: title },
       { property: "og:description", content: description },
@@ -79,6 +80,7 @@ export function resourceHead(
     links: [
       { rel: "canonical", href: url },
       { rel: "describedby", href: `${ORIGIN}/llms.txt` },
+      { rel: "alternate", type: "text/plain", href: `${ORIGIN}/faq-index.txt` },
       { rel: "help", href: `${ORIGIN}/answers` },
     ],
     scripts: [
