@@ -607,6 +607,7 @@
 .ds-cr-intro-metrics:hover,
 .ds-cr-command-bar:hover,
 .ds-cr-market-header:hover,
+.ds-cr-chart-frame:hover,
 .ds-cr-card:hover,
 .ds-cr-subcard:hover {
   border-color: oklch(0.927 0.151 127 / 0.38);
