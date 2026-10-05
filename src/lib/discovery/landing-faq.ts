@@ -4,15 +4,19 @@ export const LANDING_FAQS = [
     "Screen stocks across five exchanges, compare financial ratios, explore model scores, investigate company risks and peers, use valuation calculators, and connect your research with news, IPOs and economic events.",
   ],
   [
-    "Which markets does DeepScreen cover?",
-    "DeepScreen covers supported listings on NSE and BSE in India, NYSE and Nasdaq in the United States, and LSE in the United Kingdom.",
+    "How does the 13-factor score work?",
+    "DeepScreen combines valuation, profitability, leverage and payout measures into a research score out of 100. Open the methodology and individual metric explanations to understand the inputs and limitations; a score is a starting point for research.",
   ],
   [
-    "Does DeepScreen provide investment advice?",
-    "No. DeepScreen provides research tools and educational explanations. Scores, verdicts and model outputs are not personalized investment advice, forecasts or guarantees of returns.",
+    "Is the market data live?",
+    "The research workspace refreshes quotes and other information from its providers. Availability, refresh frequency and exchange delays vary. Check each page's source and timestamp; the interactive examples on this landing page are illustrations.",
   ],
   [
-    "Can I use DeepScreen for free?",
-    "Company search and educational guides are available without a paid subscription. Current feature availability and pricing are shown on the pricing page.",
+    "Can I get started for free?",
+    "You can explore the screener and public research tools. Advanced features have plan-based access; the pricing page explains what is included in each plan.",
+  ],
+  [
+    "Does DeepScreen place trades for me?",
+    "No. DeepScreen is a research and education platform. It does not execute trades, and model scores or strategy examples are not personalised investment advice or guarantees of returns.",
   ],
 ] as const;
