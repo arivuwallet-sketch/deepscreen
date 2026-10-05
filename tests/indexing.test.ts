@@ -141,6 +141,25 @@ test('public crawler policy allows major search and AI crawlers', async () => {
   assert.ok(!robots.includes('User-agent: ClaudeBot\nDisallow: /\n'));
   assert.ok(!robots.includes('User-agent: Google-Extended\nDisallow: /\n'));
   assert.match(robots, /User-agent: \*\nAllow: \//);
+  for (const crawler of [
+    'OAI-SearchBot',
+    'OAI-AdsBot',
+    'ChatGPT-User',
+    'GPTBot',
+    'Claude-SearchBot',
+    'Claude-User',
+    'ClaudeBot',
+    'PerplexityBot',
+    'Perplexity-User',
+    'Google-Extended',
+    'Google-CloudVertexBot',
+    'Applebot-Extended',
+    'CCBot',
+    'meta-externalagent',
+  ]) {
+    assert.ok(robots.includes('User-agent: ' + crawler), crawler + ' must be explicitly allowed');
+  }
+
   for (const path of [
     '/answers',
     '/knowledge',
