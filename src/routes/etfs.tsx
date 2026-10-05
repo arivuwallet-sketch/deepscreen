@@ -7,7 +7,7 @@ import { faqForType } from "@/lib/seo/investment-faq";
 import { etfKeywords, metaKeywords } from "@/lib/seo/keywords";
 import { buildBreadcrumbSchema, buildFAQSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 
-const title = "ETF Analysis: Holdings, Tracking, Fees & Liquidity | DeepScreen";
+const title = "ETF Analysis India: Tracking Error, Fees & Holdings | DeepScreen";
 const description = "Learn how to analyze ETFs using holdings, concentration, portfolio valuation, tracking error, tracking difference, expense ratio, bid-ask spread, AUM, volume and NAV premium or discount.";
 const url = "https://deepscreen.online/etfs";
 const faqs = faqForType("ETF");
