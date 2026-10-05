@@ -143,12 +143,20 @@ function InvestmentPage() {
         <InvestmentAnalysisAvailable item={item} {...(analysis ? { initialData: analysis } : {})} />
         <div className="mt-12">
           <LiveNewsFeed
-            query={`"${item.name.replace(/"/g, "").slice(0, 110)}" when:1d`}
+            query={`"${item.name.replace(/"/g, "").slice(0, 110)}" "${item.code}"`}
             title={`${item.type === "FUND" ? "Mutual fund" : item.type} news · ${item.code}`}
-            limit={12}
+            limit={20}
             maxAgeHours={24}
+            mode={item.type === "FUND" ? "mutual-fund" : item.type === "ETF" ? "etf" : "reit"}
+            entityName={item.name}
+            entityCode={item.code}
+            market={item.market}
+            showCategory
           />
-          <p className="mt-3 text-xs text-muted-foreground">Stories mentioning this investment are shown only when the provider supplies a publication time within the past 24 hours. Headlines refresh every minute while this page is open.</p>
+          <p className="mt-3 text-xs text-muted-foreground">
+            Product-specific headlines are combined with relevant {item.type === "FUND" ? "mutual-fund" : item.type === "ETF" ? "ETF" : "REIT"} market news.
+            Only verified publication times from the last 24 hours are shown, newest first, with checks every 30 seconds while open.
+          </p>
         </div>
         <InvestmentFaqSection faqs={investmentDetailFaq(item)} title={`Questions about ${item.name}`} description={`Research answers for ${item.name} (${item.code}) using the analysis framework appropriate to a ${item.type === "FUND" ? "mutual fund" : item.type}.`} />
       </div>
