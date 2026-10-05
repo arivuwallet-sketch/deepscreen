@@ -2,7 +2,8 @@ import { useMemo } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowDown, ArrowUp, Minus, Radio } from "lucide-react";
 
-import { quoteKey, useLiveQuotes } from "@/hooks/useLiveQuotes";
+import { useMarketMovers } from "@/hooks/useMarketMovers";
+import { quoteKey } from "@/hooks/useLiveQuotes";
 import { formatPrice, formatVolume } from "@/lib/deepscreen/format";
 import { analyze } from "@/lib/deepscreen/metrics";
 import { mergeLiveStock } from "@/lib/deepscreen/live-merge";
@@ -24,6 +25,23 @@ type Row = {
 
 function shortName(name: string) {
   return name.length > 28 ? `${name.slice(0, 27)}…` : name;
+}
+
+function marketStateLabel(state: string) {
+  switch (state.toUpperCase()) {
+    case "REGULAR":
+      return "LIVE";
+    case "PRE":
+    case "PREPRE":
+      return "PRE";
+    case "POST":
+    case "POSTPOST":
+      return "AFTER";
+    case "CLOSED":
+      return "CLOSED";
+    default:
+      return "LATEST";
+  }
 }
 
 function MoverList({
@@ -65,7 +83,7 @@ function MoverList({
                   <span className="truncate text-xs text-muted-foreground">{shortName(stock.name)}</span>
                 </div>
                 <p className="num mt-1 text-[10px] text-muted-foreground">
-                  {formatPrice(quote.price, stock.exchange)} · Vol {formatVolume(quote.volume)}
+                  {stock.exchange} · {formatPrice(quote.price, stock.exchange)} · Vol {formatVolume(quote.volume)}
                   {score >= 0 ? ` · Score ${score}` : ""}
                 </p>
               </div>
@@ -73,9 +91,7 @@ function MoverList({
                 <p className={cn("text-sm font-semibold", quote.changePct >= 0 ? "text-bull" : "text-bear")}>
                   {quote.changePct >= 0 ? "+" : ""}{quote.changePct.toFixed(2)}%
                 </p>
-                <p className="text-[10px] text-muted-foreground">
-                  {quote.marketState === "REGULAR" ? "LIVE" : quote.marketState || "LATEST"}
-                </p>
+                <p className="text-[10px] text-muted-foreground">{marketStateLabel(quote.marketState)}</p>
               </div>
             </Link>
           ))
@@ -88,45 +104,50 @@ function MoverList({
 }
 
 export function MarketMovers({ stocks, title = "Live market movers", exchangeLabel }: MarketMoversProps) {
-  const keys = useMemo(
-    () =>
-      stocks
-        .slice()
-        .sort((a, b) => b.marketCap - a.marketCap)
-        .slice(0, 100)
-        .map((s) => ({ exchange: s.exchange, symbol: s.symbol, name: s.name })),
+  const exchanges = useMemo(
+    () => Array.from(new Set(stocks.map((stock) => stock.exchange))).sort(),
     [stocks],
   );
-  const { data: live, dataUpdatedAt, isFetching } = useLiveQuotes(keys);
+  const stockByKey = useMemo(
+    () => new Map(stocks.map((stock) => [quoteKey(stock), stock] as const)),
+    [stocks],
+  );
+  const { data: snapshot, isFetching } = useMarketMovers(exchanges);
 
   const rows = useMemo<Row[]>(() => {
-    if (!live) return [];
-    return keys
-      .map((key) => {
-        const stock = stocks.find((s) => quoteKey(s) === quoteKey(key));
-        const quote = live[quoteKey(key)];
-        if (!stock || !quote) return null;
-        const merged = mergeLiveStock(stock, quote, null, null).stock;
-        const score = analyze(merged).score;
-        return { stock, quote, score };
-      })
-      .filter((row): row is Row => row !== null && Number.isFinite(row.quote.changePct));
-  }, [keys, live, stocks]);
+    if (!snapshot) return [];
+    const unique = new Map<string, Row>();
+
+    for (const mover of [...snapshot.gainers, ...snapshot.losers]) {
+      const key = quoteKey(mover);
+      const stock = stockByKey.get(key);
+      if (!stock || !Number.isFinite(mover.quote.changePct)) continue;
+
+      const merged = mergeLiveStock(stock, mover.quote, null, null).stock;
+      unique.set(key, {
+        stock,
+        quote: mover.quote,
+        score: analyze(merged).score,
+      });
+    }
+
+    return [...unique.values()];
+  }, [snapshot, stockByKey]);
 
   const performers = rows
-    .filter((r) => r.quote.changePct > 0)
+    .filter((row) => row.quote.changePct > 0)
     .slice()
     .sort((a, b) => b.score - a.score || b.quote.changePct - a.quote.changePct)
     .slice(0, 8);
 
   const gainers = rows
-    .filter((r) => r.quote.changePct > 0)
+    .filter((row) => row.quote.changePct > 0)
     .slice()
     .sort((a, b) => b.quote.changePct - a.quote.changePct)
     .slice(0, 8);
 
   const losers = rows
-    .filter((r) => r.quote.changePct < 0)
+    .filter((row) => row.quote.changePct < 0)
     .slice()
     .sort((a, b) => a.quote.changePct - b.quote.changePct)
     .slice(0, 8);
@@ -137,19 +158,22 @@ export function MarketMovers({ stocks, title = "Live market movers", exchangeLab
         <div>
           <h2 className="text-sm font-semibold uppercase tracking-wide">{title}</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            {exchangeLabel ? `${exchangeLabel} · ` : ""}Live quotes refresh every 15 seconds.
+            {exchangeLabel ? `${exchangeLabel} · ` : ""}
+            Provider-ranked equity movers refresh every 15 seconds. Closed markets show the latest session.
           </p>
         </div>
         <span className="num inline-flex items-center gap-1.5 text-[10px] text-muted-foreground">
           <Radio className={cn("size-3", isFetching ? "animate-pulse text-primary" : "text-bull")} />
-          {dataUpdatedAt ? `Updated ${new Date(dataUpdatedAt).toLocaleTimeString()}` : "Loading live quotes…"}
+          {snapshot?.fetchedAt
+            ? `Updated ${new Date(snapshot.fetchedAt).toLocaleTimeString()}`
+            : "Loading live movers…"}
         </span>
       </div>
 
       <div className="mt-3 grid gap-3 lg:grid-cols-3">
-        <MoverList title="Top performers" rows={performers} tone="neutral" empty="Waiting for live market quotes…" />
-        <MoverList title="Market gainers" rows={gainers} tone="up" empty="No positive movers in the live window." />
-        <MoverList title="Market losers" rows={losers} tone="down" empty="No negative movers in the live window." />
+        <MoverList title="Top performers" rows={performers} tone="neutral" empty="Waiting for provider-ranked movers…" />
+        <MoverList title="Market gainers" rows={gainers} tone="up" empty="No positive movers in the latest provider window." />
+        <MoverList title="Market losers" rows={losers} tone="down" empty="No negative movers in the latest provider window." />
       </div>
     </section>
   );
