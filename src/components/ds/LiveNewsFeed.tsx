@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 
 import { getNewsFeed } from "@/lib/market/market.functions";
+import type { NewsFeedMode } from "@/lib/market/news-topics";
 import type { FeedItem } from "@/lib/rss.server";
 import { cn } from "@/lib/utils";
 
@@ -84,6 +85,11 @@ export function LiveNewsFeed({
   limit = 12,
   maxAgeHours,
   globalMarket = false,
+  mode = "generic",
+  entityName,
+  entityCode,
+  exchange,
+  market,
   showCategory = false,
   scrollable = false,
   className,
@@ -93,16 +99,45 @@ export function LiveNewsFeed({
   limit?: number;
   maxAgeHours?: number;
   globalMarket?: boolean;
+  mode?: NewsFeedMode;
+  entityName?: string;
+  entityCode?: string;
+  exchange?: string;
+  market?: string;
   showCategory?: boolean;
   scrollable?: boolean;
   className?: string;
 }) {
   const fetchNews = useServerFn(getNewsFeed);
   const { data, isLoading, dataUpdatedAt } = useQuery({
-    queryKey: ["news-feed", query, limit, maxAgeHours ?? null, globalMarket],
-    queryFn: () => fetchNews({ data: { query, limit, maxAgeHours, globalMarket } }),
+    queryKey: [
+      "news-feed",
+      query,
+      limit,
+      maxAgeHours ?? null,
+      globalMarket,
+      mode,
+      entityName ?? null,
+      entityCode ?? null,
+      exchange ?? null,
+      market ?? null,
+    ],
+    queryFn: () =>
+      fetchNews({
+        data: {
+          query,
+          limit,
+          maxAgeHours,
+          globalMarket,
+          mode,
+          entityName,
+          entityCode,
+          exchange,
+          market,
+        },
+      }),
     refetchInterval: 30_000,
-    staleTime: 15_000,
+    staleTime: 10_000,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
   });

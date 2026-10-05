@@ -636,7 +636,13 @@ function StockPage() {
             <LiveNewsFeed
               query={newsSearchQuery(stock.name, stock.symbol)}
               title={`${stock.symbol} live news`}
-              limit={10}
+              limit={20}
+              maxAgeHours={24}
+              mode="company"
+              entityName={stock.name}
+              entityCode={stock.symbol}
+              exchange={stock.exchange}
+              showCategory
             />
           </div>
         </section>
