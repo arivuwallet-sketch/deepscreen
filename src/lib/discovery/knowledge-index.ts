@@ -27,6 +27,15 @@ export const LEGACY_BLOGS = [
   },
 ] as const;
 
+export const LEGACY_BLOG_FAQS = [
+  "What percentage of Americans own stock in 2026?",
+  "How many retail investors does India have?",
+  "What share of US stock trading comes from retail investors?",
+  "Is options trading growing?",
+  "How big was the global IPO market in 2025?",
+  "Are younger investors taking on more risk than older investors?",
+] as const;
+
 const MARKET_PATH: Record<(typeof MARKET_GUIDE_FAQS)[number]["topic"], string> = {
   COMMODITIES: "/commodities",
   GIFT_NIFTY: "/gift-nifty",
@@ -88,6 +97,15 @@ export function knowledgeGroups(): KnowledgeGroup[] {
           href: `/blog/${post.slug}#${faqAnchor(faq.q)}`,
         })),
       ),
+    },
+    {
+      id: "legacy-blog-faq",
+      title: "Retail investing statistics FAQ",
+      description: "Questions from DeepScreen's standalone 2026 retail-investing research article.",
+      entries: LEGACY_BLOG_FAQS.map((question) => ({
+        question,
+        href: `/blog/retail-investing-statistics-2026.html#${faqAnchor(question)}`,
+      })),
     },
     {
       id: "learn-faq",
