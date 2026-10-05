@@ -251,6 +251,23 @@ https://deepscreen.online/investments
 DeepScreen publishes source-backed investment research articles at:
 https://deepscreen.online/blog
 
+### 5 October 2026 personal finance series
+
+Save Money — Stop subscription creep and recurring-payment waste:
+https://deepscreen.online/blog/stop-subscription-creep-recurring-payments-india
+
+Uses the DeepScreen RACE audit to review recurring mandates, annualise costs, classify subscriptions as keep/downgrade/rotate/cancel, and verify cancellation across merchant, card and UPI AutoPay controls. It cites RBI recurring e-mandate rules and NPCI's UPI AutoPay lifecycle guidance.
+
+Protect Money — What to do after UPI or bank fraud in India:
+https://deepscreen.online/blog/what-to-do-after-upi-bank-fraud-india
+
+Uses the DeepScreen FREEZE protocol for immediate containment, bank/payment-provider reporting, 1930 and cybercrime.gov.in reporting, evidence preservation, follow-up and eligible RBI Ombudsman escalation. It explains that RBI liability depends on the facts and speed of reporting; it does not promise reimbursement.
+
+Make More Money — Freelancing in India: pricing, profit and tax basics:
+https://deepscreen.online/blog/freelancing-pricing-profit-tax-india
+
+Uses the DeepScreen FLOOR method to derive a sustainable pricing floor from costs, billable capacity, obligations and reserve/profit. It includes an illustrative ₹85,000 monthly revenue / 80 billable-hour example and explains that Section 44ADA applies only to eligible specified professions, with the current Income Tax Department thresholds and conditions.
+
 ### Direct vs Regular mutual funds in India
 https://deepscreen.online/blog/direct-vs-regular-mutual-funds-india
 
