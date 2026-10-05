@@ -407,23 +407,30 @@
 }
 
 
-/* Global cursor-following stardust. Decorative only; never intercepts input. */
-.ds-cursor-stardust {
+/* Ambient site-wide stardust. It drifts independently across every route; it does not follow the cursor. */
+.ds-global-stardust {
   position: fixed;
   inset: 0;
-  z-index: 70;
+  z-index: 42;
   width: 100vw;
   height: 100vh;
   max-width: none;
   pointer-events: none;
   user-select: none;
   touch-action: none;
-  opacity: 0.94;
+  opacity: 0.78;
   contain: strict;
+  mix-blend-mode: screen;
 }
 
-@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
-  .ds-cursor-stardust {
+@media (pointer: coarse) {
+  .ds-global-stardust {
+    opacity: 0.52;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-global-stardust {
     display: none;
   }
 }
