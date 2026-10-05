@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { INVESTMENT_BLOG_POSTS } from "@/lib/content/investment-blog";
-import { LEGACY_BLOGS } from "@/lib/discovery/knowledge-index";
+import { LEGACY_BLOGS } from "@/lib/discovery/legacy-blog";
 
 const ORIGIN = "https://deepscreen.online";
 const FEED_URL = ORIGIN + "/blog/feed.xml";
@@ -40,8 +40,8 @@ function feedXml(): string {
       "<title>" + escapeXml(post.title) + "</title>" +
       "<link>" + ORIGIN + post.href + "</link>" +
       "<guid isPermaLink=\"true\">" + ORIGIN + post.href + "</guid>" +
-      "<description>Source-backed 2026 retail-investing statistics and market-participation research.</description>" +
-      "<pubDate>" + rfc822("2026-09-25") + "</pubDate>" +
+      "<description>" + escapeXml(post.description) + "</description>" +
+      "<pubDate>" + rfc822(post.published) + "</pubDate>" +
       "<category>Market research</category>" +
       "</item>",
   );
