@@ -629,7 +629,7 @@ export const deepChartKeywords: string[] = [
   "stock technical analysis",
   "stock chart analysis",
   "trading chart analysis",
-  "live market charts",
+  "interactive technical charts",
   "stock charts",
   "crypto technical analysis",
   "forex technical analysis",
@@ -770,9 +770,23 @@ export const forexTradingKeywords: string[] = [
   "authorised forex trading India",
 ];
 
+export const investmentDirectoryKeywords: string[] = [
+  "investment screener",
+  "investment analysis",
+  "mutual fund screener",
+  "mutual fund screener India",
+  "ETF screener",
+  "ETF screener India",
+  "Indian ETF screener",
+  "REIT screener",
+  "REIT screener India",
+  "compare mutual funds ETFs REITs",
+  "investment directory India",
+  "fund ETF REIT comparison",
+];
+
 export const mutualFundKeywords: string[] = [
   "mutual fund analysis",
-  "mutual fund screener India",
   "mutual funds India",
   "mutual fund NAV",
   "NAV mutual fund",
@@ -803,9 +817,6 @@ export const mutualFundKeywords: string[] = [
 
 export const etfKeywords: string[] = [
   "ETF analysis",
-  "ETF screener",
-  "ETF screener India",
-  "Indian ETF screener",
   "ETF India",
   "ETF holdings",
   "ETF expense ratio",
@@ -985,6 +996,7 @@ export const keywordGroups: { id: string; title: string; keywords: string[] }[] 
   { id: "trading", title: "Trading & risk management", keywords: tradingKeywords },
   { id: "crypto", title: "Crypto trading", keywords: cryptoTradingKeywords },
   { id: "forex", title: "Forex trading", keywords: forexTradingKeywords },
+  { id: "investments", title: "Investment screening", keywords: investmentDirectoryKeywords },
   { id: "mutual-funds", title: "Mutual funds", keywords: mutualFundKeywords },
   { id: "etfs", title: "ETFs", keywords: etfKeywords },
   { id: "reits", title: "REITs", keywords: reitKeywords },
