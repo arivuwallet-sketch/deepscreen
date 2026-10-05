@@ -14,6 +14,7 @@ import {
 } from "recharts";
 
 import { Shell } from "@/components/ds/Shell";
+import { PaywallGate } from "@/components/ds/PaywallGate";
 import { TopicIndex } from "@/components/ds/TopicIndex";
 import { metaKeywords, optionsKeywords, screenerKeywords } from "@/lib/seo/keywords";
 import { formatPrice } from "@/lib/deepscreen/format";
@@ -167,11 +168,18 @@ function OptionsPage() {
           ))}
         </div>
 
-        <div className="mt-6 grid gap-4 lg:grid-cols-2">
-          {shown.map((s) => (
-            <StrategyCard key={s.key} s={s} exchange={picked.exchange} spot={spot} />
-          ))}
-        </div>
+        <PaywallGate
+          strict
+          feature="Options Strategy Lab payoff analytics"
+          className="mt-6"
+          minHeight="min-h-[520px]"
+        >
+          <div className="grid gap-4 lg:grid-cols-2">
+            {shown.map((s) => (
+              <StrategyCard key={s.key} s={s} exchange={picked.exchange} spot={spot} />
+            ))}
+          </div>
+        </PaywallGate>
         <section className="mt-10 border-t border-border pt-8">
           <h2 className="text-lg font-semibold">Options strategy guides</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
