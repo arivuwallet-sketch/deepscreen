@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowDown,
@@ -410,7 +410,7 @@ function FeatureScene({ kind }: { kind: FeatureSceneKind }) {
       <div className="ds-motion-scene ds-motion-filters">
         <div className="ds-filter-cloud">
           {["13,000+", "ROCE > 15%", "D/E < 1", "P/E", "GROWTH", "NSE", "NASDAQ", "QUALITY"].map((label, i) => (
-            <span key={label} style={{ "--i": i } as React.CSSProperties}>{label}</span>
+            <span key={label} style={{ "--i": i } as CSSProperties}>{label}</span>
           ))}
         </div>
         <div className="ds-filter-funnel">
