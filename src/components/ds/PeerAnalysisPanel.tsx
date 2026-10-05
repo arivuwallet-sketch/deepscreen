@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import type { Analysis } from "@/lib/deepscreen/metrics";
 import type { Stock } from "@/lib/deepscreen/types";
 import { cn } from "@/lib/utils";
+import { useSubscription } from "@/hooks/useSubscription";
 
 export interface PeerRow {
   stock: Stock;
@@ -57,9 +58,10 @@ export function PeerAnalysisPanel({
   targetIndustry: string | null;
   dataUpdatedAt?: number;
 }) {
+  const { isPro } = useSubscription();
   const targetRow: PeerRow = { stock, analysis, industry: targetIndustry, exactIndustry: true };
   const metrics: { key: MetricKey; label: string }[] = [
-    { key: "score", label: "DeepScreen score" },
+    ...(isPro ? [{ key: "score" as const, label: "DeepScreen score" }] : []),
     { key: "growth", label: "Growth" },
     { key: "roe", label: "ROE" },
     { key: "roce", label: "ROCE" },
@@ -71,19 +73,21 @@ export function PeerAnalysisPanel({
     metrics.map((m) => [m.key, median(peers.map((p) => metricValue(p, m.key)))]),
   ) as Record<MetricKey, number | null>;
 
-  const scoreMedian = medians.score;
+  const scoreMedian = isPro ? medians.score ?? null : null;
   const scoreDelta = scoreMedian === null ? null : analysis.score - scoreMedian;
   const exactCount = peers.filter((p) => p.exactIndustry).length;
 
   const summary = peers.length === 0
     ? "Peer fundamentals are still loading. The comparison will populate automatically when comparable company data arrives."
-    : scoreDelta === null
-      ? "DeepScreen is comparing " + stock.symbol + " with " + peers.length + " closest available listed peers."
-      : stock.symbol + " scores " + analysis.score + "/100 versus a " + (scoreMedian ?? 0).toFixed(0) +
-        "/100 peer median (" + (scoreDelta >= 0 ? "+" : "") + scoreDelta.toFixed(0) + " points). " +
-        (exactCount > 0
-          ? exactCount + " peer" + (exactCount === 1 ? "" : "s") + " match" + (exactCount === 1 ? "s" : "") + " the same provider-reported industry."
-          : "The comparison uses same-sector peers because an exact provider-reported industry match is unavailable.");
+    : !isPro
+      ? "DeepScreen is comparing " + stock.symbol + " with " + peers.length + " closest available listed peers using core fundamentals. DeepScreen score comparison is available with Pro."
+      : scoreDelta === null
+        ? "DeepScreen is comparing " + stock.symbol + " with " + peers.length + " closest available listed peers."
+        : stock.symbol + " scores " + analysis.score + "/100 versus a " + (scoreMedian ?? 0).toFixed(0) +
+          "/100 peer median (" + (scoreDelta >= 0 ? "+" : "") + scoreDelta.toFixed(0) + " points). " +
+          (exactCount > 0
+            ? exactCount + " peer" + (exactCount === 1 ? "" : "s") + " match" + (exactCount === 1 ? "s" : "") + " the same provider-reported industry."
+            : "The comparison uses same-sector peers because an exact provider-reported industry match is unavailable.");
 
   return (
     <section className="mt-6 rounded-lg border border-border bg-panel p-5">
@@ -119,13 +123,9 @@ export function PeerAnalysisPanel({
               <thead className="bg-card text-[10px] uppercase tracking-wide text-muted-foreground">
                 <tr>
                   <th className="px-3 py-2 text-left">Company</th>
-                  <th className="px-3 py-2 text-right">Score</th>
-                  <th className="px-3 py-2 text-right">Growth</th>
-                  <th className="px-3 py-2 text-right">ROE</th>
-                  <th className="px-3 py-2 text-right">ROCE</th>
-                  <th className="px-3 py-2 text-right">Net margin</th>
-                  <th className="px-3 py-2 text-right">D/E</th>
-                  <th className="px-3 py-2 text-right">P/E</th>
+                  {metrics.map((metric) => (
+                    <th key={metric.key} className="px-3 py-2 text-right">{metric.label}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
@@ -161,13 +161,11 @@ export function PeerAnalysisPanel({
                         {peer.exactIndustry ? "Industry match" : "Sector match"}
                       </span>
                     </td>
-                    <td className="num px-3 py-2 text-right">{peer.analysis.score}</td>
-                    <td className="num px-3 py-2 text-right">{peer.stock.fundamentals.growth.toFixed(1)}%</td>
-                    <td className="num px-3 py-2 text-right">{peer.stock.fundamentals.roe.toFixed(1)}%</td>
-                    <td className="num px-3 py-2 text-right">{peer.stock.fundamentals.roce.toFixed(1)}%</td>
-                    <td className="num px-3 py-2 text-right">{peer.stock.fundamentals.netMargin.toFixed(1)}%</td>
-                    <td className="num px-3 py-2 text-right">{peer.stock.fundamentals.debtToEquity.toFixed(1)}x</td>
-                    <td className="num px-3 py-2 text-right">{peer.stock.fundamentals.pe.toFixed(1)}x</td>
+                    {metrics.map((metric) => (
+                      <td key={metric.key} className="num px-3 py-2 text-right">
+                        {formatMetric(metric.key, metricValue(peer, metric.key))}
+                      </td>
+                    ))}
                   </tr>
                 ))}
 
