@@ -426,7 +426,8 @@ async function fetchLse(fetchedAt: string): Promise<LiveIpo[]> {
       const market = cells[1] ?? "";
       const primary = parseLseSize(cells[2] ?? "");
       const secondary = parseLseSize(cells[3] ?? "");
-      const currency = (cells[4] ?? "").trim() || "GBP";
+      const rawCurrency = (cells[4] ?? "").trim();
+      const currency = rawCurrency && rawCurrency !== "-" ? rawCurrency : "GBP";
       const [bandLow, bandHigh] = parseBand(cells[5] ?? "");
       const expected = cells[6] ?? "";
       const listing = parseLseDate(expected);
