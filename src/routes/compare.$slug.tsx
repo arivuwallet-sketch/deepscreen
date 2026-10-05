@@ -1,6 +1,7 @@
 import { jsonLd } from "@/lib/seo/json-ld";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
+import { PaywallGate } from "@/components/ds/PaywallGate";
 import { analyze } from "@/lib/deepscreen/metrics";
 import { findStock } from "@/lib/deepscreen/stocks";
 import { findComparison, findStockComparison } from "@/lib/seo/content";
@@ -96,14 +97,16 @@ function ComparisonPage() {
   if (left && right) {
     const la = analyze(left),
       ra = analyze(right);
-    const rows = [
-      ["DeepScreen score", `${la.score}/100`, `${ra.score}/100`],
-      ["Verdict", la.verdict, ra.verdict],
+    const freeRows = [
       ["P/E", `${left.fundamentals.pe}x`, `${right.fundamentals.pe}x`],
-      ["PEG", `${left.fundamentals.peg}`, `${right.fundamentals.peg}`],
       ["ROCE", `${left.fundamentals.roce}%`, `${right.fundamentals.roce}%`],
       ["Revenue growth", `${left.fundamentals.growth}%`, `${right.fundamentals.growth}%`],
       ["Debt/equity", `${left.fundamentals.debtToEquity}x`, `${right.fundamentals.debtToEquity}x`],
+    ];
+    const proRows = [
+      ["DeepScreen score", `${la.score}/100`, `${ra.score}/100`],
+      ["Verdict", la.verdict, ra.verdict],
+      ["PEG", `${left.fundamentals.peg}`, `${right.fundamentals.peg}`],
     ];
     return (
       <Shell>
@@ -136,7 +139,15 @@ function ComparisonPage() {
               {right.name}: share price and fundamentals
             </Link>
           </nav>
-          <CompareTable headings={[left.symbol, right.symbol]} rows={rows} />
+          <CompareTable headings={[left.symbol, right.symbol]} rows={freeRows} />
+          <PaywallGate
+            strict
+            feature="DeepScreen score, verdict & advanced comparison"
+            className="mt-6"
+            minHeight="min-h-[220px]"
+          >
+            <CompareTable headings={[left.symbol, right.symbol]} rows={proRows} />
+          </PaywallGate>
         </article>
       </Shell>
     );
