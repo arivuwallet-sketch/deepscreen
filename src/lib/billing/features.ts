@@ -32,7 +32,7 @@ export const PRO_FEATURES = [
   "Portfolio X-Ray, portfolio health, concentration and risk matrix",
 ] as const;
 
-export const FEATURE_COMPARISON: PricingFeature[] = [
+export const FEATURE_COMPARISON = [
   { name: "Company search & exchange directory", free: "Full directory", pro: "Full directory", availability: "free" },
   { name: "Core company data & ratios", free: "Core ratios", pro: "Core + advanced", availability: "free" },
   { name: "Public news, calendars, guides & FAQs", free: true, pro: true, availability: "free" },
@@ -48,4 +48,4 @@ export const FEATURE_COMPARISON: PricingFeature[] = [
   { name: "Research alerts & score changes", free: false, pro: true, availability: "pro" },
   { name: "Options Strategy Lab analytics", free: "Inputs & education", pro: "12 payoff models + Greeks + POP", availability: "pro" },
   { name: "Portfolio X-Ray", free: false, pro: "Health, concentration & risk matrix", availability: "pro" },
-] as const;
+] satisfies readonly PricingFeature[];
