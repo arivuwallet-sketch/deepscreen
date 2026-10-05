@@ -800,7 +800,12 @@ export const getNewsFeed = createServerFn({ method: "GET" })
         ) => {
           const freshQuery = newsQueryVariants(topic.query, maxAgeHours)[0] ?? topic.query;
           const genericQuery = freshQuery.replace(/\s+when:[^\s]+/gi, "").trim();
-          const includeYahoo = mode === "global-market" ? topicIndex < 6 : true;
+          const includeYahoo =
+            mode === "global-market"
+              ? topicIndex < 6
+              : mode === "company"
+                ? topicIndex < 2
+                : topicIndex < 3;
 
           const [google, bing, yahoo] = await Promise.all([
             fetchFeed(googleNewsFeed(freshQuery), "Google News", topic.category, perTopicLimit),
