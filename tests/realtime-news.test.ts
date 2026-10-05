@@ -59,7 +59,8 @@ test("global market feed aggregates regions and market-moving themes", async () 
     assert.ok(market.includes(`category: "${category}"`), category);
   }
 
-  assert.ok(market.includes("GLOBAL_MARKET_NEWS_TOPICS.map"));
+  assert.ok(market.includes("GLOBAL_MARKET_NEWS_TOPICS.slice(start, start + 4)"));
+  assert.ok(market.includes("start += 4"));
   assert.ok(market.includes("categoryCounts"));
   assert.ok(market.includes("if (count >= 6) return false"));
 });
