@@ -465,14 +465,27 @@ export interface LiveNewsResult {
   providerCount: number;
 }
 
+const GLOBAL_MARKET_NEWS_TOPICS = [
+  { category: "GLOBAL", query: "global stock markets equities" },
+  { category: "US", query: "Wall Street stocks S&P 500 Nasdaq Dow" },
+  { category: "INDIA", query: "India stock market Nifty Sensex NSE BSE" },
+  { category: "EUROPE", query: "Europe stocks STOXX FTSE DAX CAC markets" },
+  { category: "ASIA", query: "Asia stocks Nikkei Hang Seng Shanghai Kospi markets" },
+  { category: "MACRO", query: "Federal Reserve ECB BOE RBI rates inflation markets" },
+  { category: "EARNINGS", query: "stock earnings results guidance markets" },
+  { category: "M&A", query: "merger acquisition takeover stocks markets" },
+  { category: "TECH", query: "technology semiconductor AI stocks markets" },
+  { category: "COMMODITIES", query: "oil gold commodities markets stocks" },
+] as const;
+
 const NEWS_CACHE_TTL_MS = 60_000;
 const newsMemoryCache = new Map<string, { data: LiveNewsResult; fetchedAt: number }>();
 const newsInFlight = new Map<string, Promise<LiveNewsResult>>();
 
-function newsKey(query: string, maxAgeHours?: number): string {
+function newsKey(query: string, maxAgeHours?: number, globalMarket = false): string {
   const normalized = query.trim().replace(/\s+/g, " ").toLowerCase().slice(0, 220);
   const age = maxAgeHours === undefined ? "default" : `${Math.round(maxAgeHours * 10) / 10}h`;
-  return `${normalized}::${age}`;
+  return globalMarket ? `global-market::${age}` : `${normalized}::${age}`;
 }
 
 // Never surface stale cached/provider headlines as "latest" news. A provider
@@ -530,16 +543,19 @@ function newsQueryVariants(query: string, maxAgeHours?: number): string[] {
 
 
 export const getNewsFeed = createServerFn({ method: "GET" })
-  .inputValidator((d: { query: string; limit?: number; maxAgeHours?: number }) => d)
+  .inputValidator((d: { query: string; limit?: number; maxAgeHours?: number; globalMarket?: boolean }) => d)
   .handler(async ({ data }): Promise<LiveNewsResult> => {
     const { dedupe, refreshAges } = await import("@/lib/rss.server");
-    const limit = Math.min(Math.max(data.limit ?? 14, 1), 30);
+    const limit = Math.min(Math.max(data.limit ?? 14, 1), 50);
     const maxAgeHours =
       typeof data.maxAgeHours === "number" && Number.isFinite(data.maxAgeHours) && data.maxAgeHours > 0
         ? Math.min(data.maxAgeHours, 30 * 24)
         : undefined;
-    const key = newsKey(data.query, maxAgeHours);
-    if (!key) return { items: [], fetchedAt: Date.now(), stale: false, providerCount: 0 };
+    const globalMarket = data.globalMarket === true;
+    const key = newsKey(data.query, maxAgeHours, globalMarket);
+    if (!globalMarket && !data.query.trim()) {
+      return { items: [], fetchedAt: Date.now(), stale: false, providerCount: 0 };
+    }
 
     const memory = newsMemoryCache.get(key);
     if (memory && Date.now() - memory.fetchedAt < NEWS_CACHE_TTL_MS) {
@@ -565,44 +581,84 @@ export const getNewsFeed = createServerFn({ method: "GET" })
         return result;
       }
 
-      const queries = newsQueryVariants(data.query, maxAgeHours);
-      const allItems = [];
+      const allItems: FeedItem[] = [];
       const providerNames = new Set<string>();
 
-      const upstreamLimit = Math.min(40, Math.max(20, limit * 2));
-      const fetchVariant = async (query: string) => {
-        const genericQuery = query.replace(/\s+when:[^\s]+/gi, "").trim();
-        const [google, bing, yahoo] = await Promise.all([
-          fetchFeed(googleNewsFeed(query), "Google News", "market", upstreamLimit),
-          fetchFeed(bingNewsFeed(genericQuery), "Bing News", "market", upstreamLimit),
-          fetchYahooNews(genericQuery, upstreamLimit),
-        ]);
-        if (google.length > 0) providerNames.add("Google News");
-        if (bing.length > 0) providerNames.add("Bing News");
-        if (yahoo.length > 0) providerNames.add("Yahoo Finance");
-        return [...google, ...bing, ...yahoo];
-      };
+      if (globalMarket) {
+        const perTopicLimit = Math.max(8, Math.min(14, Math.ceil(limit / 2)));
+        const topicResults = await Promise.all(
+          GLOBAL_MARKET_NEWS_TOPICS.map(async (topic, topicIndex) => {
+            const freshQuery = newsQueryVariants(topic.query, maxAgeHours)[0] ?? topic.query;
+            const genericQuery = freshQuery.replace(/\s+when:[^\s]+/gi, "").trim();
 
-      // Try the freshness-constrained query first. If providers return rows
-      // but none have a valid publication time inside the requested window,
-      // continue into the conservative fallbacks instead of treating an old
-      // result set as a successful "latest" fetch.
-      const exactItems = queries.length > 0 ? await fetchVariant(queries[0]!) : [];
-      allItems.push(...exactItems);
+            // Google + Bing run for every topic. Yahoo is added for the broad
+            // regional/macro topics, giving provider redundancy without
+            // multiplying requests unnecessarily for every niche theme.
+            const [google, bing, yahoo] = await Promise.all([
+              fetchFeed(googleNewsFeed(freshQuery), "Google News", topic.category, perTopicLimit),
+              fetchFeed(bingNewsFeed(genericQuery), "Bing News", topic.category, perTopicLimit),
+              topicIndex < 6 ? fetchYahooNews(genericQuery, perTopicLimit) : Promise.resolve([]),
+            ]);
+            if (google.length > 0) providerNames.add("Google News");
+            if (bing.length > 0) providerNames.add("Bing News");
+            if (yahoo.length > 0) providerNames.add("Yahoo Finance");
 
-      const exactRecent = filterRecentNews(exactItems, maxAgeHours);
-      if (exactRecent.length === 0 && queries.length > 1) {
-        const fallbackItems = await Promise.all(queries.slice(1).map(fetchVariant));
-        fallbackItems.forEach((items) => allItems.push(...items));
+            return [...google, ...bing, ...yahoo].map((item) => ({
+              ...item,
+              category: topic.category,
+            }));
+          }),
+        );
+        topicResults.forEach((items) => allItems.push(...items));
+      } else {
+        const queries = newsQueryVariants(data.query, maxAgeHours);
+        const upstreamLimit = Math.min(40, Math.max(20, limit * 2));
+        const fetchVariant = async (query: string) => {
+          const genericQuery = query.replace(/\s+when:[^\s]+/gi, "").trim();
+          const [google, bing, yahoo] = await Promise.all([
+            fetchFeed(googleNewsFeed(query), "Google News", "market", upstreamLimit),
+            fetchFeed(bingNewsFeed(genericQuery), "Bing News", "market", upstreamLimit),
+            fetchYahooNews(genericQuery, upstreamLimit),
+          ]);
+          if (google.length > 0) providerNames.add("Google News");
+          if (bing.length > 0) providerNames.add("Bing News");
+          if (yahoo.length > 0) providerNames.add("Yahoo Finance");
+          return [...google, ...bing, ...yahoo];
+        };
+
+        const exactItems = queries.length > 0 ? await fetchVariant(queries[0]!) : [];
+        allItems.push(...exactItems);
+
+        const exactRecent = filterRecentNews(exactItems, maxAgeHours);
+        if (exactRecent.length === 0 && queries.length > 1) {
+          const fallbackItems = await Promise.all(queries.slice(1).map(fetchVariant));
+          fallbackItems.forEach((items) => allItems.push(...items));
+        }
       }
 
       // Sort before deduplication so, when multiple providers carry the same
       // headline, the copy with the newest verified publication timestamp wins.
-      const items = dedupe(
+      const sorted = dedupe(
         filterRecentNews(allItems, maxAgeHours).sort(
           (a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt),
         ),
-      ).slice(0, limit);
+      );
+
+      // A global feed should stay broad rather than letting one hot market
+      // consume the entire list. Keep at most six rows from any one topic,
+      // then restore pure newest-first chronology across the balanced set.
+      const categoryCounts = new Map<string, number>();
+      const balanced = globalMarket
+        ? sorted.filter((item) => {
+            const count = categoryCounts.get(item.category) ?? 0;
+            if (count >= 6) return false;
+            categoryCounts.set(item.category, count + 1);
+            return true;
+          })
+        : sorted;
+      const items = balanced
+        .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
+        .slice(0, limit);
 
       if (items.length > 0) {
         const fetchedAt = Date.now();
