@@ -73,3 +73,133 @@
   background: radial-gradient(circle at 30% 25%, #d5ffc3, #1f714a 40%, #0e2d21 70%);
   box-shadow: 0 0 80px #65b56838;
 }
+
+
+/* 2D motion overlay layered over the existing 3D landing scene. */
+.ds-scene-motion {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+.ds-scene-orbit {
+  position: absolute;
+  left: 73%;
+  top: 50%;
+  border: 1px solid #c8fa8625;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: ds-scene-orbit-spin 18s linear infinite;
+}
+.ds-scene-orbit.orbit-a {
+  width: 470px;
+  height: 470px;
+}
+.ds-scene-orbit.orbit-b {
+  width: 335px;
+  height: 335px;
+  animation-duration: 13s;
+  animation-direction: reverse;
+}
+.ds-scene-orbit i {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #c8fa86;
+  box-shadow: 0 0 16px #c8fa867d;
+}
+.ds-scene-orbit i:nth-child(1) { left: 49%; top: -3px; }
+.ds-scene-orbit i:nth-child(2) { right: 8%; top: 28%; }
+.ds-scene-orbit i:nth-child(3) { left: 13%; bottom: 18%; }
+.ds-scene-orbit.orbit-b i:nth-child(1) { left: 5%; top: 40%; }
+.ds-scene-orbit.orbit-b i:nth-child(2) { right: 11%; bottom: 21%; }
+.ds-scene-scan {
+  position: absolute;
+  left: 51%;
+  top: 18%;
+  width: 44%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #c8fa8650, transparent);
+  box-shadow: 0 0 16px #c8fa8620;
+  animation: ds-scene-scan 5.4s ease-in-out infinite;
+}
+.ds-scene-hud {
+  position: absolute;
+  min-width: 88px;
+  padding: 8px 10px;
+  border: 1px solid #c8fa8620;
+  border-radius: 5px;
+  background: #08130dbd;
+  backdrop-filter: blur(5px);
+  font-family: "IBM Plex Mono", monospace;
+  animation: ds-scene-hud-float 5.8s ease-in-out infinite;
+}
+.ds-scene-hud span,
+.ds-scene-hud b {
+  display: block;
+}
+.ds-scene-hud span {
+  color: #c8fa86;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+}
+.ds-scene-hud b {
+  margin-top: 3px;
+  color: #78907d;
+  font-size: 6px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+}
+.ds-scene-hud.hud-a { right: 9%; top: 24%; }
+.ds-scene-hud.hud-b { right: 5%; top: 63%; animation-delay: -1.8s; }
+.ds-scene-hud.hud-c { left: 54%; top: 72%; animation-delay: -3.2s; }
+
+.ds-scene.is-paused .ds-scene-motion *,
+.ds-scene.is-paused .ds-scene-motion *:before,
+.ds-scene.is-paused .ds-scene-motion *:after {
+  animation-play-state: paused !important;
+}
+
+@keyframes ds-scene-orbit-spin {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+@keyframes ds-scene-scan {
+  0%, 100% { transform: translateY(0); opacity: 0.15; }
+  50% { transform: translateY(420px); opacity: 0.75; }
+}
+@keyframes ds-scene-hud-float {
+  0%, 100% { transform: translateY(0); opacity: 0.62; }
+  50% { transform: translateY(-8px); opacity: 1; }
+}
+
+@media (max-width: 759px) {
+  .ds-scene-orbit {
+    left: 50%;
+    top: 73%;
+  }
+  .ds-scene-orbit.orbit-a {
+    width: 330px;
+    height: 330px;
+  }
+  .ds-scene-orbit.orbit-b {
+    width: 245px;
+    height: 245px;
+  }
+  .ds-scene-scan {
+    left: 17%;
+    top: 58%;
+    width: 66%;
+  }
+  .ds-scene-hud.hud-a { right: 7%; top: 60%; }
+  .ds-scene-hud.hud-b { display: none; }
+  .ds-scene-hud.hud-c { left: 8%; top: 81%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-scene-motion *,
+  .ds-scene-motion *:before,
+  .ds-scene-motion *:after {
+    animation: none !important;
+  }
+}

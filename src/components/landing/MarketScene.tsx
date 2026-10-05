@@ -305,7 +305,7 @@ export function MarketScene({
     host.current?.dispatchEvent(new Event("scene-update"));
   }, [paused, market]);
   return (
-    <div className={`ds-scene ds-scene--${variant} ${ready ? "is-ready" : ""}`} aria-hidden="true">
+    <div className={`ds-scene ds-scene--${variant} ${ready ? "is-ready" : ""} ${paused ? "is-paused" : ""}`} aria-hidden="true">
       <div className="ds-scene-glow" />
       <div className="ds-scene-fallback">
         <span />
@@ -314,6 +314,14 @@ export function MarketScene({
         <i />
       </div>
       <div ref={host} className="ds-scene-canvas" />
+      <div className="ds-scene-motion">
+        <div className="ds-scene-orbit orbit-a"><i /><i /><i /></div>
+        <div className="ds-scene-orbit orbit-b"><i /><i /></div>
+        <div className="ds-scene-scan" />
+        <div className="ds-scene-hud hud-a"><span>13F</span><b>MODEL</b></div>
+        <div className="ds-scene-hud hud-b"><span>5X</span><b>MARKETS</b></div>
+        <div className="ds-scene-hud hud-c"><span>LIVE</span><b>RESEARCH</b></div>
+      </div>
       <div className="ds-scene-grid" />
     </div>
   );
