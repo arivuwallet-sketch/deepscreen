@@ -90,9 +90,9 @@ test("news feed attaches impact levels and affected-market signals", async () =>
   assert.ok(market.includes("HIGH_IMPACT_NEWS_RE"));
   assert.ok(market.includes("MEDIUM_IMPACT_NEWS_RE"));
   assert.ok(market.includes("AFFECTED_MARKET_RULES"));
-  assert.ok(market.includes('label: "India"'));
-  assert.ok(market.includes('label: "US"'));
-  assert.ok(market.includes('label: "UK"'));
+  assert.ok(market.includes('label: "NSE/BSE"'));
+  assert.ok(market.includes('label: "NYSE/Nasdaq"'));
+  assert.ok(market.includes('label: "LSE"'));
   assert.ok(market.includes('label: "Europe"'));
   assert.ok(market.includes('label: "Asia"'));
   assert.ok(market.includes('label: "FX"'));
@@ -101,7 +101,7 @@ test("news feed attaches impact levels and affected-market signals", async () =>
   assert.ok(market.includes('label: "Tech"'));
   assert.ok(market.includes("withNewsSignals("));
 
-  assert.ok(feed.includes("IMPACT {(n.impactLevel ?? \"low\").toUpperCase()}"));
+  assert.ok(feed.includes("EST. IMPACT {(n.impactLevel ?? \"low\").toUpperCase()}"));
   assert.ok(feed.includes("AFFECTS:"));
   assert.ok(feed.includes("n.affectedMarkets?.length"));
   assert.ok(feed.includes("not a guaranteed market reaction or trading signal"));
