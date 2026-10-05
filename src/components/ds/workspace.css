@@ -361,7 +361,7 @@
     background-position 0.45s ease;
 }
 .ds-workspace-content
-  :where(div, section, article, aside, a, li, dl, nav).border-border:is(
+  :where(div, section, article, aside, a, li, dl, nav, p, form, fieldset, figure).border-border:is(
     .rounded,
     .rounded-md,
     .rounded-lg,
