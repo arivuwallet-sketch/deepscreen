@@ -643,11 +643,19 @@ export function LandingPage() {
               },
               {
                 icon: Globe2,
-                tag: "MARKETS",
+                tag: "COMMODITIES",
                 title: "Follow the markets around the stock.",
-                text: "Track commodity research for gold, silver, crude oil, natural gas and copper, understand GIFT Nifty context, and connect broader market conditions back to your research.",
+                text: "Track research for gold, silver, crude oil, natural gas and copper with timestamped prices, trend context and links into deeper technical analysis.",
                 link: "/commodities",
-                cta: "Explore market guides",
+                cta: "Explore commodities",
+              },
+              {
+                icon: Activity,
+                tag: "GIFT NIFTY",
+                title: "Read the pre-market context carefully.",
+                text: "Understand GIFT Nifty, NSE IX, trading-session context, futures basis and how the contract is commonly used as an indication—not a guarantee—of the Nifty 50 open.",
+                link: "/gift-nifty",
+                cta: "Explore GIFT Nifty",
               },
               {
                 icon: Newspaper,
@@ -822,10 +830,16 @@ export function LandingPage() {
         </div>
         <nav aria-label="Footer navigation">
           <a href="/screener">Screener</a>
-          <Link to="/pricing">Pricing</Link>
+          <Link to="/chart-reader">DeepChart</Link>
+          <Link to="/investments">Investments</Link>
+          <Link to="/options">Options</Link>
+          <Link to="/trading">Trading Guide</Link>
           <Link to="/commodities">Commodities</Link>
           <Link to="/gift-nifty">Gift Nifty</Link>
           <Link to="/ipo-gmp">IPO GMP</Link>
+          <Link to="/blog">Blog</Link>
+          <Link to="/knowledge">Knowledge</Link>
+          <Link to="/pricing">Pricing</Link>
           <Link to="/methodology">Methodology</Link>
           <Link to="/data-sources">Data sources</Link>
           <Link to="/about">About</Link>
