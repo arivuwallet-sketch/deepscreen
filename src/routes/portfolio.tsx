@@ -99,14 +99,16 @@ function PortfolioPage() {
           Your saved stocks, live fundamental changes, research alerts and portfolio health in one place.
         </p>
 
-        <WatchlistAlertsPanel
-          rows={rows.map(({ stock, analysis, fundamentals, sources }) => ({
-            stock,
-            analysis,
-            fundamentals,
-            sources,
-          }))}
-        />
+        <PaywallGate strict feature="My Stocks research alerts" className="mt-6" minHeight="min-h-[220px]">
+          <WatchlistAlertsPanel
+            rows={rows.map(({ stock, analysis, fundamentals, sources }) => ({
+              stock,
+              analysis,
+              fundamentals,
+              sources,
+            }))}
+          />
+        </PaywallGate>
 
         <PaywallGate strict feature="Portfolio X-Ray" className="mt-6" minHeight="min-h-[420px]">
         <div>
