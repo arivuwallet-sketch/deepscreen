@@ -52,10 +52,12 @@ export function LiveNewsFeed({
 }) {
   const fetchNews = useServerFn(getNewsFeed);
   const { data, isLoading, dataUpdatedAt } = useQuery({
-    queryKey: ["news-feed", query, limit],
-    queryFn: () => fetchNews({ data: { query, limit } }),
-    refetchInterval: 60_000,
-    staleTime: 30_000,
+    queryKey: ["news-feed", query, limit, maxAgeHours ?? null],
+    queryFn: () => fetchNews({ data: { query, limit, maxAgeHours } }),
+    refetchInterval: 30_000,
+    staleTime: 15_000,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
   const now = Date.now();
   const items = maxAgeHours === undefined
