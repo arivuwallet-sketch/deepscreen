@@ -52,10 +52,12 @@ export function LiveNewsFeed({
 }) {
   const fetchNews = useServerFn(getNewsFeed);
   const { data, isLoading, dataUpdatedAt } = useQuery({
-    queryKey: ["news-feed", query, limit],
-    queryFn: () => fetchNews({ data: { query, limit } }),
-    refetchInterval: 60_000,
-    staleTime: 30_000,
+    queryKey: ["news-feed", query, limit, maxAgeHours ?? null],
+    queryFn: () => fetchNews({ data: { query, limit, maxAgeHours } }),
+    refetchInterval: 30_000,
+    staleTime: 15_000,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
   const now = Date.now();
   const items = maxAgeHours === undefined
@@ -65,17 +67,27 @@ export function LiveNewsFeed({
         return Number.isFinite(published) && published <= now + 10 * 60_000 && published >= now - maxAgeHours * 60 * 60_000;
       });
 
+  const newest = items[0];
+  const checkedAt = new Date(data?.fetchedAt ?? dataUpdatedAt ?? Date.now()).toLocaleTimeString();
+
   return (
     <section className={cn("rounded-lg border border-border bg-panel", className)}>
       <header className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
         <h2 className="text-sm font-semibold uppercase tracking-wide">{title}</h2>
-        <span className="num flex items-center gap-1.5 text-xs text-muted-foreground">
+        <span
+          className="num flex items-center gap-1.5 text-xs text-muted-foreground"
+          title={dataUpdatedAt ? "Feed checked " + checkedAt : undefined}
+        >
           <span className={cn("size-1.5 rounded-full", data?.stale || !items.length ? "bg-warn" : "animate-pulse bg-bull")} />
           {data?.stale
-            ? `LAST GOOD · ${new Date(data.fetchedAt).toLocaleTimeString()}`
-            : dataUpdatedAt
-              ? new Date(data?.fetchedAt ?? dataUpdatedAt).toLocaleTimeString()
-              : "UPDATING"}
+            ? newest
+              ? "LAST GOOD · " + ago(newest.minutesAgo)
+              : "LAST GOOD"
+            : newest
+              ? "LATEST · " + ago(newest.minutesAgo)
+              : dataUpdatedAt
+                ? "NO FRESH NEWS"
+                : "UPDATING"}
         </span>
       </header>
       {isLoading ? (
