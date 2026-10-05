@@ -586,9 +586,9 @@ const MEDIUM_IMPACT_NEWS_RE =
   /\b(earnings|results|guidance|forecast|outlook|merger|acquisition|takeover|buyout|ipo|regulation|regulator|antitrust|lawsuit|probe|downgrade|upgrade|oil|crude|gold|yield|treasury|bond|currency|dollar|rupee|euro|sterling|election|trade deal|strike|layoffs?|recall)\b/i;
 
 const AFFECTED_MARKET_RULES: { label: string; re: RegExp }[] = [
-  { label: "India", re: /\b(india|nifty|sensex|nse|bse|rbi|rupee|mumbai)\b/i },
-  { label: "US", re: /\b(u\.?s\.?|united states|wall street|s&p|nasdaq|dow|federal reserve|\bfed\b|treasury|sec)\b/i },
-  { label: "UK", re: /\b(uk|u\.?k\.?|britain|british|london|ftse|bank of england|\bboe\b|sterling|pound)\b/i },
+  { label: "NSE/BSE", re: /\b(india|nifty|sensex|nse|bse|rbi|rupee|mumbai)\b/i },
+  { label: "NYSE/Nasdaq", re: /\b(u\.?s\.?|united states|wall street|s&p|nasdaq|dow|federal reserve|\bfed\b|treasury|sec)\b/i },
+  { label: "LSE", re: /\b(uk|u\.?k\.?|britain|british|london|ftse|bank of england|\bboe\b|sterling|pound)\b/i },
   { label: "Europe", re: /\b(europe|eurozone|stoxx|dax|cac|ecb|european central bank|\beuro\b)\b/i },
   { label: "Asia", re: /\b(asia|china|japan|hong kong|south korea|korea|nikkei|hang seng|shanghai|kospi|boj|pboc|yen|yuan)\b/i },
   { label: "FX", re: /\b(forex|fx|currency|currencies|dollar|rupee|euro|sterling|pound|yen|yuan)\b/i },
@@ -598,18 +598,18 @@ const AFFECTED_MARKET_RULES: { label: string; re: RegExp }[] = [
 ];
 
 const CATEGORY_MARKET_FALLBACKS: Record<string, string[]> = {
-  GLOBAL: ["Global"],
-  US: ["US"],
-  INDIA: ["India"],
+  GLOBAL: ["Global Equities"],
+  US: ["NYSE/Nasdaq"],
+  INDIA: ["NSE/BSE"],
   EUROPE: ["Europe"],
   ASIA: ["Asia"],
-  MACRO: ["Global", "Bonds", "FX"],
+  MACRO: ["Global Equities", "Bonds", "FX"],
   EARNINGS: ["Equities"],
   "M&A": ["Equities"],
   TECH: ["Tech"],
   COMMODITIES: ["Commodities"],
   "FX/BONDS": ["FX", "Bonds"],
-  GEOPOLITICS: ["Global", "Commodities"],
+  GEOPOLITICS: ["Global Equities", "Commodities"],
   market: ["Equities"],
   company: ["Equities"],
   workplace: ["Equities"],
@@ -640,7 +640,7 @@ function classifyNewsImpact(item: FeedItem): FeedItem {
     if (!affectedMarkets.includes(fallback)) affectedMarkets.push(fallback);
   }
 
-  if (affectedMarkets.length === 0) affectedMarkets.push("Global");
+  if (affectedMarkets.length === 0) affectedMarkets.push("Global Equities");
 
   return {
     ...item,
