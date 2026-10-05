@@ -121,7 +121,7 @@ export function MarketMovers({ stocks, title = "Live market movers", exchangeLab
     .sort((a, b) =>
       isPro
         ? (b.score ?? -Infinity) - (a.score ?? -Infinity) || b.quote.changePct - a.quote.changePct
-        : b.quote.changePct - a.quote.changePct,
+        : (b.quote.volume ?? 0) - (a.quote.volume ?? 0) || b.quote.changePct - a.quote.changePct,
     )
     .slice(0, 8);
 
@@ -153,7 +153,7 @@ export function MarketMovers({ stocks, title = "Live market movers", exchangeLab
       </div>
 
       <div className="mt-3 grid gap-3 lg:grid-cols-3">
-        <MoverList title={isPro ? "Top performers · Pro score" : "Top positive movers"} rows={performers} tone="neutral" empty="Waiting for live market quotes…" />
+        <MoverList title={isPro ? "Top performers · Pro score" : "Most-active gainers"} rows={performers} tone="neutral" empty="Waiting for live market quotes…" />
         <MoverList title="Market gainers" rows={gainers} tone="up" empty="No positive movers in the live window." />
         <MoverList title="Market losers" rows={losers} tone="down" empty="No negative movers in the live window." />
       </div>
