@@ -13,7 +13,7 @@ export const LANDING_FAQS = [
   ],
   [
     "Can I get started for free?",
-    "You can explore the screener and public research tools. Advanced features have plan-based access; the pricing page explains what is included in each plan.",
+    "Yes. Free includes company search, core ratios, public market research, guides, calendars and the basic DeepChart chart. Pro unlocks model-derived features such as the 13-factor verdict, advanced DeepChart analysis and trade plans, Options Strategy Lab analytics, valuation tools, research alerts and Portfolio X-Ray.",
   ],
   [
     "Does DeepScreen place trades for me?",
