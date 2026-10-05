@@ -8,7 +8,7 @@ function StatusPill({ s }: { s: PlaybookSetup["status"] }) {
   return (
     <span
       className={cn(
-        "rounded-full border px-2 py-0.5 font-mono text-[10px] tracking-wider",
+        "rounded-[5px] border px-2 py-1 font-mono text-[9px] font-semibold uppercase tracking-[0.1em]",
         s === "TRIGGERED"
           ? "border-primary/50 bg-primary/15 text-primary"
           : s === "ARMED"
@@ -30,7 +30,7 @@ function SetupCard({ s }: { s: PlaybookSetup }) {
         <StatusPill s={s.status} />
       </div>
       <div className="mb-3 flex items-baseline gap-2">
-        <span className={cn("font-serif text-2xl", s.direction === "LONG" ? "text-bull" : s.direction === "SHORT" ? "text-bear" : "text-muted-foreground")}>
+        <span className={cn("text-2xl font-semibold tracking-[-0.035em]", s.direction === "LONG" ? "text-bull" : s.direction === "SHORT" ? "text-bear" : "text-muted-foreground")}>
           {s.direction ?? "—"}
         </span>
         {s.checks.length > 0 && (

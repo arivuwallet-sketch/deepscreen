@@ -25,7 +25,7 @@ const NAV_ITEMS: Array<readonly [string, string]> = [
 
 const MARKET_GUIDES: Array<readonly [string, string]> = [
   ["/research-desk", "Research Desk"],
-  ["/chart-reader", "Chart Reader"],
+  ["/chart-reader", "DeepChart"],
   ["/commodities", "Commodities"],
   ["/gift-nifty", "Gift Nifty"],
   ["/ipo-gmp", "IPO GMP"],
@@ -174,7 +174,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <Link to="/commodities" className="hover:text-foreground">Commodities</Link>
           <Link to="/gift-nifty" className="hover:text-foreground">Gift Nifty</Link>
           <Link to="/ipo-gmp" className="hover:text-foreground">IPO GMP</Link>
-          <Link to="/chart-reader" className="hover:text-foreground">Chart Reader</Link>
+          <Link to="/chart-reader" className="hover:text-foreground">DeepChart</Link>
           <Link to="/stock-filters" className="hover:text-foreground">
             Stock Filters
           </Link>

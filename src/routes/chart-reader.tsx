@@ -19,13 +19,13 @@ export const Route = createFileRoute("/chart-reader")({
   staticData: { sitemap: true },
   head: () => ({
     meta: [
-      { title: "DeepScreen Chart Reader — Technical Analysis for Stocks, Forex, Crypto & Commodities" },
+      { title: "DeepChart — Technical Analysis for Stocks, Forex, Crypto & Commodities | DeepScreen" },
       {
         name: "description",
         content:
-          "Interactive technical chart reading with market structure, support and resistance, momentum, divergence, Fibonacci and multi-timeframe context. Educational analysis only; no guaranteed outcomes.",
+          "DeepChart is DeepScreen’s technical analysis workspace for market structure, support and resistance, momentum, divergence, Fibonacci and multi-timeframe context. Educational analysis only; no guaranteed outcomes.",
       },
-      { property: "og:title", content: "DeepScreen Chart Reader — Live Technical Analysis" },
+      { property: "og:title", content: "DeepChart — Live Technical Analysis | DeepScreen" },
       {
         property: "og:description",
         content:
@@ -143,12 +143,12 @@ function Index() {
             <div className="ds-cr-intro-copy">
               <p className="ds-eyebrow">
                 <span aria-hidden="true" />
-                Live technical workspace
+                DeepChart / live technical workspace
               </p>
               <h1>
-                Read the chart.
+                DeepChart.
                 <br />
-                <em>See the structure.</em>
+                <span>Read the structure.</span>
               </h1>
               <p>
                 A technical reading layer for stocks, indices, forex, crypto and commodities.
@@ -156,7 +156,7 @@ function Index() {
                 multi-timeframe context into one explainable workspace.
               </p>
             </div>
-            <div className="ds-cr-intro-metrics" aria-label="Chart reader coverage">
+            <div className="ds-cr-intro-metrics" aria-label="DeepChart coverage">
               <div>
                 <Activity size={16} />
                 <span>5</span>
@@ -177,7 +177,7 @@ function Index() {
         </section>
 
         <div className="ds-cr-workspace">
-          <section className="ds-cr-command-bar" aria-label="Chart reader controls">
+          <section className="ds-cr-command-bar" aria-label="DeepChart controls">
             <div className="ds-cr-market-tabs" role="group" aria-label="Market groups">
               {MARKETS.map((market) => (
                 <button
@@ -278,7 +278,7 @@ function Index() {
                       EMA 20 / 50 / 200 · VWAP · Supertrend · liquidity · S/R · trade levels
                     </span>
                   </div>
-                  <span className="ds-cr-engine-badge">DeepScreen engine</span>
+                  <span className="ds-cr-engine-badge">DeepChart engine</span>
                 </div>
                 <div className="ds-cr-chart-canvas">
                   {main.isError ? (
@@ -294,7 +294,7 @@ function Index() {
                         {main.isLoading ? "Reading the market…" : "Not enough history to analyze."}
                       </strong>
                       <span>
-                        DeepScreen is preparing price structure, volatility and multi-timeframe context.
+                        DeepChart is preparing price structure, volatility and multi-timeframe context.
                       </span>
                     </div>
                   ) : (
@@ -390,7 +390,7 @@ function TradeTicket({ a }: { a: A }) {
           </div>
           <div
             className={cn(
-              "font-serif mt-2 text-5xl leading-[0.95]",
+              "mt-2 text-5xl font-medium leading-[0.95] tracking-[-0.045em]",
               tone === "bull" ? "text-bull" : tone === "bear" ? "text-bear" : "text-foreground",
             )}
           >
@@ -518,7 +518,7 @@ function Details({ a, htf }: { a: A; htf: Timeframe | null }) {
   return (
     <Tabs defaultValue="playbook" className="ds-cr-card p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-serif text-3xl">
+        <h2 className="text-3xl font-medium tracking-[-0.035em]">
           The reading{htf && <span className="text-muted-foreground"> · HTF {htf}</span>}
         </h2>
         <TabsList className="bg-secondary p-0.5">
