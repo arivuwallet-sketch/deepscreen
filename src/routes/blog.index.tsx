@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
 import { INVESTMENT_BLOG_POSTS } from "@/lib/content/investment-blog";
-import { LEGACY_BLOGS } from "@/lib/discovery/knowledge-index";
+import { LEGACY_BLOGS } from "@/lib/discovery/legacy-blog";
 import { buildBreadcrumbSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 
 const title = "Market, Investing & Personal Finance Blog | DeepScreen";
@@ -101,7 +101,7 @@ function BlogIndex() {
                 <a href={post.href} className="hover:text-primary">{post.title}</a>
               </h2>
               <p className="mt-3 flex-1 text-sm leading-6 text-muted-foreground">
-                A source-backed 2026 roundup covering retail-investor participation, options activity and IPO-market statistics.
+                {post.description}
               </p>
               <a href={post.href} className="mt-4 text-sm font-medium text-primary hover:underline">
                 Read the research →
