@@ -104,7 +104,7 @@ function currencySymbol(ipo: LiveIpo): string {
   const currency = (ipo.currency ?? "").toUpperCase();
   if (currency === "INR") return "₹";
   if (currency === "USD") return "$";
-  if (currency === "GBP" || currency === "GBP") return "£";
+  if (currency === "GBP" || currency === "GBX" || currency === "GBP") return "£";
   return currency ? `${currency} ` : "";
 }
 
