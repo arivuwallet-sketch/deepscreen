@@ -16,7 +16,7 @@ type YahooGroup = {
 
 const GROUPS: YahooGroup[] = [
   { id: "india", deep: ["NSE", "BSE"], yahoo: ["NSI", "BSE"] },
-  { id: "us", deep: ["NYSE", "NASDAQ"], yahoo: ["NYQ", "NMS", "NGM", "NCM"] },
+  { id: "us", deep: ["NYSE", "NASDAQ"], yahoo: ["NYQ", "NAS", "NMS", "NGM", "NCM"] },
   { id: "uk", deep: ["LSE"], yahoo: ["LSE"] },
 ];
 
@@ -24,6 +24,7 @@ const YAHOO_TO_DEEP: Record<string, DeepExchange> = {
   NSI: "NSE",
   BSE: "BSE",
   NYQ: "NYSE",
+  NAS: "NASDAQ",
   NMS: "NASDAQ",
   NGM: "NASDAQ",
   NCM: "NASDAQ",
@@ -198,8 +199,7 @@ async function fetchScreener(exchangeCodes: string[], direction: "ASC" | "DESC")
   const movementOperator = direction === "DESC" ? "GT" : "LT";
   const body = {
     offset: 0,
-    count: 100,
-    size: 100,
+    size: 250,
     sortField: "percentchange",
     sortType: direction,
     quoteType: "EQUITY",
@@ -218,7 +218,7 @@ async function fetchScreener(exchangeCodes: string[], direction: "ASC" | "DESC")
 
   try {
     const url =
-      "https://query1.finance.yahoo.com/v1/finance/screener" +
+      "https://query2.finance.yahoo.com/v1/finance/screener" +
       `?corsDomain=finance.yahoo.com&formatted=false&lang=en-US&region=US&crumb=${encodeURIComponent(auth.crumb)}`;
     const response = await fetch(url, {
       method: "POST",
