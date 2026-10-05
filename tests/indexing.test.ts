@@ -141,6 +141,17 @@ test('public crawler policy allows major search and AI crawlers', async () => {
   assert.ok(!robots.includes('User-agent: ClaudeBot\nDisallow: /\n'));
   assert.ok(!robots.includes('User-agent: Google-Extended\nDisallow: /\n'));
   assert.match(robots, /User-agent: \*\nAllow: \//);
+  for (const path of [
+    '/answers',
+    '/knowledge',
+    '/faq-index.txt',
+    '/blog/',
+    '/learn/',
+    '/api/v1/answers',
+    '/api/v1/metrics',
+  ]) {
+    assert.ok(robots.includes('Allow: ' + path), path + ' must be crawlable');
+  }
   assert.match(robots, /Sitemap: https:\/\/deepscreen\.online\/sitemap\.xml/);
 });
 
@@ -240,6 +251,7 @@ test('investment blog cluster remains indexable, sourced and sitemap-discoverabl
   }
 
   assert.match(sitemapSections, /INVESTMENT_BLOG_POSTS\.map\(\(post\) => \(\{ slug: post\.slug \}\)\)/);
+  assert.match(sitemapSections, /retail-investing-statistics-2026\.html/);
   assert.match(blogContent, /Association of Mutual Funds in India/);
   assert.match(blogContent, /National Stock Exchange of India/);
   assert.match(blogContent, /Securities and Exchange Board of India/);
@@ -321,7 +333,8 @@ test('daily personal finance posts remain indexable sourced and AI-discoverable'
   assert.match(blogContent, /Deposit Insurance and Credit Guarantee Corporation/);
   assert.match(blogContent, /Insurance Regulatory and Development Authority of India/);
   assert.match(blogContent, /Ministry of Micro, Small and Medium Enterprises/);
-  assert.match(blogIndex, /Personal finance: save it, protect it, then grow it/);
+  assert.match(blogIndex, /Today · 5 October 2026/);
+  assert.match(blogIndex, /Today's money guide: recurring costs, fraud response and freelance economics/);
 });
 
 test('investment blog registry has no sparse array entries', async () => {
@@ -359,4 +372,51 @@ test('DeepScreen and stock-market FAQ remains canonical visible and AI-discovera
   assert.match(llms, /DeepScreen & stock market FAQ/);
   assert.match(llms, /38 visible, canonical answers/);
 });
+test('all FAQ Q&A and blog discovery surfaces stay crawlable and linked', async () => {
+  const knowledgeRoute = await readFile(new URL('../src/routes/knowledge.tsx', import.meta.url), 'utf8');
+  const faqIndexRoute = await readFile(new URL('../src/routes/faq-index[.]txt.ts', import.meta.url), 'utf8');
+  const knowledgeRegistry = await readFile(new URL('../src/lib/discovery/knowledge-index.ts', import.meta.url), 'utf8');
+  const homepageRoute = await readFile(new URL('../src/routes/index.tsx', import.meta.url), 'utf8');
+  const homepage = await readFile(new URL('../src/components/landing/LandingPage.tsx', import.meta.url), 'utf8');
+  const blogArticle = await readFile(new URL('../src/components/ds/InvestmentBlogArticle.tsx', import.meta.url), 'utf8');
+  const learnRoute = await readFile(new URL('../src/routes/learn.$slug.tsx', import.meta.url), 'utf8');
+  const optionsRoute = await readFile(new URL('../src/routes/options.$slug.tsx', import.meta.url), 'utf8');
+  const stockRoute = await readFile(new URL('../src/routes/stock.$exchange.$symbol.tsx', import.meta.url), 'utf8');
+  const legacyBlog = await readFile(new URL('../public/blog/retail-investing-statistics-2026.html', import.meta.url), 'utf8');
+  const llms = await readFile(new URL('../public/llms.txt', import.meta.url), 'utf8');
 
+  assert.ok(knowledgeRoute.includes('createFileRoute("/knowledge")'));
+  assert.match(knowledgeRoute, /staticData:\s*\{\s*sitemap:\s*true\s*\}/);
+  assert.ok(knowledgeRoute.includes('index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'));
+  assert.ok(knowledgeRoute.includes('knowledgeGroups()'));
+  assert.ok(knowledgeRoute.includes('INVESTMENT_BLOG_POSTS'));
+
+  assert.ok(faqIndexRoute.includes('createFileRoute("/faq-index.txt")'));
+  assert.ok(faqIndexRoute.includes('knowledgeText()'));
+  assert.ok(faqIndexRoute.includes('text/plain; charset=utf-8'));
+  assert.ok(!faqIndexRoute.includes('X-Robots-Tag'));
+
+  for (const token of [
+    'ANSWERS', 'LANDING_FAQS', 'MARKET_GUIDE_FAQS', 'INVESTMENT_FAQS',
+    'INVESTMENT_BLOG_POSTS', 'GUIDES', 'RATIOS', 'STRATEGY_GUIDES',
+    'retail-investing-statistics-2026.html',
+  ]) assert.ok(knowledgeRegistry.includes(token), token);
+
+  assert.ok(homepageRoute.includes('buildFAQSchema'));
+  assert.ok(homepageRoute.includes('LANDING_FAQS'));
+  assert.ok(homepage.includes('faqAnchor(question)'));
+  assert.ok(blogArticle.includes('id={faqAnchor(faq.q)}'));
+  assert.ok(learnRoute.includes('id={faqAnchor('));
+  assert.ok(optionsRoute.includes('id={faqAnchor('));
+  assert.ok(stockRoute.includes('id={faqAnchor(faq.q)}'));
+
+  assert.ok(legacyBlog.includes('name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"'));
+  assert.ok(legacyBlog.includes('rel="canonical" href="https://deepscreen.online/blog/retail-investing-statistics-2026.html"'));
+  assert.ok(legacyBlog.includes('id="faq-how-many-retail-investors-does-india-have"'));
+
+  for (const url of [
+    'https://deepscreen.online/knowledge',
+    'https://deepscreen.online/faq-index.txt',
+    'https://deepscreen.online/blog/retail-investing-statistics-2026.html',
+  ]) assert.ok(llms.includes(url), url);
+});
