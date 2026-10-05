@@ -26,7 +26,7 @@ export const Route = createFileRoute("/screener")({
       {
         name: "description",
         content:
-          "Beginner-first stock research across NSE, BSE, NYSE, Nasdaq and LSE. DeepScreen explains ratios, highlights potential traps and combines fundamental analysis with market context.",
+          "DeepScreen is a global stock screener and investment research platform for NSE, BSE, NYSE, Nasdaq and LSE, combining fundamental analysis, valuation and market context.",
       },
       { property: "og:title", content: "Stock Screener for NSE, BSE, US & UK Markets | DeepScreen" },
       {
