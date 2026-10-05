@@ -5,10 +5,11 @@ import { Shell } from "@/components/ds/Shell";
 import { MarketGuideFaqSection } from "@/components/ds/MarketGuideFaqSection";
 import { Button } from "@/components/ui/button";
 import { MARKET_GUIDE_SOURCES, marketGuideFaq } from "@/lib/seo/market-guide-faq";
+import { ipoGmpKeywords, metaKeywords } from "@/lib/seo/keywords";
 import { buildBreadcrumbSchema, buildFAQSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 
 const URL = "https://deepscreen.online/ipo-gmp";
-const title = "IPO GMP: Meaning, Formula, Risks & Reliability | DeepScreen";
+const title = "IPO GMP Calculator & Guide: Meaning, Formula & Risks | DeepScreen";
 const description = "Learn IPO GMP meaning, formula, negative GMP, GMP vs subscription, why grey market premium is unofficial, and how to research an IPO beyond listing-day hype.";
 const faqs = marketGuideFaq("IPO_GMP");
 
@@ -16,6 +17,7 @@ export const Route = createFileRoute("/ipo-gmp")({
   staticData: { sitemap: true },
   head: () => ({ meta: [
     { title }, { name: "description", content: description },
+    { name: "keywords", content: metaKeywords(ipoGmpKeywords) },
     { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" },
     { property: "og:title", content: title }, { property: "og:description", content: description },
     { property: "og:type", content: "article" }, { property: "og:url", content: URL },

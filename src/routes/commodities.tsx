@@ -8,6 +8,7 @@ import { CommodityDashboard } from "@/components/commodities/CommodityDashboard"
 import { COMMODITY_SYMBOLS, type CommoditySnapshot } from "@/lib/market/commodity-analysis";
 import { getCommodityQuotes } from "@/lib/market/commodity-quotes.functions";
 import { MARKET_GUIDE_SOURCES, marketGuideFaq } from "@/lib/seo/market-guide-faq";
+import { commodityKeywords, metaKeywords } from "@/lib/seo/keywords";
 import {
   buildBreadcrumbSchema,
   buildFAQSchema,
@@ -19,9 +20,9 @@ import {
 } from "@/lib/seo/json-ld";
 
 const URL = "https://deepscreen.online/commodities";
-const title = "Commodity Prices & Trend Analysis | DeepScreen";
+const title = "Commodity Prices: Gold, Silver, Oil, Gas & Copper | DeepScreen";
 const description =
-  "Track gold, silver, WTI oil, natural gas and copper futures with timestamped quotes, daily charts, moving averages, RSI and source-linked market context.";
+  "Track gold, silver, WTI crude oil, natural gas and copper futures with timestamped prices, trend analysis, moving averages, RSI and source-linked market context.";
 const faqs = marketGuideFaq("COMMODITIES");
 const commodities = [
   {
@@ -93,6 +94,7 @@ export const Route = createFileRoute("/commodities")({
     meta: [
       { title },
       { name: "description", content: description },
+      { name: "keywords", content: metaKeywords(commodityKeywords) },
       {
         name: "robots",
         content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",

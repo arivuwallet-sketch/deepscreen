@@ -3,6 +3,7 @@ import { Shell } from "@/components/ds/Shell";
 import { knowledgeGroups } from "@/lib/discovery/knowledge-index";
 import { LEGACY_BLOGS } from "@/lib/discovery/legacy-blog";
 import { INVESTMENT_BLOG_POSTS } from "@/lib/content/investment-blog";
+import { knowledgeKeywords, metaKeywords } from "@/lib/seo/keywords";
 import {
   buildBreadcrumbSchema,
   buildGraph,
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/knowledge")({
     meta: [
       { title },
       { name: "description", content: description },
+      { name: "keywords", content: metaKeywords(knowledgeKeywords) },
       {
         name: "robots",
         content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",

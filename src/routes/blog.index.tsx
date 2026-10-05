@@ -3,9 +3,10 @@ import { Shell } from "@/components/ds/Shell";
 import { INVESTMENT_BLOG_POSTS } from "@/lib/content/investment-blog";
 import { LEGACY_BLOGS } from "@/lib/discovery/legacy-blog";
 import { buildBreadcrumbSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
+import { commodityKeywords, cryptoTradingKeywords, etfKeywords, forexTradingKeywords, giftNiftyKeywords, ipoGmpKeywords, metaKeywords, mutualFundKeywords, reitKeywords, researchBlogKeywords, tradingKeywords } from "@/lib/seo/keywords";
 
-const title = "Market, Investing & Personal Finance Blog | DeepScreen";
-const description = "DeepScreen research on markets, investing and personal finance: saving money, protecting wealth, increasing income, funds, ETFs, REITs, commodities, GIFT Nifty and IPOs.";
+const title = "Stock Market, Trading & Personal Finance Blog | DeepScreen";
+const description = "DeepScreen research on stocks, trading, technical analysis, crypto, forex and personal finance, plus mutual funds, ETFs, REITs, commodities, GIFT Nifty and IPOs.";
 const url = "https://deepscreen.online/blog";
 const BLOG_POSTS = [...INVESTMENT_BLOG_POSTS].sort((a, b) => b.published.localeCompare(a.published));
 
@@ -15,6 +16,7 @@ export const Route = createFileRoute("/blog/")({
     meta: [
       { title },
       { name: "description", content: description },
+      { name: "keywords", content: metaKeywords(researchBlogKeywords, tradingKeywords, cryptoTradingKeywords, forexTradingKeywords, mutualFundKeywords, etfKeywords, reitKeywords, commodityKeywords, giftNiftyKeywords, ipoGmpKeywords) },
       { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" },
       { property: "og:title", content: title },
       { property: "og:description", content: description },

@@ -514,3 +514,57 @@ test('DeepChart TradingView affiliate link stays transparent and correctly attri
   assert.ok(chartRoute.includes('Open TradingView'));
 });
 
+test('high-intent search keyword clusters stay mapped to their relevant pages', async () => {
+  const keywords = await readFile(new URL('../src/lib/seo/keywords.ts', import.meta.url), 'utf8');
+  const routes = {
+    deepchart: await readFile(new URL('../src/routes/chart-reader.tsx', import.meta.url), 'utf8'),
+    trading: await readFile(new URL('../src/routes/trading.tsx', import.meta.url), 'utf8'),
+    mutualFunds: await readFile(new URL('../src/routes/mutual-funds.tsx', import.meta.url), 'utf8'),
+    etfs: await readFile(new URL('../src/routes/etfs.tsx', import.meta.url), 'utf8'),
+    reits: await readFile(new URL('../src/routes/reits.tsx', import.meta.url), 'utf8'),
+    investments: await readFile(new URL('../src/routes/investments.tsx', import.meta.url), 'utf8'),
+    commodities: await readFile(new URL('../src/routes/commodities.tsx', import.meta.url), 'utf8'),
+    giftNifty: await readFile(new URL('../src/routes/gift-nifty.tsx', import.meta.url), 'utf8'),
+    ipoGmp: await readFile(new URL('../src/routes/ipo-gmp.tsx', import.meta.url), 'utf8'),
+    blog: await readFile(new URL('../src/routes/blog.index.tsx', import.meta.url), 'utf8'),
+    knowledge: await readFile(new URL('../src/routes/knowledge.tsx', import.meta.url), 'utf8'),
+  };
+
+  for (const token of [
+    'deepChartKeywords',
+    'tradingKeywords',
+    'cryptoTradingKeywords',
+    'forexTradingKeywords',
+    'investmentDirectoryKeywords',
+    'mutualFundKeywords',
+    'etfKeywords',
+    'reitKeywords',
+    'commodityKeywords',
+    'giftNiftyKeywords',
+    'ipoGmpKeywords',
+    'researchBlogKeywords',
+    'knowledgeKeywords',
+  ]) assert.ok(keywords.includes('export const ' + token), token);
+
+  assert.ok(routes.deepchart.includes('metaKeywords(deepChartKeywords, tradingKeywords, cryptoTradingKeywords, forexTradingKeywords)'));
+  assert.ok(routes.trading.includes('metaKeywords(tradingKeywords, cryptoTradingKeywords, forexTradingKeywords)'));
+  assert.ok(routes.mutualFunds.includes('metaKeywords(mutualFundKeywords)'));
+  assert.ok(routes.etfs.includes('metaKeywords(etfKeywords)'));
+  assert.ok(routes.reits.includes('metaKeywords(reitKeywords)'));
+  assert.ok(routes.investments.includes('metaKeywords(investmentDirectoryKeywords, mutualFundKeywords, etfKeywords, reitKeywords)'));
+  assert.ok(routes.commodities.includes('metaKeywords(commodityKeywords)'));
+  assert.ok(routes.giftNifty.includes('metaKeywords(giftNiftyKeywords)'));
+  assert.ok(routes.ipoGmp.includes('metaKeywords(ipoGmpKeywords)'));
+  assert.ok(routes.blog.includes('metaKeywords(researchBlogKeywords'));
+  assert.ok(routes.knowledge.includes('metaKeywords(knowledgeKeywords)'));
+
+  assert.ok(routes.deepchart.includes('Technical Analysis Charts for Stocks, Crypto & Forex'));
+  assert.ok(routes.trading.includes('Trading Guide: Risk Management, Crypto & Forex'));
+  assert.ok(routes.mutualFunds.includes('Mutual Fund Analysis India'));
+  assert.ok(routes.etfs.includes('ETF Analysis India'));
+  assert.ok(routes.reits.includes('REIT Analysis India'));
+  assert.ok(routes.commodities.includes('Commodity Prices: Gold, Silver, Oil, Gas & Copper'));
+  assert.ok(routes.giftNifty.includes('GIFT Nifty Guide'));
+  assert.ok(routes.ipoGmp.includes('IPO GMP Calculator & Guide'));
+});
+

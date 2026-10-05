@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
 import { MarketEducationFaqSection } from "@/components/ds/MarketEducationFaqSection";
 import { MARKET_EDUCATION_FAQS, marketEducationFaq } from "@/lib/seo/market-education-faq";
+import { cryptoTradingKeywords, forexTradingKeywords, metaKeywords, tradingKeywords } from "@/lib/seo/keywords";
 import {
   buildBreadcrumbSchema,
   buildFAQSchema,
@@ -13,9 +14,9 @@ import {
 } from "@/lib/seo/json-ld";
 
 const URL = "https://deepscreen.online/trading";
-const title = "Trading, Crypto & Forex Guide — Risk, Charts & FAQs | DeepScreen";
+const title = "Trading Guide: Risk Management, Crypto & Forex | DeepScreen";
 const description =
-  "Learn trading, crypto and forex with answer-first guides on risk management, position sizing, spot vs futures, leverage, liquidation, pips, spreads and chart analysis.";
+  "Learn trading risk management, position sizing, stop-losses and risk-reward, plus crypto spot vs futures, leverage/liquidation and forex pips, spreads and chart analysis.";
 
 const faqs = MARKET_EDUCATION_FAQS.filter((faq) => faq.topic !== "DEEPCHART");
 
@@ -53,11 +54,7 @@ export const Route = createFileRoute("/trading")({
       { title },
       { name: "description", content: description },
       { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" },
-      {
-        name: "keywords",
-        content:
-          "trading guide, trading for beginners, trading risk management, position sizing, crypto trading, spot vs futures crypto, forex trading, pips, forex leverage, DeepChart, technical analysis",
-      },
+      { name: "keywords", content: metaKeywords(tradingKeywords, cryptoTradingKeywords, forexTradingKeywords) },
       { property: "og:title", content: title },
       { property: "og:description", content: description },
       { property: "og:type", content: "website" },
