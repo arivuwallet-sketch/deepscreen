@@ -4,6 +4,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
 import { InvestmentTopicGuide } from "@/components/ds/InvestmentTopicGuide";
 import { faqForType } from "@/lib/seo/investment-faq";
+import { metaKeywords, mutualFundKeywords } from "@/lib/seo/keywords";
 import { buildBreadcrumbSchema, buildFAQSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 
 const title = "Mutual Fund Analysis: NAV, TER, Returns & Risk | DeepScreen";
@@ -18,7 +19,7 @@ export const Route = createFileRoute("/mutual-funds")({
     meta: [
       { title },
       { name: "description", content: description },
-      { name: "keywords", content: "mutual fund analysis, mutual fund NAV, mutual fund TER, expense ratio, direct vs regular mutual fund, rolling returns, mutual fund benchmark, Sharpe ratio, Sortino ratio, mutual fund risk" },
+      { name: "keywords", content: metaKeywords(mutualFundKeywords) },
       { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" },
       { property: "og:title", content: title },
       { property: "og:description", content: description },
