@@ -13,6 +13,7 @@ import { GUIDES, findGuide } from "@/lib/deepscreen/guides";
 import { metaKeywords, keywordGroups } from "@/lib/seo/keywords";
 import { RATIO_EXAMPLES, ratioFaqs } from "@/lib/seo/research";
 import { findRatio } from "@/lib/seo/content";
+import { faqAnchor } from "@/lib/seo/faq-anchor";
 
 const BASE = "https://deepscreen.online";
 
@@ -42,6 +43,7 @@ export const Route = createFileRoute("/learn/$slug")({
         meta: [
           { title },
           { name: "description", content: ratio.answer },
+          { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" },
           { property: "og:title", content: title },
           { property: "og:description", content: ratio.answer },
           { property: "og:type", content: "article" },
@@ -50,7 +52,7 @@ export const Route = createFileRoute("/learn/$slug")({
           { name: "twitter:title", content: title },
           { name: "twitter:description", content: ratio.answer },
         ],
-        links: [{ rel: "canonical", href: url }],
+        links: [{ rel: "canonical", href: url }, { rel: "describedby", href: `${BASE}/faq-index.txt` }],
         scripts: [
           {
             type: "application/ld+json",
@@ -86,6 +88,7 @@ export const Route = createFileRoute("/learn/$slug")({
       meta: [
         { title: `${guide.title} — DeepScreen` },
         { name: "description", content: guide.description },
+        { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" },
         { property: "og:title", content: guide.title },
         { property: "og:description", content: guide.description },
         { property: "og:type", content: "article" },
@@ -175,7 +178,7 @@ function GuidePage() {
           <h2 className="text-lg font-semibold text-foreground">Frequently asked questions</h2>
           <dl className="mt-4 space-y-5">
             {guide.faqs.map((f) => (
-              <div key={f.q}>
+              <div key={f.q} id={faqAnchor(f.q)} className="scroll-mt-24">
                 <dt className="text-sm font-semibold text-foreground">{f.q}</dt>
                 <dd className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{f.a}</dd>
               </div>
@@ -259,7 +262,7 @@ function RatioGuide({ ratio }: { ratio: NonNullable<ReturnType<typeof findRatio>
           <h2 className="text-lg font-semibold">Frequently asked questions</h2>
           <dl className="mt-4 space-y-5">
             {faq.map((item) => (
-              <div key={item.q}>
+              <div key={item.q} id={faqAnchor(item.q)} className="scroll-mt-24">
                 <dt className="font-semibold">{item.q}</dt>
                 <dd className="mt-1 text-sm text-muted-foreground">{item.a}</dd>
               </div>
