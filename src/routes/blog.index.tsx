@@ -1,11 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
 import { INVESTMENT_BLOG_POSTS } from "@/lib/content/investment-blog";
+import { LEGACY_BLOGS } from "@/lib/discovery/legacy-blog";
 import { buildBreadcrumbSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 
 const title = "Market, Investing & Personal Finance Blog | DeepScreen";
 const description = "DeepScreen research on markets, investing and personal finance: saving money, protecting wealth, increasing income, funds, ETFs, REITs, commodities, GIFT Nifty and IPOs.";
 const url = "https://deepscreen.online/blog";
+const BLOG_POSTS = [...INVESTMENT_BLOG_POSTS].sort((a, b) => b.published.localeCompare(a.published));
 
 export const Route = createFileRoute("/blog/")({
   staticData: { sitemap: true },
@@ -23,6 +25,8 @@ export const Route = createFileRoute("/blog/")({
     links: [
       { rel: "canonical", href: url },
       { rel: "describedby", href: "https://deepscreen.online/llms.txt" },
+      { rel: "alternate", type: "application/rss+xml", href: "https://deepscreen.online/blog/feed.xml", title: "DeepScreen Research RSS" },
+      { rel: "alternate", type: "text/plain", href: "https://deepscreen.online/faq-index.txt", title: "DeepScreen FAQ index" },
     ],
     scripts: [{
       type: "application/ld+json",
@@ -38,12 +42,20 @@ export const Route = createFileRoute("/blog/")({
           "@type": "ItemList",
           "@id": url + "#articles",
           name: "DeepScreen market and investment research articles",
-          itemListElement: INVESTMENT_BLOG_POSTS.map((post, index) => ({
-            "@type": "ListItem",
-            position: index + 1,
-            url: "https://deepscreen.online/blog/" + post.slug,
-            name: post.h1,
-          })),
+          itemListElement: [
+            ...BLOG_POSTS.map((post, index) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              url: "https://deepscreen.online/blog/" + post.slug,
+              name: post.h1,
+            })),
+            ...LEGACY_BLOGS.map((post, index) => ({
+              "@type": "ListItem",
+              position: BLOG_POSTS.length + index + 1,
+              url: "https://deepscreen.online" + post.href,
+              name: post.title,
+            })),
+          ],
         },
       )),
     }],
@@ -64,7 +76,7 @@ function BlogIndex() {
         </header>
 
         <section className="mt-10 grid gap-5 lg:grid-cols-3" aria-label="Investment research articles">
-          {INVESTMENT_BLOG_POSTS.map((post) => (
+          {BLOG_POSTS.map((post) => (
             <article key={post.slug} className="flex flex-col rounded-xl border border-border bg-card/30 p-5">
               <p className="text-xs font-semibold uppercase tracking-wide text-primary">{post.category}</p>
               <h2 className="mt-3 text-xl font-semibold leading-snug">
@@ -80,6 +92,20 @@ function BlogIndex() {
               <Link to="/blog/$slug" params={{ slug: post.slug }} className="mt-4 text-sm font-medium text-primary hover:underline">
                 Read the guide →
               </Link>
+            </article>
+          ))}
+          {LEGACY_BLOGS.map((post) => (
+            <article key={post.href} className="flex flex-col rounded-xl border border-border bg-card/30 p-5">
+              <p className="text-xs font-semibold uppercase tracking-wide text-primary">Market research</p>
+              <h2 className="mt-3 text-xl font-semibold leading-snug">
+                <a href={post.href} className="hover:text-primary">{post.title}</a>
+              </h2>
+              <p className="mt-3 flex-1 text-sm leading-6 text-muted-foreground">
+                {post.description}
+              </p>
+              <a href={post.href} className="mt-4 text-sm font-medium text-primary hover:underline">
+                Read the research →
+              </a>
             </article>
           ))}
         </section>
@@ -109,6 +135,8 @@ function BlogIndex() {
             <Link to="/gift-nifty" className="text-primary hover:underline">GIFT Nifty</Link>
             <Link to="/ipo-gmp" className="text-primary hover:underline">IPO GMP</Link>
             <Link to="/data-sources" className="text-primary hover:underline">Data sources</Link>
+            <Link to="/knowledge" className="text-primary hover:underline">Q&A and FAQ index</Link>
+            <a href="/faq-index.txt" className="text-primary hover:underline">Plain-text discovery index</a>
           </div>
         </section>
       </div>

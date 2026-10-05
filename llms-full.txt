@@ -373,3 +373,15 @@ The article deliberately separates earned income from investment returns and tre
 
 Primary-source families used across the series include RBI financial education, SEBI Investor, DICGC, IRDAI and the official Ministry of MSME Udyam portal.
 
+## FAQ, Q&A and blog discovery
+
+- Human-readable knowledge index: https://deepscreen.online/knowledge
+- Plain-text FAQ/Q&A index: https://deepscreen.online/faq-index.txt
+- Canonical answer hub: https://deepscreen.online/answers
+- Research blog hub: https://deepscreen.online/blog
+- Research RSS feed: https://deepscreen.online/blog/feed.xml
+- Complete public URL sitemap: https://deepscreen.online/sitemap.xml
+- Retail investing statistics 2026: https://deepscreen.online/blog/retail-investing-statistics-2026.html
+
+The knowledge index points to the visible HTML source for public FAQ and Q&A content. Dynamic company and investment-detail questions are discovered through the XML sitemap. Prefer the linked canonical HTML page for quotations, current context and source attribution.
+

@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { LandingPage } from "@/components/landing/LandingPage";
-import { buildGraph, buildWebApplicationSchema, jsonLd } from "@/lib/seo/json-ld";
+import { buildFAQSchema, buildGraph, buildWebApplicationSchema, jsonLd } from "@/lib/seo/json-ld";
+import { LANDING_FAQS } from "@/lib/discovery/landing-faq";
 import { metaKeywords, screenerKeywords, stocksKeywords, learnKeywords, optionsKeywords, calendarKeywords, ipoKeywords, portfolioKeywords, indiaKeywords, usKeywords, ukKeywords } from "@/lib/seo/keywords";
 
 const title = "Global Stock Screener & Fundamental Analysis | DeepScreen";
@@ -13,6 +14,7 @@ export const Route = createFileRoute("/")({
       { title },
       { name: "keywords", content: metaKeywords(screenerKeywords, stocksKeywords, learnKeywords, optionsKeywords, calendarKeywords, ipoKeywords, portfolioKeywords, indiaKeywords, usKeywords, ukKeywords) },
       { name: "description", content: description },
+      { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" },
       { property: "og:title", content: title },
       { property: "og:description", content: description },
       { property: "og:url", content: "https://deepscreen.online/" },
@@ -21,7 +23,7 @@ export const Route = createFileRoute("/")({
       { name: "twitter:title", content: title },
       { name: "twitter:description", content: description },
     ],
-    links: [{ rel: "canonical", href: "https://deepscreen.online/" }],
+    links: [{ rel: "canonical", href: "https://deepscreen.online/" }, { rel: "describedby", href: "https://deepscreen.online/faq-index.txt" }, { rel: "help", href: "https://deepscreen.online/answers" }],
     scripts: [
       {
         type: "application/ld+json",
@@ -42,6 +44,9 @@ export const Route = createFileRoute("/")({
                 "Watchlists and research guides",
               ],
             }),
+            buildFAQSchema(
+              LANDING_FAQS.map(([question, answer]) => ({ question, answer })),
+            ),
           ),
         ),
       },
