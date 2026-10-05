@@ -176,6 +176,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <Link to="/gift-nifty" className="hover:text-foreground">Gift Nifty</Link>
           <Link to="/ipo-gmp" className="hover:text-foreground">IPO GMP</Link>
           <Link to="/chart-reader" className="hover:text-foreground">DeepChart</Link>
+          <Link to="/trading" className="hover:text-foreground">Trading Guide</Link>
           <Link to="/stock-filters" className="hover:text-foreground">
             Stock Filters
           </Link>
