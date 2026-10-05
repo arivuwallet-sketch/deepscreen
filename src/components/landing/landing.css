@@ -1269,7 +1269,7 @@
   background: #0c1810cc;
   color: #91a994;
   font-size: 7px;
-  animation: ds-filter-chip 4.8s calc(var(--i) * -0.31s) ease-in-out infinite;
+  animation: ds-filter-chip 4.8s ease-in-out infinite;
 }
 .ds-filter-cloud span:nth-child(1) { left: 6%; top: 8%; }
 .ds-filter-cloud span:nth-child(2) { left: 29%; top: 5%; }
