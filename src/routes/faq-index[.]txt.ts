@@ -5,6 +5,8 @@ export const Route = createFileRoute("/faq-index.txt")({
   staticData: { sitemap: false },
   server: {
     handlers: {
+      ANY: () =>
+        new Response(null, { status: 405, headers: { Allow: "GET", "Cache-Control": "no-store" } }),
       GET: () =>
         new Response(knowledgeText(), {
           headers: {
