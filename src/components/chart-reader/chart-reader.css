@@ -410,6 +410,25 @@
   border-radius: 10px;
 }
 
+.ds-cr-card,
+.ds-cr-subcard {
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.ds-cr-sidebar > .ds-cr-card:first-child {
+  background:
+    radial-gradient(circle at 88% 8%, oklch(0.927 0.151 127 / 0.075), transparent 32%),
+    linear-gradient(180deg, oklch(0.23 0.028 155 / 0.98), oklch(0.19 0.021 155 / 0.98));
+}
+
+.ds-chart-reader .font-serif {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+}
+
 .ds-cr-chart-frame {
   position: relative;
   overflow: hidden;
