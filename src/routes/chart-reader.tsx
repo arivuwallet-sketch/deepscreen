@@ -200,7 +200,7 @@ function Index() {
       </header>
 
       <div className="mx-auto grid max-w-[1680px] gap-5 px-5 py-6 xl:grid-cols-[minmax(0,1fr)_400px]">
-        <main className="flex min-w-0 flex-col gap-5">
+        <section className="flex min-w-0 flex-col gap-5">
           {/* Instrument header */}
           <div className="flex flex-wrap items-end gap-x-8 gap-y-4">
             <div className="min-w-0">
@@ -274,7 +274,7 @@ function Index() {
           </div>
 
           {analysis && <Details a={analysis} htf={htfTf} />}
-        </main>
+        </section>
 
         <aside className="flex flex-col gap-5 xl:sticky xl:top-[124px] xl:h-fit">
           {analysis ? (
