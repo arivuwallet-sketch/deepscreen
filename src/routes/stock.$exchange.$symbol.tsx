@@ -115,10 +115,6 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
     const description = `Research ${s.name} (${s.exchange}: ${s.symbol}): available financial ratios, valuation, company news and data limitations on DeepScreen.`;
     const faqs = stockFaqs(s, sources, loaderData.snapshot.fundamentals, researchPeerNames(s));
     const url = `https://deepscreen.online${stockPath(s.exchange, s.symbol)}`;
-    const schemaAnalysis = Object.values(sources).some((value) => value === "live")
-      ? analyze(s)
-      : undefined;
-
     return {
       meta: [
         { title },
@@ -172,7 +168,6 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
                   exchange: s.exchange as ExchangeCode,
                   companyName: s.name,
                   ...(loaderData.snapshot.fundamentals?.sector ? { sector: loaderData.snapshot.fundamentals.sector } : {}),
-                  ...(schemaAnalysis ? { score: schemaAnalysis.score, verdict: schemaAnalysis.verdict } : {}),
                 }),
               }),
               buildFAQSchema(
