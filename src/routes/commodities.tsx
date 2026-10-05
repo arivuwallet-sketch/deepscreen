@@ -20,9 +20,9 @@ import {
 } from "@/lib/seo/json-ld";
 
 const URL = "https://deepscreen.online/commodities";
-const title = "Commodity Prices & Trend Analysis | DeepScreen";
+const title = "Commodity Prices: Gold, Silver, Oil, Gas & Copper | DeepScreen";
 const description =
-  "Track gold, silver, WTI oil, natural gas and copper futures with timestamped quotes, daily charts, moving averages, RSI and source-linked market context.";
+  "Track gold, silver, WTI crude oil, natural gas and copper futures with timestamped prices, trend analysis, moving averages, RSI and source-linked market context.";
 const faqs = marketGuideFaq("COMMODITIES");
 const commodities = [
   {
