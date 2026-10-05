@@ -14,6 +14,25 @@ export interface StockFilterPreset {
   test?: (stock: Stock) => boolean;
 }
 
+const PRO_DERIVED_FILTER_PATTERN =
+  /(?:fundamentally (?:strong|weak)|financially strong|strong balance sheet|stable stocks?|warren buffett|compounder|wealth creator|multibagger|financial health|low peg|garp|growth at reasonable price|quality at reasonable price|^value stocks$|undervalued stocks?|attractive valuation|global value stocks?)/i;
+
+/**
+ * Some preset memberships reveal the same 13-factor score or PEG intelligence
+ * that is sold as Pro elsewhere. The category definition stays public, but the
+ * matching-company set is a Pro output.
+ */
+export function stockFilterRequiresPro(
+  preset: Pick<StockFilterPreset, "label" | "description">,
+): boolean {
+  return (
+    PRO_DERIVED_FILTER_PATTERN.test(preset.label) ||
+    /(?:DeepScreen model score|\bscore\b.*(?:heuristic|screen)|(?:heuristic|screen).*\bscore\b|\bPEG\b)/i.test(
+      preset.description,
+    )
+  );
+}
+
 type Rule = (stock: Stock) => boolean;
 type RuleDef = { rule: Rule; description: string };
 

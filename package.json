@@ -11,6 +11,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "test:indexing": "node --experimental-strip-types --test tests/indexing.test.ts",
+    "test:pricing": "node --experimental-strip-types --test tests/pricing-feature-gates.test.ts",
     "test:indexing:ssr": "npm run build && node scripts/check-indexing.mjs",
     "indexnow:submit": "node scripts/submit-indexnow.mjs",
     "indexnow:dry-run": "node scripts/submit-indexnow.mjs --dry-run"

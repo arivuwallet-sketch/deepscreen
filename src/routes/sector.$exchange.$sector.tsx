@@ -1,11 +1,12 @@
 import { jsonLd } from "@/lib/seo/json-ld";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Shell } from "@/components/ds/Shell";
 import { StockTable } from "@/components/ds/StockTable";
 import { getExchange } from "@/lib/deepscreen/exchanges";
 import { SECTORS, stocksByExchange } from "@/lib/deepscreen/stocks";
 import { analyze } from "@/lib/deepscreen/metrics";
+import { useSubscription } from "@/hooks/useSubscription";
 import { DIRECTORY_PAGE_SIZE } from "@/lib/seo/directory";
 import {
   exchangeKeywords,
@@ -24,7 +25,12 @@ export const Route = createFileRoute("/sector/$exchange/$sector")({
     if (!exchange || !sector) throw notFound();
     const stocks = stocksByExchange(exchange.code)
       .filter((s) => s.sector === sector)
-      .sort((a, b) => analyze(b).score - analyze(a).score);
+      .sort(
+        (a, b) =>
+          b.marketCap - a.marketCap ||
+          a.name.localeCompare(b.name) ||
+          a.symbol.localeCompare(b.symbol),
+      );
     if (!stocks.length) throw notFound();
     return { exchange, sector, stocks };
   },
@@ -85,12 +91,25 @@ export const Route = createFileRoute("/sector/$exchange/$sector")({
   component: SectorPage,
 });
 function SectorPage() {
+  const { isPro } = useSubscription();
   const { exchange, sector, stocks } = Route.useLoaderData();
   const [page, setPage] = useState(1);
-  const pageCount = Math.max(1, Math.ceil(stocks.length / DIRECTORY_PAGE_SIZE));
+  const orderedStocks = useMemo(
+    () =>
+      isPro
+        ? [...stocks].sort(
+            (a, b) =>
+              analyze(b).score - analyze(a).score ||
+              b.marketCap - a.marketCap ||
+              a.name.localeCompare(b.name),
+          )
+        : stocks,
+    [stocks, isPro],
+  );
+  const pageCount = Math.max(1, Math.ceil(orderedStocks.length / DIRECTORY_PAGE_SIZE));
   const safePage = Math.min(page, pageCount);
   const start = (safePage - 1) * DIRECTORY_PAGE_SIZE;
-  const visibleStocks = stocks.slice(start, start + DIRECTORY_PAGE_SIZE);
+  const visibleStocks = orderedStocks.slice(start, start + DIRECTORY_PAGE_SIZE);
 
   return (
     <Shell>
@@ -107,9 +126,10 @@ function SectorPage() {
           {exchange.code} {sector} stocks
         </h1>
         <p className="mt-3 max-w-3xl text-sm text-muted-foreground">
-          Browse {stocks.length} {exchange.code} listings grouped under {sector}. Directory sector
-          labels can be inferred and initial rankings use modeled inputs. Verify each company’s
-          business profile and reported figures before treating it as a sector peer.
+          Browse {stocks.length} {exchange.code} listings grouped under {sector}. Free browsing is
+          ordered by directory market capitalisation; Pro users can see the DeepScreen-score ordering.
+          Directory sector labels can be inferred, so verify each company’s business profile and
+          reported figures before treating it as a sector peer.
         </p>
         <div className="mt-8">
           <StockTable stocks={visibleStocks} />

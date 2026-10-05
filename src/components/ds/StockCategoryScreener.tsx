@@ -1,10 +1,13 @@
 import { useMemo, useState } from "react";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Lock, Search, SlidersHorizontal } from "lucide-react";
 
 import { StockTable } from "@/components/ds/StockTable";
+import { PaywallGate } from "@/components/ds/PaywallGate";
+import { useSubscription } from "@/hooks/useSubscription";
 import {
   STOCK_FILTER_PRESETS,
   filterStocksByPreset,
+  stockFilterRequiresPro,
   type StockFilterPreset,
 } from "@/lib/deepscreen/stock-filter-presets";
 import type { Stock } from "@/lib/deepscreen/types";
@@ -59,6 +62,7 @@ export function StockCategoryScreener({
   stocks: Stock[];
   title?: string;
 }) {
+  const { isPro } = useSubscription();
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showCatalog, setShowCatalog] = useState(false);
@@ -67,24 +71,25 @@ export function StockCategoryScreener({
   const counts = useMemo(() => {
     const map = new Map<string, number>();
     for (const preset of STOCK_FILTER_PRESETS) {
-      if (!preset.test) continue;
+      if (!preset.test || (!isPro && stockFilterRequiresPro(preset))) continue;
       let count = 0;
       for (const stock of stocks) if (preset.test(stock)) count += 1;
       map.set(preset.id, count);
     }
     return map;
-  }, [stocks]);
+  }, [stocks, isPro]);
 
   const selected = useMemo(
     () => STOCK_FILTER_PRESETS.find((preset) => preset.id === selectedId),
     [selectedId],
   );
 
-  const totalMatches = selected ? counts.get(selected.id) ?? 0 : 0;
+  const selectedRequiresPro = selected ? stockFilterRequiresPro(selected) : false;
+  const totalMatches = selected && (!selectedRequiresPro || isPro) ? counts.get(selected.id) ?? 0 : 0;
   const matches = useMemo(() => {
-    if (!selected) return [];
+    if (!selected || (stockFilterRequiresPro(selected) && !isPro)) return [];
     return sortByMarketCap(filterStocksByPreset(stocks, selected)).slice(0, limit);
-  }, [stocks, selected, limit]);
+  }, [stocks, selected, limit, isPro]);
 
   const visiblePresets = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -171,6 +176,7 @@ export function StockCategoryScreener({
             <div className="flex flex-wrap gap-2">
               {presets.map((preset) => {
                 const active = selectedId === preset.id;
+                const requiresPro = stockFilterRequiresPro(preset);
                 const count = counts.get(preset.id);
                 return (
                   <button
@@ -186,7 +192,11 @@ export function StockCategoryScreener({
                     )}
                   >
                     {preset.label}
-                    {typeof count === "number" && (
+                    {!isPro && requiresPro ? (
+                      <span className={cn("ml-1.5 inline-flex items-center gap-1", active ? "text-primary-foreground/80" : "text-primary")}>
+                        <Lock className="size-3" /> Pro
+                      </span>
+                    ) : typeof count === "number" ? (
                       <span
                         className={cn(
                           "ml-1.5",
@@ -195,7 +205,7 @@ export function StockCategoryScreener({
                       >
                         {count.toLocaleString()}
                       </span>
-                    )}
+                    ) : null}
                   </button>
                 );
               })}
@@ -213,9 +223,9 @@ export function StockCategoryScreener({
                 {selected.description}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                {totalMatches.toLocaleString()} of {stocks.length.toLocaleString()} companies match
-                this rule. Directory ratios and classifications can be modeled or inferred; verify
-                live/provider-backed values on the company page before making decisions.
+                {!isPro && selectedRequiresPro
+                  ? "This preset uses DeepScreen Pro score/PEG intelligence. Its definition stays public; the matching-company set requires Pro."
+                  : `${totalMatches.toLocaleString()} of ${stocks.length.toLocaleString()} companies match this rule. Directory ratios and classifications can be modeled or inferred; verify live/provider-backed values on the company page before making decisions.`}
               </p>
             </div>
             <button
@@ -227,7 +237,15 @@ export function StockCategoryScreener({
             </button>
           </div>
 
-          {totalMatches > 0 ? (
+          {!isPro && selectedRequiresPro ? (
+            <PaywallGate
+              strict
+              feature={`${selected.label} matching-company screen`}
+              minHeight="min-h-[280px]"
+            >
+              <StockTable stocks={[]} />
+            </PaywallGate>
+          ) : totalMatches > 0 ? (
             <>
               <StockTable stocks={matches} />
               {totalMatches > limit && (

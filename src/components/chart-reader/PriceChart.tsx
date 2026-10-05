@@ -5,7 +5,7 @@ import type { Analysis } from "@/lib/chart-reader/analysis";
 import { decimals } from "@/lib/chart-reader/analysis";
 import { chartTheme as T } from "@/lib/chart-reader/chart-theme";
 
-export function PriceChart({ candles, analysis }: { candles: Candle[]; analysis: Analysis }) {
+export function PriceChart({ candles, analysis, advanced = false }: { candles: Candle[]; analysis: Analysis; advanced?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -64,10 +64,12 @@ export function PriceChart({ candles, analysis }: { candles: Candle[]; analysis:
       line(analysis.series.ema20, T.ema20, 20);
       line(analysis.series.ema50, T.ema50, 50);
       if (candles.length > 200) line(analysis.series.ema200, T.ema200, 200);
-      line(analysis.series.vwap, "#d1b66f", 20);
-      line(analysis.series.supertrend, "#7bd7a2", 11);
+      if (advanced) {
+        line(analysis.series.vwap, "#d1b66f", 20);
+        line(analysis.series.supertrend, "#7bd7a2", 11);
+      }
 
-      for (const p of analysis.pools)
+      if (advanced) for (const p of analysis.pools)
         s.createPriceLine({
           price: p.price,
           color: "#8fb7a3",
@@ -76,7 +78,7 @@ export function PriceChart({ candles, analysis }: { candles: Candle[]; analysis:
           axisLabelVisible: false,
           title: p.kind === "equal-highs" ? "BSL" : "SSL",
         });
-      if (analysis.profile) {
+      if (advanced && analysis.profile) {
         s.createPriceLine({
           price: analysis.profile.poc,
           color: "#d1b66f",
@@ -103,7 +105,7 @@ export function PriceChart({ candles, analysis }: { candles: Candle[]; analysis:
         });
       }
 
-      for (const lv of analysis.levels)
+      if (advanced) for (const lv of analysis.levels)
         s.createPriceLine({
           price: lv.price,
           color: T.level,
@@ -112,7 +114,7 @@ export function PriceChart({ candles, analysis }: { candles: Candle[]; analysis:
           axisLabelVisible: false,
           title: lv.kind === "support" ? "S" : "R",
         });
-      for (const z of analysis.zones) {
+      if (advanced) for (const z of analysis.zones) {
         const col = z.bias === "bull" ? T.up : T.down;
         const t =
           z.kind === "BREAKER"
@@ -139,40 +141,42 @@ export function PriceChart({ candles, analysis }: { candles: Candle[]; analysis:
           title: "",
         });
       }
-      const p = analysis.plan;
-      const pl = (price: number, color: string, title: string, style = LW.LineStyle.Solid) =>
-        s.createPriceLine({
-          price,
-          color,
-          lineWidth: 2,
-          lineStyle: style,
-          axisLabelVisible: true,
-          title,
-        });
-      pl(p.entry, T.entry, "ENTRY");
-      if (p.deepEntry != null)
-        pl(p.deepEntry, T.info ?? "#9eb8ad", "DEEP", LW.LineStyle.SparseDotted);
-      pl(p.stop, T.stop, "SL");
-      pl(p.tp1, T.tp, "TP1", LW.LineStyle.Dashed);
-      pl(p.tp2, T.tp, "TP2", LW.LineStyle.Dashed);
-      pl(p.tp3, T.tp, "TP3", LW.LineStyle.Dashed);
-      pl(p.trailingStop, T.trail, "TRAIL", LW.LineStyle.SparseDotted);
+      if (advanced) {
+        const p = analysis.plan;
+        const pl = (price: number, color: string, title: string, style = LW.LineStyle.Solid) =>
+          s.createPriceLine({
+            price,
+            color,
+            lineWidth: 2,
+            lineStyle: style,
+            axisLabelVisible: true,
+            title,
+          });
+        pl(p.entry, T.entry, "ENTRY");
+        if (p.deepEntry != null)
+          pl(p.deepEntry, T.info ?? "#9eb8ad", "DEEP", LW.LineStyle.SparseDotted);
+        pl(p.stop, T.stop, "SL");
+        pl(p.tp1, T.tp, "TP1", LW.LineStyle.Dashed);
+        pl(p.tp2, T.tp, "TP2", LW.LineStyle.Dashed);
+        pl(p.tp3, T.tp, "TP3", LW.LineStyle.Dashed);
+        pl(p.trailingStop, T.trail, "TRAIL", LW.LineStyle.SparseDotted);
 
-      const times = new Set(candles.map((c) => c.time));
-      LW.createSeriesMarkers(
-        s,
-        analysis.markers
-          .filter((m) => times.has(m.time))
-          .sort((a, b) => a.time - b.time)
-          .map((m) => ({
-            time: m.time as Time,
-            position: m.position,
-            color: m.bias === "bull" ? T.up : m.bias === "bear" ? T.down : T.text,
-            shape: m.bias === "bull" ? "arrowUp" : m.bias === "bear" ? "arrowDown" : "circle",
-            text: m.text,
-            size: m.bias === "neutral" ? 0.4 : 1,
-          })),
-      );
+        const times = new Set(candles.map((c) => c.time));
+        LW.createSeriesMarkers(
+          s,
+          analysis.markers
+            .filter((m) => times.has(m.time))
+            .sort((a, b) => a.time - b.time)
+            .map((m) => ({
+              time: m.time as Time,
+              position: m.position,
+              color: m.bias === "bull" ? T.up : m.bias === "bear" ? T.down : T.text,
+              shape: m.bias === "bull" ? "arrowUp" : m.bias === "bear" ? "arrowDown" : "circle",
+              text: m.text,
+              size: m.bias === "neutral" ? 0.4 : 1,
+            })),
+        );
+      }
       chart.timeScale().setVisibleLogicalRange({
         from: Math.max(0, candles.length - 150),
         to: candles.length + 8,
@@ -190,7 +194,7 @@ export function PriceChart({ candles, analysis }: { candles: Candle[]; analysis:
       disposed = true;
       cleanup();
     };
-  }, [candles, analysis]);
+  }, [candles, analysis, advanced]);
 
   return <div ref={ref} className="h-full w-full" />;
 }
