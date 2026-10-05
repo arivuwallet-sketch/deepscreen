@@ -60,6 +60,8 @@ function Answers() {
             <a href="/llms.txt" className="text-primary hover:underline">AI-readable site index</a>
             <a href="/llms-full.txt" className="text-primary hover:underline">AI-readable research context</a>
             <a href="/sitemap.xml" className="text-primary hover:underline">Complete public URL sitemap</a>
+            <Link to="/knowledge" className="text-primary hover:underline">Complete FAQ &amp; Q&A index</Link>
+            <a href="/faq-index.txt" className="text-primary hover:underline">Plain-text FAQ index</a>
           </div>
         </section>
 
