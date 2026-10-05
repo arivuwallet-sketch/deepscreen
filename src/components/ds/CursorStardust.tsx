@@ -110,6 +110,15 @@ export function CursorStardust() {
     const onPointerMove = (event: PointerEvent) => {
       if (event.pointerType === "touch") return;
       const now = performance.now();
+      if (!pointer.active) {
+        pointer.x = event.clientX;
+        pointer.y = event.clientY;
+        pointer.px = event.clientX;
+        pointer.py = event.clientY;
+        pointer.lastMove = now;
+        pointer.active = true;
+        return;
+      }
       const dx = event.clientX - pointer.x;
       const dy = event.clientY - pointer.y;
       const distance = Math.hypot(dx, dy);
@@ -121,7 +130,6 @@ export function CursorStardust() {
       pointer.x = event.clientX;
       pointer.y = event.clientY;
       pointer.lastMove = now;
-      pointer.active = true;
 
       if (distance < 2) return;
       const count = Math.min(7, 2 + Math.floor(distance / 18));
@@ -134,6 +142,10 @@ export function CursorStardust() {
         const drift = 0.18 + speed * 0.42;
         addParticle(x, y, trailX * drift, trailY * drift);
       }
+    };
+
+    const deactivatePointer = () => {
+      pointer.active = false;
     };
 
     const onPointerDown = (event: PointerEvent) => {
@@ -204,6 +216,8 @@ export function CursorStardust() {
     window.addEventListener("resize", resize, { passive: true });
     window.addEventListener("pointermove", onPointerMove, { passive: true });
     window.addEventListener("pointerdown", onPointerDown, { passive: true });
+    window.addEventListener("blur", deactivatePointer, { passive: true });
+    document.documentElement.addEventListener("pointerleave", deactivatePointer, { passive: true });
     frame = window.requestAnimationFrame(animate);
 
     return () => {
@@ -211,6 +225,8 @@ export function CursorStardust() {
       window.removeEventListener("resize", resize);
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("blur", deactivatePointer);
+      document.documentElement.removeEventListener("pointerleave", deactivatePointer);
       ctx.clearRect(0, 0, width, height);
     };
   }, [paused]);
