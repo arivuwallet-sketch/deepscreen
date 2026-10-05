@@ -5,6 +5,7 @@ import { LANDING_FAQS } from "@/lib/discovery/landing-faq";
 import { LEGACY_BLOGS, LEGACY_BLOG_FAQS } from "@/lib/discovery/legacy-blog";
 import { INVESTMENT_FAQS } from "@/lib/seo/investment-faq";
 import { MARKET_GUIDE_FAQS } from "@/lib/seo/market-guide-faq";
+import { MARKET_EDUCATION_FAQS } from "@/lib/seo/market-education-faq";
 import { RATIOS, STRATEGY_GUIDES, ratioGuideSlug } from "@/lib/seo/content";
 import { faqAnchor } from "@/lib/seo/faq-anchor";
 import { ratioFaqs } from "@/lib/seo/research";
@@ -12,6 +13,7 @@ import { ratioFaqs } from "@/lib/seo/research";
 export type KnowledgeEntry = {
   question: string;
   href: string;
+  answer?: string;
 };
 
 export type KnowledgeGroup = {
@@ -61,6 +63,16 @@ export function knowledgeGroups(): KnowledgeGroup[] {
       entries: MARKET_GUIDE_FAQS.map((faq) => ({
         question: faq.question,
         href: `${MARKET_PATH[faq.topic]}#${faq.id}`,
+      })),
+    },
+    {
+      id: "deepchart-trading-faq",
+      title: "DeepChart, trading, crypto and forex FAQ",
+      description: "Technical-analysis, trading-risk, crypto-market and forex questions.",
+      entries: MARKET_EDUCATION_FAQS.map((faq) => ({
+        question: faq.question,
+        answer: faq.answer,
+        href: faq.topic === "DEEPCHART" ? `/chart-reader#${faq.id}` : `/trading#${faq.id}`,
       })),
     },
     {
@@ -139,14 +151,21 @@ export function knowledgeText(origin = "https://deepscreen.online"): string {
     "This file lists canonical public questions and their visible HTML locations. Use the linked page as the source of truth for the full answer and current context.",
     "",
     "## Research blogs",
-    ...INVESTMENT_BLOG_POSTS.map((post) => `- ${post.h1}: ${origin}/blog/${post.slug}`),
-    ...LEGACY_BLOGS.map((post) => `- ${post.title}: ${origin}${post.href}`),
+    ...INVESTMENT_BLOG_POSTS.flatMap((post) => [
+      `- ${post.h1}: ${origin}/blog/${post.slug}`,
+      `  Direct answer: ${post.directAnswer}`,
+    ]),
+    ...LEGACY_BLOGS.flatMap((post) => [
+      `- ${post.title}: ${origin}${post.href}`,
+      `  Summary: ${post.description}`,
+    ]),
   ];
 
   for (const group of knowledgeGroups()) {
     lines.push("", `## ${group.title}`, group.description);
     for (const entry of group.entries) {
       lines.push(`- ${entry.question}: ${origin}${entry.href}`);
+      if (entry.answer) lines.push(`  Answer: ${entry.answer}`);
     }
   }
 

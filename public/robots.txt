@@ -23,6 +23,8 @@ User-agent: CCBot
 User-agent: meta-externalagent
 Allow: /
 Allow: /answers
+Allow: /chart-reader
+Allow: /trading
 Allow: /knowledge
 Allow: /faq-index.txt
 Allow: /blog/
@@ -44,6 +46,8 @@ Disallow: /account/
 User-agent: *
 Allow: /
 Allow: /answers
+Allow: /chart-reader
+Allow: /trading
 Allow: /knowledge
 Allow: /faq-index.txt
 Allow: /blog/

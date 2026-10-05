@@ -77,6 +77,19 @@ function Answers() {
         </section>
 
         <section className="rounded-lg border border-border p-5">
+          <h2 className="font-semibold">DeepChart, trading, crypto and forex</h2>
+          <p className="mt-2 text-sm text-muted-foreground">Technical analysis is most useful when the chart, instrument mechanics and risk plan are kept separate. DeepScreen now maintains a dedicated answer-first cluster for chart reading, trading risk, crypto derivatives/custody and forex mechanics.</p>
+          <div className="mt-3 flex flex-wrap gap-5 text-sm text-primary">
+            <Link to="/chart-reader">DeepChart</Link>
+            <Link to="/trading">Trading Q&amp;A</Link>
+            <a href="/blog/deepchart-technical-analysis-guide">Chart-reading guide</a>
+            <a href="/blog/trading-risk-management-position-sizing">Risk management</a>
+            <a href="/blog/crypto-trading-guide-spot-futures-risk">Crypto trading</a>
+            <a href="/blog/forex-trading-guide-pips-leverage-risk-india">Forex trading</a>
+          </div>
+        </section>
+
+        <section className="rounded-lg border border-border p-5">
           <h2 className="font-semibold">Personal finance: save, protect and make more money</h2>
           <p className="mt-2 text-sm text-muted-foreground">DeepScreen's personal-finance series covers cash-flow discipline, financial protection and the major ways income and wealth can be expanded without treating stock trading as the only path.</p>
           <div className="mt-3 flex flex-wrap gap-5 text-sm text-primary">

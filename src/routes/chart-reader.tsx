@@ -9,11 +9,17 @@ import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlaybookPanel } from "@/components/chart-reader/PlaybookPanel";
 import { Shell } from "@/components/ds/Shell";
+import { MarketEducationFaqSection } from "@/components/ds/MarketEducationFaqSection";
+import { marketEducationFaq } from "@/lib/seo/market-education-faq";
+import { buildFAQSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 import "@/components/chart-reader/chart-reader.css";
 
 const PriceChart = lazy(() =>
   import("@/components/chart-reader/PriceChart").then((m) => ({ default: m.PriceChart })),
 );
+
+const DEEPCHART_URL = "https://deepscreen.online/chart-reader";
+const DEEPCHART_FAQS = marketEducationFaq("DEEPCHART");
 
 export const Route = createFileRoute("/chart-reader")({
   staticData: { sitemap: true },
@@ -25,6 +31,7 @@ export const Route = createFileRoute("/chart-reader")({
         content:
           "DeepChart is DeepScreen’s technical analysis workspace for market structure, support and resistance, momentum, divergence, Fibonacci and multi-timeframe context. Educational analysis only; no guaranteed outcomes.",
       },
+      { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" },
       { property: "og:title", content: "DeepChart — Live Technical Analysis | DeepScreen" },
       {
         property: "og:description",
@@ -35,9 +42,23 @@ export const Route = createFileRoute("/chart-reader")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
-      { rel: "canonical", href: "https://deepscreen.online/chart-reader" },
-      { rel: "describedby", href: "https://deepscreen.online/llms.txt" },
+      { rel: "canonical", href: DEEPCHART_URL },
+      { rel: "describedby", href: "https://deepscreen.online/faq-index.txt" },
+      { rel: "help", href: "https://deepscreen.online/trading" },
     ],
+    scripts: [{
+      type: "application/ld+json",
+      children: jsonLd(buildGraph(
+        buildOrganizationSchema(),
+        buildWebSiteSchema(),
+        buildWebPageSchema({
+          name: "DeepChart — Technical Analysis for Stocks, Forex, Crypto & Commodities",
+          description: "Explainable technical analysis using structure, momentum, volatility, liquidity, levels and multi-timeframe context.",
+          url: DEEPCHART_URL,
+        }),
+        buildFAQSchema(DEEPCHART_FAQS.map((faq) => ({ question: faq.question, answer: faq.answer }))),
+      )),
+    }],
   }),
   component: Index,
 });
@@ -339,6 +360,30 @@ function Index() {
             No method is 100% accurate. Free market data may be delayed by the exchange or provider,
             and any position should be sized so a stop-out is affordable.
           </footer>
+        </div>
+
+        <div className="mx-auto max-w-6xl px-4 pb-12 sm:px-6">
+          <section className="mt-10 rounded-xl border border-border bg-panel p-5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-primary">Learn the process</p>
+            <h2 className="mt-2 text-xl font-semibold">Use the chart with a risk framework</h2>
+            <p className="mt-2 max-w-4xl text-sm leading-6 text-muted-foreground">
+              DeepChart explains the technical condition; the supporting guides explain how to interpret
+              the setup, size risk, and account for crypto or forex instrument mechanics.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+              <a href="/blog/deepchart-technical-analysis-guide" className="text-primary hover:underline">How to read a chart</a>
+              <a href="/blog/trading-risk-management-position-sizing" className="text-primary hover:underline">Trading risk management</a>
+              <a href="/blog/crypto-trading-guide-spot-futures-risk" className="text-primary hover:underline">Crypto trading guide</a>
+              <a href="/blog/forex-trading-guide-pips-leverage-risk-india" className="text-primary hover:underline">Forex trading guide</a>
+              <a href="/trading" className="text-primary hover:underline">Trading Q&amp;A hub</a>
+            </div>
+          </section>
+
+          <MarketEducationFaqSection
+            faqs={DEEPCHART_FAQS}
+            title="DeepChart questions answered"
+            description="How DeepChart works, which markets and timeframes it covers, how to use support and resistance, and why no technical signal is guaranteed."
+          />
         </div>
       </div>
     </Shell>

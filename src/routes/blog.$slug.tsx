@@ -71,6 +71,7 @@ export const Route = createFileRoute("/blog/$slug")({
       links: [
         { rel: "canonical", href: canonical },
         { rel: "describedby", href: "https://deepscreen.online/llms.txt" },
+        { rel: "alternate", type: "text/plain", href: "https://deepscreen.online/faq-index.txt", title: "DeepScreen knowledge index" },
       ],
       scripts: [{
         type: "application/ld+json",

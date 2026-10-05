@@ -85,7 +85,30 @@ const dividend = {
 export function researchLinks(path: string): ResearchLink[] {
   if (/^\/(auth|portfolio|pricing|checkout)(\/|$)/.test(path)) return [];
   let links: ResearchLink[];
-  if (path.startsWith("/stock/")) links = [ratios, checklist, sources];
+  if (path === "/chart-reader" || path === "/trading")
+    links = [
+      {
+        to: "/chart-reader",
+        label: "Open DeepChart technical analysis",
+        description: "Read price structure, momentum, volatility, liquidity and higher-timeframe context.",
+      },
+      {
+        to: "/trading",
+        label: "Trading, crypto and forex Q&A",
+        description: "Understand instrument mechanics and risk before acting on a signal.",
+      },
+      {
+        to: "/learn/how-to-read-candlestick-charts",
+        label: "How to read candlestick charts",
+        description: "Start with open, high, low, close, bodies, wicks and price structure.",
+      },
+      {
+        to: "/calendar",
+        label: "Economic calendar",
+        description: "Check scheduled events that can rapidly change volatility.",
+      },
+    ];
+  else if (path.startsWith("/stock/")) links = [ratios, checklist, sources];
   else if (/^\/(exchange|sector|best)(\/|$)/.test(path)) links = [methodology, ratios, sources];
   else if (path.startsWith("/options"))
     links = [
