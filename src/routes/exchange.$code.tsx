@@ -16,6 +16,7 @@ import type { CapTier } from "@/lib/deepscreen/types";
 import { cn } from "@/lib/utils";
 import { exchangeKeywords, metaKeywords, screenerKeywords } from "@/lib/seo/keywords";
 import { MarketMovers } from "@/components/ds/MarketMovers";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const TOPIC_BY_EXCHANGE: Record<string, string> = {
   NSE: "india",
@@ -108,6 +109,7 @@ export const Route = createFileRoute("/exchange/$code")({
 type SortKey = "name" | "score" | "marketCap" | "pe" | "peg" | "roce" | "changePct";
 
 function ExchangePage() {
+  const { isPro } = useSubscription();
   const { exchange, page } = Route.useLoaderData();
   const [caps, setCaps] = useState<CapTier[]>([]);
   const [sector, setSector] = useState("all");
@@ -138,16 +140,20 @@ function ExchangePage() {
         case "pe":
           return a.fundamentals.pe - b.fundamentals.pe;
         case "peg":
-          return a.fundamentals.peg - b.fundamentals.peg;
+          return isPro
+            ? a.fundamentals.peg - b.fundamentals.peg
+            : a.name.localeCompare(b.name) || a.symbol.localeCompare(b.symbol);
         case "roce":
           return b.fundamentals.roce - a.fundamentals.roce;
         case "changePct":
           return b.changePct - a.changePct;
         default:
-          return analyze(b).score - analyze(a).score;
+          return isPro
+            ? analyze(b).score - analyze(a).score
+            : a.name.localeCompare(b.name) || a.symbol.localeCompare(b.symbol);
       }
     });
-  }, [all, caps, sector, indexIds, sort]);
+  }, [all, caps, sector, indexIds, sort, isPro]);
 
   const toggleCap = (c: CapTier) =>
     setCaps((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]));
@@ -216,10 +222,10 @@ function ExchangePage() {
             className="rounded border border-border bg-background px-2 py-1.5 text-xs"
           >
             <option value="name">Company name</option>
-            <option value="score">DeepScreen score</option>
+            <option value="score" disabled={!isPro}>DeepScreen score · Pro</option>
             <option value="marketCap">Market cap</option>
             <option value="pe">Lowest P/E</option>
-            <option value="peg">Lowest PEG</option>
+            <option value="peg" disabled={!isPro}>Lowest PEG · Pro</option>
             <option value="roce">Highest ROCE</option>
             <option value="changePct">Top movers</option>
           </select>
