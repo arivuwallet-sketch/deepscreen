@@ -7,6 +7,7 @@ import { quoteKey, useLiveQuotes } from "@/hooks/useLiveQuotes";
 import { formatPrice } from "@/lib/deepscreen/format";
 import { InvestmentFaqSection } from "@/components/ds/InvestmentFaqSection";
 import { INVESTMENT_FAQS, INVESTMENT_SOURCE_LINKS } from "@/lib/seo/investment-faq";
+import { etfKeywords, metaKeywords, mutualFundKeywords, reitKeywords } from "@/lib/seo/keywords";
 import { buildBreadcrumbSchema, buildFAQSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 
 const title = "Mutual Fund, ETF & REIT Analysis | DeepScreen";
@@ -21,7 +22,7 @@ export const Route = createFileRoute("/investments")({
       { title },
       { name: "description", content: description },
       { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" },
-      { name: "keywords", content: "mutual fund analysis, ETF analysis, REIT analysis, mutual fund NAV, expense ratio, TER, direct vs regular mutual fund, ETF tracking error, tracking difference, ETF premium discount NAV, ETF holdings, REIT occupancy, WALE, AFFO, NDCF, REIT LTV, REIT NAV" },
+      { name: "keywords", content: metaKeywords(mutualFundKeywords, etfKeywords, reitKeywords) },
       { property: "og:title", content: title },
       { property: "og:description", content: description },
       { property: "og:type", content: "website" },
