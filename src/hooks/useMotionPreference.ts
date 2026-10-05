@@ -27,13 +27,14 @@ export function useMotionPreference() {
   }, []);
   const toggle = () =>
     setPaused((value) => {
+      const next = !value;
       try {
-        window.localStorage.setItem(KEY, String(!value));
-        window.dispatchEvent(new CustomEvent<boolean>(EVENT, { detail: !value }));
+        window.localStorage.setItem(KEY, String(next));
       } catch {
         /* Private browsing remains usable. */
       }
-      return !value;
+      window.dispatchEvent(new CustomEvent<boolean>(EVENT, { detail: next }));
+      return next;
     });
   return { paused, toggle };
 }
