@@ -85,13 +85,13 @@ function BlogIndex() {
         </section>
 
         <section className="mt-12 rounded-xl border border-primary/20 bg-primary/5 p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-primary">Today · 4 October 2026</p>
-          <h2 className="mt-2 text-lg font-semibold">Personal finance: save it, protect it, then grow it</h2>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">Today's three-part series covers the full money cycle: creating surplus, protecting against financial shocks, and expanding income through work, business, real estate and financial assets.</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-primary">Today · 5 October 2026</p>
+          <h2 className="mt-2 text-lg font-semibold">Today's money guide: recurring costs, fraud response and freelance economics</h2>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">Today's three-part series turns common money problems into practical systems: audit recurring payments, respond quickly to UPI or bank fraud, and price freelance work from sustainable business economics.</p>
           <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm">
-            <a href="/blog/how-to-save-money-every-month-india" className="text-primary hover:underline">How to save money every month</a>
-            <a href="/blog/how-to-protect-your-money-india" className="text-primary hover:underline">How to protect your money</a>
-            <a href="/blog/how-to-make-more-money-income-paths-india" className="text-primary hover:underline">How to make more money</a>
+            <a href="/blog/stop-subscription-creep-recurring-payments-india" className="text-primary hover:underline">Stop subscription creep</a>
+            <a href="/blog/what-to-do-after-upi-bank-fraud-india" className="text-primary hover:underline">What to do after UPI or bank fraud</a>
+            <a href="/blog/freelancing-pricing-profit-tax-india" className="text-primary hover:underline">Freelancing: pricing, profit and tax</a>
           </div>
         </section>
 

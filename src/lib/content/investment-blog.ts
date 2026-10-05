@@ -2301,6 +2301,656 @@ export const INVESTMENT_BLOG_POSTS: BlogPost[] = [
       { label: "DeepScreen investment directory", href: "/investments" },
       { label: "Stock screener", href: "/screener" },
     ],
+  },
+  {
+    slug: "stop-subscription-creep-recurring-payments-india",
+    category: "Save Money",
+    title: "Stop Subscription Creep & Recurring-Payment Waste | DeepScreen",
+    h1: "How to stop subscription creep and recurring-payment waste in India",
+    description:
+      "Audit subscriptions, UPI AutoPay and card e-mandates with a practical India-focused system for finding low-value renewals, annualising costs and cancelling safely.",
+    excerpt:
+      "Recurring payments are easy to ignore because each debit looks small. The real problem is accumulation: unused memberships, duplicate services, app renewals and mandates that quietly become permanent monthly expenses.",
+    primaryKeyword: "how to cancel recurring payments in India",
+    secondaryKeywords: [
+      "subscription audit India",
+      "stop subscription creep",
+      "UPI AutoPay cancel mandate",
+      "recurring payment audit",
+      "cancel auto debit India",
+      "save money on subscriptions",
+      "manage UPI mandates",
+    ],
+    published: "2026-10-05",
+    updated: "2026-10-05",
+    readingMinutes: 10,
+    directAnswer:
+      "To stop subscription creep, list every recurring debit, convert each one to an annual cost, classify it as keep, downgrade, rotate or cancel, then remove the underlying mandate when you no longer want automatic renewal. Review UPI AutoPay, card e-mandates, app-store subscriptions and bank statements together because no single screen necessarily shows every recurring commitment.",
+    uniqueAngle:
+      "The DeepScreen RACE audit turns recurring-payment cleanup into four steps: Review every mandate, Annualise the cost, Classify the value, and Execute the cancellation or downgrade.",
+    keyTakeaways: [
+      "A ₹499 monthly charge is ₹5,988 a year; annualising recurring costs makes small debits easier to compare with larger goals.",
+      "Review bank statements, cards, UPI AutoPay mandates and app-store subscriptions together instead of trusting memory.",
+      "RBI's e-mandate framework requires a facility to withdraw an e-mandate, and NPCI's UPI AutoPay framework includes revoke, pause and modify operations.",
+      "Cancelling a merchant subscription and revoking a payment mandate are related but not always the same action; confirm both when appropriate.",
+      "The goal is not to cancel everything. Keep services that are used and valuable, and target duplication, forgotten renewals and low-use plans first.",
+    ],
+    sections: [
+      {
+        id: "why-creep-happens",
+        heading: "Why subscription creep is so hard to notice",
+        answer:
+          "Recurring payments reduce the number of times you actively decide to spend, so low-value services can survive for months without a fresh purchase decision.",
+        paragraphs: [
+          {
+            text:
+              "A recurring payment can be convenient and completely legitimate. The problem begins when the service is no longer used, a cheaper tier would be enough, two subscriptions solve the same problem, or a free trial quietly turns into a long-running debit.",
+          },
+          {
+            text:
+              "The practical fix is to stop treating each debit as a separate small purchase. Convert recurring commitments into annual rupee amounts and compare them with one another.",
+          },
+        ],
+      },
+      {
+        id: "race-framework",
+        heading: "Use the DeepScreen RACE subscription audit",
+        answer:
+          "RACE stands for Review, Annualise, Classify and Execute.",
+        table: {
+          caption: "DeepScreen RACE recurring-payment audit",
+          headers: ["Step", "What to do", "Decision question"],
+          rows: [
+            ["R — Review", "List subscriptions, UPI AutoPay mandates, card e-mandates and app-store renewals", "What can debit automatically?"],
+            ["A — Annualise", "Multiply monthly costs by 12 and add annual plans", "What is the true yearly cost?"],
+            ["C — Classify", "Mark each item Keep, Downgrade, Rotate or Cancel", "Is the value still higher than the cost?"],
+            ["E — Execute", "Cancel/downgrade the service and revoke the mandate where appropriate", "Did the recurring payment actually stop?"],
+          ],
+        },
+      },
+      {
+        id: "annualise",
+        heading: "Annualise every recurring cost before deciding",
+        answer:
+          "Monthly pricing can make a service feel cheap even when the annual cash outflow is meaningful.",
+        table: {
+          caption: "Illustrative annualisation — not a list of recommended services",
+          headers: ["Recurring charge", "Monthly cost", "Annual cost"],
+          rows: [
+            ["Service A", "₹199", "₹2,388"],
+            ["Service B", "₹499", "₹5,988"],
+            ["Service C", "₹999", "₹11,988"],
+            ["Three services combined", "₹1,697", "₹20,364"],
+          ],
+        },
+        note:
+          "Illustration only. Use your actual statements and plan prices. Annual cost = monthly charge × 12 unless billing frequency or discounts differ.",
+      },
+      {
+        id: "four-buckets",
+        heading: "Keep, downgrade, rotate or cancel",
+        answer:
+          "A good audit protects useful services while removing low-value recurring commitments.",
+        bullets: [
+          "Keep: used often, priced reasonably and difficult to replace without losing real value.",
+          "Downgrade: useful, but the current tier includes capacity or features you rarely use.",
+          "Rotate: entertainment, software or seasonal services that do not need to run every month of the year.",
+          "Cancel: duplicate, forgotten, rarely used, or no longer connected to a current goal.",
+        ],
+      },
+      {
+        id: "where-to-look",
+        heading: "Where to look for recurring payments in India",
+        answer:
+          "Use multiple sources because subscriptions can be attached to different payment rails.",
+        bullets: [
+          "Bank and credit-card statements for repeating merchant names or similar monthly amounts.",
+          "UPI apps under AutoPay, mandates or recurring-payment sections.",
+          "Card issuer or bank e-mandate / standing-instruction controls.",
+          "Google Play, Apple App Store and other app-store subscription pages.",
+          "Merchant account pages for software, telecom, media, cloud, fitness and memberships.",
+          "Email search for words such as renewal, subscription, invoice, plan and trial.",
+        ],
+        paragraphs: [
+          {
+            text:
+              "RBI's recurring-transaction framework requires issuers to provide an online facility to withdraw an e-mandate. The framework also provides for pre-debit notifications in covered recurring transactions, subject to later RBI changes and exceptions.",
+            sources: ["rbi-emando-2019", "rbi-emando-2024"],
+          },
+          {
+            text:
+              "NPCI's October 2025 UPI AutoPay enhancement requires payer PSPs and UPI apps to support mandate lifecycle management, including existing operations such as revoke, pause and modify, within the relevant mandate-management area.",
+            sources: ["npci-autopay-2025"],
+          },
+        ],
+      },
+      {
+        id: "cancel-correctly",
+        heading: "Cancel the service and check the payment mandate",
+        answer:
+          "Do not assume that deleting an app, removing a card from a merchant profile or uninstalling a service automatically ends every recurring instruction.",
+        paragraphs: [
+          {
+            text:
+              "Where the merchant provides a subscription cancellation flow, use it and keep the confirmation. Then check the bank, card or UPI mandate list and revoke an active mandate if it is no longer needed.",
+          },
+          {
+            text:
+              "RBI's original card e-mandate framework explicitly requires an online withdrawal facility, after which further recurring transactions should not be allowed for the withdrawn mandate, subject to the framework's pipeline-transaction exception.",
+            sources: ["rbi-emando-2019"],
+          },
+        ],
+      },
+      {
+        id: "renewal-calendar",
+        heading: "Build a renewal calendar for annual and free-trial plans",
+        answer:
+          "A renewal calendar moves the decision back before the debit instead of after it.",
+        bullets: [
+          "Record the next renewal date and expected amount.",
+          "Set a reminder 7 to 14 days before renewal for non-essential plans.",
+          "Record whether cancellation must be done through the merchant, app store, bank or UPI mandate.",
+          "For annual plans, compare the renewal price with your actual usage over the previous year.",
+        ],
+      },
+      {
+        id: "ten-minute-audit",
+        heading: "The 10-minute monthly recurring-payment check",
+        answer:
+          "A short fixed routine is more useful than a large audit you never repeat.",
+        table: {
+          caption: "10-minute DeepScreen recurring-payment check",
+          headers: ["Minute", "Action"],
+          rows: [
+            ["0–2", "Open the latest bank and card statements and flag repeating merchants"],
+            ["2–4", "Open UPI AutoPay / mandate lists and card e-mandates"],
+            ["4–6", "Annualise any new or forgotten recurring charge"],
+            ["6–8", "Choose keep, downgrade, rotate or cancel"],
+            ["8–10", "Execute changes and save confirmations"],
+          ],
+        },
+      },
+    ],
+    faqs: [
+      {
+        q: "How do I find all my subscriptions in India?",
+        a: "Check bank and card statements, UPI AutoPay or mandate sections, app-store subscriptions, merchant accounts and renewal emails. No single list necessarily captures every recurring commitment.",
+      },
+      {
+        q: "Can I cancel a UPI AutoPay mandate?",
+        a: "UPI AutoPay supports lifecycle operations including revoke, pause and modify. The exact screen differs by app, so use the mandate or AutoPay section and follow the app's authenticated flow.",
+      },
+      {
+        q: "Does deleting an app cancel the subscription?",
+        a: "Not necessarily. Cancel through the merchant or app-store subscription controls and verify whether any recurring payment mandate remains active.",
+      },
+      {
+        q: "Should I cancel every subscription to save money?",
+        a: "No. Keep services that you use and value. The highest-priority targets are forgotten renewals, duplicates, oversized tiers and services that no longer match a current goal.",
+      },
+      {
+        q: "How often should I audit recurring payments?",
+        a: "A light monthly check plus a deeper quarterly review works well for many households. Annual plans should also be reviewed shortly before renewal.",
+      },
+    ],
+    sources: [
+      {
+        id: "rbi-emando-2019",
+        title: "Processing of e-mandate on cards for recurring transactions",
+        publisher: "Reserve Bank of India",
+        date: "21 August 2019; accessed October 2026",
+        href: "https://www.rbi.org.in/scripts/NotificationUser.aspx?Id=11668",
+      },
+      {
+        id: "rbi-emando-2024",
+        title: "Processing of e-mandates for recurring transactions",
+        publisher: "Reserve Bank of India",
+        date: "22 August 2024; accessed October 2026",
+        href: "https://www.rbi.org.in/scripts/BS_CircularIndexDisplay.aspx?Id=12722",
+      },
+      {
+        id: "npci-autopay-2025",
+        title: "Enhancement of UPI AutoPay — NPCI/UPI/OC-223/2025-26",
+        publisher: "National Payments Corporation of India",
+        date: "7 October 2025; accessed October 2026",
+        href: "https://www.npci.org.in/uploads/UPI_OC_223_Enhancement_of_UPI_Autopay_3e6a1cdb33.pdf",
+      },
+    ],
+    relatedLinks: [
+      { label: "How to save money every month", href: "/blog/how-to-save-money-every-month-india" },
+      { label: "What to do after UPI or bank fraud", href: "/blog/what-to-do-after-upi-bank-fraud-india" },
+      { label: "Freelancing pricing, profit and tax", href: "/blog/freelancing-pricing-profit-tax-india" },
+      { label: "DeepScreen research blog", href: "/blog" },
+    ],
+  },
+  {
+    slug: "what-to-do-after-upi-bank-fraud-india",
+    category: "Protect Money",
+    title: "UPI or Bank Fraud in India: What to Do Immediately | DeepScreen",
+    h1: "What to do immediately after UPI or bank fraud in India",
+    description:
+      "A practical response checklist for suspected UPI or bank fraud in India: report the bank, call 1930, use cybercrime.gov.in, preserve evidence and understand RBI liability timelines.",
+    excerpt:
+      "The first hour after suspected financial fraud is about speed, evidence and containment. Report the transaction immediately, contact the bank or payment provider, use India's 1930 cyber-fraud helpline and preserve a clean record of every complaint reference.",
+    primaryKeyword: "what to do after UPI fraud",
+    secondaryKeywords: [
+      "UPI fraud complaint India",
+      "1930 cyber fraud helpline",
+      "report bank fraud India",
+      "unauthorised bank transaction RBI",
+      "cybercrime.gov.in financial fraud",
+      "customer liability unauthorised transaction",
+      "RBI ombudsman bank complaint",
+    ],
+    published: "2026-10-05",
+    updated: "2026-10-05",
+    readingMinutes: 11,
+    directAnswer:
+      "If you suspect UPI or bank fraud, report the unauthorised transaction to your bank or payment provider immediately, call India's cyber-financial-fraud helpline 1930, file/track the complaint at cybercrime.gov.in, block or secure the affected payment access, and preserve transaction IDs, screenshots and complaint references. Do not wait to see whether the money returns on its own.",
+    uniqueAngle:
+      "The DeepScreen FREEZE protocol separates immediate containment from later dispute resolution: Freeze access, Report the bank, Emergency-report via 1930/portal, Evidence-pack the case, Zero-delay follow-up, Escalate if unresolved.",
+    keyTakeaways: [
+      "Call 1930 for immediate reporting of cyber financial fraud and use the National Cyber Crime Reporting Portal for the online complaint trail.",
+      "Notify the bank or payment provider immediately and keep the complaint/acknowledgement number.",
+      "RBI's unauthorised-electronic-transaction rules can provide zero or limited liability in specified situations, but the outcome depends on where the breach occurred and how quickly it was reported.",
+      "If customer negligence such as sharing payment credentials caused the loss, RBI's liability treatment differs; reporting still matters because losses after reporting are treated differently under the framework.",
+      "The RBI Ombudsman is an escalation route for eligible complaints after first approaching the regulated entity and satisfying the applicable waiting/response conditions.",
+    ],
+    sections: [
+      {
+        id: "first-30-minutes",
+        heading: "The first 30 minutes: contain and report",
+        answer:
+          "Treat suspected financial fraud as an incident-response problem, not as a customer-service task you can postpone.",
+        bullets: [
+          "Contact the bank, card issuer or payment provider using an official channel and report the transaction as unauthorised.",
+          "Block or temporarily disable the affected card, UPI access or payment instrument where appropriate.",
+          "Call 1930 for cyber financial fraud as soon as possible.",
+          "File or track the complaint through the National Cyber Crime Reporting Portal.",
+          "Change compromised passwords/PIN-related access only through official apps/sites; never follow links sent by the fraudster.",
+          "Do not send an additional 'recovery fee', 'verification payment' or refund-processing amount to anyone contacting you unofficially.",
+        ],
+        paragraphs: [
+          {
+            text:
+              "The Government of India's National Cyber Crime Reporting Portal states that cyber financial fraud can be reported immediately through helpline 1930.",
+            sources: ["cybercrime-portal"],
+          },
+        ],
+      },
+      {
+        id: "freeze-protocol",
+        heading: "Use the DeepScreen FREEZE fraud-response protocol",
+        answer:
+          "FREEZE gives you a sequence to follow while stress is high.",
+        table: {
+          caption: "DeepScreen FREEZE protocol",
+          headers: ["Step", "Action", "Output to keep"],
+          rows: [
+            ["F — Freeze", "Secure/block the affected payment access", "Block/freeze confirmation"],
+            ["R — Report", "Notify bank/payment provider immediately", "Complaint/reference number"],
+            ["E — Emergency report", "Call 1930 and use cybercrime.gov.in", "Acknowledgement / complaint ID"],
+            ["E — Evidence", "Save transaction ID, time, amount, messages, numbers, URLs and screenshots", "Chronological evidence pack"],
+            ["Z — Zero-delay follow-up", "Confirm the complaint in writing and track stated timelines", "Email/SMS/ticket trail"],
+            ["E — Escalate", "Use the applicable regulated-entity and RBI grievance path if unresolved", "Escalation reference"],
+          ],
+        },
+      },
+      {
+        id: "rbi-liability",
+        heading: "RBI customer-liability rules make reporting speed important",
+        answer:
+          "RBI's framework distinguishes bank fault, third-party breaches and customer negligence; the result is not the same in every fraud case.",
+        paragraphs: [
+          {
+            text:
+              "Under RBI's 2017 framework for unauthorised electronic banking transactions, a customer can have zero liability where the bank is at fault, and can also have zero liability in a qualifying third-party breach if the customer notifies the bank within three working days of receiving the transaction communication.",
+            sources: ["rbi-unauthorised"],
+          },
+          {
+            text:
+              "For a qualifying third-party breach reported within four to seven working days, liability is limited to the transaction value or the applicable RBI table amount, whichever is lower. Beyond seven working days, the bank's Board-approved policy applies.",
+            sources: ["rbi-unauthorised"],
+          },
+          {
+            text:
+              "If the loss is due to customer negligence, such as sharing payment credentials, RBI states that the customer bears the loss until the unauthorised transaction is reported; losses occurring after reporting are borne by the bank under that framework. This is why the article cannot promise reimbursement simply because a complaint was filed.",
+            sources: ["rbi-unauthorised"],
+          },
+        ],
+      },
+      {
+        id: "reversal-timeline",
+        heading: "What does RBI say about provisional credit in eligible cases?",
+        answer:
+          "Where the zero/limited-liability framework applies, RBI sets a timeline for the bank's shadow reversal.",
+        paragraphs: [
+          {
+            text:
+              "RBI states that on being notified by the customer, the bank should credit a shadow reversal of the amount involved in an unauthorised electronic transaction within 10 working days, without waiting for an insurance settlement, where the framework applies. The eventual complaint outcome still depends on the facts and liability determination.",
+            sources: ["rbi-unauthorised"],
+          },
+        ],
+      },
+      {
+        id: "evidence",
+        heading: "Build one evidence pack instead of scattered screenshots",
+        answer:
+          "A clean chronology makes bank, police/cyber and regulatory follow-up easier.",
+        bullets: [
+          "Date and exact time you noticed the fraud.",
+          "Transaction amount, UPI/reference/UTR/transaction ID and beneficiary/merchant details shown to you.",
+          "Bank/app alerts and statement entries.",
+          "Phone numbers, email addresses, UPI IDs, websites or social profiles used by the suspected fraudster.",
+          "Screenshots of chats and payment requests without editing or cropping away context.",
+          "Bank complaint number, 1930 acknowledgement and cybercrime portal complaint number.",
+          "A short written timeline of what happened, including any credentials or permissions that may have been shared.",
+        ],
+      },
+      {
+        id: "do-not-do",
+        heading: "What not to do after a fraud",
+        answer:
+          "Avoid actions that destroy evidence or create a second loss.",
+        bullets: [
+          "Do not pay a person who claims they can recover the money for an upfront fee.",
+          "Do not share OTPs, UPI PINs, card PINs, CVV or remote-access permissions with someone claiming to be the bank or police.",
+          "Do not delete the chat, SMS or call history before preserving evidence.",
+          "Do not rely only on a social-media DM to report the incident; use official bank, 1930 and government reporting channels.",
+          "Do not assume the first complaint automatically covers every affected account or payment instrument.",
+        ],
+      },
+      {
+        id: "ombudsman",
+        heading: "When can you escalate to the RBI Ombudsman?",
+        answer:
+          "First complain to the concerned regulated entity; if the applicable response period expires without a satisfactory resolution, the RBI grievance framework may become available.",
+        paragraphs: [
+          {
+            text:
+              "The Reserve Bank - Integrated Ombudsman Scheme, 2026 requires the complainant to first approach the concerned regulated entity. RBI's current FAQ says an Ombudsman complaint can be filed if there is no reply within 30 days or within a longer timeline specified by RBI, NPCI or Card Network guidelines, if applicable, or if the complainant is dissatisfied with the reply/resolution.",
+            sources: ["rbi-ombudsman-2026"],
+          },
+          {
+            text:
+              "RBI says online Ombudsman complaints are filed through cms.rbi.org.in. The Ombudsman route is for grievance redress against covered regulated entities; it does not replace the immediate 1930/cybercrime reporting path for suspected cyber fraud.",
+            sources: ["rbi-ombudsman-2026"],
+          },
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "What number should I call for UPI fraud in India?",
+        a: "For immediate reporting of cyber financial fraud, the National Cyber Crime Reporting Portal directs users to helpline 1930. You should also report the unauthorised transaction to your bank/payment provider immediately.",
+      },
+      {
+        q: "Will the bank always refund UPI fraud?",
+        a: "No. RBI's customer-liability framework depends on the facts, including whether the bank was at fault, a third-party breach occurred, customer negligence contributed, and how quickly the customer reported the transaction.",
+      },
+      {
+        q: "What happens if I shared an OTP or UPI PIN?",
+        a: "Report the incident immediately anyway. RBI's framework treats customer negligence differently and can make the customer liable for losses until reporting, but losses after reporting are treated separately under the applicable rules.",
+      },
+      {
+        q: "Should I call 1930 before or after the bank?",
+        a: "Do both immediately rather than waiting for one process to finish. The bank/payment-provider complaint addresses the transaction and account; 1930 and cybercrime.gov.in create the cyber-fraud reporting trail.",
+      },
+      {
+        q: "When can I complain to the RBI Ombudsman?",
+        a: "Under RB-IOS 2026, first complain to the concerned regulated entity. If you receive an unsatisfactory reply, or the applicable response period expires, you may be eligible to escalate through RBI's Complaint Management System subject to the Scheme's conditions and time limits.",
+      },
+    ],
+    sources: [
+      {
+        id: "cybercrime-portal",
+        title: "National Cyber Crime Reporting Portal — Financial Fraud",
+        publisher: "Indian Cybercrime Coordination Centre, Ministry of Home Affairs, Government of India",
+        date: "accessed October 2026",
+        href: "https://www.cybercrime.gov.in/",
+      },
+      {
+        id: "rbi-unauthorised",
+        title: "Customer Protection — Limiting Liability of Customers in Unauthorised Electronic Banking Transactions",
+        publisher: "Reserve Bank of India",
+        date: "6 July 2017; accessed October 2026",
+        href: "https://www.rbi.org.in/commonman/English/scripts/Notification.aspx?Id=2623",
+      },
+      {
+        id: "rbi-ombudsman-2026",
+        title: "Reserve Bank - Integrated Ombudsman Scheme, 2026 — Frequently Asked Questions",
+        publisher: "Reserve Bank of India",
+        date: "1 July 2026; accessed October 2026",
+        href: "https://old.rbi.org.in/commonman/english/scripts/faqs.aspx?id=3407",
+      },
+    ],
+    relatedLinks: [
+      { label: "How to protect your money", href: "/blog/how-to-protect-your-money-india" },
+      { label: "Stop subscription creep", href: "/blog/stop-subscription-creep-recurring-payments-india" },
+      { label: "Freelancing pricing, profit and tax", href: "/blog/freelancing-pricing-profit-tax-india" },
+      { label: "DeepScreen research blog", href: "/blog" },
+    ],
+  },
+  {
+    slug: "freelancing-pricing-profit-tax-india",
+    category: "Make More Money",
+    title: "Freelancing in India: Pricing, Profit & Tax Basics | DeepScreen",
+    h1: "Freelancing in India: how to price your work, track profit and handle tax basics",
+    description:
+      "A practical India-focused freelancing guide covering minimum viable pricing, billable capacity, scope control, profit tracking, cash flow and Section 44ADA basics.",
+    excerpt:
+      "Freelance revenue is not the same as personal income. Your rate has to pay for non-billable time, software, equipment, admin, bad debt, time off, business risk and tax obligations before it becomes sustainable profit.",
+    primaryKeyword: "freelancing pricing India",
+    secondaryKeywords: [
+      "freelance rates India",
+      "how to price freelance work",
+      "freelance profit calculator",
+      "freelancer tax India",
+      "Section 44ADA freelancer",
+      "freelance business expenses",
+      "freelance pricing formula",
+    ],
+    published: "2026-10-05",
+    updated: "2026-10-05",
+    readingMinutes: 12,
+    directAnswer:
+      "Price freelance work from required business revenue and realistic billable capacity, not by dividing your old salary by working hours. Track revenue, direct project costs, operating costs, unpaid admin time and cash actually collected. For tax, classify the activity correctly: Section 44ADA can apply only to eligible resident individuals or partnership firms (not LLPs) carrying on specified professions, subject to its conditions and gross-receipt thresholds.",
+    uniqueAngle:
+      "The DeepScreen FLOOR method turns freelance pricing into five inputs: Fixed costs, Labour capacity, Operating costs, Obligations and Reserve/profit. It creates a minimum economic floor before market positioning, urgency, complexity and value are considered.",
+    keyTakeaways: [
+      "A freelance rate must pay for both billable and non-billable time; 160 working hours in a month does not mean 160 sellable hours.",
+      "Revenue is not profit. Track project costs, software, equipment, contractors, payment fees and other operating expenses separately.",
+      "Scope control is part of pricing: revisions, meetings, travel, turnaround time and ownership/licensing terms can change the economics of a project.",
+      "Section 44ADA is not a generic freelancer tax scheme; it applies to specified professions and eligible taxpayers, subject to statutory conditions.",
+      "The Income Tax Department currently states a ₹50 lakh Section 44ADA gross-receipts threshold, increased to ₹75 lakh where cash receipts do not exceed 5% of total gross receipts.",
+    ],
+    sections: [
+      {
+        id: "revenue-vs-income",
+        heading: "Freelance revenue is not take-home income",
+        answer:
+          "The amount a client pays must fund the business before it can fund your lifestyle.",
+        paragraphs: [
+          {
+            text:
+              "A salaried role can hide costs that an independent worker must absorb directly: software, hardware, internet, workspace, professional services, unpaid sales time, administration, time off and late or failed payments. A sustainable rate prices those realities rather than copying an employee hourly wage.",
+          },
+        ],
+      },
+      {
+        id: "floor-method",
+        heading: "Use the DeepScreen FLOOR pricing method",
+        answer:
+          "Build a minimum revenue floor from your actual business economics before deciding how to position the price to a client.",
+        table: {
+          caption: "DeepScreen FLOOR freelance pricing method",
+          headers: ["Input", "What it means", "Examples"],
+          rows: [
+            ["F — Fixed costs", "Costs that recur even with no client project", "Internet, software, equipment reserve, workspace"],
+            ["L — Labour capacity", "Realistic billable hours or project capacity", "Client work after sales/admin/learning/time off"],
+            ["O — Operating costs", "Costs that rise with delivery", "Contractors, travel, payment fees, project tools"],
+            ["O — Obligations", "Cash reserved for tax, compliance and other required outflows", "Tax reserve, bookkeeping, professional fees"],
+            ["R — Reserve / profit", "Buffer for risk and reinvestment", "Bad debt, downtime, equipment replacement, growth"],
+          ],
+        },
+      },
+      {
+        id: "worked-example",
+        heading: "Worked example: why billable capacity changes the rate",
+        answer:
+          "The same monthly revenue need produces a very different hourly floor depending on how many hours you can actually sell.",
+        paragraphs: [
+          {
+            text:
+              "Suppose a freelancer calculates that the business needs ₹85,000 of monthly revenue to cover personal draw, recurring business costs, obligations and a modest reserve. If only 80 hours are realistically billable after sales, admin, revisions and downtime, the base economic floor is ₹85,000 ÷ 80 = ₹1,062.50 per billable hour.",
+          },
+          {
+            text:
+              "That ₹1,062.50 figure is an illustration, not a market rate or recommendation. It still does not price unusually complex work, rush delivery, project risk, extensive meetings, usage rights or a client-specific value premium.",
+          },
+        ],
+        table: {
+          caption: "Illustrative billable-capacity sensitivity",
+          headers: ["Monthly revenue need", "Billable hours", "Base hourly floor"],
+          rows: [
+            ["₹85,000", "60", "₹1,416.67"],
+            ["₹85,000", "80", "₹1,062.50"],
+            ["₹85,000", "100", "₹850.00"],
+          ],
+        },
+      },
+      {
+        id: "project-pricing",
+        heading: "Convert the hourly floor into project pricing",
+        answer:
+          "Use the hourly floor as an internal cost test even if the client receives a fixed project price.",
+        bullets: [
+          "Estimate delivery hours plus meetings, revisions and project administration.",
+          "Add direct project costs such as contractors, travel or paid assets.",
+          "Define the number of revision rounds and what counts as new scope.",
+          "Price rush work separately when it displaces other paid capacity.",
+          "State payment milestones, due dates, cancellation terms and ownership/licensing terms in writing.",
+        ],
+        paragraphs: [
+          {
+            text:
+              "A 20-hour project at the illustrative ₹1,062.50 base floor would imply ₹21,250 before special scope, direct project costs, urgency or value adjustments. Quoting below the economic floor is not automatically wrong — for example, a deliberate portfolio project may be strategic — but it should be a conscious decision rather than accidental underpricing.",
+          },
+        ],
+      },
+      {
+        id: "profit-tracking",
+        heading: "Track profit and cash separately",
+        answer:
+          "A profitable invoice can still create cash-flow stress if the client has not paid.",
+        table: {
+          caption: "Simple freelancer operating dashboard",
+          headers: ["Metric", "Basic calculation", "Why it matters"],
+          rows: [
+            ["Booked revenue", "Invoices/contracts agreed", "Shows sales pipeline, not cash"],
+            ["Cash collected", "Payments actually received", "Pays current bills"],
+            ["Direct project costs", "Costs traceable to client work", "Shows project economics"],
+            ["Operating costs", "Recurring business overhead", "Shows business cost base"],
+            ["Operating profit before personal income tax", "Revenue − direct costs − operating costs", "Shows whether pricing supports the business"],
+            ["Receivables", "Invoiced but unpaid", "Shows collection risk"],
+          ],
+        },
+      },
+      {
+        id: "client-concentration",
+        heading: "Watch client concentration before calling revenue stable",
+        answer:
+          "A freelancer with one dominant client can have high revenue and still have fragile income.",
+        bullets: [
+          "Track the percentage of revenue from the largest client.",
+          "Do not treat an unsigned pipeline as guaranteed income.",
+          "Keep a cash reserve for gaps between projects and late payments.",
+          "Build repeatable acquisition channels before the current contract ends.",
+          "Price long payment terms and collection risk into cash-flow planning.",
+        ],
+      },
+      {
+        id: "tax-basics",
+        heading: "Section 44ADA: useful for some professionals, not every freelancer",
+        answer:
+          "Eligibility depends on the taxpayer and the nature of the profession; do not assume that every freelance activity qualifies.",
+        paragraphs: [
+          {
+            text:
+              "The Income Tax Department states that Section 44ADA can be used by a resident individual or partnership firm other than an LLP carrying on a specified profession. The specified-profession list includes legal, medical, engineering or architectural, accountancy, technical consultancy, interior decoration and other professions notified under the law.",
+            sources: ["itd-itr4-44ada"],
+          },
+          {
+            text:
+              "The Department currently states a gross-receipts threshold of ₹50 lakh, increased to ₹75 lakh where cash receipts do not exceed 5% of total gross receipts for the year. Section 44ADA deems 50% of eligible gross receipts as professional income, subject to the statutory rules.",
+            sources: ["itd-itr4-44ada", "itd-section-44ada"],
+          },
+          {
+            text:
+              "A designer, developer, creator, marketer or other freelancer should not infer eligibility only from the word 'freelancer'. Classification can depend on the exact activity and tax law. When the position is material or unclear, use a qualified tax professional and the current Income Tax Department guidance.",
+          },
+        ],
+      },
+      {
+        id: "launch-checklist",
+        heading: "A practical freelance launch checklist",
+        answer:
+          "Build the operating system before increasing client volume.",
+        bullets: [
+          "Separate business records from personal spending even if you operate as an individual.",
+          "Create a standard scope, proposal, invoice and payment-follow-up process.",
+          "Calculate the FLOOR pricing inputs and update them when costs or capacity change.",
+          "Track cash collected, unpaid invoices, direct costs and operating costs monthly.",
+          "Keep source documents for receipts, invoices and business expenses.",
+          "Review tax classification and filing requirements before deadlines rather than after revenue grows.",
+          "Measure which clients and services produce repeatable profit, not just high invoice values.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "How should I calculate my freelance hourly rate?",
+        a: "Start with the annual or monthly revenue your business needs, include costs, obligations and a reserve, then divide by realistic billable hours rather than total working hours. Use the result as an economic floor, not an automatic market quote.",
+      },
+      {
+        q: "Is freelance revenue the same as profit?",
+        a: "No. Profit remains after direct project costs and operating costs. Cash collected is also different from invoiced revenue, so track receivables separately.",
+      },
+      {
+        q: "Does every freelancer qualify for Section 44ADA?",
+        a: "No. Section 44ADA applies to eligible taxpayers carrying on specified professions and meeting the statutory conditions. The label 'freelancer' by itself does not establish eligibility.",
+      },
+      {
+        q: "What is the Section 44ADA turnover limit?",
+        a: "The Income Tax Department currently states a ₹50 lakh gross-receipts threshold, increased to ₹75 lakh where cash receipts do not exceed 5% of total gross receipts, subject to the other Section 44ADA conditions.",
+      },
+      {
+        q: "Should I price by the hour or by project?",
+        a: "Either can work. Even with project pricing, calculate an internal hourly or capacity-based floor so scope growth, revisions and non-billable work do not quietly make the project uneconomic.",
+      },
+    ],
+    sources: [
+      {
+        id: "itd-itr4-44ada",
+        title: "File ITR-4 (Sugam) Online — Frequently Asked Questions",
+        publisher: "Income Tax Department, Government of India",
+        date: "accessed October 2026",
+        href: "https://www.incometax.gov.in/iec/foportal/help/e-filing-itr4-form-sugam-faq",
+      },
+      {
+        id: "itd-section-44ada",
+        title: "Section 44ADA — Special provision for computing profits and gains of profession on presumptive basis",
+        publisher: "Income Tax Department, Government of India",
+        date: "accessed October 2026",
+        href: "https://www.incometaxindia.gov.in/w/section-44ada-9",
+      },
+    ],
+    relatedLinks: [
+      { label: "How to make more money", href: "/blog/how-to-make-more-money-income-paths-india" },
+      { label: "Stop subscription creep", href: "/blog/stop-subscription-creep-recurring-payments-india" },
+      { label: "What to do after UPI or bank fraud", href: "/blog/what-to-do-after-upi-bank-fraud-india" },
+      { label: "DeepScreen research blog", href: "/blog" },
+    ],
   }
 ];
 
