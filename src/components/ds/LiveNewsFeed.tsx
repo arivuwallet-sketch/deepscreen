@@ -57,13 +57,13 @@ export function FeedList({
               )}
               title="Estimated impact from the headline and topic; not a guaranteed market reaction or trading signal."
             >
-              IMPACT {(n.impactLevel ?? "low").toUpperCase()}
+              EST. IMPACT {(n.impactLevel ?? "low").toUpperCase()}
             </span>
             <span>{n.source} · {ago(n.minutesAgo)}</span>
           </div>
           <div className="num mt-1.5 flex flex-wrap items-center gap-1.5 text-[10px] text-muted-foreground">
             <span className="text-[9px] tracking-wide">AFFECTS:</span>
-            {(n.affectedMarkets?.length ? n.affectedMarkets : ["Global"]).map((market) => (
+            {(n.affectedMarkets?.length ? n.affectedMarkets : ["Global Equities"]).map((market) => (
               <span
                 key={market}
                 className="rounded border border-border/80 bg-background/30 px-1.5 py-0.5 text-[9px] text-foreground/80"
