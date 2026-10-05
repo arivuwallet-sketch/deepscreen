@@ -411,7 +411,7 @@ The options engine uses Black-Scholes-Merton style calculations and can display:
 
 ### 12 modeled strategy types
 
-The lab covers a broad set of bullish, bearish, neutral and volatility strategies, including:
+The current strategy engine models:
 
 - Long Call
 - Long Put
@@ -419,12 +419,12 @@ The lab covers a broad set of bullish, bearish, neutral and volatility strategie
 - Bull Put Spread
 - Bear Call Spread
 - Bear Put Spread
-- Put Backspread
+- Put Backspread (Ratio)
 - Short Strangle
 - Collar
-- Long Butterfly Spread
+- Long Call Butterfly
 - Short Straddle
-- Additional supported multi-leg strategy configurations in the current strategy engine
+- Long Straddle
 
 DeepScreen also publishes individual strategy education pages.
 
