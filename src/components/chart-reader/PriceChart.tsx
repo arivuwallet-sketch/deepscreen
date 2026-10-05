@@ -1,0 +1,196 @@
+import { useEffect, useRef } from "react";
+import type { Time } from "lightweight-charts";
+import type { Candle } from "@/lib/chart-reader/market.functions";
+import type { Analysis } from "@/lib/chart-reader/analysis";
+import { decimals } from "@/lib/chart-reader/analysis";
+import { chartTheme as T } from "@/lib/chart-reader/chart-theme";
+
+export function PriceChart({ candles, analysis }: { candles: Candle[]; analysis: Analysis }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let disposed = false;
+    let cleanup = () => {};
+    (async () => {
+      const LW = await import("lightweight-charts");
+      if (disposed || !ref.current) return;
+      const el = ref.current;
+      const chart = LW.createChart(el, {
+        width: el.clientWidth,
+        height: el.clientHeight,
+        localization: { locale: "en-US" },
+        layout: {
+          background: { color: T.bg },
+          textColor: T.text,
+          fontFamily: "IBM Plex Mono, monospace",
+          fontSize: 11,
+        },
+        grid: { vertLines: { color: T.grid }, horzLines: { color: T.grid } },
+        crosshair: { mode: LW.CrosshairMode.Normal },
+        rightPriceScale: { borderColor: T.grid },
+        timeScale: { borderColor: T.grid, timeVisible: true, secondsVisible: false },
+      });
+      const prec = decimals(analysis.price);
+      const pf = { type: "price" as const, precision: prec, minMove: 1 / 10 ** prec };
+      const s = chart.addSeries(LW.CandlestickSeries, {
+        upColor: T.up,
+        downColor: T.down,
+        wickUpColor: T.up,
+        wickDownColor: T.down,
+        borderVisible: false,
+        priceFormat: pf,
+      });
+      s.setData(
+        candles.map((c) => ({
+          time: c.time as Time,
+          open: c.open,
+          high: c.high,
+          low: c.low,
+          close: c.close,
+        })),
+      );
+      const line = (vals: number[], color: string, from: number) => {
+        const l = chart.addSeries(LW.LineSeries, {
+          color,
+          lineWidth: 1,
+          priceLineVisible: false,
+          lastValueVisible: false,
+          crosshairMarkerVisible: false,
+        });
+        l.setData(
+          candles.slice(from).map((c, i) => ({ time: c.time as Time, value: vals[i + from] })),
+        );
+      };
+      line(analysis.series.ema20, T.ema20, 20);
+      line(analysis.series.ema50, T.ema50, 50);
+      if (candles.length > 200) line(analysis.series.ema200, T.ema200, 200);
+      line(analysis.series.vwap, "#f97316", 20);
+      line(analysis.series.supertrend, "#14b8a6", 11);
+
+      for (const p of analysis.pools)
+        s.createPriceLine({
+          price: p.price,
+          color: "#c084fc",
+          lineWidth: 1,
+          lineStyle: LW.LineStyle.Dashed,
+          axisLabelVisible: false,
+          title: p.kind === "equal-highs" ? "BSL" : "SSL",
+        });
+      if (analysis.profile) {
+        s.createPriceLine({
+          price: analysis.profile.poc,
+          color: "#eab308",
+          lineWidth: 1,
+          lineStyle: LW.LineStyle.Solid,
+          axisLabelVisible: false,
+          title: "POC",
+        });
+        s.createPriceLine({
+          price: analysis.profile.vah,
+          color: "#eab308",
+          lineWidth: 1,
+          lineStyle: LW.LineStyle.SparseDotted,
+          axisLabelVisible: false,
+          title: "VAH",
+        });
+        s.createPriceLine({
+          price: analysis.profile.val,
+          color: "#eab308",
+          lineWidth: 1,
+          lineStyle: LW.LineStyle.SparseDotted,
+          axisLabelVisible: false,
+          title: "VAL",
+        });
+      }
+
+      for (const lv of analysis.levels)
+        s.createPriceLine({
+          price: lv.price,
+          color: T.level,
+          lineWidth: 1,
+          lineStyle: LW.LineStyle.Dotted,
+          axisLabelVisible: false,
+          title: lv.kind === "support" ? "S" : "R",
+        });
+      for (const z of analysis.zones) {
+        const col = z.bias === "bull" ? T.up : T.down;
+        const t =
+          z.kind === "BREAKER"
+            ? "BB"
+            : z.kind === "DEMAND"
+              ? "DZ"
+              : z.kind === "SUPPLY"
+                ? "SZ"
+                : z.kind;
+        s.createPriceLine({
+          price: z.top,
+          color: col,
+          lineWidth: 1,
+          lineStyle: LW.LineStyle.LargeDashed,
+          axisLabelVisible: false,
+          title: t,
+        });
+        s.createPriceLine({
+          price: z.bottom,
+          color: col,
+          lineWidth: 1,
+          lineStyle: LW.LineStyle.LargeDashed,
+          axisLabelVisible: false,
+          title: "",
+        });
+      }
+      const p = analysis.plan;
+      const pl = (price: number, color: string, title: string, style = LW.LineStyle.Solid) =>
+        s.createPriceLine({
+          price,
+          color,
+          lineWidth: 2,
+          lineStyle: style,
+          axisLabelVisible: true,
+          title,
+        });
+      pl(p.entry, T.entry, "ENTRY");
+      if (p.deepEntry != null)
+        pl(p.deepEntry, T.info ?? "#38bdf8", "DEEP", LW.LineStyle.SparseDotted);
+      pl(p.stop, T.stop, "SL");
+      pl(p.tp1, T.tp, "TP1", LW.LineStyle.Dashed);
+      pl(p.tp2, T.tp, "TP2", LW.LineStyle.Dashed);
+      pl(p.tp3, T.tp, "TP3", LW.LineStyle.Dashed);
+      pl(p.trailingStop, T.trail, "TRAIL", LW.LineStyle.SparseDotted);
+
+      const times = new Set(candles.map((c) => c.time));
+      LW.createSeriesMarkers(
+        s,
+        analysis.markers
+          .filter((m) => times.has(m.time))
+          .sort((a, b) => a.time - b.time)
+          .map((m) => ({
+            time: m.time as Time,
+            position: m.position,
+            color: m.bias === "bull" ? T.up : m.bias === "bear" ? T.down : T.text,
+            shape: m.bias === "bull" ? "arrowUp" : m.bias === "bear" ? "arrowDown" : "circle",
+            text: m.text,
+            size: m.bias === "neutral" ? 0.4 : 1,
+          })),
+      );
+      chart.timeScale().setVisibleLogicalRange({
+        from: Math.max(0, candles.length - 150),
+        to: candles.length + 8,
+      });
+      const ro = new ResizeObserver(() =>
+        chart.applyOptions({ width: el.clientWidth, height: el.clientHeight }),
+      );
+      ro.observe(el);
+      cleanup = () => {
+        ro.disconnect();
+        chart.remove();
+      };
+    })();
+    return () => {
+      disposed = true;
+      cleanup();
+    };
+  }, [candles, analysis]);
+
+  return <div ref={ref} className="h-full w-full" />;
+}
