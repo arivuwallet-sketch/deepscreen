@@ -190,6 +190,9 @@ export function Shell({ children }: { children: ReactNode }) {
           <Link to="/answers" className="hover:text-foreground">
             Answers
           </Link>
+          <Link to="/knowledge" className="hover:text-foreground">
+            Knowledge Index
+          </Link>
           <Link to="/research-checklist" className="hover:text-foreground">
             Research checklist
           </Link>
