@@ -26,6 +26,7 @@ import { MarketScene } from "./MarketScene";
 import { useMotionPreference } from "@/hooks/useMotionPreference";
 import { LANDING_FAQS } from "@/lib/discovery/landing-faq";
 import { faqAnchor } from "@/lib/seo/faq-anchor";
+import { DEEPSCREEN_ENTITY_SENTENCE } from "@/lib/seo/brand";
 import "./landing.css";
 
 const MARKETS = [
@@ -589,7 +590,7 @@ export function LandingPage() {
           <MarketScene paused={paused} market={market} />
           <section className="ds-chapter ds-hero">
             <div className="ds-hero-copy">
-              <Eyebrow>Global stock screener. Informed investing.</Eyebrow>
+              <Eyebrow>DeepScreen · Global stock screener & investment research</Eyebrow>
               <h1>
                 See the signal.
                 <br />
@@ -598,7 +599,7 @@ export function LandingPage() {
                 <em>the noise.</em>
               </h1>
               <p className="ds-lead">
-                Screen and research stocks across India, the US and the UK.
+                {DEEPSCREEN_ENTITY_SENTENCE}
                 <br className="ds-desktop-break" /> Move from fundamentals to DeepChart technicals,
                 funds, ETFs, REITs, options, market context and research education in one workspace.
               </p>
