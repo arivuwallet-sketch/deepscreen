@@ -2607,3 +2607,218 @@
     top: 76%;
   }
 }
+
+
+/* Motion layered onto the landing page's original visual previews. */
+.ds-terminal,
+.ds-feature-card,
+.ds-valuation-demo,
+.ds-options-demo {
+  position: relative;
+}
+
+.ds-terminal {
+  overflow: hidden;
+}
+.ds-terminal:after {
+  content: "";
+  position: absolute;
+  z-index: 4;
+  left: -15%;
+  right: -15%;
+  top: -18%;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, #c8fa8660, transparent);
+  box-shadow: 0 0 20px #c8fa8622;
+  animation: ds-terminal-scan 6.2s ease-in-out infinite;
+}
+.ds-terminal-top i {
+  animation: ds-status-pulse 2.8s ease-in-out infinite;
+}
+.ds-terminal-top i:nth-child(2) { animation-delay: -0.9s; }
+.ds-terminal-top i:nth-child(3) { animation-delay: -1.8s; }
+.ds-company-icon {
+  position: relative;
+  overflow: hidden;
+}
+.ds-company-icon:after {
+  content: "";
+  position: absolute;
+  inset: -35%;
+  background: linear-gradient(110deg, transparent 35%, #c8fa862b 50%, transparent 65%);
+  transform: translateX(-80%) rotate(8deg);
+  animation: ds-icon-glint 5.8s ease-in-out infinite;
+}
+.ds-score-ring:after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border: 1px dashed #c8fa8630;
+  border-radius: 50%;
+  animation: ds-score-orbit 14s linear infinite;
+}
+.ds-score-ring > span {
+  animation: ds-score-breathe 3.8s ease-in-out infinite;
+}
+.ds-demo-metrics b {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, #58864c, #c8fa86 55%, #7fa95f),
+    linear-gradient(90deg, transparent, #ffffff24, transparent);
+  background-size: 100% 100%, 60px 100%;
+  animation: ds-metric-glow 4.6s ease-in-out infinite;
+}
+.ds-demo-metrics b:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, #ffffff30, transparent);
+  transform: translateX(-110%);
+  animation: ds-bar-sweep 3.8s ease-in-out infinite;
+}
+
+.ds-feature-card:before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 78% 18%, #c8fa8600 0, #c8fa8600 28%, #c8fa8609 44%, transparent 60%);
+  transform: translateX(-18%);
+  opacity: 0.45;
+  animation: ds-card-light 8s ease-in-out infinite;
+}
+.ds-feature-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.ds-valuation-demo,
+.ds-options-demo {
+  overflow: hidden;
+}
+.ds-valuation-demo:after,
+.ds-options-demo:after {
+  content: "";
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  top: 34%;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, #c8fa8632, transparent);
+  animation: ds-preview-scan 5.2s ease-in-out infinite;
+}
+.ds-cashbars i {
+  transform-origin: bottom center;
+  animation: ds-cashbar-live 3.4s ease-in-out infinite;
+}
+.ds-cashbars > div:nth-child(2) i { animation-delay: -0.6s; }
+.ds-cashbars > div:nth-child(3) i { animation-delay: -1.2s; }
+.ds-cashbars > div:nth-child(4) i { animation-delay: -1.8s; }
+.ds-cashbars > div:nth-child(5) i { animation-delay: -2.4s; }
+.ds-value {
+  text-shadow: 0 0 18px #c8fa8615;
+  animation: ds-value-float 4.2s ease-in-out infinite;
+}
+.ds-options-demo polyline {
+  stroke-dasharray: 900;
+  stroke-dashoffset: 900;
+  filter: drop-shadow(0 0 6px #c8fa8640);
+  animation: ds-payoff-draw 4.4s ease-in-out infinite;
+}
+.ds-options-demo svg path[stroke-dasharray] {
+  animation: ds-axis-pulse 4s ease-in-out infinite;
+}
+.ds-demo-tabs button[aria-pressed="true"] {
+  box-shadow: inset 0 0 18px #c8fa8609;
+  animation: ds-active-tab 3.2s ease-in-out infinite;
+}
+
+@keyframes ds-terminal-scan {
+  0%, 10% { transform: translateY(0); opacity: 0; }
+  35% { opacity: 0.7; }
+  70% { transform: translateY(520px); opacity: 0.3; }
+  100% { transform: translateY(560px); opacity: 0; }
+}
+@keyframes ds-status-pulse {
+  0%, 100% { opacity: 0.38; transform: scale(0.82); }
+  50% { opacity: 0.95; transform: scale(1.18); background: #7ca76a; }
+}
+@keyframes ds-icon-glint {
+  0%, 25% { transform: translateX(-90%) rotate(8deg); opacity: 0; }
+  45% { opacity: 1; }
+  65%, 100% { transform: translateX(90%) rotate(8deg); opacity: 0; }
+}
+@keyframes ds-score-orbit {
+  to { transform: rotate(360deg); }
+}
+@keyframes ds-score-breathe {
+  0%, 100% { opacity: 0.86; transform: scale(0.98); }
+  50% { opacity: 1; transform: scale(1.025); }
+}
+@keyframes ds-metric-glow {
+  0%, 100% { filter: brightness(0.9); }
+  50% { filter: brightness(1.14); }
+}
+@keyframes ds-bar-sweep {
+  0%, 25% { transform: translateX(-120%); opacity: 0; }
+  45% { opacity: 0.9; }
+  75%, 100% { transform: translateX(150%); opacity: 0; }
+}
+@keyframes ds-card-light {
+  0%, 100% { transform: translateX(-18%); opacity: 0.25; }
+  50% { transform: translateX(16%); opacity: 0.6; }
+}
+@keyframes ds-preview-scan {
+  0%, 100% { transform: translateY(-28px); opacity: 0; }
+  45% { opacity: 0.55; }
+  65% { transform: translateY(165px); opacity: 0.25; }
+}
+@keyframes ds-cashbar-live {
+  0%, 100% { transform: scaleY(0.91); filter: brightness(0.86); }
+  50% { transform: scaleY(1); filter: brightness(1.14); }
+}
+@keyframes ds-value-float {
+  0%, 100% { transform: translateY(0); opacity: 0.9; }
+  50% { transform: translateY(-2px); opacity: 1; }
+}
+@keyframes ds-payoff-draw {
+  0%, 10% { stroke-dashoffset: 900; opacity: 0.35; }
+  45%, 78% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: -80; opacity: 0.55; }
+}
+@keyframes ds-axis-pulse {
+  0%, 100% { opacity: 0.26; }
+  50% { opacity: 0.55; }
+}
+@keyframes ds-active-tab {
+  0%, 100% { border-color: #c8fa8638; }
+  50% { border-color: #c8fa8670; }
+}
+
+/* The existing Pause Motion control pauses both new and original visual animations. */
+.ds-paused .ds-terminal *,
+.ds-paused .ds-terminal:after,
+.ds-paused .ds-feature-card:before,
+.ds-paused .ds-valuation-demo *,
+.ds-paused .ds-valuation-demo:after,
+.ds-paused .ds-options-demo *,
+.ds-paused .ds-options-demo:after {
+  animation-play-state: paused !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-terminal *,
+  .ds-terminal:after,
+  .ds-feature-card:before,
+  .ds-valuation-demo *,
+  .ds-valuation-demo:after,
+  .ds-options-demo *,
+  .ds-options-demo:after {
+    animation: none !important;
+  }
+}
