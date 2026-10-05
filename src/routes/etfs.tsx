@@ -4,6 +4,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
 import { InvestmentTopicGuide } from "@/components/ds/InvestmentTopicGuide";
 import { faqForType } from "@/lib/seo/investment-faq";
+import { etfKeywords, metaKeywords } from "@/lib/seo/keywords";
 import { buildBreadcrumbSchema, buildFAQSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 
 const title = "ETF Analysis: Holdings, Tracking, Fees & Liquidity | DeepScreen";
@@ -18,7 +19,7 @@ export const Route = createFileRoute("/etfs")({
     meta: [
       { title },
       { name: "description", content: description },
-      { name: "keywords", content: "ETF analysis, ETF holdings, ETF tracking error, tracking difference, ETF expense ratio, ETF liquidity, ETF bid ask spread, premium discount NAV, ETF AUM, ETF concentration" },
+      { name: "keywords", content: metaKeywords(etfKeywords) },
       { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" },
       { property: "og:title", content: title },
       { property: "og:description", content: description },
