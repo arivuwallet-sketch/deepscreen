@@ -4,6 +4,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
 import { findStrategyGuide } from "@/lib/seo/content";
 import { metaKeywords, optionsKeywords } from "@/lib/seo/keywords";
+import { faqAnchor } from "@/lib/seo/faq-anchor";
 const BASE = "https://deepscreen.online";
 export const Route = createFileRoute("/options/$slug")({
   staticData: { sitemap: true },
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/options/$slug")({
       meta: [
         { title },
         { name: "description", content: s.description },
+        { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" },
         {
           name: "keywords",
           content: metaKeywords(
@@ -40,7 +42,7 @@ export const Route = createFileRoute("/options/$slug")({
         { property: "og:url", content: url },
         { name: "twitter:card", content: "summary_large_image" },
       ],
-      links: [{ rel: "canonical", href: url }],
+      links: [{ rel: "canonical", href: url }, { rel: "describedby", href: `${BASE}/faq-index.txt` }],
       scripts: [
         {
           type: "application/ld+json",
@@ -111,11 +113,11 @@ function StrategyPage() {
         <section className="mt-8">
           <h2 className="text-lg font-semibold">Strategy questions</h2>
           <dl className="mt-4 space-y-4">
-            <div>
+            <div id={faqAnchor(`What is a ${s.name}?`)} className="scroll-mt-24">
               <dt className="font-medium">What is a {s.name}?</dt>
               <dd className="mt-2 text-sm text-muted-foreground">{s.answer}</dd>
             </div>
-            <div>
+            <div id={faqAnchor(`What is the maximum risk of a ${s.name}?`)} className="scroll-mt-24">
               <dt className="font-medium">What is the maximum risk of a {s.name}?</dt>
               <dd className="mt-2 text-sm text-muted-foreground">{s.risk}</dd>
             </div>
