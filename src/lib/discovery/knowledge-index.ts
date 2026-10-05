@@ -5,6 +5,7 @@ import { LANDING_FAQS } from "@/lib/discovery/landing-faq";
 import { LEGACY_BLOGS, LEGACY_BLOG_FAQS } from "@/lib/discovery/legacy-blog";
 import { INVESTMENT_FAQS } from "@/lib/seo/investment-faq";
 import { MARKET_GUIDE_FAQS } from "@/lib/seo/market-guide-faq";
+import { MARKET_EDUCATION_FAQS } from "@/lib/seo/market-education-faq";
 import { RATIOS, STRATEGY_GUIDES, ratioGuideSlug } from "@/lib/seo/content";
 import { faqAnchor } from "@/lib/seo/faq-anchor";
 import { ratioFaqs } from "@/lib/seo/research";
@@ -61,6 +62,15 @@ export function knowledgeGroups(): KnowledgeGroup[] {
       entries: MARKET_GUIDE_FAQS.map((faq) => ({
         question: faq.question,
         href: `${MARKET_PATH[faq.topic]}#${faq.id}`,
+      })),
+    },
+    {
+      id: "deepchart-trading-faq",
+      title: "DeepChart, trading, crypto and forex FAQ",
+      description: "Technical-analysis, trading-risk, crypto-market and forex questions.",
+      entries: MARKET_EDUCATION_FAQS.map((faq) => ({
+        question: faq.question,
+        href: faq.topic === "DEEPCHART" ? `/chart-reader#${faq.id}` : `/trading#${faq.id}`,
       })),
     },
     {
