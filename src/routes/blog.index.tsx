@@ -25,6 +25,8 @@ export const Route = createFileRoute("/blog/")({
     links: [
       { rel: "canonical", href: url },
       { rel: "describedby", href: "https://deepscreen.online/llms.txt" },
+      { rel: "alternate", type: "application/rss+xml", href: "https://deepscreen.online/blog/feed.xml", title: "DeepScreen Research RSS" },
+      { rel: "alternate", type: "text/plain", href: "https://deepscreen.online/faq-index.txt", title: "DeepScreen FAQ index" },
     ],
     scripts: [{
       type: "application/ld+json",
