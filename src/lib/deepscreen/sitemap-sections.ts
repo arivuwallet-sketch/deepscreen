@@ -197,15 +197,15 @@ export function buildSitemapSections(router: AnyRouter): Map<string, SitemapEntr
   // Every public stock-filter URL is discoverable. Data-backed pages show
   // matching companies; reference pages explain the category and required
   // evidence without fabricating membership.
-  const blog = [
-    ...collectDynamic(
-      router,
-      "/blog/$slug",
-      "/blog/$slug",
-      INVESTMENT_BLOG_POSTS.map((post) => ({ slug: post.slug })),
-    ),
-    { path: "/blog/retail-investing-statistics-2026.html" },
-  ];
+  const blog = isSitemapRouteIncluded(router.routesById["/blog/$slug"])
+    ? [
+        ...INVESTMENT_BLOG_POSTS.map((post) => ({
+          path: "/blog/" + encodePathSegment(post.slug),
+          lastmod: post.updated,
+        })),
+        { path: "/blog/retail-investing-statistics-2026.html", lastmod: "2026-09-25" },
+      ]
+    : [];
 
   const filters = collectDynamic(
     router,
