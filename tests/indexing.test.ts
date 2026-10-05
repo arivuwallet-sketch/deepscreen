@@ -429,3 +429,61 @@ test('all FAQ Q&A and blog discovery surfaces stay crawlable and linked', async 
     'https://deepscreen.online/blog/retail-investing-statistics-2026.html',
   ]) assert.ok(llms.includes(url), url);
 });
+
+test('DeepChart trading crypto and forex content stays visible indexable and AI-discoverable', async () => {
+  const chartRoute = await readFile(new URL('../src/routes/chart-reader.tsx', import.meta.url), 'utf8');
+  const tradingRoute = await readFile(new URL('../src/routes/trading.tsx', import.meta.url), 'utf8');
+  const tradingFaq = await readFile(new URL('../src/lib/seo/market-education-faq.ts', import.meta.url), 'utf8');
+  const tradingBlog = await readFile(new URL('../src/lib/content/trading-blog.ts', import.meta.url), 'utf8');
+  const blogRegistry = await readFile(new URL('../src/lib/content/investment-blog.ts', import.meta.url), 'utf8');
+  const knowledgeRegistry = await readFile(new URL('../src/lib/discovery/knowledge-index.ts', import.meta.url), 'utf8');
+  const answersRoute = await readFile(new URL('../src/routes/answers.tsx', import.meta.url), 'utf8');
+  const robots = await readFile(new URL('../public/robots.txt', import.meta.url), 'utf8');
+  const llms = await readFile(new URL('../public/llms.txt', import.meta.url), 'utf8');
+
+  assert.match(chartRoute, /createFileRoute\("\/chart-reader"\)/);
+  assert.match(chartRoute, /index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1/);
+  assert.match(chartRoute, /buildFAQSchema\(DEEPCHART_FAQS/);
+  assert.match(chartRoute, /MarketEducationFaqSection/);
+  assert.match(chartRoute, /deepchart-technical-analysis-guide/);
+  assert.match(chartRoute, /trading-risk-management-position-sizing/);
+  assert.match(chartRoute, /crypto-trading-guide-spot-futures-risk/);
+  assert.match(chartRoute, /forex-trading-guide-pips-leverage-risk-india/);
+
+  assert.match(tradingRoute, /createFileRoute\("\/trading"\)/);
+  assert.match(tradingRoute, /staticData:\s*\{\s*sitemap:\s*true\s*\}/);
+  assert.match(tradingRoute, /buildFAQSchema/);
+  assert.match(tradingRoute, /MarketEducationFaqSection/);
+  assert.match(tradingRoute, /RBI — Forex transactions FAQ/);
+  assert.doesNotMatch(tradingRoute, /noindex/i);
+
+  for (const question of [
+    'What is DeepChart?',
+    'What is risk management in trading?',
+    'What is crypto trading?',
+    'What is forex trading?',
+    'Can Indian residents trade forex on any online platform?',
+  ]) assert.ok(tradingFaq.includes(question), question);
+
+  for (const slug of [
+    'deepchart-technical-analysis-guide',
+    'trading-risk-management-position-sizing',
+    'crypto-trading-guide-spot-futures-risk',
+    'forex-trading-guide-pips-leverage-risk-india',
+  ]) {
+    assert.ok(tradingBlog.includes(`slug: "${slug}"`), slug);
+    assert.ok(llms.includes('https://deepscreen.online/blog/' + slug), slug);
+  }
+
+  assert.match(blogRegistry, /\.\.\.TRADING_BLOG_POSTS/);
+  assert.match(knowledgeRegistry, /MARKET_EDUCATION_FAQS/);
+  assert.match(knowledgeRegistry, /\/chart-reader#/);
+  assert.match(knowledgeRegistry, /\/trading#/);
+  assert.match(answersRoute, /DeepChart, trading, crypto and forex/);
+
+  assert.ok(robots.includes('Allow: /chart-reader'));
+  assert.ok(robots.includes('Allow: /trading'));
+  assert.ok(llms.includes('https://deepscreen.online/chart-reader'));
+  assert.ok(llms.includes('https://deepscreen.online/trading'));
+});
+
