@@ -250,7 +250,9 @@ test('investment blog cluster remains indexable, sourced and sitemap-discoverabl
     assert.match(llms, new RegExp('https://deepscreen\\.online/blog/' + slug));
   }
 
-  assert.match(sitemapSections, /INVESTMENT_BLOG_POSTS\.map\(\(post\) => \(\{ slug: post\.slug \}\)\)/);
+  assert.match(sitemapSections, /INVESTMENT_BLOG_POSTS\.map\(\(post\) => \(\{/);
+  assert.match(sitemapSections, /path: "\/blog\/" \+ encodePathSegment\(post\.slug\)/);
+  assert.match(sitemapSections, /lastmod: post\.updated/);
   assert.match(sitemapSections, /retail-investing-statistics-2026\.html/);
   assert.match(blogContent, /Association of Mutual Funds in India/);
   assert.match(blogContent, /National Stock Exchange of India/);
@@ -375,6 +377,7 @@ test('DeepScreen and stock-market FAQ remains canonical visible and AI-discovera
 test('all FAQ Q&A and blog discovery surfaces stay crawlable and linked', async () => {
   const knowledgeRoute = await readFile(new URL('../src/routes/knowledge.tsx', import.meta.url), 'utf8');
   const faqIndexRoute = await readFile(new URL('../src/routes/faq-index[.]txt.ts', import.meta.url), 'utf8');
+  const feedRoute = await readFile(new URL('../src/routes/blog.feed[.]xml.ts', import.meta.url), 'utf8');
   const knowledgeRegistry = await readFile(new URL('../src/lib/discovery/knowledge-index.ts', import.meta.url), 'utf8');
   const homepageRoute = await readFile(new URL('../src/routes/index.tsx', import.meta.url), 'utf8');
   const homepage = await readFile(new URL('../src/components/landing/LandingPage.tsx', import.meta.url), 'utf8');
@@ -395,6 +398,10 @@ test('all FAQ Q&A and blog discovery surfaces stay crawlable and linked', async 
   assert.ok(faqIndexRoute.includes('knowledgeText()'));
   assert.ok(faqIndexRoute.includes('text/plain; charset=utf-8'));
   assert.ok(!faqIndexRoute.includes('X-Robots-Tag'));
+  assert.ok(feedRoute.includes('createFileRoute("/blog/feed.xml")'));
+  assert.ok(feedRoute.includes('application/rss+xml'));
+  assert.ok(feedRoute.includes('INVESTMENT_BLOG_POSTS'));
+  assert.ok(feedRoute.includes('LEGACY_BLOGS'));
 
   for (const token of [
     'ANSWERS', 'LANDING_FAQS', 'MARKET_GUIDE_FAQS', 'INVESTMENT_FAQS',
