@@ -1262,10 +1262,7 @@
 
 /* Filters */
 .ds-filter-cloud span {
-  --x: calc((var(--i) % 4) * 23%);
   position: absolute;
-  left: calc(7% + var(--x));
-  top: calc(8% + (var(--i) / 4) * 19%);
   padding: 7px 9px;
   border: 1px solid #8db27425;
   border-radius: 4px;
@@ -1274,6 +1271,14 @@
   font-size: 7px;
   animation: ds-filter-chip 4.8s calc(var(--i) * -0.31s) ease-in-out infinite;
 }
+.ds-filter-cloud span:nth-child(1) { left: 6%; top: 8%; }
+.ds-filter-cloud span:nth-child(2) { left: 29%; top: 5%; }
+.ds-filter-cloud span:nth-child(3) { left: 55%; top: 10%; }
+.ds-filter-cloud span:nth-child(4) { right: 6%; top: 7%; }
+.ds-filter-cloud span:nth-child(5) { left: 10%; top: 29%; }
+.ds-filter-cloud span:nth-child(6) { left: 35%; top: 27%; }
+.ds-filter-cloud span:nth-child(7) { right: 22%; top: 28%; }
+.ds-filter-cloud span:nth-child(8) { right: 5%; top: 34%; }
 .ds-filter-funnel {
   position: absolute;
   left: 50%;
