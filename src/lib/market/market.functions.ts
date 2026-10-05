@@ -50,6 +50,79 @@ export const getLiveQuotes = createServerFn({ method: "POST" })
     return out;
   });
 
+export interface MarketIndexQuote {
+  id: string;
+  exchange: "NSE" | "BSE" | "NYSE" | "NASDAQ" | "LSE";
+  name: string;
+  symbol: string;
+  flag: string;
+  price: number | null;
+  previousClose: number | null;
+  change: number | null;
+  changePct: number | null;
+  marketState: string;
+  asOf: string | null;
+}
+
+const INDEX_TAPE_CACHE_TTL_MS = 8_000;
+let indexTapeCache: { data: MarketIndexQuote[]; fetchedAt: number } | null = null;
+let indexTapeInFlight: Promise<MarketIndexQuote[]> | null = null;
+
+async function fetchMarketIndexTape(): Promise<MarketIndexQuote[]> {
+  const { MARKET_INDEX_TAPE } = await import("./market-indices");
+  const { fetchChartQuote } = await import("./yahoo.server");
+  const out: MarketIndexQuote[] = [];
+
+  for (let start = 0; start < MARKET_INDEX_TAPE.length; start += 5) {
+    const batch = MARKET_INDEX_TAPE.slice(start, start + 5);
+    const quotes = await Promise.all(batch.map((index) => fetchChartQuote(index.symbol)));
+
+    batch.forEach((index, position) => {
+      const quote = quotes[position];
+      const change =
+        quote && Number.isFinite(quote.price) && Number.isFinite(quote.previousClose)
+          ? quote.price - quote.previousClose
+          : null;
+      out.push({
+        ...index,
+        price: quote?.price ?? null,
+        previousClose: quote?.previousClose ?? null,
+        change,
+        changePct: quote?.changePct ?? null,
+        marketState: quote?.marketState ?? "",
+        asOf: quote?.asOf ?? null,
+      });
+    });
+  }
+
+  return out;
+}
+
+export const getMarketIndexTape = createServerFn({ method: "GET" }).handler(
+  async (): Promise<MarketIndexQuote[]> => {
+    if (indexTapeCache && Date.now() - indexTapeCache.fetchedAt < INDEX_TAPE_CACHE_TTL_MS) {
+      return indexTapeCache.data;
+    }
+
+    if (!indexTapeInFlight) {
+      indexTapeInFlight = fetchMarketIndexTape()
+        .then((data) => {
+          indexTapeCache = { data, fetchedAt: Date.now() };
+          return data;
+        })
+        .catch((error: unknown) => {
+          console.warn("[market-index-tape] refresh failed", error);
+          return indexTapeCache?.data ?? [];
+        })
+        .finally(() => {
+          indexTapeInFlight = null;
+        });
+    }
+
+    return indexTapeInFlight;
+  },
+);
+
 export const getLiveFundamentals = createServerFn({ method: "GET" })
   .inputValidator((d: { exchange: string; symbol: string }) => d)
   .handler(async ({ data }): Promise<LiveFundamentals | null> => {
