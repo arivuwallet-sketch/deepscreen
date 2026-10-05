@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { Search } from "lucide-react";
+import { Lock, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import { STOCK_FILTER_PRESETS } from "@/lib/deepscreen/stock-filter-presets";
+import { STOCK_FILTER_PRESETS, stockFilterRequiresPro } from "@/lib/deepscreen/stock-filter-presets";
 
 export function StockFilterDirectory() {
   const [query, setQuery] = useState("");
@@ -89,7 +89,9 @@ export function StockFilterDirectory() {
                       {preset.label}
                     </h3>
                     <span className="shrink-0 rounded-full border border-primary/30 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-primary">
-                      live
+                      {stockFilterRequiresPro(preset) ? (
+                        <span className="inline-flex items-center gap-1"><Lock className="size-2.5" /> Pro</span>
+                      ) : "Free"}
                     </span>
                   </div>
                   <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
