@@ -535,6 +535,7 @@ test('high-intent search keyword clusters stay mapped to their relevant pages', 
     'tradingKeywords',
     'cryptoTradingKeywords',
     'forexTradingKeywords',
+    'investmentDirectoryKeywords',
     'mutualFundKeywords',
     'etfKeywords',
     'reitKeywords',
@@ -550,10 +551,10 @@ test('high-intent search keyword clusters stay mapped to their relevant pages', 
   assert.ok(routes.mutualFunds.includes('metaKeywords(mutualFundKeywords)'));
   assert.ok(routes.etfs.includes('metaKeywords(etfKeywords)'));
   assert.ok(routes.reits.includes('metaKeywords(reitKeywords)'));
-  assert.ok(routes.investments.includes('metaKeywords(mutualFundKeywords, etfKeywords, reitKeywords)'));
+  assert.ok(routes.investments.includes('metaKeywords(investmentDirectoryKeywords, mutualFundKeywords, etfKeywords, reitKeywords)'));
   assert.ok(routes.commodities.includes('metaKeywords(commodityKeywords)'));
   assert.ok(routes.giftNifty.includes('metaKeywords(giftNiftyKeywords)'));
-  assert.ok(routes.ipoGmp.includes('metaKeywords(ipoGmpKeywords, ipoKeywords)'));
+  assert.ok(routes.ipoGmp.includes('metaKeywords(ipoGmpKeywords)'));
   assert.ok(routes.blog.includes('metaKeywords(researchBlogKeywords'));
   assert.ok(routes.knowledge.includes('metaKeywords(knowledgeKeywords)'));
 
