@@ -476,6 +476,8 @@ const GLOBAL_MARKET_NEWS_TOPICS = [
   { category: "M&A", query: "merger acquisition takeover stocks markets" },
   { category: "TECH", query: "technology semiconductor AI stocks markets" },
   { category: "COMMODITIES", query: "oil gold commodities markets stocks" },
+  { category: "FX/BONDS", query: "dollar currencies bond yields treasury markets stocks" },
+  { category: "GEOPOLITICS", query: "geopolitics war sanctions trade markets stocks" },
 ] as const;
 
 const NEWS_CACHE_TTL_MS = 60_000;
