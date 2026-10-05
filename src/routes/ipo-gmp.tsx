@@ -5,6 +5,7 @@ import { Shell } from "@/components/ds/Shell";
 import { MarketGuideFaqSection } from "@/components/ds/MarketGuideFaqSection";
 import { Button } from "@/components/ui/button";
 import { MARKET_GUIDE_SOURCES, marketGuideFaq } from "@/lib/seo/market-guide-faq";
+import { ipoGmpKeywords, ipoKeywords, metaKeywords } from "@/lib/seo/keywords";
 import { buildBreadcrumbSchema, buildFAQSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 
 const URL = "https://deepscreen.online/ipo-gmp";
@@ -16,6 +17,7 @@ export const Route = createFileRoute("/ipo-gmp")({
   staticData: { sitemap: true },
   head: () => ({ meta: [
     { title }, { name: "description", content: description },
+    { name: "keywords", content: metaKeywords(ipoGmpKeywords, ipoKeywords) },
     { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" },
     { property: "og:title", content: title }, { property: "og:description", content: description },
     { property: "og:type", content: "article" }, { property: "og:url", content: URL },
