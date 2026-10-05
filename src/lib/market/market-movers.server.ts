@@ -192,26 +192,26 @@ function toLiveQuote(raw: Raw): LiveQuote | null {
   };
 }
 
-async function fetchScreener(exchangeCodes: string[], direction: "ASC" | "DESC"): Promise<Raw[]> {
+async function fetchScreener(exchangeCodes: string[], direction: "asc" | "desc"): Promise<Raw[]> {
   const auth = await getSession();
   if (!auth) return [];
 
-  const movementOperator = direction === "DESC" ? "GT" : "LT";
+  const movementOperator = direction === "desc" ? "gt" : "lt";
   const body = {
     offset: 0,
     size: 250,
     sortField: "percentchange",
     sortType: direction,
-    quoteType: "EQUITY",
+    quoteType: "equity",
     userId: "",
     userIdType: "guid",
     query: {
-      operator: "AND",
+      operator: "and",
       operands: [
-        { operator: "IS-IN", operands: ["exchange", ...exchangeCodes] },
+        { operator: "is-in", operands: ["exchange", ...exchangeCodes] },
         { operator: movementOperator, operands: ["percentchange", 0] },
-        { operator: "GT", operands: ["intradayprice", 0] },
-        { operator: "GT", operands: ["dayvolume", 0] },
+        { operator: "gt", operands: ["intradayprice", 0] },
+        { operator: "gt", operands: ["dayvolume", 0] },
       ],
     },
   };
@@ -257,7 +257,7 @@ export interface LiveMarketMoversSnapshot {
   gainers: LiveMarketMover[];
   losers: LiveMarketMover[];
   fetchedAt: string;
-  source: "Yahoo Finance equity screener";
+  source: "Yahoo Finance equity screener" | "Yahoo Finance chart fallback";
 }
 
 const CACHE_TTL_MS = 12_000;
@@ -272,6 +272,37 @@ function sanitizeExchanges(exchanges: string[]): DeepExchange[] {
   return clean.length ? clean.sort() : [...ALLOWED_EXCHANGES];
 }
 
+async function fetchChartFallback(exchanges: DeepExchange[]): Promise<LiveMarketMover[]> {
+  const { fetchChartQuote, yahooSymbol } = await import("./yahoo.server");
+  const candidates = exchanges.flatMap((exchange) =>
+    STOCKS
+      .filter((stock) => stock.exchange === exchange)
+      .slice()
+      .sort((a, b) => b.marketCap - a.marketCap)
+      .slice(0, 40),
+  );
+
+  const rows: LiveMarketMover[] = [];
+  const chunkSize = 10;
+  for (let start = 0; start < candidates.length; start += chunkSize) {
+    const chunk = candidates.slice(start, start + chunkSize);
+    const quotes = await Promise.all(
+      chunk.map((stock) => fetchChartQuote(yahooSymbol(stock.exchange, stock.symbol))),
+    );
+    chunk.forEach((stock, index) => {
+      const quote = quotes[index];
+      if (!quote || !Number.isFinite(quote.changePct)) return;
+      rows.push({
+        exchange: stock.exchange as DeepExchange,
+        symbol: stock.symbol,
+        name: stock.name,
+        quote,
+      });
+    });
+  }
+  return rows;
+}
+
 async function refreshMarketMovers(exchanges: DeepExchange[]): Promise<LiveMarketMoversSnapshot> {
   const wanted = new Set(exchanges);
   const indexes = buildStockIndexes(wanted);
@@ -280,8 +311,8 @@ async function refreshMarketMovers(exchanges: DeepExchange[]): Promise<LiveMarke
   const resultSets = await Promise.all(
     relevantGroups.map(async (group) => {
       const [up, down] = await Promise.all([
-        fetchScreener(group.yahoo, "DESC"),
-        fetchScreener(group.yahoo, "ASC"),
+        fetchScreener(group.yahoo, "desc"),
+        fetchScreener(group.yahoo, "asc"),
       ]);
       return [...up, ...down];
     }),
@@ -305,7 +336,14 @@ async function refreshMarketMovers(exchanges: DeepExchange[]): Promise<LiveMarke
     }
   }
 
-  const rows = [...deduped.values()];
+  let rows = [...deduped.values()];
+  let source: LiveMarketMoversSnapshot["source"] = "Yahoo Finance equity screener";
+
+  if (rows.length === 0) {
+    rows = await fetchChartFallback(exchanges);
+    source = "Yahoo Finance chart fallback";
+  }
+
   const gainers = rows
     .filter((row) => row.quote.changePct > 0)
     .sort((a, b) => b.quote.changePct - a.quote.changePct)
@@ -319,7 +357,7 @@ async function refreshMarketMovers(exchanges: DeepExchange[]): Promise<LiveMarke
     gainers,
     losers,
     fetchedAt: new Date().toISOString(),
-    source: "Yahoo Finance equity screener",
+    source,
   };
 }
 
@@ -345,7 +383,7 @@ export async function fetchLiveMarketMovers(exchanges: string[]): Promise<LiveMa
       gainers: [],
       losers: [],
       fetchedAt: new Date().toISOString(),
-      source: "Yahoo Finance equity screener" as const,
+      source: "Yahoo Finance chart fallback" as const,
     })
     .finally(() => {
       inFlight.delete(key);
