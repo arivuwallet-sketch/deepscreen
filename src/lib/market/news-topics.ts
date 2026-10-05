@@ -27,9 +27,13 @@ function exchangeMarket(exchange: string | undefined): string {
 function productTerm(name?: string, code?: string): string {
   const n = clean(name);
   const c = clean(code, 40);
-  if (n && c) return `"${n}" "${c}"`;
+  if (n && c) return `"${n}" OR "${c}"`;
   if (n) return `"${n}"`;
   return c;
+}
+
+function cleanQuery(value: string | undefined, max = 220): string {
+  return (value ?? "").replace(/[\n\r]+/g, " ").replace(/\s+/g, " ").trim().slice(0, max);
 }
 
 export function buildScopedNewsTopics(input: {
@@ -41,11 +45,11 @@ export function buildScopedNewsTopics(input: {
   market?: string;
 }): ScopedNewsTopic[] {
   const entity = productTerm(input.entityName, input.entityCode);
-  const base = clean(input.query, 220);
+  const base = cleanQuery(input.query, 220);
   const market = exchangeMarket(input.exchange || input.market);
 
   if (input.mode === "company") {
-    const company = entity || base;
+    const company = base || entity;
     if (!company) return [];
     return [
       { category: "COMPANY", query: company, affectedMarkets: [market] },
