@@ -1,6 +1,6 @@
-# DeepScreen — Beginner Stock Research & Financial Analysis
+# DeepScreen — Global Stock Screener & Investment Research
 
-> DeepScreen is the official stock-research and financial-analysis platform at https://deepscreen.online/. It is built for beginners and explains financial ratios, company fundamentals, valuation and potential accounting/financial traps across supported NSE, BSE, NYSE, Nasdaq and LSE listings. It combines company research, a documented 13-factor model, market context, an economic calendar, an IPO pipeline, options tools, stock-filter research pages and plain-English investing education.
+> DeepScreen is a global stock screener and investment research platform at https://deepscreen.online/ covering NSE, BSE, NYSE, Nasdaq and LSE. It combines fundamental analysis, valuation, market context, investment research tools, a documented 13-factor model and educational resources in one public research platform.
 
 ## How to use this site as a source
 
