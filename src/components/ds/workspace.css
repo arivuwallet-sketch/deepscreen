@@ -342,13 +342,13 @@
 /* Shared landing-style panel treatment for cards across every DeepScreen workspace page.
    Controls (buttons, inputs, badges, pagination) are intentionally excluded. */
 .ds-workspace-content
-  :where(div, section, article, aside, a, li, dl, nav).border:is(
+  :where(div, section, article, aside, a, li, dl, nav, p, form, fieldset, figure).border:is(
     .rounded,
     .rounded-md,
     .rounded-lg,
     .rounded-xl,
     .rounded-2xl
-  ) {
+  ):not(:has(> input, > select, > textarea)) {
   border-radius: var(--ds-box-radius);
   background-image: var(--ds-box-surface);
   background-repeat: no-repeat;
@@ -367,17 +367,17 @@
     .rounded-lg,
     .rounded-xl,
     .rounded-2xl
-  ):not([class*="bg-"]) {
+  ):not(:has(> input, > select, > textarea)):not([class*="bg-"]) {
   background-color: var(--panel);
 }
 .ds-workspace-content
-  :where(div, section, article, aside, a, li, dl, nav).border:is(
+  :where(div, section, article, aside, a, li, dl, nav, p, form, fieldset, figure).border:is(
     .rounded,
     .rounded-md,
     .rounded-lg,
     .rounded-xl,
     .rounded-2xl
-  ):hover {
+  ):not(:has(> input, > select, > textarea)):hover {
   border-color: oklch(0.927 0.151 127 / 0.38);
   background-position: 88% 10%, 0 0;
   box-shadow:
@@ -538,7 +538,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .ds-workspace-content
-    :where(div, section, article, aside, a, li, dl, nav).border:is(
+    :where(div, section, article, aside, a, li, dl, nav, p, form, fieldset, figure).border:is(
       .rounded,
       .rounded-md,
       .rounded-lg,
