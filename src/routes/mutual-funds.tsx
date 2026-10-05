@@ -7,7 +7,7 @@ import { faqForType } from "@/lib/seo/investment-faq";
 import { metaKeywords, mutualFundKeywords } from "@/lib/seo/keywords";
 import { buildBreadcrumbSchema, buildFAQSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 
-const title = "Mutual Fund Analysis: NAV, TER, Returns & Risk | DeepScreen";
+const title = "Mutual Fund Analysis India: NAV, TER, Returns & Risk | DeepScreen";
 const description = "Learn how to analyze mutual funds using NAV history, rolling returns, benchmark performance, drawdown, risk-adjusted metrics, portfolio structure, manager tenure, TER and exit load.";
 const url = "https://deepscreen.online/mutual-funds";
 const faqs = faqForType("FUND");
