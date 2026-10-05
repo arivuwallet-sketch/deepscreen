@@ -4,6 +4,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
 import { InvestmentTopicGuide } from "@/components/ds/InvestmentTopicGuide";
 import { faqForType } from "@/lib/seo/investment-faq";
+import { metaKeywords, reitKeywords } from "@/lib/seo/keywords";
 import { buildBreadcrumbSchema, buildFAQSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 
 const title = "REIT Analysis: Occupancy, WALE, NDCF, AFFO & NAV | DeepScreen";
@@ -18,7 +19,7 @@ export const Route = createFileRoute("/reits")({
     meta: [
       { title },
       { name: "description", content: description },
-      { name: "keywords", content: "REIT analysis, REIT occupancy, WALE, NDCF, AFFO, REIT LTV, debt EBITDA, REIT NAV, cap rate, REIT distribution yield, tenant concentration" },
+      { name: "keywords", content: metaKeywords(reitKeywords) },
       { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" },
       { property: "og:title", content: title },
       { property: "og:description", content: description },
