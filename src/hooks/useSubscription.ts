@@ -33,8 +33,13 @@ export const PLANS: Plan[] = [
     days: 7,
     perMonth: "₹50 / week",
     anchorQuote: "🍪 The cost of one packet of biscuits.",
-    features: ["Standard Pro Features", "Real-Time Alerts", "Basic Screener"],
-    blurb: "Try the full god-mode engine for a week — every metric unlocked.",
+    features: [
+      "All DeepScreen Pro features",
+      "DeepChart Pro analysis & trade plans",
+      "Options Strategy Lab analytics",
+      "Portfolio X-Ray & research alerts",
+    ],
+    blurb: "Try every Pro research feature for 7 days with the same access as the longer plans.",
   },
   {
     tier: "monthly",
@@ -43,8 +48,13 @@ export const PLANS: Plan[] = [
     days: 30,
     perMonth: "₹175 / month",
     anchorQuote: "🍿 The price of a single movie ticket.",
-    features: ["Standard Pro Features", "Real-Time Alerts", "Basic Screener"],
-    blurb: "The everyday plan: deep scores, DCF, portfolio matrix and alerts.",
+    features: [
+      "All DeepScreen Pro features",
+      "DeepChart Pro analysis & trade plans",
+      "Options Strategy Lab analytics",
+      "Portfolio X-Ray & research alerts",
+    ],
+    blurb: "Full Pro access for 30 days: deep scores, valuation, advanced chart analysis and portfolio tools.",
   },
   {
     tier: "annual",
@@ -53,9 +63,15 @@ export const PLANS: Plan[] = [
     days: 365,
     perMonth: "Only ₹150/month!",
     anchorQuote: "📺 Cheaper than your yearly Netflix plan, but it actually makes you smarter.",
-    features: ["All Pro Features", "Priority Support", "Beta Access", "Advanced Forensic Badges"],
-    badge: "Most Popular",
-    blurb: "Best value. A full year of DeepScreen Pro plus every upcoming feature.",
+    features: [
+      "All DeepScreen Pro features",
+      "DeepChart Pro analysis & trade plans",
+      "Options Strategy Lab analytics",
+      "Portfolio X-Ray & research alerts",
+      "Priority support & beta feature access",
+    ],
+    badge: "Best Value",
+    blurb: "Full Pro access for 365 days at the lowest effective monthly price.",
   },
 ];
 
