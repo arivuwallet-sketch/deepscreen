@@ -108,7 +108,7 @@ function PortfolioPage() {
           }))}
         />
 
-        <PaywallGate feature="Portfolio X-Ray" className="mt-6" minHeight="min-h-[420px]">
+        <PaywallGate strict feature="Portfolio X-Ray" className="mt-6" minHeight="min-h-[420px]">
         <div>
         {!signedIn && !loading ? (
           <EmptyCard>
