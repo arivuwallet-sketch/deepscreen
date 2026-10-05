@@ -2,12 +2,14 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 
 import { Shell } from "@/components/ds/Shell";
+import { PaywallGate } from "@/components/ds/PaywallGate";
 import { StockTable } from "@/components/ds/StockTable";
 import { STOCKS } from "@/lib/deepscreen/stocks";
 import {
   STOCK_FILTER_PRESETS,
   filterStocksByPreset,
   findStockFilterPreset,
+  stockFilterRequiresPro,
   type StockFilterPreset,
 } from "@/lib/deepscreen/stock-filter-presets";
 import { jsonLd } from "@/lib/seo/json-ld";
@@ -295,6 +297,27 @@ function StockFilterPage() {
         </section>
 
         {preset.status === "available" ? (
+          stockFilterRequiresPro(preset) ? (
+            <PaywallGate
+              strict
+              feature={`${preset.label} matching-company screen`}
+              className="mt-6"
+              minHeight="min-h-[360px]"
+            >
+              <div>
+                <section className="rounded-lg border border-border bg-card/40 p-4 text-sm text-muted-foreground">
+                  <p>
+                    <strong>Filter status:</strong> Live and data-backed from DeepScreen's existing
+                    directory fields. {matches.length.toLocaleString()} of {STOCKS.length.toLocaleString()}{" "}
+                    covered companies currently match this rule.
+                  </p>
+                </section>
+                <div className="mt-6">
+                  <StockTable stocks={matches.slice(0, limit)} />
+                </div>
+              </div>
+            </PaywallGate>
+          ) : (
           <>
             <section className="mt-6 rounded-lg border border-border bg-card/40 p-4 text-sm text-muted-foreground">
               <p>
@@ -351,6 +374,7 @@ function StockFilterPage() {
               )}
             </section>
           </>
+          )
         ) : (
           <section className="mt-6 rounded-xl border border-border bg-panel p-5" aria-labelledby="required-data">
             <p className="num text-xs uppercase tracking-[0.16em] text-muted-foreground">
