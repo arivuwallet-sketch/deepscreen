@@ -20,6 +20,7 @@ import {
   Play,
   Menu,
   X,
+  type LucideIcon,
 } from "lucide-react";
 import { MarketScene } from "./MarketScene";
 import { useMotionPreference } from "@/hooks/useMotionPreference";
@@ -267,7 +268,7 @@ type FeatureSceneKind =
 
 const FEATURE_SCENES: {
   kind: FeatureSceneKind;
-  icon: typeof Activity;
+  icon: LucideIcon;
   tag: string;
   title: string;
   text: string;
@@ -901,7 +902,6 @@ export function LandingPage() {
                 </div>
               </article>
             ))}
-          </div>
           </div>
         </section>
         <section className="ds-process ds-section">
