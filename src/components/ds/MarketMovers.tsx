@@ -9,6 +9,7 @@ import { mergeLiveStock } from "@/lib/deepscreen/live-merge";
 import type { Stock } from "@/lib/deepscreen/types";
 import type { LiveQuote } from "@/lib/market/yahoo.server";
 import { cn } from "@/lib/utils";
+import { useSubscription } from "@/hooks/useSubscription";
 
 type MarketMoversProps = {
   stocks: Stock[];
@@ -19,7 +20,7 @@ type MarketMoversProps = {
 type Row = {
   stock: Stock;
   quote: LiveQuote;
-  score: number;
+  score: number | null;
 };
 
 function shortName(name: string) {
@@ -66,7 +67,7 @@ function MoverList({
                 </div>
                 <p className="num mt-1 text-[10px] text-muted-foreground">
                   {formatPrice(quote.price, stock.exchange)} · Vol {formatVolume(quote.volume)}
-                  {score >= 0 ? ` · Score ${score}` : ""}
+                  {score !== null ? ` · Score ${score}` : ""}
                 </p>
               </div>
               <div className="num text-right">
@@ -88,6 +89,7 @@ function MoverList({
 }
 
 export function MarketMovers({ stocks, title = "Live market movers", exchangeLabel }: MarketMoversProps) {
+  const { isPro } = useSubscription();
   const keys = useMemo(
     () =>
       stocks
@@ -107,16 +109,20 @@ export function MarketMovers({ stocks, title = "Live market movers", exchangeLab
         const quote = live[quoteKey(key)];
         if (!stock || !quote) return null;
         const merged = mergeLiveStock(stock, quote, null, null).stock;
-        const score = analyze(merged).score;
+        const score = isPro ? analyze(merged).score : null;
         return { stock, quote, score };
       })
       .filter((row): row is Row => row !== null && Number.isFinite(row.quote.changePct));
-  }, [keys, live, stocks]);
+  }, [keys, live, stocks, isPro]);
 
   const performers = rows
     .filter((r) => r.quote.changePct > 0)
     .slice()
-    .sort((a, b) => b.score - a.score || b.quote.changePct - a.quote.changePct)
+    .sort((a, b) =>
+      isPro
+        ? (b.score ?? -Infinity) - (a.score ?? -Infinity) || b.quote.changePct - a.quote.changePct
+        : b.quote.changePct - a.quote.changePct,
+    )
     .slice(0, 8);
 
   const gainers = rows
@@ -147,7 +153,7 @@ export function MarketMovers({ stocks, title = "Live market movers", exchangeLab
       </div>
 
       <div className="mt-3 grid gap-3 lg:grid-cols-3">
-        <MoverList title="Top performers" rows={performers} tone="neutral" empty="Waiting for live market quotes…" />
+        <MoverList title={isPro ? "Top performers · Pro score" : "Top positive movers"} rows={performers} tone="neutral" empty="Waiting for live market quotes…" />
         <MoverList title="Market gainers" rows={gainers} tone="up" empty="No positive movers in the live window." />
         <MoverList title="Market losers" rows={losers} tone="down" empty="No negative movers in the live window." />
       </div>
