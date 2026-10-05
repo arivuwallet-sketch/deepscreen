@@ -569,11 +569,13 @@ export const getNewsFeed = createServerFn({ method: "GET" })
       const allItems = [];
       const providerNames = new Set<string>();
 
+      const upstreamLimit = Math.min(40, Math.max(20, limit * 2));
       const fetchVariant = async (query: string) => {
+        const genericQuery = query.replace(/\s+when:[^\s]+/gi, "").trim();
         const [google, bing, yahoo] = await Promise.all([
-          fetchFeed(googleNewsFeed(query), "Google News", "market", limit),
-          fetchFeed(bingNewsFeed(query), "Bing News", "market", limit),
-          fetchYahooNews(query, limit),
+          fetchFeed(googleNewsFeed(query), "Google News", "market", upstreamLimit),
+          fetchFeed(bingNewsFeed(genericQuery), "Bing News", "market", upstreamLimit),
+          fetchYahooNews(genericQuery, upstreamLimit),
         ]);
         if (google.length > 0) providerNames.add("Google News");
         if (bing.length > 0) providerNames.add("Bing News");
