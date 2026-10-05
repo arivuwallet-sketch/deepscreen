@@ -1,7 +1,7 @@
 import { jsonLd } from "@/lib/seo/json-ld";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, ChevronRight, ShieldCheck, Smartphone, Sparkles } from "lucide-react";
+import { Check, ChevronRight, Lock, ShieldCheck, Smartphone, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { PLANS, useSubscription, type Plan } from "@/hooks/useSubscription";
 import { confirmCheckout, createCheckout } from "@/lib/billing/billing.functions";
+import { FEATURE_COMPARISON, FREE_FEATURES, PRO_FEATURES } from "@/lib/billing/features";
 import { openCashfreeCheckout } from "@/lib/billing/cashfree-sdk";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -36,7 +37,7 @@ export const Route = createFileRoute("/pricing")({
       {
         name: "description",
         content:
-          "Unlock DeepScreen Pro: 13-factor deep scores, DCF & Graham valuation, Vision score, Secret Tips, forensic breakdowns, sell alerts and portfolio X-ray.",
+          "Compare DeepScreen Free vs Pro. Free includes company search, core ratios, public research and basic DeepChart. Pro unlocks the 13-factor verdict, DeepChart trade plans, Options Strategy Lab analytics, valuation models, alerts and Portfolio X-Ray.",
       },
       { name: "keywords", content: metaKeywords(screenerKeywords, stocksKeywords) },
       { property: "og:title", content: "DeepScreen Pro Pricing" },
@@ -61,7 +62,7 @@ export const Route = createFileRoute("/pricing")({
           name: "DeepScreen Pro",
           url: "https://deepscreen.online/pricing",
           description:
-            "Full DeepScreen analysis engine: 13-factor verdict, DCF and Graham valuation, forensic breakdowns, alerts and portfolio X-Ray.",
+            "DeepScreen Pro unlocks the 13-factor verdict, advanced DeepChart analysis and trade plans, Options Strategy Lab analytics, DCF and Graham valuation, forensic breakdowns, research alerts and Portfolio X-Ray.",
           brand: { "@type": "Brand", name: "DeepScreen" },
           offers: [
             {
@@ -106,26 +107,6 @@ export const Route = createFileRoute("/pricing")({
   }),
   component: PricingPage,
 });
-
-const FREE = [
-  "Search all 13,000+ listed companies with live prices",
-  "Raw fundamental ratios (P/E, ROE, ROCE, P/B, D/E, ROA, PEG)",
-  "Live IPO pipeline across every tracked exchange",
-  "Company financials, news feed and economic calendar",
-  "Basic peer comparison — raw metrics side by side",
-];
-
-const PRO = [
-  "DeepScreen Verdict — 13-factor weighted score",
-  "Holding period, target price, trim level & stop-loss",
-  "Automated DCF and Graham intrinsic-value models",
-  "Vision & Utility score (10–40 year hold horizon)",
-  "Secret Tips badges — ROE traps, fortress balance sheets, smart-money flows",
-  "God's Eye forensic breakdown — which Piotroski/Altman/Beneish checks failed",
-  "Advanced ratios — margins, cash flow, EV/EBITDA, turnover & DuPont",
-  "Contextual ratio insights on every metric card",
-  "Portfolio X-Ray and cross-platform alerts",
-];
 
 function PricingPage() {
   const { user } = useAuth();
@@ -279,11 +260,13 @@ function PricingPage() {
         <div className="text-center">
           <p className="num text-xs uppercase tracking-[0.25em] text-primary">DeepScreen Pro</p>
           <h1 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
-            Unlock the full god-mode engine
+            Free research. Pro-grade analysis when you need it.
           </h1>
-          <p className="mx-auto mt-3 max-w-2xl text-sm text-muted-foreground">
-            Search, live prices, raw ratios, IPOs and news stay free forever. Pro opens the
-            verdict, valuation models, forensic breakdowns, sell alerts and portfolio X-ray.
+          <p className="mx-auto mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
+            DeepScreen Free keeps the public research layer open: company search, core ratios, market
+            guides, news, calendars and the basic DeepChart chart. Pro unlocks model-derived outputs:
+            the 13-factor verdict, advanced DeepChart reading and trade plan, Options Strategy Lab
+            analytics, valuation models, alerts and Portfolio X-Ray.
           </p>
           {verifying && (
             <p className="num mt-4 text-xs text-muted-foreground">Verifying your payment…</p>
@@ -356,20 +339,26 @@ function PricingPage() {
             <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
               Free forever
             </h3>
-            <ul className="mt-3 space-y-2 text-sm">
-              {FREE.map((f) => (
+            <p className="mt-2 text-xs leading-5 text-muted-foreground">
+              Useful public research stays available without a paid subscription.
+            </p>
+            <ul className="mt-4 space-y-2 text-sm">
+              {FREE_FEATURES.map((f) => (
                 <li key={f} className="flex gap-2 text-muted-foreground">
                   <Check className="mt-0.5 size-4 shrink-0 text-muted-foreground" /> {f}
                 </li>
               ))}
             </ul>
           </div>
-          <div className="rounded-lg border border-primary/30 bg-panel p-6">
+          <div className="rounded-lg border border-primary/30 bg-primary/5 p-6">
             <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-primary">
-              <Sparkles className="size-4" /> Pro
+              <Sparkles className="size-4" /> DeepScreen Pro
             </h3>
-            <ul className="mt-3 space-y-2 text-sm">
-              {PRO.map((f) => (
+            <p className="mt-2 text-xs leading-5 text-muted-foreground">
+              All paid durations unlock the same Pro feature set; only the access period changes.
+            </p>
+            <ul className="mt-4 space-y-2 text-sm">
+              {PRO_FEATURES.map((f) => (
                 <li key={f} className="flex gap-2">
                   <Check className="mt-0.5 size-4 shrink-0 text-bull" /> {f}
                 </li>
@@ -377,6 +366,46 @@ function PricingPage() {
             </ul>
           </div>
         </div>
+
+        <section className="mt-10 overflow-hidden rounded-lg border border-border bg-panel" aria-labelledby="feature-comparison-heading">
+          <div className="border-b border-border px-5 py-4">
+            <p className="num text-xs uppercase tracking-[0.18em] text-primary">Feature access</p>
+            <h2 id="feature-comparison-heading" className="mt-1 text-xl font-semibold">Free vs Pro</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Free keeps discovery and education open. Pro gates advanced derived analytics, trade-plan outputs and portfolio intelligence.
+            </p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[700px] text-left text-sm">
+              <thead className="border-b border-border bg-muted/20 text-xs uppercase tracking-wide text-muted-foreground">
+                <tr>
+                  <th className="px-5 py-3">Feature</th>
+                  <th className="px-5 py-3">Free</th>
+                  <th className="px-5 py-3 text-primary">Pro</th>
+                </tr>
+              </thead>
+              <tbody>
+                {FEATURE_COMPARISON.map((row) => (
+                  <tr key={row.name} className="border-b border-border/60 last:border-0">
+                    <th scope="row" className="px-5 py-3.5 font-medium">{row.name}</th>
+                    <td className="px-5 py-3.5 text-muted-foreground">
+                      {row.free === true ? (
+                        <span className="inline-flex items-center gap-1.5"><Check className="size-4 text-bull" /> Included</span>
+                      ) : row.free === false ? (
+                        <span className="inline-flex items-center gap-1.5"><Lock className="size-3.5" /> Pro only</span>
+                      ) : row.free}
+                    </td>
+                    <td className="px-5 py-3.5">
+                      {row.pro === true ? (
+                        <span className="inline-flex items-center gap-1.5"><Check className="size-4 text-bull" /> Included</span>
+                      ) : row.pro === false ? "—" : row.pro}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
 
         <p className="mt-8 text-center text-xs text-muted-foreground">
           Secure checkout by Cashfree — UPI, RuPay, netbanking, wallets and international cards.{" "}
