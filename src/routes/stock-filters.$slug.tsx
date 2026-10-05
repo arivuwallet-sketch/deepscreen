@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 
 import { Shell } from "@/components/ds/Shell";
 import { PaywallGate } from "@/components/ds/PaywallGate";
+import { useSubscription } from "@/hooks/useSubscription";
 import { StockTable } from "@/components/ds/StockTable";
 import { STOCKS } from "@/lib/deepscreen/stocks";
 import {
@@ -244,19 +245,21 @@ export const Route = createFileRoute("/stock-filters/$slug")({
 });
 
 function StockFilterPage() {
+  const { isPro } = useSubscription();
   const { preset: loaded } = Route.useLoaderData();
   const preset = findStockFilterPreset(loaded.id);
   const [limit, setLimit] = useState(INITIAL_LIMIT);
+  const requiresPro = preset ? stockFilterRequiresPro(preset) : false;
 
   const matches = useMemo(() => {
-    if (!preset || preset.status !== "available") return [];
+    if (!preset || preset.status !== "available" || (requiresPro && !isPro)) return [];
     return filterStocksByPreset(STOCKS, preset).sort(
       (a, b) =>
         b.marketCap - a.marketCap ||
         a.name.localeCompare(b.name) ||
         a.symbol.localeCompare(b.symbol),
     );
-  }, [preset]);
+  }, [preset, requiresPro, isPro]);
 
   if (!preset) return null;
 
@@ -297,7 +300,7 @@ function StockFilterPage() {
         </section>
 
         {preset.status === "available" ? (
-          stockFilterRequiresPro(preset) ? (
+          requiresPro ? (
             <PaywallGate
               strict
               feature={`${preset.label} matching-company screen`}
