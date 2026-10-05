@@ -2,6 +2,7 @@ import { jsonLd } from "@/lib/seo/json-ld";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
 import { StockTable } from "@/components/ds/StockTable";
+import { PaywallGate } from "@/components/ds/PaywallGate";
 import { STOCKS } from "@/lib/deepscreen/stocks";
 import { analyze } from "@/lib/deepscreen/metrics";
 import { findRanking } from "@/lib/seo/content";
@@ -106,9 +107,20 @@ function RankingPage() {
           DeepScreen’s modeled directory inputs. Provider updates in the table do not make this a
           verified market-wide ranking. Review source availability on each company page.
         </p>
-        <div className="mt-8">
-          <StockTable stocks={stocks} />
-        </div>
+        {ranking.sort === "score" ? (
+          <PaywallGate
+            strict
+            feature="DeepScreen score-ranked shortlist"
+            className="mt-8"
+            minHeight="min-h-[360px]"
+          >
+            <StockTable stocks={stocks} />
+          </PaywallGate>
+        ) : (
+          <div className="mt-8">
+            <StockTable stocks={stocks} />
+          </div>
+        )}
         <p className="mt-5 text-xs text-muted-foreground">
           Selection is model-based; individual table fields may update from available providers.
           This shortlist is not investment advice.
