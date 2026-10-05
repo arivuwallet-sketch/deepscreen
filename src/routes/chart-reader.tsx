@@ -9,6 +9,8 @@ import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlaybookPanel } from "@/components/chart-reader/PlaybookPanel";
 import { Shell } from "@/components/ds/Shell";
+import { PaywallGate } from "@/components/ds/PaywallGate";
+import { useSubscription } from "@/hooks/useSubscription";
 import { MarketEducationFaqSection } from "@/components/ds/MarketEducationFaqSection";
 import { marketEducationFaq } from "@/lib/seo/market-education-faq";
 import { deepChartKeywords, cryptoTradingKeywords, forexTradingKeywords, metaKeywords, tradingKeywords } from "@/lib/seo/keywords";
@@ -123,6 +125,7 @@ const HTF: Record<Timeframe, Timeframe | null> = {
 };
 
 function Index() {
+  const { isPro } = useSubscription();
   const [symbol, setSymbol] = useState("BTC-USD");
   const [tf, setTf] = useState<Timeframe>("1h");
   const [custom, setCustom] = useState("");
@@ -298,7 +301,7 @@ function Index() {
                   <div>
                     <p>Technical canvas</p>
                     <span>
-                      EMA 20 / 50 / 200 · VWAP · Supertrend · liquidity · S/R · trade levels
+                      {isPro ? "EMA 20 / 50 / 200 · VWAP · Supertrend · liquidity · S/R · trade levels" : "Candles · EMA 20 / 50 / 200 · upgrade for advanced overlays"}
                     </span>
                   </div>
                   <span className="ds-cr-engine-badge">DeepChart engine</span>
@@ -329,18 +332,24 @@ function Index() {
                         </div>
                       }
                     >
-                      <PriceChart candles={main.data.candles} analysis={analysis} />
+                      <PriceChart candles={main.data.candles} analysis={analysis} advanced={isPro} />
                     </Suspense>
                   )}
                 </div>
               </div>
 
-              {analysis && <Details a={analysis} htf={htfTf} />}
+              {analysis && (
+                <PaywallGate strict feature="DeepChart advanced reading & playbook" className="mt-4" minHeight="min-h-[300px]">
+                  <Details a={analysis} htf={htfTf} />
+                </PaywallGate>
+              )}
             </section>
 
             <aside className="ds-cr-sidebar">
               {analysis ? (
-                <TradeTicket a={analysis} />
+                <PaywallGate strict feature="DeepChart verdict & trade plan" minHeight="min-h-[520px]">
+                  <TradeTicket a={analysis} />
+                </PaywallGate>
               ) : (
                 <div className="ds-cr-card p-6">
                   <p className="ds-eyebrow">
