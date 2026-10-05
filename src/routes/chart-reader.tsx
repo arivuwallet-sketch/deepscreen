@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { lazy, Suspense, useMemo, useState } from "react";
-import { Activity, Crosshair, Layers3, Radio, Search } from "lucide-react";
+import { Activity, Crosshair, ExternalLink, Layers3, Radio, Search } from "lucide-react";
 import { getCandles, TIMEFRAMES, type Timeframe } from "@/lib/chart-reader/market.functions";
 import { analyze, fmtPrice, trendBias, type Bias } from "@/lib/chart-reader/analysis";
 import { cn } from "@/lib/utils";
@@ -352,6 +352,31 @@ function Index() {
                   </p>
                 </div>
               )}
+
+              <section className="ds-cr-card ds-cr-partner-card p-5" aria-labelledby="tradingview-partner-title">
+                <p className="ds-eyebrow">
+                  <span aria-hidden="true" />
+                  TradingView partner
+                </p>
+                <h2 id="tradingview-partner-title" className="mt-3 text-lg font-semibold">
+                  Continue your chart research on TradingView
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  Open TradingView for additional chart layouts, drawing tools, indicators and market views.
+                </p>
+                <a
+                  href="https://in.tradingview.com/?aff_id=1171851"
+                  target="_blank"
+                  rel="sponsored nofollow noopener noreferrer"
+                  className="ds-cr-partner-cta"
+                >
+                  Open TradingView
+                  <ExternalLink size={14} aria-hidden="true" />
+                </a>
+                <p className="ds-cr-partner-disclosure">
+                  Affiliate disclosure: DeepScreen may earn a commission if you sign up through this link, at no extra cost to you.
+                </p>
+              </section>
             </aside>
           </div>
 

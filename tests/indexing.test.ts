@@ -506,3 +506,11 @@ test('DeepChart trading crypto and forex content stays visible indexable and AI-
   assert.ok(llms.includes('https://deepscreen.online/trading'));
 });
 
+test('DeepChart TradingView affiliate link stays transparent and correctly attributed', async () => {
+  const chartRoute = await readFile(new URL('../src/routes/chart-reader.tsx', import.meta.url), 'utf8');
+  assert.ok(chartRoute.includes('https://in.tradingview.com/?aff_id=1171851'));
+  assert.ok(chartRoute.includes('rel="sponsored nofollow noopener noreferrer"'));
+  assert.ok(chartRoute.includes('Affiliate disclosure: DeepScreen may earn a commission'));
+  assert.ok(chartRoute.includes('Open TradingView'));
+});
+
