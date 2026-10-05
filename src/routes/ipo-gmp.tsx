@@ -9,7 +9,7 @@ import { ipoGmpKeywords, ipoKeywords, metaKeywords } from "@/lib/seo/keywords";
 import { buildBreadcrumbSchema, buildFAQSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 
 const URL = "https://deepscreen.online/ipo-gmp";
-const title = "IPO GMP: Meaning, Formula, Risks & Reliability | DeepScreen";
+const title = "IPO GMP Calculator & Guide: Meaning, Formula & Risks | DeepScreen";
 const description = "Learn IPO GMP meaning, formula, negative GMP, GMP vs subscription, why grey market premium is unofficial, and how to research an IPO beyond listing-day hype.";
 const faqs = marketGuideFaq("IPO_GMP");
 
