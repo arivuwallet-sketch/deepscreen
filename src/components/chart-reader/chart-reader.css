@@ -3,6 +3,7 @@
   --cr-soft-line: oklch(0.46 0.04 150 / 0.22);
   --cr-glow: oklch(0.927 0.151 127 / 0.09);
   position: relative;
+  font-family: var(--font-sans);
   background:
     linear-gradient(180deg, oklch(0.18 0.024 155 / 0.35), transparent 520px),
     radial-gradient(circle at 8% 0%, oklch(0.33 0.07 150 / 0.2), transparent 34%);
@@ -38,9 +39,9 @@
   font-weight: 480;
 }
 
-.ds-cr-intro h1 em {
-  font-family: Georgia, "Times New Roman", serif;
-  font-weight: 400;
+.ds-cr-intro h1 span {
+  font-family: var(--font-sans);
+  font-weight: 500;
   color: var(--primary);
 }
 
@@ -131,11 +132,14 @@
 .ds-cr-timeframes button {
   flex: 0 0 auto;
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: 5px;
   color: var(--muted-foreground);
   background: transparent;
-  font: 10px var(--font-mono);
-  letter-spacing: 0.03em;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.01em;
   transition:
     color 0.18s ease,
     background-color 0.18s ease,
@@ -144,7 +148,7 @@
 }
 
 .ds-cr-market-tabs button {
-  padding: 9px 13px;
+  padding: 10px 14px;
 }
 
 .ds-cr-market-tabs button:hover,
@@ -156,10 +160,10 @@
 
 .ds-cr-market-tabs button[aria-pressed="true"],
 .ds-cr-timeframes button[aria-pressed="true"] {
-  color: var(--primary-foreground);
-  border-color: transparent;
-  background: var(--primary);
-  box-shadow: 0 6px 26px oklch(0.927 0.151 127 / 0.11);
+  color: var(--primary);
+  border-color: oklch(0.927 0.151 127 / 0.46);
+  background: oklch(0.927 0.151 127 / 0.07);
+  box-shadow: inset 0 -2px 0 var(--primary);
 }
 
 .ds-cr-symbol-search {
@@ -201,14 +205,22 @@
 
 .ds-cr-symbol-search button {
   min-height: 34px;
-  padding-inline: 15px;
-  border: 0;
-  border-radius: 7px;
+  padding-inline: 16px;
+  border: 1px solid var(--primary);
+  border-radius: 5px;
   background: var(--primary);
   color: var(--primary-foreground);
+  font-family: var(--font-sans);
   font-size: 11px;
   font-weight: 650;
+  letter-spacing: 0.01em;
   cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.ds-cr-symbol-search button:hover {
+  background: oklch(0.96 0.12 127);
+  border-color: oklch(0.96 0.12 127);
 }
 
 .ds-cr-instrument-strip {
@@ -223,13 +235,14 @@
   flex: 0 0 auto;
   display: flex;
   align-items: baseline;
-  gap: 9px;
+  gap: 10px;
   min-height: 42px;
-  padding: 0 13px;
+  padding: 0 14px;
   border: 1px solid var(--cr-soft-line);
-  border-radius: 9px;
+  border-radius: 5px;
   background: oklch(0.195 0.023 155 / 0.52);
   color: var(--muted-foreground);
+  font-family: var(--font-sans);
   cursor: pointer;
   transition:
     border-color 0.18s,
@@ -244,15 +257,16 @@
 }
 
 .ds-cr-instrument-strip button[aria-pressed="true"] {
-  color: var(--foreground);
+  color: var(--primary);
   border-color: oklch(0.927 0.151 127 / 0.55);
-  background: oklch(0.927 0.151 127 / 0.075);
-  box-shadow: inset 0 -2px 0 oklch(0.927 0.151 127 / 0.55);
+  background: oklch(0.927 0.151 127 / 0.055);
+  box-shadow: inset 3px 0 0 var(--primary);
 }
 
 .ds-cr-instrument-strip span {
   font-size: 12px;
-  font-weight: 550;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .ds-cr-instrument-strip small {
@@ -381,13 +395,17 @@
   padding: 3px;
   overflow-x: auto;
   border: 1px solid var(--cr-soft-line);
-  border-radius: 9px;
+  border-radius: 6px;
   background: oklch(0.16 0.018 159 / 0.55);
   scrollbar-width: none;
 }
 
 .ds-cr-timeframes button {
-  padding: 7px 9px;
+  padding: 8px 10px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
 }
 
 .ds-cr-chart-frame,
@@ -425,8 +443,8 @@
 }
 
 .ds-chart-reader .font-serif {
-  font-family: Georgia, "Times New Roman", serif;
-  font-weight: 400;
+  font-family: var(--font-sans);
+  font-weight: 500;
 }
 
 .ds-cr-chart-frame {
@@ -545,14 +563,16 @@
 }
 
 .ds-chart-reader [role="tab"] {
-  border-radius: 6px;
+  border-radius: 4px;
   color: var(--muted-foreground);
+  font-family: var(--font-sans);
+  font-weight: 600;
 }
 
 .ds-chart-reader [role="tab"][data-state="active"] {
-  background: oklch(0.927 0.151 127 / 0.095);
+  background: oklch(0.927 0.151 127 / 0.06);
   color: var(--primary);
-  box-shadow: inset 0 0 0 1px oklch(0.927 0.151 127 / 0.2);
+  box-shadow: inset 0 -2px 0 var(--primary);
 }
 
 .ds-chart-reader .ds-eyebrow {
