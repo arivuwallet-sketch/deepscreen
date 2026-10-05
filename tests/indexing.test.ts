@@ -236,6 +236,8 @@ test('investment blog cluster remains indexable, sourced and sitemap-discoverabl
   assert.match(blogDetail, /createFileRoute\("\/blog\/\$slug"\)/);
   assert.match(blogDetail, /BlogPosting/);
   assert.match(blogDetail, /buildFAQSchema/);
+  assert.match(blogDetail, /retail-investing-statistics-2026\.html/);
+  assert.match(blogDetail, /statusCode:\s*308/);
   assert.match(blogDetail, /index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1/);
 
   for (const slug of [
