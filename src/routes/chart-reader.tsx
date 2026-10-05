@@ -11,6 +11,7 @@ import { PlaybookPanel } from "@/components/chart-reader/PlaybookPanel";
 import { Shell } from "@/components/ds/Shell";
 import { MarketEducationFaqSection } from "@/components/ds/MarketEducationFaqSection";
 import { marketEducationFaq } from "@/lib/seo/market-education-faq";
+import { deepChartKeywords, cryptoTradingKeywords, forexTradingKeywords, metaKeywords, tradingKeywords } from "@/lib/seo/keywords";
 import { buildFAQSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 import "@/components/chart-reader/chart-reader.css";
 
@@ -31,6 +32,7 @@ export const Route = createFileRoute("/chart-reader")({
         content:
           "DeepChart is DeepScreen’s technical analysis workspace for market structure, support and resistance, momentum, divergence, Fibonacci and multi-timeframe context. Educational analysis only; no guaranteed outcomes.",
       },
+      { name: "keywords", content: metaKeywords(deepChartKeywords, tradingKeywords, cryptoTradingKeywords, forexTradingKeywords) },
       { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" },
       { property: "og:title", content: "DeepChart — Live Technical Analysis | DeepScreen" },
       {
