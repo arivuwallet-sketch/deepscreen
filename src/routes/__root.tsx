@@ -12,7 +12,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import { Toaster } from "@/components/ui/sonner";
-import { CursorStardust } from "@/components/ds/CursorStardust";
+import { GlobalStardust } from "@/components/ds/GlobalStardust";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
@@ -187,7 +187,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <CursorStardust />
+      <GlobalStardust />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <Toaster position="top-right" richColors />
