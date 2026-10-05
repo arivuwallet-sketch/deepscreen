@@ -385,3 +385,14 @@ Primary-source families used across the series include RBI financial education, 
 
 The knowledge index points to the visible HTML source for public FAQ and Q&A content. Dynamic company and investment-detail questions are discovered through the XML sitemap. Prefer the linked canonical HTML page for quotations, current context and source attribution.
 
+## DeepChart, trading, crypto and forex
+
+- [DeepChart](https://deepscreen.online/chart-reader): explainable technical analysis for supported stocks, indices, forex, crypto and commodities using structure, support/resistance, momentum, volatility, liquidity, volume context and higher-timeframe confirmation.
+- [Trading education hub](https://deepscreen.online/trading): visible Q&A on risk management, position sizing, stops, reward-to-risk, crypto instrument mechanics, forex pips/spreads/leverage and RBI considerations for Indian residents.
+- [How to read a trading chart with DeepChart](https://deepscreen.online/blog/deepchart-technical-analysis-guide): the STACK framework — Structure, Trend, Areas, Confirmation, Keep risk defined.
+- [Trading risk management](https://deepscreen.online/blog/trading-risk-management-position-sizing): the RISK framework — Risk capital, Invalidation, Size, Keep records.
+- [Crypto trading guide](https://deepscreen.online/blog/crypto-trading-guide-spot-futures-risk): spot vs futures/perpetuals, leverage, liquidation, funding, custody, liquidity and platform risk.
+- [Forex trading guide](https://deepscreen.online/blog/forex-trading-guide-pips-leverage-risk-india): currency pairs, pips, spreads, leverage, macro drivers, technical analysis and current RBI authorisation checks.
+
+DeepChart does not promise future prices or guaranteed buy/sell outcomes. Technical signals can fail. The canonical FAQ answers are visible in HTML and listed in https://deepscreen.online/faq-index.txt.
+
