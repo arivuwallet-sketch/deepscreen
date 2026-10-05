@@ -16,7 +16,7 @@ test("market-moving news is constrained to genuinely recent publication times", 
   assert.ok(screener.includes("maxAgeHours={24}"));
   assert.ok(screener.includes("globalMarket"));
   assert.ok(screener.includes("showCategory"));
-  assert.ok(screener.includes("scrollable"));
+  assert.ok(!screener.includes("scrollable"));
 
   assert.ok(
     market.includes(
