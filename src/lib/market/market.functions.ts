@@ -465,12 +465,14 @@ export interface LiveNewsResult {
   providerCount: number;
 }
 
-const NEWS_CACHE_TTL_MS = 2 * 60_000;
+const NEWS_CACHE_TTL_MS = 60_000;
 const newsMemoryCache = new Map<string, { data: LiveNewsResult; fetchedAt: number }>();
 const newsInFlight = new Map<string, Promise<LiveNewsResult>>();
 
-function newsKey(query: string): string {
-  return query.trim().replace(/\s+/g, " ").toLowerCase().slice(0, 240);
+function newsKey(query: string, maxAgeHours?: number): string {
+  const normalized = query.trim().replace(/\s+/g, " ").toLowerCase().slice(0, 220);
+  const age = maxAgeHours === undefined ? "default" : `${Math.round(maxAgeHours * 10) / 10}h`;
+  return `${normalized}::${age}`;
 }
 
 // Never surface stale cached/provider headlines as "latest" news. A provider
@@ -478,8 +480,12 @@ function newsKey(query: string): string {
 // time is validated independently of the cache fetch time.
 const MAX_NEWS_AGE_MS = 30 * 24 * 60 * 60_000;
 
-function filterRecentNews(items: FeedItem[]): FeedItem[] {
-  const cutoff = Date.now() - MAX_NEWS_AGE_MS;
+function filterRecentNews(items: FeedItem[], maxAgeHours?: number): FeedItem[] {
+  const requestedAgeMs =
+    typeof maxAgeHours === "number" && Number.isFinite(maxAgeHours) && maxAgeHours > 0
+      ? maxAgeHours * 60 * 60_000
+      : MAX_NEWS_AGE_MS;
+  const cutoff = Date.now() - Math.min(MAX_NEWS_AGE_MS, requestedAgeMs);
   return items.filter((item) => {
     const published = Date.parse(item.publishedAt);
     return Number.isFinite(published) && published >= cutoff && published <= Date.now() + 10 * 60_000;
@@ -493,14 +499,20 @@ function filterRecentNews(items: FeedItem[]): FeedItem[] {
  * that contain two quoted terms (the stock page's "company" OR "ticker" form).
  * Never broadens arbitrary workplace/general-news queries.
  */
-function newsQueryVariants(query: string): string[] {
+function newsQueryVariants(query: string, maxAgeHours?: number): string[] {
   const safe = query.trim().replace(/\s+/g, " ").slice(0, 240);
   if (!safe) return [];
 
-  // Google News understands the "when:" freshness operator. Put a fresh
-  // search first so active companies return current stories instead of an
-  // old but highly-ranked evergreen result.
-  const fresh = safe.includes("when:") ? safe : `${safe} when:30d`;
+  // Match Google News' search freshness to the server-side publication-time
+  // filter. This keeps "latest" feeds from being relevance-ranked against
+  // weeks-old evergreen stories before we even receive the RSS response.
+  const freshness =
+    typeof maxAgeHours === "number" && maxAgeHours <= 24
+      ? "1d"
+      : typeof maxAgeHours === "number" && maxAgeHours <= 24 * 7
+        ? "7d"
+        : "30d";
+  const fresh = safe.includes("when:") ? safe : `${safe} when:${freshness}`;
   const variants = [fresh, safe];
   const quoted = [...safe.matchAll(/"([^"]+)"/g)]
     .map((match) => match[1]?.trim())
@@ -518,11 +530,15 @@ function newsQueryVariants(query: string): string[] {
 
 
 export const getNewsFeed = createServerFn({ method: "GET" })
-  .inputValidator((d: { query: string; limit?: number }) => d)
+  .inputValidator((d: { query: string; limit?: number; maxAgeHours?: number }) => d)
   .handler(async ({ data }): Promise<LiveNewsResult> => {
     const { dedupe, refreshAges } = await import("@/lib/rss.server");
     const limit = Math.min(Math.max(data.limit ?? 14, 1), 30);
-    const key = newsKey(data.query);
+    const maxAgeHours =
+      typeof data.maxAgeHours === "number" && Number.isFinite(data.maxAgeHours) && data.maxAgeHours > 0
+        ? Math.min(data.maxAgeHours, 30 * 24)
+        : undefined;
+    const key = newsKey(data.query, maxAgeHours);
     if (!key) return { items: [], fetchedAt: Date.now(), stale: false, providerCount: 0 };
 
     const memory = newsMemoryCache.get(key);
@@ -538,7 +554,7 @@ export const getNewsFeed = createServerFn({ method: "GET" })
       const { readNewsCache, writeNewsCache } = await import("./news-cache.server");
       const persisted = await readNewsCache(key);
       if (persisted && Date.now() - persisted.fetchedAt < NEWS_CACHE_TTL_MS) {
-        const recentPersisted = filterRecentNews(refreshAges(persisted.items));
+        const recentPersisted = filterRecentNews(refreshAges(persisted.items), maxAgeHours);
         const result = {
           items: recentPersisted.slice(0, limit),
           fetchedAt: persisted.fetchedAt,
@@ -549,7 +565,7 @@ export const getNewsFeed = createServerFn({ method: "GET" })
         return result;
       }
 
-      const queries = newsQueryVariants(data.query);
+      const queries = newsQueryVariants(data.query, maxAgeHours);
       const allItems = [];
       const providerNames = new Set<string>();
 
@@ -576,7 +592,7 @@ export const getNewsFeed = createServerFn({ method: "GET" })
         fallbackItems.forEach((items) => allItems.push(...items));
       }
 
-      const items = filterRecentNews(dedupe(allItems))
+      const items = filterRecentNews(dedupe(allItems), maxAgeHours)
         .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
         .slice(0, limit);
 
@@ -594,7 +610,7 @@ export const getNewsFeed = createServerFn({ method: "GET" })
       }
 
       if (persisted) {
-        const recentPersisted = filterRecentNews(refreshAges(persisted.items)).slice(0, limit);
+        const recentPersisted = filterRecentNews(refreshAges(persisted.items), maxAgeHours).slice(0, limit);
         if (recentPersisted.length > 0) {
           console.warn(`[news] providers empty for ${key}; serving recent last-good cache`);
           const result = {
