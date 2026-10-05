@@ -3,6 +3,7 @@ import { ArrowRight, ArrowUpRight, Clock3, Globe2, Scale } from "lucide-react";
 import { Shell } from "@/components/ds/Shell";
 import { MarketGuideFaqSection } from "@/components/ds/MarketGuideFaqSection";
 import { MARKET_GUIDE_SOURCES, marketGuideFaq } from "@/lib/seo/market-guide-faq";
+import { giftNiftyKeywords, metaKeywords } from "@/lib/seo/keywords";
 import { buildBreadcrumbSchema, buildFAQSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 
 const URL = "https://deepscreen.online/gift-nifty";
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/gift-nifty")({
   staticData: { sitemap: true },
   head: () => ({ meta: [
     { title }, { name: "description", content: description },
+    { name: "keywords", content: metaKeywords(giftNiftyKeywords) },
     { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" },
     { property: "og:title", content: title }, { property: "og:description", content: description },
     { property: "og:type", content: "article" }, { property: "og:url", content: URL },
