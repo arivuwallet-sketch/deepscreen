@@ -149,7 +149,7 @@ function Home() {
 
         <div className="grid gap-6 lg:grid-cols-2">
           <EconomicCalendar />
-          <LiveNewsFeed query="stock market" title="Market-moving news" limit={12} />
+          <LiveNewsFeed query="stock market" title="Market-moving news" limit={12} maxAgeHours={24} />
         </div>
 
         <MarketMovers stocks={liveMoverUniverse} title="Live global market movers" />
