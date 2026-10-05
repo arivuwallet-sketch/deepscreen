@@ -123,6 +123,7 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
       meta: [
         { title },
         { name: "description", content: description },
+        { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" },
         {
           name: "keywords",
           content: metaKeywords(
@@ -148,7 +149,7 @@ export const Route = createFileRoute("/stock/$exchange/$symbol")({
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: description },
       ],
-      links: [{ rel: "canonical", href: url }],
+      links: [{ rel: "canonical", href: url }, { rel: "describedby", href: "https://deepscreen.online/faq-index.txt" }],
       scripts: [
         {
           type: "application/ld+json",
