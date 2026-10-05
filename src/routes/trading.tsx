@@ -14,9 +14,9 @@ import {
 } from "@/lib/seo/json-ld";
 
 const URL = "https://deepscreen.online/trading";
-const title = "Trading, Crypto & Forex Guide — Risk, Charts & FAQs | DeepScreen";
+const title = "Trading Guide: Risk Management, Crypto & Forex | DeepScreen";
 const description =
-  "Learn trading, crypto and forex with answer-first guides on risk management, position sizing, spot vs futures, leverage, liquidation, pips, spreads and chart analysis.";
+  "Learn trading risk management, position sizing, stop-losses and risk-reward, plus crypto spot vs futures, leverage/liquidation and forex pips, spreads and chart analysis.";
 
 const faqs = MARKET_EDUCATION_FAQS.filter((faq) => faq.topic !== "DEEPCHART");
 
