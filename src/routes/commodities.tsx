@@ -8,6 +8,7 @@ import { CommodityDashboard } from "@/components/commodities/CommodityDashboard"
 import { COMMODITY_SYMBOLS, type CommoditySnapshot } from "@/lib/market/commodity-analysis";
 import { getCommodityQuotes } from "@/lib/market/commodity-quotes.functions";
 import { MARKET_GUIDE_SOURCES, marketGuideFaq } from "@/lib/seo/market-guide-faq";
+import { commodityKeywords, metaKeywords } from "@/lib/seo/keywords";
 import {
   buildBreadcrumbSchema,
   buildFAQSchema,
@@ -93,6 +94,7 @@ export const Route = createFileRoute("/commodities")({
     meta: [
       { title },
       { name: "description", content: description },
+      { name: "keywords", content: metaKeywords(commodityKeywords) },
       {
         name: "robots",
         content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
