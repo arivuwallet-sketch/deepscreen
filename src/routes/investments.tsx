@@ -10,7 +10,7 @@ import { INVESTMENT_FAQS, INVESTMENT_SOURCE_LINKS } from "@/lib/seo/investment-f
 import { etfKeywords, metaKeywords, mutualFundKeywords, reitKeywords } from "@/lib/seo/keywords";
 import { buildBreadcrumbSchema, buildFAQSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 
-const title = "Mutual Fund, ETF & REIT Analysis | DeepScreen";
+const title = "Mutual Fund, ETF & REIT Screener & Analysis | DeepScreen";
 const description = "Research mutual funds, ETFs and REITs with type-specific analysis. Compare NAV, fees, tracking, holdings, risk, REIT cash flow and valuation across supported markets.";
 const canonical = "https://deepscreen.online/investments";
 const PAGE_SIZE = 50;
