@@ -7,7 +7,7 @@ import { faqForType } from "@/lib/seo/investment-faq";
 import { metaKeywords, reitKeywords } from "@/lib/seo/keywords";
 import { buildBreadcrumbSchema, buildFAQSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 
-const title = "REIT Analysis: Occupancy, WALE, NDCF, AFFO & NAV | DeepScreen";
+const title = "REIT Analysis India: Occupancy, NDCF, AFFO & NAV | DeepScreen";
 const description = "Learn how to analyze REITs using occupancy, WALE, tenant concentration, NOI, NDCF or AFFO, leverage, debt maturity, distribution coverage, NAV and cap rates.";
 const url = "https://deepscreen.online/reits";
 const faqs = faqForType("REIT");
