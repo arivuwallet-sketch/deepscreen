@@ -1,10 +1,10 @@
 // Live IPO pipeline for the five exchanges covered by DeepScreen:
-//   * NSE/BSE India — NSE's live issue feeds, including BSE flags where supplied
-//   * NYSE/NASDAQ   — Nasdaq's IPO calendar (upcoming, priced and filed)
-//   * LSE           — London Stock Exchange's official New Issues page
-// The page is refreshed on demand, cached briefly per server instance, and
-// the client polls it so users see current primary-market changes without a
-// stale hand-maintained IPO list.
+//   * NSE/BSE India — official NSE issue feeds, including BSE flags where supplied
+//   * NYSE/NASDAQ   — Nasdaq IPO calendar powered by EDGAR Online
+//   * LSE           — London Stock Exchange official New Issues page
+//
+// Missing fields stay null. DeepScreen never invents offer terms, subscription
+// figures or listing dates when the upstream source does not publish them.
 
 const UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36";
@@ -13,19 +13,39 @@ export interface LiveIpo {
   symbol: string;
   name: string;
   exchange: string;
-  /** "mainboard" | "sme" | "us" — used for the board's segment filter. */
+  /** "mainboard" | "sme" | "us" */
   segment: string;
+  market: string | null;
+  securityType: string | null;
+  currency: string | null;
   bandLow: number | null;
   bandHigh: number | null;
-  /** Shares on offer (India) or shares offered (US). */
+  /** Shares offered/reserved, where the source publishes it. */
   sharesOffered: number | null;
-  /** Issue value in local-currency billions, when derivable. */
+  /** Bids received across reported categories, where published. */
+  bidsReceived: number | null;
+  /** Official subscription multiple, e.g. 12.2 = 12.2x. */
+  subscriptionMultiple: number | null;
+  /** Minimum bid / market lot where published. */
+  lotSize: number | null;
+  /** Issue value in local-currency billions, when directly reported or safely derivable. */
   issueSize: number | null;
+  /** LSE primary/secondary offer values in local-currency billions. */
+  primaryOfferSize: number | null;
+  secondaryOfferSize: number | null;
   openDate: string | null;
   closeDate: string | null;
+  /** Actual/official listing date where known, or an exchange-published expected first-trading date. */
   listingDate: string | null;
+  /** US filing date, kept separate from offer dates. */
+  filingDate: string | null;
+  /** US expected pricing date. Nasdaq notes this is estimated from filings. */
+  expectedPricingDate: string | null;
   status: "upcoming" | "open" | "closed" | "listed";
   note: string;
+  timelineBasis: string;
+  fetchedAt: string;
+  sourceUrl: string;
   source: "NSE official" | "BSE via NSE issue flag" | "Nasdaq/EDGAR Online" | "LSE official";
 }
 
@@ -42,18 +62,20 @@ function isoOf(d: Date | null): string | null {
   return d ? d.toISOString().slice(0, 10) : null;
 }
 
-/** "03-Sep-2026" → Date */
-function parseNseDate(s: string | undefined): Date | null {
+function parseNseDate(s: string | null | undefined): Date | null {
   if (!s) return null;
-  const m = /^(\d{1,2})-([A-Za-z]{3})-(\d{4})$/.exec(s.trim());
-  if (!m) return null;
-  const months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
-  const mi = months.indexOf((m[2] ?? "").toLowerCase());
-  if (mi < 0) return null;
-  return new Date(Date.UTC(Number(m[3]), mi, Number(m[1])));
+  const value = s.trim();
+  const dmy = /^(\d{1,2})-([A-Za-z]{3})-(\d{4})$/.exec(value);
+  if (dmy) {
+    const months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+    const mi = months.indexOf((dmy[2] ?? "").toLowerCase());
+    if (mi >= 0) return new Date(Date.UTC(Number(dmy[3]), mi, Number(dmy[1])));
+  }
+  const iso = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (iso) return new Date(Date.UTC(Number(iso[1]), Number(iso[2]) - 1, Number(iso[3])));
+  return null;
 }
 
-/** "9/08/2026" → Date */
 function parseUsDate(s: string | null | undefined): Date | null {
   if (!s) return null;
   const m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(s.trim());
@@ -61,20 +83,31 @@ function parseUsDate(s: string | null | undefined): Date | null {
   return new Date(Date.UTC(Number(m[3]), Number(m[1]) - 1, Number(m[2])));
 }
 
-function num(s: unknown): number | null {
-  if (typeof s === "number") return Number.isFinite(s) ? s : null;
-  if (typeof s !== "string") return null;
-  const n = Number(s.replace(/[^0-9.\-]/g, ""));
-  return Number.isFinite(n) && s.trim() !== "" ? n : null;
+function num(value: unknown): number | null {
+  if (typeof value === "number") return Number.isFinite(value) ? value : null;
+  if (typeof value !== "string") return null;
+  const clean = value.replace(/,/g, "").replace(/[^0-9.\-]/g, "");
+  const parsed = Number(clean);
+  return Number.isFinite(parsed) && value.trim() !== "" ? parsed : null;
 }
 
-/** "Rs.168 to Rs.177" / "Rs. 90" → [low, high] */
-function parseBand(s: string | undefined): [number | null, number | null] {
-  if (!s) return [null, null];
-  const nums = (s.match(/[\d,]+(?:\.\d+)?/g) ?? []).map((x) => Number(x.replace(/,/g, "")));
-  if (nums.length === 0) return [null, null];
-  if (nums.length === 1) return [nums[0] ?? null, nums[0] ?? null];
-  return [Math.min(...nums), Math.max(...nums)];
+function firstNum(...values: unknown[]): number | null {
+  for (const value of values) {
+    const parsed = num(value);
+    if (parsed !== null) return parsed;
+  }
+  return null;
+}
+
+/** "Rs.168 to Rs.177", "$12 - $14", "£2.50" → [low, high]. */
+function parseBand(value: string | null | undefined): [number | null, number | null] {
+  if (!value) return [null, null];
+  const values = (value.match(/[\d,]+(?:\.\d+)?/g) ?? [])
+    .map((part) => Number(part.replace(/,/g, "")))
+    .filter(Number.isFinite);
+  if (values.length === 0) return [null, null];
+  if (values.length === 1) return [values[0] ?? null, values[0] ?? null];
+  return [Math.min(...values), Math.max(...values)];
 }
 
 function statusFrom(open: Date | null, close: Date | null, listing: Date | null): LiveIpo["status"] {
@@ -107,42 +140,91 @@ interface NseRow {
   companyName?: string;
   symbol?: string;
   series?: string;
+  securityType?: string;
   status?: string;
   isBse?: string;
   issuePrice?: string;
   issueSize?: string;
   noOfSharesOffered?: string;
+  sharesOffered?: string;
+  offeredReserved?: string;
+  noOfSharesBid?: string;
+  totalBidQty?: string;
+  bidQuantity?: string;
+  subscription?: string;
+  subscriptionTimes?: string;
+  timesSubscribed?: string;
+  noOfTimes?: string;
+  minBidQuantity?: string;
+  marketLot?: string;
+  lotSize?: string;
   issueStartDate?: string;
   issueEndDate?: string;
+  listingDate?: string;
+  dateOfListing?: string;
+  listingDt?: string;
 }
 
-function mapNse(rows: NseRow[], fallbackSegment: string): LiveIpo[] {
+function mapNse(rows: NseRow[], fallbackSegment: string, fetchedAt: string): LiveIpo[] {
+  const sourceUrl = "https://www.nseindia.com/market-data/all-upcoming-issues-ipo";
   return rows
-    .filter((r) => r.symbol || r.companyName)
-    .map((r) => {
-      const open = parseNseDate(r.issueStartDate);
-      const close = parseNseDate(r.issueEndDate);
-      // Indian issues typically list ~3 working days after close.
-      const listing = close ? new Date(close.getTime() + 3 * 86400000) : null;
-      const [bandLow, bandHigh] = parseBand(r.issuePrice);
-      const shares = num(r.issueSize) ?? num(r.noOfSharesOffered);
-      const value = shares && bandHigh ? (shares * bandHigh) / 1e9 : null;
-      const sme = (r.series ?? "").toUpperCase() === "SME";
+    .filter((row) => row.symbol || row.companyName)
+    .map((row) => {
+      const open = parseNseDate(row.issueStartDate);
+      const close = parseNseDate(row.issueEndDate);
+      const listing = parseNseDate(row.listingDate ?? row.dateOfListing ?? row.listingDt);
+      const [bandLow, bandHigh] = parseBand(row.issuePrice);
+      const shares = firstNum(row.noOfSharesOffered, row.sharesOffered, row.offeredReserved);
+      const bids = firstNum(row.noOfSharesBid, row.totalBidQty, row.bidQuantity);
+      const reportedMultiple = firstNum(
+        row.subscription,
+        row.subscriptionTimes,
+        row.timesSubscribed,
+        row.noOfTimes,
+      );
+      const subscriptionMultiple =
+        reportedMultiple ?? (shares && shares > 0 && bids !== null ? bids / shares : null);
+      const lotSize = firstNum(row.minBidQuantity, row.marketLot, row.lotSize);
+      const issueSize = shares && bandHigh ? (shares * bandHigh) / 1e9 : null;
+      const sme = (row.series ?? "").toUpperCase() === "SME";
+      const exchange = row.isBse === "1" ? "BSE" : "NSE";
+      const status = statusFrom(open, close, listing);
+
       return {
-        symbol: (r.symbol || r.companyName || "").trim().toUpperCase().slice(0, 20),
-        name: (r.companyName ?? r.symbol ?? "").trim(),
-        exchange: r.isBse === "1" ? "BSE" : "NSE",
+        symbol: (row.symbol || row.companyName || "").trim().toUpperCase().slice(0, 30),
+        name: (row.companyName ?? row.symbol ?? "").trim(),
+        exchange,
         segment: sme ? "sme" : fallbackSegment,
+        market: sme ? "SME" : "Mainboard",
+        securityType: row.securityType ?? row.series ?? "Equity",
+        currency: "INR",
         bandLow,
         bandHigh,
         sharesOffered: shares,
-        issueSize: value,
+        bidsReceived: bids,
+        subscriptionMultiple:
+          subscriptionMultiple !== null && Number.isFinite(subscriptionMultiple)
+            ? Number(subscriptionMultiple.toFixed(2))
+            : null,
+        lotSize,
+        issueSize,
+        primaryOfferSize: null,
+        secondaryOfferSize: null,
         openDate: isoOf(open),
         closeDate: isoOf(close),
         listingDate: isoOf(listing),
-        status: statusFrom(open, close, listing),
-        note: sme ? "SME platform issue. Source: NSE issue feed." : "Mainboard issue. Source: NSE issue feed.",
-        source: r.isBse === "1" ? "BSE via NSE issue flag" : "NSE official",
+        filingDate: null,
+        expectedPricingDate: null,
+        status,
+        note: sme
+          ? "SME platform issue. Subscription figures are shown only when published by the official NSE issue feed."
+          : "Mainboard issue. Subscription figures are shown only when published by the official NSE issue feed.",
+        timelineBasis: listing
+          ? "Official exchange issue/listing dates"
+          : "Official issue dates; listing date not published in this feed",
+        fetchedAt,
+        sourceUrl,
+        source: exchange === "BSE" ? "BSE via NSE issue flag" : "NSE official",
       } satisfies LiveIpo;
     });
 }
@@ -160,54 +242,86 @@ interface NasdaqRow {
 }
 
 function usExchange(label: string | null | undefined): string {
-  const s = (label ?? "").toUpperCase();
-  if (s.includes("NYSE") || s.includes("NEW YORK")) return "NYSE";
+  const value = (label ?? "").toUpperCase();
+  if (value.includes("NYSE") || value.includes("NEW YORK")) return "NYSE";
   return "NASDAQ";
 }
 
-function mapNasdaq(rows: NasdaqRow[], kind: "upcoming" | "priced" | "filed"): LiveIpo[] {
+function mapNasdaq(
+  rows: NasdaqRow[],
+  kind: "upcoming" | "priced" | "filed",
+  fetchedAt: string,
+): LiveIpo[] {
+  const sourceUrl = "https://www.nasdaq.com/market-activity/ipos";
   return rows
-    .filter((r) => r.companyName)
-    .map((r) => {
-      const dateStr = kind === "priced" ? r.pricedDate : kind === "upcoming" ? r.expectedPriceDate : r.filedDate;
-      const d = parseUsDate(dateStr);
-      const price = num(r.proposedSharePrice);
-      const value = num(r.dollarValueOfSharesOffered);
-      const status: LiveIpo["status"] =
-        kind === "priced" ? "listed" : kind === "filed" ? "upcoming" : statusFrom(d, d, d);
+    .filter((row) => row.companyName)
+    .map((row) => {
+      const expectedPrice = parseUsDate(row.expectedPriceDate);
+      const priced = parseUsDate(row.pricedDate);
+      const filed = parseUsDate(row.filedDate);
+      const [bandLow, bandHigh] = parseBand(row.proposedSharePrice);
+      const shares = num(row.sharesOffered);
+      const directValue = num(row.dollarValueOfSharesOffered);
+      const issueSize =
+        directValue !== null
+          ? directValue / 1e9
+          : shares && bandHigh
+            ? (shares * bandHigh) / 1e9
+            : null;
+      const exchange = usExchange(row.proposedExchange);
+      const status: LiveIpo["status"] = kind === "priced" ? "listed" : "upcoming";
+
       return {
-        symbol: (r.proposedTickerSymbol ?? "").trim().toUpperCase() || "—",
-        name: (r.companyName ?? "").trim(),
-        exchange: usExchange(r.proposedExchange),
+        symbol: (row.proposedTickerSymbol ?? "").trim().toUpperCase() || "—",
+        name: (row.companyName ?? "").trim(),
+        exchange,
         segment: "us",
-        bandLow: price,
-        bandHigh: price,
-        sharesOffered: num(r.sharesOffered),
-        issueSize: value ? value / 1e9 : null,
-        openDate: isoOf(d),
-        closeDate: isoOf(d),
-        listingDate: kind === "priced" ? isoOf(d) : isoOf(d),
+        market: row.proposedExchange?.trim() || exchange,
+        securityType: "Equity",
+        currency: "USD",
+        bandLow,
+        bandHigh,
+        sharesOffered: shares,
+        bidsReceived: null,
+        subscriptionMultiple: null,
+        lotSize: null,
+        issueSize,
+        primaryOfferSize: null,
+        secondaryOfferSize: null,
+        openDate: null,
+        closeDate: null,
+        listingDate: kind === "priced" ? isoOf(priced) : null,
+        filingDate: isoOf(filed),
+        expectedPricingDate: kind === "upcoming" ? isoOf(expectedPrice) : null,
         status,
         note:
           kind === "priced"
-            ? "Priced and listed on the US calendar. Source: Nasdaq/EDGAR Online."
+            ? "Priced issue from the Nasdaq IPO calendar."
             : kind === "filed"
-              ? "S-1 filed; pricing date not yet set. Source: Nasdaq/EDGAR Online."
-              : "Expected to price on the US calendar. Source: Nasdaq/EDGAR Online.",
+              ? "SEC filing shown by the Nasdaq/EDGAR Online IPO calendar; pricing date is not yet set."
+              : "Expected pricing date from the Nasdaq/EDGAR Online calendar. Nasdaq states expected dates are estimates based on filings.",
+        timelineBasis:
+          kind === "priced"
+            ? "Priced date reported by Nasdaq/EDGAR Online"
+            : kind === "filed"
+              ? "SEC filing date; no offer/listing date inferred"
+              : "Expected pricing date estimated by EDGAR Online from filings",
+        fetchedAt,
+        sourceUrl,
         source: "Nasdaq/EDGAR Online",
       } satisfies LiveIpo;
     });
 }
 
-async function fetchIndia(): Promise<LiveIpo[]> {
+async function fetchIndia(fetchedAt: string): Promise<LiveIpo[]> {
   const ref = "https://www.nseindia.com/market-data/all-upcoming-issues-ipo";
   const [upcoming, current] = await Promise.all([
     getJson("https://www.nseindia.com/api/all-upcoming-issues?category=ipo", ref),
     getJson("https://www.nseindia.com/api/ipo-current-issue", ref),
   ]);
   const rows: LiveIpo[] = [];
-  if (Array.isArray(upcoming)) rows.push(...mapNse(upcoming as NseRow[], "mainboard"));
-  if (Array.isArray(current)) rows.push(...mapNse(current as NseRow[], "mainboard"));
+  if (Array.isArray(upcoming)) rows.push(...mapNse(upcoming as NseRow[], "mainboard", fetchedAt));
+  if (Array.isArray(current)) rows.push(...mapNse(current as NseRow[], "mainboard", fetchedAt));
   return rows;
 }
 
@@ -218,9 +332,8 @@ function monthKey(offset: number): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
 
-
-function decodeHtml(s: string): string {
-  return s
+function decodeHtml(value: string): string {
+  return value
     .replace(/&nbsp;/gi, " ")
     .replace(/&amp;/gi, "&")
     .replace(/&pound;/gi, "£")
@@ -234,37 +347,57 @@ function decodeHtml(s: string): string {
     .trim();
 }
 
-function parseLseDate(s: string): Date | null {
-  const exact = /(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/i.exec(s);
+function parseLseDate(value: string): Date | null {
+  const exact = /(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/i.exec(value);
   if (exact) {
-    const month = ["january","february","march","april","may","june","july","august","september","october","november","december"].indexOf((exact[2] ?? "").toLowerCase());
-    if (month < 0) return null;
-    return new Date(Date.UTC(Number(exact[3]), month, Number(exact[1])));
+    const month = [
+      "january",
+      "february",
+      "march",
+      "april",
+      "may",
+      "june",
+      "july",
+      "august",
+      "september",
+      "october",
+      "november",
+      "december",
+    ].indexOf((exact[2] ?? "").toLowerCase());
+    if (month >= 0) return new Date(Date.UTC(Number(exact[3]), month, Number(exact[1])));
   }
-  const approximate = /(?:early|mid|late)?\s*([A-Za-z]+)\s+(\d{4})/i.exec(s);
+
+  const approximate = /(?:early|mid|late)?\s*([A-Za-z]+)\s+(\d{4})/i.exec(value);
   if (!approximate) return null;
-  const month = ["january","february","march","april","may","june","july","august","september","october","november","december"].indexOf((approximate[1] ?? "").toLowerCase());
+  const month = [
+    "january",
+    "february",
+    "march",
+    "april",
+    "may",
+    "june",
+    "july",
+    "august",
+    "september",
+    "october",
+    "november",
+    "december",
+  ].indexOf((approximate[1] ?? "").toLowerCase());
   if (month < 0) return null;
-  const day = /early/i.test(s) ? 8 : /late/i.test(s) ? 25 : /mid/i.test(s) ? 15 : 1;
+  const day = /early/i.test(value) ? 8 : /late/i.test(value) ? 25 : /mid/i.test(value) ? 15 : 1;
   return new Date(Date.UTC(Number(approximate[2]), month, day));
 }
 
-function parseLseBand(s: string): [number | null, number | null] {
-  const nums = (s.match(/\d[\d,]*(?:\.\d+)?/g) ?? []).map((x) => Number(x.replace(/,/g, "")));
-  if (nums.length === 0) return [null, null];
-  return [Math.min(...nums), Math.max(...nums)];
+function parseLseSize(value: string): number | null {
+  const match = /([\d,.]+)\s*(billion|million|bn|m)/i.exec(value);
+  if (!match) return null;
+  const parsed = Number((match[1] ?? "").replace(/,/g, ""));
+  if (!Number.isFinite(parsed)) return null;
+  return /billion|bn/i.test(match[2] ?? "") ? parsed : parsed / 1000;
 }
 
-function parseLseSize(s: string): number | null {
-  const m = /([\d,.]+)\s*(billion|million|bn|m)/i.exec(s);
-  if (!m) return null;
-  const n = Number((m[1] ?? "").replace(/,/g, ""));
-  if (!Number.isFinite(n)) return null;
-  return /billion|bn/i.test(m[2] ?? "") ? n : n / 1000;
-}
-
-/** London Stock Exchange official New Issues page. Only equity issues are kept. */
-async function fetchLse(): Promise<LiveIpo[]> {
+/** London Stock Exchange official New Issues page. Only upcoming equity issues are kept. */
+async function fetchLse(fetchedAt: string): Promise<LiveIpo[]> {
   const url = "https://www.londonstockexchange.com/live-markets/new-issues";
   try {
     const res = await fetch(url, {
@@ -283,34 +416,52 @@ async function fetchLse(): Promise<LiveIpo[]> {
 
     for (const row of rows) {
       const cells = (row.match(/<t[dh][^>]*>[\s\S]*?<\/t[dh]>/gi) ?? []).map(decodeHtml);
-      if (cells.length < 7) continue;
-      if (/^name$/i.test(cells[0] ?? "")) continue;
-      const type = cells[6] ?? "";
+      // Official LSE order:
+      // Name | Market | Primary offer | Secondary offer | Currency | Price range | Expected first date | Type
+      if (cells.length < 8 || /^name$/i.test(cells[0] ?? "")) continue;
+      const type = cells[7] ?? "";
       if (!/equity/i.test(type)) continue;
 
-      const expected = cells[5] ?? "";
-      const listing = parseLseDate(expected);
-      const [bandLow, bandHigh] = parseLseBand(cells[4] ?? "");
-      const primary = parseLseSize(cells[1] ?? "");
-      const secondary = parseLseSize(cells[2] ?? "");
-      const size = primary !== null && secondary !== null ? primary + secondary : primary ?? secondary;
       const name = cells[0] ?? "";
+      const market = cells[1] ?? "";
+      const primary = parseLseSize(cells[2] ?? "");
+      const secondary = parseLseSize(cells[3] ?? "");
+      const rawCurrency = (cells[4] ?? "").trim();
+      const currency = rawCurrency && rawCurrency !== "-" ? rawCurrency : "GBP";
+      const [bandLow, bandHigh] = parseBand(cells[5] ?? "");
+      const expected = cells[6] ?? "";
+      const listing = parseLseDate(expected);
+      const size =
+        primary !== null && secondary !== null ? primary + secondary : primary ?? secondary;
       if (!name) continue;
 
       out.push({
         symbol: "—",
         name,
         exchange: "LSE",
-        segment: "mainboard",
+        segment: /AIM/i.test(market) ? "sme" : "mainboard",
+        market: market || null,
+        securityType: type || "Equity",
+        currency,
         bandLow,
         bandHigh,
         sharesOffered: null,
+        bidsReceived: null,
+        subscriptionMultiple: null,
+        lotSize: null,
         issueSize: size,
-        openDate: isoOf(listing),
+        primaryOfferSize: primary,
+        secondaryOfferSize: secondary,
+        openDate: null,
         closeDate: null,
         listingDate: isoOf(listing),
-        status: "upcoming",
-        note: `LSE official New Issues feed. Expected first trading date: ${expected || "TBA"}.`,
+        filingDate: null,
+        expectedPricingDate: null,
+        status: listing && listing.getTime() <= today().getTime() ? "listed" : "upcoming",
+        note: `Expected first trading date from the LSE official New Issues feed: ${expected || "TBA"}.`,
+        timelineBasis: "Exchange-published expected first trading date",
+        fetchedAt,
+        sourceUrl: url,
         source: "LSE official",
       });
     }
@@ -320,17 +471,21 @@ async function fetchLse(): Promise<LiveIpo[]> {
   }
 }
 
-async function fetchUs(): Promise<LiveIpo[]> {
+async function fetchUs(fetchedAt: string): Promise<LiveIpo[]> {
   const months = [-1, 0, 1, 2].map(monthKey);
   const out: LiveIpo[] = [];
   const results = await Promise.all(
-    months.map((m) =>
-      getJson(`https://api.nasdaq.com/api/ipo/calendar?date=${m}`, "https://www.nasdaq.com/market-activity/ipos"),
+    months.map((month) =>
+      getJson(
+        `https://api.nasdaq.com/api/ipo/calendar?date=${month}`,
+        "https://www.nasdaq.com/market-activity/ipos",
+      ),
     ),
   );
-  for (const res of results) {
+
+  for (const result of results) {
     const data = (
-      res as {
+      result as {
         data?: {
           upcoming?: { upcomingTable?: { rows?: NasdaqRow[] } | null } | null;
           priced?: { rows?: NasdaqRow[] } | null;
@@ -339,18 +494,24 @@ async function fetchUs(): Promise<LiveIpo[]> {
       } | null
     )?.data;
     if (!data) continue;
-    out.push(...mapNasdaq(data.upcoming?.upcomingTable?.rows ?? [], "upcoming"));
-    out.push(...mapNasdaq(data.priced?.rows ?? [], "priced"));
-    out.push(...mapNasdaq(data.filed?.rows ?? [], "filed"));
+    out.push(...mapNasdaq(data.upcoming?.upcomingTable?.rows ?? [], "upcoming", fetchedAt));
+    out.push(...mapNasdaq(data.priced?.rows ?? [], "priced", fetchedAt));
+    out.push(...mapNasdaq(data.filed?.rows ?? [], "filed", fetchedAt));
   }
   return out;
 }
 
-/** All live issues across NSE/BSE/NYSE/NASDAQ, de-duplicated and date-sorted. */
+/** All live issues across NSE/BSE/NYSE/NASDAQ/LSE, de-duplicated and date-sorted. */
 export async function fetchLiveIpos(): Promise<LiveIpo[]> {
   if (cache && Date.now() - cache.at < CACHE_MS) return cache.data;
 
-  const [india, us, lse] = await Promise.all([fetchIndia(), fetchUs(), fetchLse()]);
+  const fetchedAt = new Date().toISOString();
+  const [india, us, lse] = await Promise.all([
+    fetchIndia(fetchedAt),
+    fetchUs(fetchedAt),
+    fetchLse(fetchedAt),
+  ]);
+
   const seen = new Set<string>();
   const merged: LiveIpo[] = [];
   for (const ipo of [...india, ...us, ...lse]) {
@@ -360,7 +521,10 @@ export async function fetchLiveIpos(): Promise<LiveIpo[]> {
     seen.add(key);
     merged.push(ipo);
   }
-  merged.sort((a, b) => (b.openDate ?? "").localeCompare(a.openDate ?? ""));
+
+  const dateKey = (ipo: LiveIpo) =>
+    ipo.openDate ?? ipo.expectedPricingDate ?? ipo.listingDate ?? ipo.filingDate ?? "";
+  merged.sort((a, b) => dateKey(b).localeCompare(dateKey(a)));
 
   if (merged.length > 0) cache = { at: Date.now(), data: merged };
   return merged;
