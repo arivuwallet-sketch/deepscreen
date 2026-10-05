@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import type { BlogParagraph, BlogPost, BlogTable } from "@/lib/content/investment-blog";
+import { faqAnchor } from "@/lib/seo/faq-anchor";
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("en-GB", {
@@ -146,7 +147,7 @@ export function InvestmentBlogArticle({ post }: { post: BlogPost }) {
         <h2 id="faq-title" className="mt-2 text-2xl font-bold">Common questions</h2>
         <dl className="mt-6 space-y-4">
           {post.faqs.map((faq) => (
-            <div key={faq.q} className="rounded-xl border border-border bg-card/30 p-5">
+            <div key={faq.q} id={faqAnchor(faq.q)} className="scroll-mt-24 rounded-xl border border-border bg-card/30 p-5">
               <dt className="font-semibold text-foreground">{faq.q}</dt>
               <dd className="mt-2 text-sm leading-6 text-muted-foreground">{faq.a}</dd>
             </div>
