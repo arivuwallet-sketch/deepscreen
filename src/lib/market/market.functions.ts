@@ -588,30 +588,41 @@ export const getNewsFeed = createServerFn({ method: "GET" })
 
       if (globalMarket) {
         const perTopicLimit = Math.max(8, Math.min(14, Math.ceil(limit / 2)));
-        const topicResults = await Promise.all(
-          GLOBAL_MARKET_NEWS_TOPICS.map(async (topic, topicIndex) => {
-            const freshQuery = newsQueryVariants(topic.query, maxAgeHours)[0] ?? topic.query;
-            const genericQuery = freshQuery.replace(/\s+when:[^\s]+/gi, "").trim();
+        const fetchTopic = async (
+          topic: (typeof GLOBAL_MARKET_NEWS_TOPICS)[number],
+          topicIndex: number,
+        ) => {
+          const freshQuery = newsQueryVariants(topic.query, maxAgeHours)[0] ?? topic.query;
+          const genericQuery = freshQuery.replace(/\s+when:[^\s]+/gi, "").trim();
 
-            // Google + Bing run for every topic. Yahoo is added for the broad
-            // regional/macro topics, giving provider redundancy without
-            // multiplying requests unnecessarily for every niche theme.
-            const [google, bing, yahoo] = await Promise.all([
-              fetchFeed(googleNewsFeed(freshQuery), "Google News", topic.category, perTopicLimit),
-              fetchFeed(bingNewsFeed(genericQuery), "Bing News", topic.category, perTopicLimit),
-              topicIndex < 6 ? fetchYahooNews(genericQuery, perTopicLimit) : Promise.resolve([]),
-            ]);
-            if (google.length > 0) providerNames.add("Google News");
-            if (bing.length > 0) providerNames.add("Bing News");
-            if (yahoo.length > 0) providerNames.add("Yahoo Finance");
+          // Google + Bing run for every topic. Yahoo is added for the broad
+          // regional/macro topics, giving provider redundancy without
+          // multiplying requests unnecessarily for every niche theme.
+          const [google, bing, yahoo] = await Promise.all([
+            fetchFeed(googleNewsFeed(freshQuery), "Google News", topic.category, perTopicLimit),
+            fetchFeed(bingNewsFeed(genericQuery), "Bing News", topic.category, perTopicLimit),
+            topicIndex < 6 ? fetchYahooNews(genericQuery, perTopicLimit) : Promise.resolve([]),
+          ]);
+          if (google.length > 0) providerNames.add("Google News");
+          if (bing.length > 0) providerNames.add("Bing News");
+          if (yahoo.length > 0) providerNames.add("Yahoo Finance");
 
-            return [...google, ...bing, ...yahoo].map((item) => ({
-              ...item,
-              category: topic.category,
-            }));
-          }),
-        );
-        topicResults.forEach((items) => allItems.push(...items));
+          return [...google, ...bing, ...yahoo].map((item) => ({
+            ...item,
+            category: topic.category,
+          }));
+        };
+
+        // Small batches avoid launching ~30 upstream requests at the exact
+        // same instant, which makes free RSS/search providers more likely to
+        // throttle a production server.
+        for (let start = 0; start < GLOBAL_MARKET_NEWS_TOPICS.length; start += 4) {
+          const batch = GLOBAL_MARKET_NEWS_TOPICS.slice(start, start + 4);
+          const topicResults = await Promise.all(
+            batch.map((topic, offset) => fetchTopic(topic, start + offset)),
+          );
+          topicResults.forEach((items) => allItems.push(...items));
+        }
       } else {
         const queries = newsQueryVariants(data.query, maxAgeHours);
         const upstreamLimit = Math.min(40, Math.max(20, limit * 2));
