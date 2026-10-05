@@ -7,7 +7,7 @@ import { giftNiftyKeywords, metaKeywords } from "@/lib/seo/keywords";
 import { buildBreadcrumbSchema, buildFAQSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
 
 const URL = "https://deepscreen.online/gift-nifty";
-const title = "GIFT Nifty: Meaning, Timings & Nifty 50 Signal | DeepScreen";
+const title = "GIFT Nifty Guide: Meaning, Timings & Nifty 50 Signal | DeepScreen";
 const description = "Understand GIFT Nifty, NSE IX trading hours, the SGX Nifty transition, futures basis and how to read the overnight signal before the Indian market opens.";
 const faqs = marketGuideFaq("GIFT_NIFTY");
 
