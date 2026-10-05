@@ -67,33 +67,45 @@ export function PaywallGate({
   children,
   className,
   minHeight = "min-h-40",
+  strict = false,
 }: {
   feature: string;
   children: ReactNode;
   className?: string;
   minHeight?: string;
+  /**
+   * Strict mode does not render premium values for Free users. Use it for
+   * derived analytics, trade plans and other outputs that should be genuinely
+   * unavailable without an active subscription.
+   */
+  strict?: boolean;
 }) {
   const { isPro, loading } = useSubscription();
 
-  // While the session is resolving (and during SSR, which is what crawlers
-  // read) render the locked variant: the real content is present in the HTML,
-  // visually blurred, so search and AI crawlers index the substance.
   if (isPro) return className ? <div className={className}>{children}</div> : <>{children}</>;
   void loading;
 
   return (
-    <div className={cn("relative overflow-hidden rounded-lg", minHeight, className)}>
-      <div aria-hidden className="pointer-events-none select-none blur-[6px] saturate-50">
-        {children}
-      </div>
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-background/70 p-6 text-center backdrop-blur-[2px]">
+    <div className={cn("relative overflow-hidden rounded-lg border border-primary/20 bg-panel", minHeight, className)}>
+      {!strict && (
+        <div aria-hidden className="pointer-events-none select-none blur-[6px] saturate-50">
+          {children}
+        </div>
+      )}
+      <div className={cn(
+        "flex flex-col items-center justify-center gap-3 p-6 text-center",
+        strict ? "absolute inset-0" : "absolute inset-0 bg-background/70 backdrop-blur-[2px]",
+      )}>
         <span className="flex size-10 items-center justify-center rounded-full border border-primary/40 bg-primary/10 text-primary">
           <Lock className="size-4" />
         </span>
         <div>
           <p className="text-sm font-semibold">{feature} is a DeepScreen Pro feature</p>
+          <p className="mt-1 max-w-md text-xs leading-5 text-muted-foreground">
+            Free includes the public research layer. Pro unlocks advanced model outputs and interactive analytics.
+          </p>
           <p className="num mt-1 text-xs text-muted-foreground">
-            Unlock from ₹{PLANS[0]!.price}/week · ₹{PLANS[1]!.price}/month · ₹{PLANS[2]!.price}/year
+            From ₹{PLANS[0]!.price}/week · ₹{PLANS[1]!.price}/month · ₹{PLANS[2]!.price}/year
           </p>
         </div>
         <Button asChild size="sm">
