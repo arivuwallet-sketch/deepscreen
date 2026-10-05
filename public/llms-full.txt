@@ -15,7 +15,7 @@ DeepScreen covers supported listings on NSE and BSE in India, NYSE and Nasdaq in
 Source: https://deepscreen.online/answers
 
 ### Can I use DeepScreen for free?
-Company search and educational guides are available without a paid subscription. Current feature availability and pricing are shown on the pricing page.
+Free includes company search, core ratios, public research, guides, calendars and the basic DeepChart chart. Pro unlocks the 13-factor verdict, advanced DeepChart analysis and trade plans, Options Strategy Lab analytics, valuation tools, research alerts and Portfolio X-Ray. Current prices and durations are shown on the pricing page.
 
 Source: https://deepscreen.online/pricing
 
