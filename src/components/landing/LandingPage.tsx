@@ -411,7 +411,7 @@ function FeatureScene({ kind }: { kind: FeatureSceneKind }) {
       <div className="ds-motion-scene ds-motion-filters">
         <div className="ds-filter-cloud">
           {["13,000+", "ROCE > 15%", "D/E < 1", "P/E", "GROWTH", "NSE", "NASDAQ", "QUALITY"].map((label, i) => (
-            <span key={label} style={{ "--i": i } as CSSProperties}>{label}</span>
+            <span key={label} style={{ animationDelay: `${i * -0.31}s` } as CSSProperties}>{label}</span>
           ))}
         </div>
         <div className="ds-filter-funnel">
@@ -886,7 +886,7 @@ export function LandingPage() {
                 data-reveal
                 tabIndex={0}
               >
-                <div className="ds-visual-stage">
+                <div className="ds-visual-stage" aria-hidden="true">
                   <FeatureScene kind={kind} />
                 </div>
                 <div className="ds-visual-copy">
