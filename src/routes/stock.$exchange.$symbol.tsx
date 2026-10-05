@@ -409,7 +409,13 @@ function StockPage() {
           );
         })()}
 
-        <section className="mt-5 grid items-stretch gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(300px,1fr)]">
+        <PaywallGate
+          strict
+          feature="13-factor DeepScreen score, verdict, strengths & risks"
+          className="mt-5"
+          minHeight="min-h-[300px]"
+        >
+          <section className="grid items-stretch gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(300px,1fr)]">
             <div className="min-w-0">
               <div className="card-hover h-full rounded-lg border border-border bg-panel p-5">
                 <div className="flex items-center justify-between">
@@ -463,9 +469,11 @@ function StockPage() {
               </div>
             </div>
         </section>
+        </PaywallGate>
 
         <section className="mt-6 grid items-stretch gap-4 lg:grid-cols-2">
           <PaywallGate
+            strict
             feature="Vision &amp; Utility score and Secret Tips badges"
             minHeight="min-h-[260px]"
           >
@@ -473,6 +481,7 @@ function StockPage() {
           </PaywallGate>
 
           <PaywallGate
+            strict
             feature="Target price, trim level & stop-loss"
             minHeight="min-h-[220px]"
           >
@@ -480,14 +489,17 @@ function StockPage() {
           </PaywallGate>
         </section>
 
-        <ScoreExplanationPanel analysis={a} />
-
-        <ScoreChangePanel
-          exchange={stock.exchange}
-          symbol={stock.symbol}
-          analysis={a}
-          liveFundamentals={liveFundamentals ?? null}
-        />
+        <PaywallGate strict feature="Score explanation & score-change analysis" className="mt-6" minHeight="min-h-[280px]">
+          <div className="space-y-6">
+            <ScoreExplanationPanel analysis={a} />
+            <ScoreChangePanel
+              exchange={stock.exchange}
+              symbol={stock.symbol}
+              analysis={a}
+              liveFundamentals={liveFundamentals ?? null}
+            />
+          </div>
+        </PaywallGate>
 
         <FundamentalSnapshotPanel
           stock={live}
@@ -496,11 +508,13 @@ function StockPage() {
           updatedAt={Math.max(fundUpdatedAt, screenerUpdatedAt)}
         />
 
-        <ResearchAlertsPanel
-          stock={live}
-          analysis={a}
-          liveFundamentals={liveFundamentals ?? null}
-        />
+        <PaywallGate strict feature="Research alerts" className="mt-6" minHeight="min-h-[260px]">
+          <ResearchAlertsPanel
+            stock={live}
+            analysis={a}
+            liveFundamentals={liveFundamentals ?? null}
+          />
+        </PaywallGate>
 
                 <PeerAnalysisPanel
           stock={live}
@@ -511,6 +525,7 @@ function StockPage() {
         />
 
         <PaywallGate
+          strict
           feature="DeepScreen Secret Tips, traps & X-Ray analysis"
           className="mt-4"
           minHeight="min-h-[420px]"
@@ -595,6 +610,7 @@ function StockPage() {
           </section>
 
         <PaywallGate
+          strict
           feature="DCF & Graham intrinsic value calculators"
           className="mt-8"
           minHeight="min-h-[360px]"
