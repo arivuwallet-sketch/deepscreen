@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 
 import type { LiveFundamentals, LiveQuote } from "./yahoo.server";
 import type { FeedItem } from "@/lib/rss.server";
+import type { NewsFeedMode } from "./news-topics";
 
 export interface LiveEvent {
   id: string;
@@ -557,10 +558,11 @@ const NEWS_CACHE_TTL_MS = 60_000;
 const newsMemoryCache = new Map<string, { data: LiveNewsResult; fetchedAt: number }>();
 const newsInFlight = new Map<string, Promise<LiveNewsResult>>();
 
-function newsKey(query: string, maxAgeHours?: number, globalMarket = false): string {
-  const normalized = query.trim().replace(/\s+/g, " ").toLowerCase().slice(0, 220);
+function newsKey(query: string, maxAgeHours?: number, scope = "generic"): string {
+  const normalized = query.trim().replace(/\s+/g, " ").toLowerCase().slice(0, 180);
+  const normalizedScope = scope.trim().replace(/\s+/g, " ").toLowerCase().slice(0, 260);
   const age = maxAgeHours === undefined ? "default" : `${Math.round(maxAgeHours * 10) / 10}h`;
-  return globalMarket ? `global-market::${age}` : `${normalized}::${age}`;
+  return `${normalizedScope}::${normalized}::${age}`;
 }
 
 // Never surface stale cached/provider headlines as "latest" news. A provider
@@ -610,6 +612,31 @@ const CATEGORY_MARKET_FALLBACKS: Record<string, string[]> = {
   COMMODITIES: ["Commodities"],
   "FX/BONDS": ["FX", "Bonds"],
   GEOPOLITICS: ["Global Equities", "Commodities"],
+  COMPANY: ["Global Equities"],
+  ANALYSTS: ["Global Equities"],
+  CORPORATE: ["Global Equities"],
+  MANAGEMENT: ["Global Equities"],
+  GOLD: ["Commodities"],
+  SILVER: ["Commodities"],
+  OIL: ["Commodities"],
+  "NAT GAS": ["Commodities"],
+  COPPER: ["Commodities"],
+  "COMMODITY MACRO": ["Commodities", "FX", "Bonds"],
+  FUND: ["Mutual Funds"],
+  "FUND UPDATE": ["Mutual Funds"],
+  "MF FLOWS": ["Mutual Funds", "NSE/BSE"],
+  "MF RULES": ["Mutual Funds", "NSE/BSE"],
+  "MF MARKET": ["Mutual Funds", "NSE/BSE"],
+  ETF: ["ETFs"],
+  "ETF UPDATE": ["ETFs"],
+  "ETF FLOWS": ["ETFs"],
+  "ETF INDEX": ["ETFs"],
+  "ETF RULES": ["ETFs"],
+  REIT: ["REITs"],
+  "REIT UPDATE": ["REITs"],
+  "REIT MARKET": ["REITs"],
+  "REAL ESTATE": ["REITs"],
+  "REIT RATES": ["REITs", "Bonds"],
   market: ["Equities"],
   company: ["Equities"],
   workplace: ["Equities"],
@@ -632,9 +659,10 @@ function classifyNewsImpact(item: FeedItem): FeedItem {
     impactLevel = "medium";
   }
 
-  const affectedMarkets = AFFECTED_MARKET_RULES
-    .filter((rule) => rule.re.test(text))
-    .map((rule) => rule.label);
+  const affectedMarkets = [...(item.affectedMarkets ?? [])];
+  for (const rule of AFFECTED_MARKET_RULES) {
+    if (rule.re.test(text) && !affectedMarkets.includes(rule.label)) affectedMarkets.push(rule.label);
+  }
 
   for (const fallback of CATEGORY_MARKET_FALLBACKS[item.category] ?? CATEGORY_MARKET_FALLBACKS[category] ?? []) {
     if (!affectedMarkets.includes(fallback)) affectedMarkets.push(fallback);
@@ -691,7 +719,17 @@ function newsQueryVariants(query: string, maxAgeHours?: number): string[] {
 
 
 export const getNewsFeed = createServerFn({ method: "GET" })
-  .inputValidator((d: { query: string; limit?: number; maxAgeHours?: number; globalMarket?: boolean }) => d)
+  .inputValidator((d: {
+    query: string;
+    limit?: number;
+    maxAgeHours?: number;
+    globalMarket?: boolean;
+    mode?: NewsFeedMode;
+    entityName?: string;
+    entityCode?: string;
+    exchange?: string;
+    market?: string;
+  }) => d)
   .handler(async ({ data }): Promise<LiveNewsResult> => {
     const { dedupe, refreshAges } = await import("@/lib/rss.server");
     const limit = Math.min(Math.max(data.limit ?? 14, 1), 50);
@@ -699,9 +737,17 @@ export const getNewsFeed = createServerFn({ method: "GET" })
       typeof data.maxAgeHours === "number" && Number.isFinite(data.maxAgeHours) && data.maxAgeHours > 0
         ? Math.min(data.maxAgeHours, 30 * 24)
         : undefined;
-    const globalMarket = data.globalMarket === true;
-    const key = newsKey(data.query, maxAgeHours, globalMarket);
-    if (!globalMarket && !data.query.trim()) {
+    const mode: NewsFeedMode | "global-market" =
+      data.globalMarket === true ? "global-market" : (data.mode ?? "generic");
+    const scope = [
+      mode,
+      data.entityName ?? "",
+      data.entityCode ?? "",
+      data.exchange ?? "",
+      data.market ?? "",
+    ].join("|");
+    const key = newsKey(data.query, maxAgeHours, scope);
+    if (mode === "generic" && !data.query.trim()) {
       return { items: [], fetchedAt: Date.now(), stale: false, providerCount: 0 };
     }
 
@@ -734,22 +780,32 @@ export const getNewsFeed = createServerFn({ method: "GET" })
       const allItems: FeedItem[] = [];
       const providerNames = new Set<string>();
 
-      if (globalMarket) {
-        const perTopicLimit = Math.max(8, Math.min(14, Math.ceil(limit / 2)));
+      if (mode !== "generic") {
+        const topics =
+          mode === "global-market"
+            ? GLOBAL_MARKET_NEWS_TOPICS
+            : (await import("./news-topics")).buildScopedNewsTopics({
+                mode,
+                query: data.query,
+                entityName: data.entityName,
+                entityCode: data.entityCode,
+                exchange: data.exchange,
+                market: data.market,
+              });
+
+        const perTopicLimit = Math.max(8, Math.min(16, Math.ceil(limit / 2)));
         const fetchTopic = async (
-          topic: (typeof GLOBAL_MARKET_NEWS_TOPICS)[number],
+          topic: { category: string; query: string; affectedMarkets?: string[] },
           topicIndex: number,
         ) => {
           const freshQuery = newsQueryVariants(topic.query, maxAgeHours)[0] ?? topic.query;
           const genericQuery = freshQuery.replace(/\s+when:[^\s]+/gi, "").trim();
+          const includeYahoo = mode === "global-market" ? topicIndex < 6 : true;
 
-          // Google + Bing run for every topic. Yahoo is added for the broad
-          // regional/macro topics, giving provider redundancy without
-          // multiplying requests unnecessarily for every niche theme.
           const [google, bing, yahoo] = await Promise.all([
             fetchFeed(googleNewsFeed(freshQuery), "Google News", topic.category, perTopicLimit),
             fetchFeed(bingNewsFeed(genericQuery), "Bing News", topic.category, perTopicLimit),
-            topicIndex < 6 ? fetchYahooNews(genericQuery, perTopicLimit) : Promise.resolve([]),
+            includeYahoo ? fetchYahooNews(genericQuery, perTopicLimit) : Promise.resolve([]),
           ]);
           if (google.length > 0) providerNames.add("Google News");
           if (bing.length > 0) providerNames.add("Bing News");
@@ -758,16 +814,16 @@ export const getNewsFeed = createServerFn({ method: "GET" })
           return [...google, ...bing, ...yahoo].map((item) => ({
             ...item,
             category: topic.category,
+            affectedMarkets: [
+              ...new Set([...(item.affectedMarkets ?? []), ...(topic.affectedMarkets ?? [])]),
+            ],
           }));
         };
 
-        // Small batches avoid launching ~30 upstream requests at the exact
-        // same instant, which makes free RSS/search providers more likely to
-        // throttle a production server.
-        for (let start = 0; start < GLOBAL_MARKET_NEWS_TOPICS.length; start += 4) {
-          const batch = GLOBAL_MARKET_NEWS_TOPICS.slice(start, start + 4);
+        for (let batchStart = 0; batchStart < topics.length; batchStart += 4) {
+          const batch = topics.slice(batchStart, batchStart + 4);
           const topicResults = await Promise.all(
-            batch.map((topic, offset) => fetchTopic(topic, start + offset)),
+            batch.map((topic, offset) => fetchTopic(topic, batchStart + offset)),
           );
           topicResults.forEach((items) => allItems.push(...items));
         }
@@ -805,14 +861,16 @@ export const getNewsFeed = createServerFn({ method: "GET" })
         ),
       );
 
-      // A global feed should stay broad rather than letting one hot market
-      // consume the entire list. Keep at most six rows from any one topic,
-      // then restore pure newest-first chronology across the balanced set.
+      // Aggregated feeds stay broad rather than letting one repetitive topic
+      // consume the whole panel. Global market news gets a six-row cap per
+      // topic; asset/product feeds get eight so relevant company/product news
+      // can still dominate when there is genuine activity.
       const categoryCounts = new Map<string, number>();
-      const balanced = globalMarket
+      const categoryCap = mode === "global-market" ? 6 : 8;
+      const balanced = mode !== "generic"
         ? sorted.filter((item) => {
             const count = categoryCounts.get(item.category) ?? 0;
-            if (count >= 6) return false;
+            if (count >= categoryCap) return false;
             categoryCounts.set(item.category, count + 1);
             return true;
           })
