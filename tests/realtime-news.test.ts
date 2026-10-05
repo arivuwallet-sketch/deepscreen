@@ -152,6 +152,7 @@ test("stock commodity ETF mutual-fund and REIT news use widened scoped feeds", a
   const funds = await source("../src/routes/mutual-funds.tsx");
   const etfs = await source("../src/routes/etfs.tsx");
   const reits = await source("../src/routes/reits.tsx");
+  const exchange = await source("../src/routes/exchange.$code.tsx");
 
   for (const mode of ["company", "commodities", "etf", "mutual-fund", "reit"]) {
     assert.ok(topics.includes(`"${mode}"`), mode);
@@ -196,6 +197,8 @@ test("stock commodity ETF mutual-fund and REIT news use widened scoped feeds", a
   assert.ok(funds.includes('mode="mutual-fund"'));
   assert.ok(etfs.includes('mode="etf"'));
   assert.ok(reits.includes('mode="reit"'));
+  assert.ok(exchange.includes("maxAgeHours={24}"));
+  assert.ok(exchange.includes("limit={20}"));
   for (const hub of [funds, etfs, reits]) {
     assert.ok(hub.includes("limit={30}"));
     assert.ok(hub.includes("maxAgeHours={24}"));
