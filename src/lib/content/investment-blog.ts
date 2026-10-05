@@ -1,3 +1,5 @@
+import { TRADING_BLOG_POSTS } from "@/lib/content/trading-blog";
+
 export type BlogSource = {
   id: string;
   title: string;
@@ -34,7 +36,7 @@ export type BlogFaq = {
 
 export type BlogPost = {
   slug: string;
-  category: "Mutual funds" | "ETFs" | "REITs" | "Commodities" | "GIFT Nifty" | "IPO" | "Save Money" | "Protect Money" | "Make More Money";
+  category: "Mutual funds" | "ETFs" | "REITs" | "Commodities" | "GIFT Nifty" | "IPO" | "Save Money" | "Protect Money" | "Make More Money" | "DeepChart" | "Trading" | "Crypto" | "Forex";
   title: string;
   h1: string;
   description: string;
@@ -2951,7 +2953,8 @@ export const INVESTMENT_BLOG_POSTS: BlogPost[] = [
       { label: "What to do after UPI or bank fraud", href: "/blog/what-to-do-after-upi-bank-fraud-india" },
       { label: "DeepScreen research blog", href: "/blog" },
     ],
-  }
+  },
+  ...TRADING_BLOG_POSTS,
 ];
 
 const BLOG_BY_SLUG = new Map(INVESTMENT_BLOG_POSTS.map((post) => [post.slug, post]));
