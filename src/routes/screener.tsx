@@ -159,7 +159,6 @@ function Home() {
             maxAgeHours={24}
             globalMarket
             showCategory
-            scrollable
           />
         </div>
 
