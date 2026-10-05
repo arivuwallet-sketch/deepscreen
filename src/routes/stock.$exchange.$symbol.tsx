@@ -46,6 +46,7 @@ import {
 } from "@/lib/deepscreen/format";
 import { cn } from "@/lib/utils";
 import { stockFaqs, stockSummary } from "@/lib/deepscreen/narrative";
+import { faqAnchor } from "@/lib/seo/faq-anchor";
 import { StockSignupPrompt } from "@/components/ds/StockSignupPrompt";
 import { WatchlistButton } from "@/components/ds/WatchlistButton";
 import { FundamentalSnapshotPanel } from "@/components/ds/FundamentalSnapshotPanel";
@@ -321,7 +322,7 @@ function StockPage() {
         <Link to="/methodology" className="mt-3 inline-block text-primary">How the research model works</Link>
       </section>
       <CompanyResearch stock={stock} profile={liveFundamentals ?? null} />
-      <section className="mt-6"><h2 className="text-lg font-semibold">Research questions</h2><dl className="mt-4 space-y-4">{stockFaqs(live, sources, liveFundamentals, researchPeerNames(live)).map(faq => <div key={faq.q}><dt className="font-medium">{faq.q}</dt><dd className="mt-1 text-sm text-muted-foreground">{faq.a}</dd></div>)}</dl></section>
+      <section className="mt-6"><h2 className="text-lg font-semibold">Research questions</h2><dl className="mt-4 space-y-4">{stockFaqs(live, sources, liveFundamentals, researchPeerNames(live)).map(faq => <div key={faq.q} id={faqAnchor(faq.q)} className="scroll-mt-24"><dt className="font-medium">{faq.q}</dt><dd className="mt-1 text-sm text-muted-foreground">{faq.a}</dd></div>)}</dl></section>
       <TopicIndex ids={["stocks", "learn"]} inContainer />
     </article></Shell>;
   }
@@ -642,7 +643,7 @@ function StockPage() {
           <h2 className="text-lg font-semibold">Frequently asked questions about {stock.symbol}</h2>
           <dl className="mt-5 space-y-5">
             {stockFaqs(live, sources, liveFundamentals, researchPeerNames(live)).map((faq) => (
-              <div key={faq.q}>
+              <div key={faq.q} id={faqAnchor(faq.q)} className="scroll-mt-24">
                 <dt className="text-sm font-semibold">{faq.q}</dt>
                 <dd className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{faq.a}</dd>
               </div>
