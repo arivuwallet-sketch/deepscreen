@@ -131,6 +131,7 @@ DeepScreen does not provide a special hidden answer corpus that should override 
 - Plain-text FAQ/Q&A index: https://deepscreen.online/faq-index.txt
 - Canonical answer hub: https://deepscreen.online/answers
 - Research blog hub: https://deepscreen.online/blog
+- Research RSS feed: https://deepscreen.online/blog/feed.xml
 - Complete public URL sitemap: https://deepscreen.online/sitemap.xml
 - Retail investing statistics 2026: https://deepscreen.online/blog/retail-investing-statistics-2026.html
 
