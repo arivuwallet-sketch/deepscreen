@@ -57,10 +57,16 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(102px, 1fr));
   border: 1px solid var(--cr-soft-line);
-  border-radius: 16px;
+  border-radius: var(--ds-box-radius, 16px);
   overflow: hidden;
-  background: oklch(0.20 0.024 155 / 0.74);
-  box-shadow: 0 24px 80px oklch(0 0 0 / 0.16);
+  background-color: oklch(0.20 0.024 155 / 0.74);
+  background-image: var(--ds-box-surface);
+  box-shadow: var(--ds-box-shadow);
+  transition:
+    border-color 0.28s ease,
+    box-shadow 0.28s ease,
+    transform 0.28s ease,
+    background-position 0.45s ease;
 }
 
 .ds-cr-intro-metrics > div {
@@ -105,12 +111,15 @@
   gap: 20px;
   padding: 12px;
   border: 1px solid var(--cr-line);
-  border-radius: 14px;
-  background: oklch(0.195 0.023 155 / 0.84);
-  box-shadow:
-    0 16px 55px oklch(0 0 0 / 0.12),
-    inset 0 1px 0 oklch(1 0 0 / 0.025);
+  border-radius: var(--ds-box-radius, 16px);
+  background-color: oklch(0.195 0.023 155 / 0.84);
+  background-image: var(--ds-box-surface);
+  box-shadow: var(--ds-box-shadow);
   backdrop-filter: blur(18px);
+  transition:
+    border-color 0.28s ease,
+    box-shadow 0.28s ease,
+    background-position 0.45s ease;
 }
 
 .ds-cr-market-tabs {
@@ -352,13 +361,14 @@
   gap: 26px;
   padding: 18px 20px;
   border: 1px solid var(--cr-line);
-  border-radius: 14px;
-  background:
-    linear-gradient(110deg, oklch(0.225 0.027 155 / 0.92), oklch(0.19 0.022 155 / 0.84)),
-    radial-gradient(circle at 90% 0%, var(--cr-glow), transparent 30%);
-  box-shadow:
-    0 14px 50px oklch(0 0 0 / 0.12),
-    inset 0 1px 0 oklch(1 0 0 / 0.03);
+  border-radius: var(--ds-box-radius, 16px);
+  background-color: oklch(0.20 0.024 155 / 0.9);
+  background-image: var(--ds-box-surface);
+  box-shadow: var(--ds-box-shadow);
+  transition:
+    border-color 0.28s ease,
+    box-shadow 0.28s ease,
+    background-position 0.45s ease;
 }
 
 .ds-cr-security h2 {
@@ -460,20 +470,15 @@
 .ds-cr-card,
 .ds-cr-subcard {
   border: 1px solid var(--cr-line);
-  background:
-    linear-gradient(180deg, oklch(0.222 0.026 155 / 0.96), oklch(0.19 0.021 155 / 0.97));
-  box-shadow:
-    0 18px 65px oklch(0 0 0 / 0.13),
-    inset 0 1px 0 oklch(1 0 0 / 0.028);
+  background-color: oklch(0.205 0.024 155 / 0.96);
+  background-image: var(--ds-box-surface);
+  box-shadow: var(--ds-box-shadow);
 }
 
 .ds-cr-chart-frame,
-.ds-cr-card {
-  border-radius: 14px;
-}
-
+.ds-cr-card,
 .ds-cr-subcard {
-  border-radius: 10px;
+  border-radius: var(--ds-box-radius, 16px);
 }
 
 .ds-cr-card,
@@ -485,9 +490,8 @@
 }
 
 .ds-cr-sidebar > .ds-cr-card:first-child {
-  background:
-    radial-gradient(circle at 88% 8%, oklch(0.927 0.151 127 / 0.075), transparent 32%),
-    linear-gradient(180deg, oklch(0.23 0.028 155 / 0.98), oklch(0.19 0.021 155 / 0.98));
+  background-color: oklch(0.205 0.024 155 / 0.98);
+  background-image: var(--ds-box-surface);
 }
 
 .ds-chart-reader .font-serif {
@@ -600,9 +604,18 @@
   overflow: hidden;
 }
 
+.ds-cr-intro-metrics:hover,
+.ds-cr-command-bar:hover,
+.ds-cr-market-header:hover,
+.ds-cr-chart-frame:hover,
 .ds-cr-card:hover,
 .ds-cr-subcard:hover {
-  border-color: oklch(0.927 0.151 127 / 0.34);
+  border-color: oklch(0.927 0.151 127 / 0.38);
+  background-position: 88% 10%, 0 0;
+  box-shadow:
+    0 22px 64px oklch(0 0 0 / 0.17),
+    0 0 34px oklch(0.927 0.151 127 / 0.035),
+    inset 0 1px 0 oklch(1 0 0 / 0.045);
 }
 
 .ds-chart-reader [role="tablist"] {
