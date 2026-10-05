@@ -583,20 +583,26 @@ export const getNewsFeed = createServerFn({ method: "GET" })
         return [...google, ...bing, ...yahoo];
       };
 
-      // Try the exact query first. Only when every provider is empty do we
-      // fan out to conservative company-name/ticker fallbacks. This keeps the
-      // normal path fast while making provider-specific misses much harder.
+      // Try the freshness-constrained query first. If providers return rows
+      // but none have a valid publication time inside the requested window,
+      // continue into the conservative fallbacks instead of treating an old
+      // result set as a successful "latest" fetch.
       const exactItems = queries.length > 0 ? await fetchVariant(queries[0]!) : [];
       allItems.push(...exactItems);
 
-      if (exactItems.length === 0 && queries.length > 1) {
+      const exactRecent = filterRecentNews(exactItems, maxAgeHours);
+      if (exactRecent.length === 0 && queries.length > 1) {
         const fallbackItems = await Promise.all(queries.slice(1).map(fetchVariant));
         fallbackItems.forEach((items) => allItems.push(...items));
       }
 
-      const items = filterRecentNews(dedupe(allItems), maxAgeHours)
-        .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
-        .slice(0, limit);
+      // Sort before deduplication so, when multiple providers carry the same
+      // headline, the copy with the newest verified publication timestamp wins.
+      const items = dedupe(
+        filterRecentNews(allItems, maxAgeHours).sort(
+          (a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt),
+        ),
+      ).slice(0, limit);
 
       if (items.length > 0) {
         const fetchedAt = Date.now();
