@@ -296,6 +296,54 @@
   min-width: 0;
 }
 
+
+.ds-cr-partner-card {
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 88% 8%, oklch(0.927 0.151 127 / 0.06), transparent 34%),
+    linear-gradient(180deg, oklch(0.222 0.026 155 / 0.96), oklch(0.19 0.021 155 / 0.97));
+}
+
+.ds-cr-partner-cta {
+  margin-top: 15px;
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: 1px solid var(--primary);
+  border-radius: 5px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.ds-cr-partner-cta:hover {
+  background: oklch(0.96 0.12 127);
+  border-color: oklch(0.96 0.12 127);
+}
+
+.ds-cr-partner-cta:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+.ds-cr-partner-disclosure {
+  margin-top: 10px;
+  color: var(--muted-foreground);
+  font: 8px/1.55 var(--font-mono);
+  letter-spacing: 0.02em;
+}
+
 .ds-cr-market-header {
   min-height: 92px;
   display: grid;
