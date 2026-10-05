@@ -12,12 +12,22 @@ function ago(min: number): string {
   return `${Math.round(min / 1440)}d ago`;
 }
 
-export function FeedList({ items, empty }: { items: FeedItem[]; empty: string }) {
+export function FeedList({
+  items,
+  empty,
+  showCategory = false,
+  scrollable = false,
+}: {
+  items: FeedItem[];
+  empty: string;
+  showCategory?: boolean;
+  scrollable?: boolean;
+}) {
   if (items.length === 0) {
     return <p className="px-4 py-6 text-sm text-muted-foreground">{empty}</p>;
   }
   return (
-    <ul className="divide-y divide-border">
+    <ul className={cn("divide-y divide-border", scrollable && "max-h-[720px] overflow-y-auto")}>
       {items.map((n) => (
         <li key={n.id} className="px-4 py-3">
           <a
@@ -28,8 +38,13 @@ export function FeedList({ items, empty }: { items: FeedItem[]; empty: string })
           >
             {n.title}
           </a>
-          <p className="num mt-1 text-xs text-muted-foreground">
-            {n.source} · {ago(n.minutesAgo)}
+          <p className="num mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+            {showCategory && n.category && n.category !== "market" ? (
+              <span className="rounded border border-primary/20 px-1.5 py-0.5 text-[9px] tracking-wide text-primary">
+                {n.category}
+              </span>
+            ) : null}
+            <span>{n.source} · {ago(n.minutesAgo)}</span>
           </p>
         </li>
       ))}
@@ -42,18 +57,24 @@ export function LiveNewsFeed({
   title,
   limit = 12,
   maxAgeHours,
+  globalMarket = false,
+  showCategory = false,
+  scrollable = false,
   className,
 }: {
   query: string;
   title: string;
   limit?: number;
   maxAgeHours?: number;
+  globalMarket?: boolean;
+  showCategory?: boolean;
+  scrollable?: boolean;
   className?: string;
 }) {
   const fetchNews = useServerFn(getNewsFeed);
   const { data, isLoading, dataUpdatedAt } = useQuery({
-    queryKey: ["news-feed", query, limit, maxAgeHours ?? null],
-    queryFn: () => fetchNews({ data: { query, limit, maxAgeHours } }),
+    queryKey: ["news-feed", query, limit, maxAgeHours ?? null, globalMarket],
+    queryFn: () => fetchNews({ data: { query, limit, maxAgeHours, globalMarket } }),
     refetchInterval: 30_000,
     staleTime: 15_000,
     refetchOnWindowFocus: true,
@@ -93,7 +114,16 @@ export function LiveNewsFeed({
       {isLoading ? (
         <p className="px-4 py-6 text-sm text-muted-foreground">Loading live headlines…</p>
       ) : (
-        <FeedList items={items} empty={maxAgeHours === undefined ? "No headlines available right now." : `No verified publication times within the last ${maxAgeHours} hours.`} />
+        <FeedList
+          items={items}
+          showCategory={showCategory}
+          scrollable={scrollable}
+          empty={
+            maxAgeHours === undefined
+              ? "No headlines available right now."
+              : `No verified publication times within the last ${maxAgeHours} hours.`
+          }
+        />
       )}
     </section>
   );
