@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowDown,
@@ -20,6 +20,7 @@ import {
   Play,
   Menu,
   X,
+  type LucideIcon,
 } from "lucide-react";
 import { MarketScene } from "./MarketScene";
 import { useMotionPreference } from "@/hooks/useMotionPreference";
@@ -251,6 +252,276 @@ function OptionsDemo() {
         </text>
       </svg>
       <p>Illustrative expiry payoff · underlying price in sample units · excludes fees</p>
+    </div>
+  );
+}
+
+
+type FeatureSceneKind =
+  | "deepchart"
+  | "investments"
+  | "filters"
+  | "trading"
+  | "markets"
+  | "workspace"
+  | "knowledge";
+
+const FEATURE_SCENES: {
+  kind: FeatureSceneKind;
+  icon: LucideIcon;
+  tag: string;
+  title: string;
+  text: string;
+  link: string;
+  cta: string;
+}[] = [
+  {
+    kind: "deepchart",
+    icon: Activity,
+    tag: "DEEPCHART",
+    title: "Read the structure as it moves.",
+    text: "See price structure, EMA layers, momentum, volatility, liquidity and higher-timeframe context come together as one explainable technical workspace.",
+    link: "/chart-reader",
+    cta: "Open DeepChart",
+  },
+  {
+    kind: "investments",
+    icon: Layers3,
+    tag: "INVESTMENTS",
+    title: "Compare different kinds of assets.",
+    text: "Move through mutual funds, ETFs and REITs with product-specific research for NAV, fees, holdings, tracking, occupancy, cash flow and valuation.",
+    link: "/investments",
+    cta: "Explore investments",
+  },
+  {
+    kind: "filters",
+    icon: ScanLine,
+    tag: "FILTERS",
+    title: "Turn a thesis into a shortlist.",
+    text: "Watch a broad market universe narrow through value, growth, quality, income, momentum, leverage, ROE/ROCE, sector, index and exchange filters.",
+    link: "/stock-filters",
+    cta: "Browse stock filters",
+  },
+  {
+    kind: "trading",
+    icon: Radar,
+    tag: "TRADING",
+    title: "See the risk before the signal.",
+    text: "Connect position size, stop distance and reward-to-risk with crypto and forex mechanics such as leverage, liquidation, pips, spreads and volatility.",
+    link: "/trading",
+    cta: "Open trading guides",
+  },
+  {
+    kind: "markets",
+    icon: Globe2,
+    tag: "MARKETS",
+    title: "Watch the market around the company.",
+    text: "Bring commodities, GIFT Nifty, scheduled macro events, news and IPO context into the same visual story instead of treating a stock in isolation.",
+    link: "/commodities",
+    cta: "Explore market context",
+  },
+  {
+    kind: "workspace",
+    icon: BellRing,
+    tag: "WORKSPACE",
+    title: "Keep the research trail together.",
+    text: "Organise watchlists, holdings, notes, source documents and follow-up ideas across My Stocks and Research Desk without breaking the research flow.",
+    link: "/portfolio",
+    cta: "Open My Stocks",
+  },
+  {
+    kind: "knowledge",
+    icon: BookOpen,
+    tag: "KNOWLEDGE",
+    title: "Move from a number to understanding.",
+    text: "Explore ratio guides, source-backed blogs, FAQs and answer hubs covering stocks, DeepChart, trading, crypto, forex, funds and personal finance.",
+    link: "/knowledge",
+    cta: "Explore the knowledge hub",
+  },
+];
+
+function FeatureScene({ kind }: { kind: FeatureSceneKind }) {
+  if (kind === "deepchart") {
+    return (
+      <div className="ds-motion-scene ds-motion-chart">
+        <div className="ds-motion-grid" />
+        <svg viewBox="0 0 520 250" role="img" aria-label="Animated DeepChart technical-analysis preview">
+          <g className="ds-motion-candles">
+            {[
+              [34, 150, 118, 170, 102],
+              [76, 130, 92, 148, 82],
+              [118, 112, 142, 154, 101],
+              [160, 136, 105, 150, 92],
+              [202, 118, 78, 138, 69],
+              [244, 92, 126, 140, 82],
+              [286, 110, 72, 123, 61],
+              [328, 82, 58, 103, 49],
+              [370, 72, 102, 112, 61],
+              [412, 94, 65, 107, 54],
+              [454, 70, 46, 86, 38],
+            ].map(([x, open, close, high, low], i) => {
+              const up = close < open;
+              const y = Math.min(open, close);
+              const h = Math.max(8, Math.abs(close - open));
+              return (
+                <g key={x} style={{ animationDelay: `${i * 70}ms` }}>
+                  <line x1={x} x2={x} y1={low} y2={high} />
+                  <rect x={x - 7} y={y} width="14" height={h} className={up ? "up" : "down"} />
+                </g>
+              );
+            })}
+          </g>
+          <path className="ds-motion-line ds-motion-line-a" d="M18 160 C90 132 134 149 194 116 S296 78 350 86 S430 63 502 48" />
+          <path className="ds-motion-line ds-motion-line-b" d="M18 176 C82 163 130 164 190 143 S286 110 350 112 S438 91 502 78" />
+          <path className="ds-motion-scanline" d="M26 62 H494" />
+          <circle className="ds-motion-pulse" cx="454" cy="70" r="5" />
+        </svg>
+        <div className="ds-motion-hud">
+          <span>EMA 20</span><span>RSI 61</span><span>ADX 28</span><span>HTF ↑</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (kind === "investments") {
+    return (
+      <div className="ds-motion-scene ds-motion-investments">
+        <div className="ds-invest-orbit">
+          <div className="ds-invest-ring"><span>64%</span></div>
+          <div className="ds-invest-card ds-invest-card-a">
+            <small>MUTUAL FUND</small><strong>NAV</strong><em>₹182.46</em>
+            <i><b style={{ width: "72%" }} /></i>
+          </div>
+          <div className="ds-invest-card ds-invest-card-b">
+            <small>ETF</small><strong>TRACKING</strong><em>0.18%</em>
+            <i><b style={{ width: "86%" }} /></i>
+          </div>
+          <div className="ds-invest-card ds-invest-card-c">
+            <small>REIT</small><strong>OCCUPANCY</strong><em>91%</em>
+            <i><b style={{ width: "91%" }} /></i>
+          </div>
+        </div>
+        <div className="ds-motion-axis"><span>NAV</span><span>TER</span><span>WALE</span><span>AFFO</span></div>
+      </div>
+    );
+  }
+
+  if (kind === "filters") {
+    return (
+      <div className="ds-motion-scene ds-motion-filters">
+        <div className="ds-filter-cloud">
+          {["13,000+", "ROCE > 15%", "D/E < 1", "P/E", "GROWTH", "NSE", "NASDAQ", "QUALITY"].map((label, i) => (
+            <span key={label} style={{ animationDelay: `${i * -0.31}s` } as CSSProperties}>{label}</span>
+          ))}
+        </div>
+        <div className="ds-filter-funnel">
+          <i /><i /><i />
+          <div className="ds-filter-beam" />
+        </div>
+        <div className="ds-filter-results">
+          {[
+            ["01", "QUALITY CO.", "82"],
+            ["02", "VALUE LABS", "78"],
+            ["03", "GROWTH PLC", "74"],
+          ].map(([rank, name, score]) => (
+            <div key={rank}><span>{rank}</span><strong>{name}</strong><em>{score}</em></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (kind === "trading") {
+    return (
+      <div className="ds-motion-scene ds-motion-trading">
+        <div className="ds-trading-tape">
+          <span>BTC/USD <b>+2.4%</b></span>
+          <span>EUR/USD <b>1.168</b></span>
+          <span>USD/INR <b>88.73</b></span>
+        </div>
+        <svg viewBox="0 0 520 220" role="img" aria-label="Animated trading risk and reward preview">
+          <rect className="ds-risk-zone" x="38" y="128" width="444" height="44" rx="3" />
+          <rect className="ds-reward-zone" x="38" y="58" width="444" height="70" rx="3" />
+          <path className="ds-motion-line ds-motion-line-a" d="M32 142 C86 128 112 154 164 122 S240 98 290 107 S352 88 398 72 S454 64 494 78" />
+          <line className="ds-entry-line" x1="38" x2="482" y1="128" y2="128" />
+          <line className="ds-stop-line" x1="38" x2="482" y1="172" y2="172" />
+          <line className="ds-target-line" x1="38" x2="482" y1="68" y2="68" />
+          <circle className="ds-motion-crosshair" cx="398" cy="72" r="8" />
+        </svg>
+        <div className="ds-risk-readout"><span>RISK 1R</span><strong>2.2R</strong><span>REWARD</span></div>
+      </div>
+    );
+  }
+
+  if (kind === "markets") {
+    return (
+      <div className="ds-motion-scene ds-motion-markets">
+        <div className="ds-market-strip">
+          {[
+            ["GOLD", "▲ 1.2"],
+            ["WTI", "▼ 0.7"],
+            ["GIFT", "▲ 0.4"],
+            ["CPI", "14:00"],
+          ].map(([a, b]) => <span key={a}><small>{a}</small><strong>{b}</strong></span>)}
+        </div>
+        <div className="ds-market-radar">
+          <i className="ds-radar-ring r1" /><i className="ds-radar-ring r2" /><i className="ds-radar-ring r3" />
+          <i className="ds-radar-sweep" />
+          <b className="p1" /><b className="p2" /><b className="p3" />
+        </div>
+        <div className="ds-market-events">
+          <div><span>09:15</span><strong>NIFTY OPEN</strong></div>
+          <div><span>14:00</span><strong>MACRO EVENT</strong></div>
+          <div><span>IPO</span><strong>PIPELINE</strong></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (kind === "workspace") {
+    return (
+      <div className="ds-motion-scene ds-motion-workspace">
+        <div className="ds-workspace-board">
+          <div className="ds-workspace-column">
+            <small>WATCHLIST</small>
+            <span><b>RELIANCE</b><em>research</em></span>
+            <span><b>NVDA</b><em>compare</em></span>
+            <span><b>HDFCBANK</b><em>review</em></span>
+          </div>
+          <div className="ds-workspace-column">
+            <small>NOTES</small>
+            <span className="note"><b>Valuation</b><em>check assumptions</em></span>
+            <span className="note"><b>Risk</b><em>read filing</em></span>
+          </div>
+          <div className="ds-workspace-column">
+            <small>SOURCES</small>
+            <span className="file"><b>10-K</b><em>PDF</em></span>
+            <span className="file"><b>Annual report</b><em>PDF</em></span>
+          </div>
+        </div>
+        <div className="ds-workspace-cursor">+</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="ds-motion-scene ds-motion-knowledge">
+      <div className="ds-knowledge-core"><BookOpen size={28} /><span>DEEPSCREEN</span></div>
+      <div className="ds-knowledge-links" aria-hidden="true">
+        <i className="l1" /><i className="l2" /><i className="l3" /><i className="l4" /><i className="l5" /><i className="l6" />
+      </div>
+      {[
+        ["FAQ", "What is ROCE?"],
+        ["GUIDE", "Read a chart"],
+        ["BLOG", "Crypto risk"],
+        ["RATIO", "EV / EBITDA"],
+        ["FOREX", "Pips & spread"],
+        ["SOURCE", "Methodology"],
+      ].map(([type, label], i) => (
+        <div key={type} className={`ds-knowledge-node n${i + 1}`}>
+          <small>{type}</small><strong>{label}</strong>
+        </div>
+      ))}
     </div>
   );
 }
@@ -607,123 +878,28 @@ export function LandingPage() {
               </Link>
             </article>
           </div>
-          <div className="ds-small-grid">
-            {[
-              {
-                icon: Activity,
-                tag: "DEEPCHART",
-                title: "Read the chart, not just the candle.",
-                text: "Analyze stocks, indices, crypto, forex and commodities with market structure, EMA 20/50/200, RSI, ADX, ATR, VWAP, Supertrend, Fibonacci, volume profile, liquidity zones, order blocks, fair-value gaps and higher-timeframe context.",
-                link: "/chart-reader",
-                cta: "Open DeepChart",
-              },
-              {
-                icon: Layers3,
-                tag: "INVESTMENTS",
-                title: "Research more than stocks.",
-                text: "Explore mutual funds, ETFs and REITs with product-specific research covering NAV, returns, TER, holdings, tracking error, liquidity, occupancy, WALE, NDCF, AFFO, leverage and valuation.",
-                link: "/investments",
-                cta: "Explore investments",
-              },
-              {
-                icon: ScanLine,
-                tag: "FILTERS",
-                title: "Turn an idea into a shortlist.",
-                text: "Browse data-backed stock filters across value, growth, quality, income, momentum, market cap, leverage, ROE/ROCE, valuation, sectors, indices and exchanges.",
-                link: "/stock-filters",
-                cta: "Browse stock filters",
-              },
-              {
-                icon: Radar,
-                tag: "TRADING",
-                title: "Understand the risk before the signal.",
-                text: "Learn position sizing, stops, reward-to-risk and expectancy, then go deeper into crypto spot vs futures, leverage, liquidation, custody, forex pips, spreads and macro drivers.",
-                link: "/trading",
-                cta: "Open trading guides",
-              },
-              {
-                icon: Globe2,
-                tag: "COMMODITIES",
-                title: "Follow the markets around the stock.",
-                text: "Track research for gold, silver, crude oil, natural gas and copper with timestamped prices, trend context and links into deeper technical analysis.",
-                link: "/commodities",
-                cta: "Explore commodities",
-              },
-              {
-                icon: Activity,
-                tag: "GIFT NIFTY",
-                title: "Read the pre-market context carefully.",
-                text: "Understand GIFT Nifty, NSE IX, trading-session context, futures basis and how the contract is commonly used as an indication—not a guarantee—of the Nifty 50 open.",
-                link: "/gift-nifty",
-                cta: "Explore GIFT Nifty",
-              },
-              {
-                icon: Newspaper,
-                tag: "CONTEXT",
-                title: "Connect the headlines.",
-                text: "Company news and broader market feeds bring current developments alongside the businesses and markets you research.",
-                link: "/screener",
-                cta: "Explore market context",
-              },
-              {
-                icon: CalendarDays,
-                tag: "CALENDAR",
-                title: "See what can move the market next.",
-                text: "Use the economic calendar and scheduled market events to understand when macro releases, earnings and other catalysts can change volatility.",
-                link: "/calendar",
-                cta: "Open the calendar",
-              },
-              {
-                icon: Rocket,
-                tag: "IPO",
-                title: "Research the next listing.",
-                text: "Explore the IPO pipeline, offering context, valuation and risk research, plus a dedicated guide explaining IPO GMP, its formula and its limitations.",
-                link: "/ipo",
-                cta: "Explore IPO research",
-              },
-              {
-                icon: Radar,
-                tag: "DUE DILIGENCE",
-                title: "Ask the harder questions.",
-                text: "Use forensic checks, risk explanations, peer analysis, methodology, source notes and the research checklist to challenge the first conclusion.",
-                link: "/research-checklist",
-                cta: "Open the research checklist",
-              },
-              {
-                icon: BellRing,
-                tag: "MY STOCKS",
-                title: "Keep your ideas close.",
-                text: "Save companies to your research workspace, revisit holdings and watchlists, review portfolio context and keep related research together.",
-                link: "/portfolio",
-                cta: "Open My Stocks",
-              },
-              {
-                icon: Layers3,
-                tag: "RESEARCH DESK",
-                title: "Organise the work behind the decision.",
-                text: "Keep watchlists, notes, source documents and manually entered holdings together with local backup and export workflows.",
-                link: "/research-desk",
-                cta: "Open Research Desk",
-              },
-              {
-                icon: BookOpen,
-                tag: "KNOWLEDGE",
-                title: "Build your own conviction.",
-                text: "Use ratio explainers, learning guides, source-backed blogs, FAQs and the public knowledge index covering stocks, DeepChart, trading, crypto, forex and personal finance.",
-                link: "/knowledge",
-                cta: "Explore the knowledge hub",
-              },
-            ].map(({ icon: Icon, ...item }) => (
-              <article key={item.tag} className="ds-feature-small" data-reveal>
-                <div className="ds-card-heading">
-                  <Icon size={22} />
-                  <span className="ds-tag">{item.tag}</span>
+          <div className="ds-visual-showcase" aria-label="Interactive DeepScreen feature showcase">
+            {FEATURE_SCENES.map(({ kind, icon: Icon, tag, title, text, link, cta }, index) => (
+              <article
+                key={kind}
+                className={`ds-visual-feature ${index % 2 ? "is-reversed" : ""}`}
+                data-reveal
+                tabIndex={0}
+              >
+                <div className="ds-visual-stage" aria-hidden="true">
+                  <FeatureScene kind={kind} />
                 </div>
-                <h3>{item.title}</h3>
-                <p>{item.text}</p>
-                <Link to={item.link} className="ds-text-link">
-                  {item.cta} <ArrowUpRight size={15} />
-                </Link>
+                <div className="ds-visual-copy">
+                  <div className="ds-card-heading">
+                    <Icon size={22} />
+                    <span className="ds-tag">{tag}</span>
+                  </div>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
+                  <Link to={link} className="ds-text-link">
+                    {cta} <ArrowUpRight size={15} />
+                  </Link>
+                </div>
               </article>
             ))}
           </div>
