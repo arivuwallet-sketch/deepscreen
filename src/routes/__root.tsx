@@ -15,6 +15,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { GlobalStardust } from "@/components/ds/GlobalStardust";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { DEEPSCREEN_META_DESCRIPTION, DEEPSCREEN_TITLE } from "@/lib/seo/brand";
 
 const FONT_CSS =
   "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=optional";
@@ -106,11 +107,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   staticData: { sitemap: false },
   head: () => ({
     meta: [
-      { title: "DeepScreen — Beginner Stock Research & Financial Analysis" },
-      { name: "description", content: "DeepScreen is a beginner-first stock research platform that explains financial ratios, highlights potential traps and guides you through fundamental analysis across India, the US and the UK." },
+      { title: DEEPSCREEN_TITLE },
+      { name: "description", content: DEEPSCREEN_META_DESCRIPTION },
       { name: "author", content: "DeepScreen" },
-      { property: "og:title", content: "DeepScreen — Beginner Stock Research & Financial Analysis" },
-      { property: "og:description", content: "Understand stocks before you trust the numbers. DeepScreen explains ratios, potential traps, company fundamentals and research questions across NSE, BSE, NYSE, Nasdaq and LSE." },
+      { property: "og:title", content: DEEPSCREEN_TITLE },
+      { property: "og:description", content: DEEPSCREEN_META_DESCRIPTION },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "index, follow" },

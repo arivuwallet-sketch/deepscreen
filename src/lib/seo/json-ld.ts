@@ -27,6 +27,8 @@
 // Shared types & constants
 // ---------------------------------------------------------------------------
 
+import { DEEPSCREEN_ENTITY_DESCRIPTION, DEEPSCREEN_NAME } from "@/lib/seo/brand";
+
 export type JsonLdNode = Record<string, unknown>;
 
 export type ExchangeCode = "NSE" | "BSE" | "NYSE" | "NASDAQ" | "LSE";
@@ -53,7 +55,7 @@ const EXCHANGE_FULL_NAME: Record<ExchangeCode, string> = {
 };
 
 export const SITE_URL = "https://deepscreen.online";
-const SITE_NAME = "DeepScreen";
+const SITE_NAME = DEEPSCREEN_NAME;
 // Reused from the site's own og:image meta tag.
 const LOGO_URL =
   "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/lovp_1bxwyvrx5d8g39th060zayanwg/238b95339aa378e8d867ec5f57431dea_1789717752670.png";
@@ -67,14 +69,13 @@ export function buildOrganizationSchema(): JsonLdNode {
     "@type": "Organization",
     "@id": `${SITE_URL}/#organization`,
     name: SITE_NAME,
-    alternateName: ["DeepScreen Stock Research", "DeepScreen Stock Screener"],
+    alternateName: ["DeepScreen Stock Screener", "DeepScreen Investment Research"],
     url: SITE_URL,
     logo: {
       "@type": "ImageObject",
       url: LOGO_URL,
     },
-    description:
-      "Beginner-first stock and investment research platform covering supported equities across NSE, BSE, NYSE, Nasdaq and LSE plus mutual funds, ETFs and REITs. DeepScreen explains financial ratios, fund costs and tracking, REIT cash-flow metrics, research questions and data limitations.",
+    description: DEEPSCREEN_ENTITY_DESCRIPTION,
     founder: {
       "@type": "Person",
       name: "Sooraj",
@@ -130,9 +131,8 @@ export function buildWebSiteSchema(): JsonLdNode {
     url: SITE_URL,
     publisher: { "@id": `${SITE_URL}/#organization` },
     inLanguage: "en",
-    alternateName: "DeepScreen Stock Research",
-    description:
-      "The official DeepScreen website for beginner-first stock and investment research, including financial-ratio analysis, mutual funds, ETFs, REITs and supported Indian, US and UK listings.",
+    alternateName: ["DeepScreen Stock Screener", "DeepScreen Investment Research"],
+    description: DEEPSCREEN_ENTITY_DESCRIPTION,
     about: { "@id": `${SITE_URL}/#organization` },
     keywords: [
       "DeepScreen",
@@ -172,7 +172,7 @@ export function buildWebApplicationSchema(app: WebApplicationFacts): JsonLdNode 
     "@type": "WebApplication",
     "@id": `${app.url}#application`,
     name: app.name,
-    alternateName: ["DeepScreen Stock Research", "DeepScreen Stock Screener"],
+    alternateName: ["DeepScreen Stock Screener", "DeepScreen Investment Research"],
     url: app.url,
     applicationCategory: "FinanceApplication",
     operatingSystem: "Web browser",
@@ -181,7 +181,7 @@ export function buildWebApplicationSchema(app: WebApplicationFacts): JsonLdNode 
     description: app.description,
     audience: {
       "@type": "Audience",
-      audienceType: "Beginner investors and people learning fundamental stock research",
+      audienceType: "Investors and researchers using global stock screening and investment research tools",
     },
     ...(app.featureList?.length ? { featureList: app.featureList } : {}),
   };

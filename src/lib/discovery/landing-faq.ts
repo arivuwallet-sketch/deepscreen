@@ -1,5 +1,9 @@
 export const LANDING_FAQS = [
   [
+    "What is DeepScreen?",
+    "DeepScreen is a global stock screener and investment research platform covering NSE, BSE, NYSE, Nasdaq and LSE. It combines fundamental analysis, valuation, market context, investment research tools and education in one workspace.",
+  ],
+  [
     "What can I do with DeepScreen?",
     "Screen stocks across five exchanges, compare financial ratios, explore model scores, investigate company risks and peers, use valuation calculators, and connect your research with news, IPOs and economic events.",
   ],

@@ -568,3 +568,26 @@ test('high-intent search keyword clusters stay mapped to their relevant pages', 
   assert.ok(routes.ipoGmp.includes('IPO GMP Calculator & Guide'));
 });
 
+
+
+test('DeepScreen brand identity stays consistent across search and AI discovery surfaces', async () => {
+  const brand = await readFile(new URL('../src/lib/seo/brand.ts', import.meta.url), 'utf8');
+  const home = await readFile(new URL('../src/routes/index.tsx', import.meta.url), 'utf8');
+  const root = await readFile(new URL('../src/routes/__root.tsx', import.meta.url), 'utf8');
+  const landing = await readFile(new URL('../src/components/landing/LandingPage.tsx', import.meta.url), 'utf8');
+  const schema = await readFile(new URL('../src/lib/seo/json-ld.ts', import.meta.url), 'utf8');
+  const llms = await readFile(new URL('../public/llms.txt', import.meta.url), 'utf8');
+  const llmsFull = await readFile(new URL('../public/llms-full.txt', import.meta.url), 'utf8');
+
+  assert.match(brand, /DeepScreen — Global Stock Screener & Investment Research/);
+  assert.match(brand, /DeepScreen is a global stock screener and investment research platform covering NSE, BSE, NYSE, Nasdaq and LSE/);
+  assert.match(home, /DEEPSCREEN_TITLE/);
+  assert.match(root, /DEEPSCREEN_TITLE/);
+  assert.match(landing, /DEEPSCREEN_ENTITY_SENTENCE/);
+  assert.match(schema, /DEEPSCREEN_ENTITY_DESCRIPTION/);
+  assert.match(llms, /# DeepScreen — Global Stock Screener & Investment Research/);
+  assert.match(llmsFull, /# DeepScreen — Global Stock Screener & Investment Research/);
+  assert.doesNotMatch(root, /Beginner Stock Research & Financial Analysis/);
+  assert.doesNotMatch(llms, /beginner-first stock-research and financial-analysis platform/i);
+  assert.doesNotMatch(llmsFull, /beginner-first stock-research and financial-analysis platform/i);
+});
