@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 const KEY = "deepscreen-motion-paused";
+const EVENT = "deepscreen-motion-preference";
 
 /** Hydration-safe, shared preference for the landing page and research workspace. */
 export function useMotionPreference() {
@@ -14,17 +15,26 @@ export function useMotionPreference() {
     const sync = (event: StorageEvent) => {
       if (event.key === KEY) setPaused(event.newValue === "true");
     };
+    const syncLocal = (event: Event) => {
+      setPaused(Boolean((event as CustomEvent<boolean>).detail));
+    };
     window.addEventListener("storage", sync);
-    return () => window.removeEventListener("storage", sync);
+    window.addEventListener(EVENT, syncLocal);
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener(EVENT, syncLocal);
+    };
   }, []);
   const toggle = () =>
     setPaused((value) => {
+      const next = !value;
       try {
-        window.localStorage.setItem(KEY, String(!value));
+        window.localStorage.setItem(KEY, String(next));
       } catch {
         /* Private browsing remains usable. */
       }
-      return !value;
+      window.dispatchEvent(new CustomEvent<boolean>(EVENT, { detail: next }));
+      return next;
     });
   return { paused, toggle };
 }
