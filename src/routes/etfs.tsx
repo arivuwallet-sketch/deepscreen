@@ -3,6 +3,7 @@ import { getInvestmentAnalysis } from "@/lib/market/investment-analysis.function
 import { createFileRoute } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
 import { InvestmentTopicGuide } from "@/components/ds/InvestmentTopicGuide";
+import { LiveNewsFeed } from "@/components/ds/LiveNewsFeed";
 import { faqForType } from "@/lib/seo/investment-faq";
 import { etfKeywords, metaKeywords } from "@/lib/seo/keywords";
 import { buildBreadcrumbSchema, buildFAQSchema, buildGraph, buildOrganizationSchema, buildWebPageSchema, buildWebSiteSchema, jsonLd } from "@/lib/seo/json-ld";
@@ -53,6 +54,20 @@ function TopicPage() {
   return (
     <Shell>
       <InvestmentTopicGuide type="ETF" initialData={Route.useLoaderData()} />
+      <div className="mx-auto max-w-6xl px-5 pb-12 sm:px-8 sm:pb-16">
+        <LiveNewsFeed
+          query="ETF exchange traded funds markets"
+          title="Latest ETF news"
+          limit={30}
+          maxAgeHours={24}
+          mode="etf"
+          showCategory
+        />
+        <p className="mt-3 text-xs text-muted-foreground">
+          The feed combines multiple topic searches and providers, keeps only verified publication
+          times from the last 24 hours, and checks for newer headlines every 30 seconds while open.
+        </p>
+      </div>
     </Shell>
   );
 }
