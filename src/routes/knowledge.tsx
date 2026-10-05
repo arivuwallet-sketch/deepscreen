@@ -1,9 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
-import {
-  LEGACY_BLOGS,
-  knowledgeGroups,
-} from "@/lib/discovery/knowledge-index";
+import { knowledgeGroups } from "@/lib/discovery/knowledge-index";
+import { LEGACY_BLOGS } from "@/lib/discovery/legacy-blog";
 import { INVESTMENT_BLOG_POSTS } from "@/lib/content/investment-blog";
 import {
   buildBreadcrumbSchema,
