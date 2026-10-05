@@ -327,9 +327,9 @@ export function LandingPage() {
                 <em>the noise.</em>
               </h1>
               <p className="ds-lead">
-                Research stocks across India, the US and the UK.
-                <br className="ds-desktop-break" /> Go deeper with powerful fundamentals, meaningful
-                market context and tools that put you in control.
+                Screen and research stocks across India, the US and the UK.
+                <br className="ds-desktop-break" /> Move from fundamentals to DeepChart technicals,
+                funds, ETFs, REITs, options, market context and research education in one workspace.
               </p>
               <div className="ds-hero-actions">
                 <StartButton />
@@ -468,8 +468,8 @@ export function LandingPage() {
               </h2>
             </div>
             <p>
-              From the first screen to the deeper questions.
-              <br />A complete set of tools for your own research process.
+              From the first screen to fundamentals, technicals, funds, derivatives and the deeper questions.
+              <br />A connected toolkit for researching markets without jumping between disconnected apps.
             </p>
           </div>
           <div className="ds-toolkit-workspace" data-reveal>
@@ -483,9 +483,9 @@ export function LandingPage() {
                 the whole business.
               </h3>
               <p>
-                Go from a stock to its story. Explore the score out of 100, strengths, risk flags,
-                peer comparisons and holding-plan context. Dig into the financial inputs and company
-                profile behind each result.
+                Go from discovery to a complete research trail. Screen companies, inspect the
+                13-factor score and raw fundamentals, compare peers, test valuation assumptions,
+                read source context, then continue into DeepChart, market events and your own watchlist.
               </p>
               <a href="/screener" className="ds-text-link">
                 Open the research workspace <ArrowUpRight size={16} />
@@ -597,8 +597,9 @@ export function LandingPage() {
                 of your risk.
               </h3>
               <p>
-                Compare options strategies, Greeks, breakevens and payoff diagrams. Examine calls,
-                puts, spreads, strangles, collars and butterflies.
+                Model 12 options strategies with Black-Scholes-Merton Greeks, breakevens, payoff
+                diagrams, max profit/loss and probability-of-profit estimates using provider or
+                scenario spot inputs.
               </p>
               <OptionsDemo />
               <Link to="/options" className="ds-text-link">
@@ -609,52 +610,100 @@ export function LandingPage() {
           <div className="ds-small-grid">
             {[
               {
+                icon: Activity,
+                tag: "DEEPCHART",
+                title: "Read the chart, not just the candle.",
+                text: "Analyze stocks, indices, crypto, forex and commodities with market structure, EMA 20/50/200, RSI, ADX, ATR, VWAP, Supertrend, Fibonacci, volume profile, liquidity zones, order blocks, fair-value gaps and higher-timeframe context.",
+                link: "/chart-reader",
+                cta: "Open DeepChart",
+              },
+              {
+                icon: Layers3,
+                tag: "INVESTMENTS",
+                title: "Research more than stocks.",
+                text: "Explore mutual funds, ETFs and REITs with product-specific research covering NAV, returns, TER, holdings, tracking error, liquidity, occupancy, WALE, NDCF, AFFO, leverage and valuation.",
+                link: "/investments",
+                cta: "Explore investments",
+              },
+              {
+                icon: ScanLine,
+                tag: "FILTERS",
+                title: "Turn an idea into a shortlist.",
+                text: "Browse data-backed stock filters across value, growth, quality, income, momentum, market cap, leverage, ROE/ROCE, valuation, sectors, indices and exchanges.",
+                link: "/stock-filters",
+                cta: "Browse stock filters",
+              },
+              {
+                icon: Radar,
+                tag: "TRADING",
+                title: "Understand the risk before the signal.",
+                text: "Learn position sizing, stops, reward-to-risk and expectancy, then go deeper into crypto spot vs futures, leverage, liquidation, custody, forex pips, spreads and macro drivers.",
+                link: "/trading",
+                cta: "Open trading guides",
+              },
+              {
+                icon: Globe2,
+                tag: "MARKETS",
+                title: "Follow the markets around the stock.",
+                text: "Track commodity research for gold, silver, crude oil, natural gas and copper, understand GIFT Nifty context, and connect broader market conditions back to your research.",
+                link: "/commodities",
+                cta: "Explore market guides",
+              },
+              {
                 icon: Newspaper,
                 tag: "CONTEXT",
                 title: "Connect the headlines.",
-                text: "Company news and broader market feeds bring the day's developments alongside the businesses you research.",
+                text: "Company news and broader market feeds bring current developments alongside the businesses and markets you research.",
                 link: "/screener",
-                cta: "Explore market news",
+                cta: "Explore market context",
               },
               {
                 icon: CalendarDays,
-                tag: "TIMING",
-                title: "See what's ahead.",
-                text: "An economic calendar, earnings events and dividends help you connect company research with the wider market schedule.",
+                tag: "CALENDAR",
+                title: "See what can move the market next.",
+                text: "Use the economic calendar and scheduled market events to understand when macro releases, earnings and other catalysts can change volatility.",
                 link: "/calendar",
                 cta: "Open the calendar",
               },
               {
                 icon: Rocket,
-                tag: "DISCOVERY",
-                title: "Follow the next chapter.",
-                text: "Explore the IPO pipeline, offering details and available research context before a new name becomes familiar.",
+                tag: "IPO",
+                title: "Research the next listing.",
+                text: "Explore the IPO pipeline, offering context, valuation and risk research, plus a dedicated guide explaining IPO GMP, its formula and its limitations.",
                 link: "/ipo",
-                cta: "Explore upcoming IPOs",
+                cta: "Explore IPO research",
               },
               {
                 icon: Radar,
                 tag: "DUE DILIGENCE",
                 title: "Ask the harder questions.",
-                text: "Forensic checks, risk explanations and peer analysis help you investigate accounting quality, business resilience and valuation traps.",
+                text: "Use forensic checks, risk explanations, peer analysis, methodology, source notes and the research checklist to challenge the first conclusion.",
                 link: "/research-checklist",
                 cta: "Open the research checklist",
               },
               {
                 icon: BellRing,
-                tag: "YOUR WORKSPACE",
+                tag: "MY STOCKS",
                 title: "Keep your ideas close.",
-                text: "Organise stocks in your watchlist, revisit your research and explore score-change tracking and research alerts where available.",
+                text: "Save companies to your research workspace, revisit holdings and watchlists, review portfolio context and keep related research together.",
                 link: "/portfolio",
                 cta: "Open My Stocks",
               },
               {
+                icon: Layers3,
+                tag: "RESEARCH DESK",
+                title: "Organise the work behind the decision.",
+                text: "Keep watchlists, notes, source documents and manually entered holdings together with local backup and export workflows.",
+                link: "/research-desk",
+                cta: "Open Research Desk",
+              },
+              {
                 icon: BookOpen,
-                tag: "UNDERSTANDING",
+                tag: "KNOWLEDGE",
                 title: "Build your own conviction.",
-                text: "Plain-language ratio explanations, investing guides and company-research questions help you understand the why behind the numbers.",
-                link: "/learn",
-                cta: "Explore the learning hub",
+                text: "Use ratio explainers, learning guides, source-backed blogs, FAQs and the public knowledge index covering stocks, DeepChart, trading, crypto, forex and personal finance.",
+                link: "/knowledge",
+                cta: "Explore the knowledge hub",
               },
             ].map(({ icon: Icon, ...item }) => (
               <article key={item.tag} className="ds-feature-small" data-reveal>
@@ -690,12 +739,12 @@ export function LandingPage() {
               [
                 "02",
                 "Understand",
-                "Unpack the score, explore financials, read the news and test your valuation assumptions.",
+                "Unpack the score and raw fundamentals, compare peers, test valuation, read the news and use DeepChart when technical context matters.",
               ],
               [
                 "03",
                 "Make it yours",
-                "Compare peers, study the downside and build a watchlist around your own research and objectives.",
+                "Connect market events, options, funds and risk research, then organise the companies and ideas that matter in My Stocks or Research Desk.",
               ],
             ].map(([number, title, text]) => (
               <div key={number} data-reveal>
