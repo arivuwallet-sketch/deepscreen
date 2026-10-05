@@ -15,6 +15,7 @@ import { EXCHANGES } from "@/lib/deepscreen/exchanges";
 import { STOCKS } from "@/lib/deepscreen/stocks";
 import { NewsletterForm } from "@/components/ds/NewsletterForm";
 import { MarketMovers } from "@/components/ds/MarketMovers";
+import { MarketIndexMarquee } from "@/components/ds/MarketIndexMarquee";
 import { SCREENER_ANSWERS } from "@/lib/discovery/answers";
 
 export const Route = createFileRoute("/screener")({
@@ -115,6 +116,8 @@ function Home() {
           </div>
         </div>
       </section>
+
+      <MarketIndexMarquee />
 
       <div className="mx-auto max-w-7xl space-y-10 px-4 py-10">
         <section>
