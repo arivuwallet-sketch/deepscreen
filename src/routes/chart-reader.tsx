@@ -26,15 +26,15 @@ export const Route = createFileRoute("/chart-reader")({
   staticData: { sitemap: true },
   head: () => ({
     meta: [
-      { title: "DeepChart — Technical Analysis for Stocks, Forex, Crypto & Commodities | DeepScreen" },
+      { title: "Technical Analysis Charts for Stocks, Crypto & Forex | DeepChart" },
       {
         name: "description",
         content:
-          "DeepChart is DeepScreen’s technical analysis workspace for market structure, support and resistance, momentum, divergence, Fibonacci and multi-timeframe context. Educational analysis only; no guaranteed outcomes.",
+          "Analyze stocks, crypto, forex, indices and commodities with market structure, support and resistance, RSI, EMA, VWAP, Fibonacci, volume profile, liquidity and multi-timeframe context.",
       },
       { name: "keywords", content: metaKeywords(deepChartKeywords, tradingKeywords, cryptoTradingKeywords, forexTradingKeywords) },
       { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" },
-      { property: "og:title", content: "DeepChart — Live Technical Analysis | DeepScreen" },
+      { property: "og:title", content: "Technical Analysis Charts for Stocks, Crypto & Forex | DeepChart" },
       {
         property: "og:description",
         content:
