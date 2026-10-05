@@ -24,7 +24,7 @@ function StatusPill({ s }: { s: PlaybookSetup["status"] }) {
 function SetupCard({ s }: { s: PlaybookSetup }) {
   const passed = s.checks.filter((c) => c.pass).length;
   return (
-    <section className="rounded-md border border-border bg-card/60 p-4">
+    <section className="ds-cr-subcard p-4">
       <div className="mb-1 flex items-center justify-between gap-2">
         <div className="ds-eyebrow">{s.name}</div>
         <StatusPill s={s.status} />
@@ -97,9 +97,9 @@ export function PlaybookPanel({ pb }: { pb: Playbook }) {
   ];
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-border/70 bg-border/40 sm:grid-cols-4">
         {tiles.map((t) => (
-          <div key={t.k} className="bg-card p-3">
+          <div key={t.k} className="bg-panel/80 p-3">
             <div className="ds-eyebrow">{t.k}</div>
             <div className={cn("mt-1 font-mono text-sm", t.c)}>{t.v}</div>
           </div>

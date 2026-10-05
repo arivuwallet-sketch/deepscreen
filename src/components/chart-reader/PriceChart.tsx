@@ -64,13 +64,13 @@ export function PriceChart({ candles, analysis }: { candles: Candle[]; analysis:
       line(analysis.series.ema20, T.ema20, 20);
       line(analysis.series.ema50, T.ema50, 50);
       if (candles.length > 200) line(analysis.series.ema200, T.ema200, 200);
-      line(analysis.series.vwap, "#f97316", 20);
-      line(analysis.series.supertrend, "#14b8a6", 11);
+      line(analysis.series.vwap, "#d1b66f", 20);
+      line(analysis.series.supertrend, "#7bd7a2", 11);
 
       for (const p of analysis.pools)
         s.createPriceLine({
           price: p.price,
-          color: "#c084fc",
+          color: "#8fb7a3",
           lineWidth: 1,
           lineStyle: LW.LineStyle.Dashed,
           axisLabelVisible: false,
@@ -79,7 +79,7 @@ export function PriceChart({ candles, analysis }: { candles: Candle[]; analysis:
       if (analysis.profile) {
         s.createPriceLine({
           price: analysis.profile.poc,
-          color: "#eab308",
+          color: "#d1b66f",
           lineWidth: 1,
           lineStyle: LW.LineStyle.Solid,
           axisLabelVisible: false,
@@ -87,7 +87,7 @@ export function PriceChart({ candles, analysis }: { candles: Candle[]; analysis:
         });
         s.createPriceLine({
           price: analysis.profile.vah,
-          color: "#eab308",
+          color: "#d1b66f",
           lineWidth: 1,
           lineStyle: LW.LineStyle.SparseDotted,
           axisLabelVisible: false,
@@ -95,7 +95,7 @@ export function PriceChart({ candles, analysis }: { candles: Candle[]; analysis:
         });
         s.createPriceLine({
           price: analysis.profile.val,
-          color: "#eab308",
+          color: "#d1b66f",
           lineWidth: 1,
           lineStyle: LW.LineStyle.SparseDotted,
           axisLabelVisible: false,
@@ -151,7 +151,7 @@ export function PriceChart({ candles, analysis }: { candles: Candle[]; analysis:
         });
       pl(p.entry, T.entry, "ENTRY");
       if (p.deepEntry != null)
-        pl(p.deepEntry, T.info ?? "#38bdf8", "DEEP", LW.LineStyle.SparseDotted);
+        pl(p.deepEntry, T.info ?? "#9eb8ad", "DEEP", LW.LineStyle.SparseDotted);
       pl(p.stop, T.stop, "SL");
       pl(p.tp1, T.tp, "TP1", LW.LineStyle.Dashed);
       pl(p.tp2, T.tp, "TP2", LW.LineStyle.Dashed);

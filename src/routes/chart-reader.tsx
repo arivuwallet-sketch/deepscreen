@@ -2,12 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { lazy, Suspense, useMemo, useState } from "react";
+import { Activity, Crosshair, Layers3, Radio, Search } from "lucide-react";
 import { getCandles, TIMEFRAMES, type Timeframe } from "@/lib/chart-reader/market.functions";
 import { analyze, fmtPrice, trendBias, type Bias } from "@/lib/chart-reader/analysis";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlaybookPanel } from "@/components/chart-reader/PlaybookPanel";
 import { Shell } from "@/components/ds/Shell";
+import "@/components/chart-reader/chart-reader.css";
 
 const PriceChart = lazy(() =>
   import("@/components/chart-reader/PriceChart").then((m) => ({ default: m.PriceChart })),
@@ -135,161 +137,209 @@ function Index() {
 
   return (
     <Shell>
-      <div className="min-h-screen">
-      {/* Top bar */}
-      <header className="border-b border-border bg-background/85 backdrop-blur-md">
-        <div className="mx-auto flex max-w-[1680px] flex-wrap items-center gap-x-6 gap-y-3 px-5 py-3">
-          <div className="flex items-baseline gap-2">
-            <span className="font-serif text-3xl italic leading-none">Chart Reader</span>
-            <span className="h-1.5 w-1.5 translate-y-[-2px] rounded-full bg-primary" />
-          </div>
-          <nav className="flex items-center gap-1 overflow-x-auto">
-            {MARKETS.map((g) => (
-              <button
-                key={g.group}
-                onClick={() => setGroup(g.group)}
-                className={cn(
-                  "rounded-full px-3.5 py-1.5 text-sm font-medium transition",
-                  group === g.group
-                    ? "bg-foreground text-background"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {g.group}
-              </button>
-            ))}
-          </nav>
-          <form
-            className="ml-auto flex items-center gap-2 rounded-full border border-input bg-secondary py-1 pl-4 pr-1 transition focus-within:border-ring"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (custom.trim()) setSymbol(custom.trim().toUpperCase());
-            }}
-          >
-            <input
-              value={custom}
-              onChange={(e) => setCustom(e.target.value)}
-              placeholder="Search any symbol — MSFT, TCS.NS, AUDUSD=X"
-              className="w-64 bg-transparent font-mono text-xs outline-none placeholder:text-muted-foreground/70"
-            />
-            <button className="rounded-full bg-primary px-4 py-1.5 text-xs font-bold text-primary-foreground transition hover:brightness-105 active:scale-95">
-              Read chart
-            </button>
-          </form>
-        </div>
-        {/* Instrument strip */}
-        <div className="border-t border-border">
-          <div className="mx-auto flex max-w-[1680px] gap-2 overflow-x-auto px-5 py-2">
-            {groupItems.map(([s, n]) => (
-              <button
-                key={s}
-                onClick={() => setSymbol(s)}
-                className={cn(
-                  "flex shrink-0 items-center gap-2 rounded-md border px-3 py-1.5 text-sm transition",
-                  symbol === s
-                    ? "border-primary/60 bg-primary/10 text-foreground"
-                    : "border-border text-muted-foreground hover:border-foreground/20 hover:text-foreground",
-                )}
-              >
-                <span className="font-semibold">{n}</span>
-                <span className="font-mono text-[10px] opacity-70">{s}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </header>
-
-      <div className="mx-auto grid max-w-[1680px] gap-5 px-5 py-6 xl:grid-cols-[minmax(0,1fr)_400px]">
-        <section className="flex min-w-0 flex-col gap-5">
-          {/* Instrument header */}
-          <div className="flex flex-wrap items-end gap-x-8 gap-y-4">
-            <div className="min-w-0">
-              <div className="ds-eyebrow mb-1">
-                {main.data?.type ?? "Market"} · {symbol}
-              </div>
-              <h1 className="font-serif truncate text-5xl leading-none">
-                {known?.[1] ?? main.data?.name ?? symbol}
+      <div className="ds-chart-reader">
+        <section className="ds-cr-intro ds-enter">
+          <div className="ds-cr-intro-inner">
+            <div className="ds-cr-intro-copy">
+              <p className="ds-eyebrow">
+                <span aria-hidden="true" />
+                Live technical workspace
+              </p>
+              <h1>
+                Read the chart.
+                <br />
+                <em>See the structure.</em>
               </h1>
+              <p>
+                A technical reading layer for stocks, indices, forex, crypto and commodities.
+                DeepScreen combines market structure, momentum, liquidity, volatility and
+                multi-timeframe context into one explainable workspace.
+              </p>
             </div>
-            {last && (
-              <div className="flex items-end gap-3">
-                <div className="font-mono text-4xl font-medium leading-none tabular-nums">
-                  {fmtPrice(last.close)}
-                </div>
-                <span
-                  className={cn(
-                    "rounded-full px-2.5 py-1 font-mono text-xs font-semibold",
-                    chg >= 0 ? "bg-bull/15 text-bull" : "bg-bear/15 text-bear",
-                  )}
-                >
-                  {chg >= 0 ? "▲ +" : "▼ "}
-                  {chg.toFixed(2)}%
-                </span>
-                <span className="pb-1 font-mono text-[10px] uppercase text-muted-foreground">
-                  {main.data?.currency}
-                </span>
+            <div className="ds-cr-intro-metrics" aria-label="Chart reader coverage">
+              <div>
+                <Activity size={16} />
+                <span>5</span>
+                <small>market groups</small>
               </div>
-            )}
-            <div className="ml-auto flex items-center gap-4">
-              <div className="flex items-center gap-1.5 font-mono text-[11px] text-muted-foreground">
-                <span className="animate-pulse h-1.5 w-1.5 rounded-full bg-bull" />
-                Live · {refresh / 1000}s
+              <div>
+                <Layers3 size={16} />
+                <span>{TIMEFRAMES.length}</span>
+                <small>timeframes</small>
               </div>
-              <div className="flex rounded-lg border border-border p-0.5">
-                {TIMEFRAMES.map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setTf(t)}
-                    className={cn(
-                      "rounded-md px-3 py-1 font-mono text-xs transition",
-                      tf === t
-                        ? "bg-primary font-semibold text-primary-foreground"
-                        : "text-muted-foreground hover:bg-accent hover:text-foreground",
-                    )}
-                  >
-                    {t}
-                  </button>
-                ))}
+              <div>
+                <Crosshair size={16} />
+                <span>HTF</span>
+                <small>confirmation</small>
               </div>
             </div>
           </div>
-
-          {/* Chart */}
-          <div className="rounded-xl border border-border bg-panel h-[600px] overflow-hidden">
-            {main.isError ? (
-              <div className="flex h-full items-center justify-center p-6 text-center text-sm text-bear">
-                {(main.error as Error).message}. Check the symbol and try again.
-              </div>
-            ) : !analysis || !main.data ? (
-              <div className="flex h-full flex-col items-center justify-center gap-3 text-muted-foreground">
-                <span className="font-serif text-2xl italic">
-                  {main.isLoading ? "Reading the tape…" : "Not enough history to analyze."}
-                </span>
-              </div>
-            ) : (
-              <Suspense fallback={null}>
-                <PriceChart candles={main.data.candles} analysis={analysis} />
-              </Suspense>
-            )}
-          </div>
-
-          {analysis && <Details a={analysis} htf={htfTf} />}
         </section>
 
-        <aside className="flex flex-col gap-5 xl:sticky xl:top-[124px] xl:h-fit">
-          {analysis ? (
-            <TradeTicket a={analysis} />
-          ) : (
-            <div className="rounded-xl border border-border bg-panel p-6 text-sm text-muted-foreground">
-              The trade plan appears once data loads.
+        <div className="ds-cr-workspace">
+          <section className="ds-cr-command-bar" aria-label="Chart reader controls">
+            <div className="ds-cr-market-tabs" role="group" aria-label="Market groups">
+              {MARKETS.map((market) => (
+                <button
+                  type="button"
+                  key={market.group}
+                  aria-pressed={group === market.group}
+                  onClick={() => setGroup(market.group)}
+                >
+                  {market.group}
+                </button>
+              ))}
             </div>
-          )}
-        </aside>
-      </div>
-      <footer className="mx-auto max-w-[1680px] border-t border-border px-5 py-6 text-xs text-muted-foreground">
-        Educational analysis, not financial advice. No method is 100% accurate — always size
-        positions so a stop-out is affordable. Free data may be delayed by the exchange.
-      </footer>
+            <form
+              className="ds-cr-symbol-search"
+              onSubmit={(event) => {
+                event.preventDefault();
+                if (custom.trim()) setSymbol(custom.trim().toUpperCase());
+              }}
+            >
+              <Search size={15} aria-hidden="true" />
+              <input
+                value={custom}
+                onChange={(event) => setCustom(event.target.value)}
+                placeholder="Search symbol — MSFT, TCS.NS, AUDUSD=X"
+                aria-label="Search market symbol"
+              />
+              <button type="submit">Read chart</button>
+            </form>
+          </section>
+
+          <div className="ds-cr-instrument-strip" aria-label={`${group} instruments`}>
+            {groupItems.map(([itemSymbol, name]) => (
+              <button
+                type="button"
+                key={itemSymbol}
+                aria-pressed={symbol === itemSymbol}
+                onClick={() => setSymbol(itemSymbol)}
+              >
+                <span>{name}</span>
+                <small>{itemSymbol}</small>
+              </button>
+            ))}
+          </div>
+
+          <div className="ds-cr-layout">
+            <section className="ds-cr-main-column">
+              <div className="ds-cr-market-header">
+                <div className="ds-cr-security">
+                  <p className="ds-eyebrow">
+                    <span aria-hidden="true" />
+                    {main.data?.type ?? "Market"} · {symbol}
+                  </p>
+                  <h2>{known?.[1] ?? main.data?.name ?? symbol}</h2>
+                </div>
+
+                {last && (
+                  <div className="ds-cr-quote">
+                    <strong>{fmtPrice(last.close)}</strong>
+                    <span
+                      className={cn(
+                        "ds-cr-change",
+                        chg >= 0 ? "is-positive" : "is-negative",
+                      )}
+                    >
+                      {chg >= 0 ? "▲ +" : "▼ "}
+                      {chg.toFixed(2)}%
+                    </span>
+                    <small>{main.data?.currency}</small>
+                  </div>
+                )}
+
+                <div className="ds-cr-market-tools">
+                  <div className="ds-cr-live-status">
+                    <Radio size={13} aria-hidden="true" />
+                    <span>{main.isFetching ? "Refreshing" : "Live"}</span>
+                    <small>{refresh / 1000}s</small>
+                  </div>
+                  <div className="ds-cr-timeframes" role="group" aria-label="Chart timeframe">
+                    {TIMEFRAMES.map((timeframe) => (
+                      <button
+                        type="button"
+                        key={timeframe}
+                        aria-pressed={tf === timeframe}
+                        onClick={() => setTf(timeframe)}
+                      >
+                        {timeframe}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="ds-cr-chart-frame">
+                <div className="ds-cr-chart-topline">
+                  <div>
+                    <p>Technical canvas</p>
+                    <span>
+                      EMA 20 / 50 / 200 · VWAP · Supertrend · liquidity · S/R · trade levels
+                    </span>
+                  </div>
+                  <span className="ds-cr-engine-badge">DeepScreen engine</span>
+                </div>
+                <div className="ds-cr-chart-canvas">
+                  {main.isError ? (
+                    <div className="ds-cr-state is-error">
+                      <Crosshair size={24} aria-hidden="true" />
+                      <strong>Chart data unavailable</strong>
+                      <span>{(main.error as Error).message}. Check the symbol and try again.</span>
+                    </div>
+                  ) : !analysis || !main.data ? (
+                    <div className="ds-cr-state">
+                      <span className="ds-cr-loader" aria-hidden="true" />
+                      <strong>
+                        {main.isLoading ? "Reading the market…" : "Not enough history to analyze."}
+                      </strong>
+                      <span>
+                        DeepScreen is preparing price structure, volatility and multi-timeframe context.
+                      </span>
+                    </div>
+                  ) : (
+                    <Suspense
+                      fallback={
+                        <div className="ds-cr-state">
+                          <span className="ds-cr-loader" aria-hidden="true" />
+                          <strong>Rendering chart…</strong>
+                        </div>
+                      }
+                    >
+                      <PriceChart candles={main.data.candles} analysis={analysis} />
+                    </Suspense>
+                  )}
+                </div>
+              </div>
+
+              {analysis && <Details a={analysis} htf={htfTf} />}
+            </section>
+
+            <aside className="ds-cr-sidebar">
+              {analysis ? (
+                <TradeTicket a={analysis} />
+              ) : (
+                <div className="ds-cr-card p-6">
+                  <p className="ds-eyebrow">
+                    <span aria-hidden="true" />
+                    Analysis pending
+                  </p>
+                  <h2 className="mt-3 text-xl font-medium">The trade context appears here.</h2>
+                  <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                    Once enough price history is available, DeepScreen will show confluence,
+                    confidence, structure, levels and risk context.
+                  </p>
+                </div>
+              )}
+            </aside>
+          </div>
+
+          <footer className="ds-cr-disclaimer">
+            <span>Technical research, not investment advice.</span>
+            No method is 100% accurate. Free market data may be delayed by the exchange or provider,
+            and any position should be sized so a stop-out is affordable.
+          </footer>
+        </div>
       </div>
     </Shell>
   );
@@ -315,7 +365,7 @@ function TradeTicket({ a }: { a: A }) {
 
   return (
     <>
-      <div className="rounded-xl border border-border bg-panel overflow-hidden">
+      <div className="ds-cr-card overflow-hidden">
         <div
           className={cn(
             "h-1",
@@ -373,7 +423,7 @@ function TradeTicket({ a }: { a: A }) {
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-panel p-5">
+      <div className="ds-cr-card p-5">
         <div className="mb-4 flex items-center justify-between">
           <span className="ds-eyebrow">Trade ticket</span>
           <span
@@ -409,7 +459,7 @@ function TradeTicket({ a }: { a: A }) {
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-panel p-5">
+      <div className="ds-cr-card p-5">
         <Tabs defaultValue="entry">
           <TabsList className="mb-3 grid h-auto w-full grid-cols-5 bg-secondary p-0.5">
             {[
@@ -466,7 +516,7 @@ function Details({ a, htf }: { a: A; htf: Timeframe | null }) {
     ["Location", `${a.premium.zone} · ${a.premium.pct.toFixed(0)}%`],
   ];
   return (
-    <Tabs defaultValue="playbook" className="rounded-xl border border-border bg-panel p-5">
+    <Tabs defaultValue="playbook" className="ds-cr-card p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 className="font-serif text-3xl">
           The reading{htf && <span className="text-muted-foreground"> · HTF {htf}</span>}
