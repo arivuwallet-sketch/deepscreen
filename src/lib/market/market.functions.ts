@@ -554,7 +554,7 @@ const GLOBAL_MARKET_NEWS_TOPICS = [
   { category: "GEOPOLITICS", query: "geopolitics war sanctions trade markets stocks" },
 ] as const;
 
-const NEWS_CACHE_TTL_MS = 60_000;
+const NEWS_CACHE_TTL_MS = 30_000;
 const newsMemoryCache = new Map<string, { data: LiveNewsResult; fetchedAt: number }>();
 const newsInFlight = new Map<string, Promise<LiveNewsResult>>();
 
