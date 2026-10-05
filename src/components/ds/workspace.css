@@ -13,10 +13,19 @@
 :where(input, textarea, select) {
   accent-color: var(--primary);
 }
-:where([role="dialog"], [role="alertdialog"], [data-radix-popper-content-wrapper] > *) {
+:where([role="dialog"], [role="alertdialog"]) {
+  border-radius: 16px;
+  background-image:
+    radial-gradient(circle at 82% 12%, oklch(0.927 0.151 127 / 0.055), transparent 36%),
+    linear-gradient(145deg, oklch(0.235 0.028 155 / 0.28), oklch(0.17 0.019 158 / 0.12) 68%);
   box-shadow:
     0 24px 90px oklch(0 0 0 / 0.4),
     inset 0 1px 0 oklch(1 0 0 / 0.05);
+}
+:where([data-radix-popper-content-wrapper] > *) {
+  box-shadow:
+    0 20px 65px oklch(0 0 0 / 0.32),
+    inset 0 1px 0 oklch(1 0 0 / 0.04);
 }
 .ds-workspace {
   --ds-reading-progress: 0;
