@@ -34,6 +34,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as ReitsRouteImport } from './routes/reits'
 import { Route as ResearchChecklistRouteImport } from './routes/research-checklist'
+import { Route as ResearchDeskRouteImport } from './routes/research-desk'
 import { Route as ScreenerRouteImport } from './routes/screener'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
@@ -182,6 +183,11 @@ const ReitsRoute = ReitsRouteImport.update({
 const ResearchChecklistRoute = ResearchChecklistRouteImport.update({
   id: '/research-checklist',
   path: '/research-checklist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResearchDeskRoute = ResearchDeskRouteImport.update({
+  id: '/research-desk',
+  path: '/research-desk',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ScreenerRoute = ScreenerRouteImport.update({
@@ -334,6 +340,7 @@ export interface FileRoutesByFullPath {
   '/refund-policy': typeof RefundPolicyRoute
   '/reits': typeof ReitsRoute
   '/research-checklist': typeof ResearchChecklistRoute
+  '/research-desk': typeof ResearchDeskRoute
   '/screener': typeof ScreenerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
@@ -385,6 +392,7 @@ export interface FileRoutesByTo {
   '/refund-policy': typeof RefundPolicyRoute
   '/reits': typeof ReitsRoute
   '/research-checklist': typeof ResearchChecklistRoute
+  '/research-desk': typeof ResearchDeskRoute
   '/screener': typeof ScreenerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
@@ -437,6 +445,7 @@ export interface FileRoutesById {
   '/refund-policy': typeof RefundPolicyRoute
   '/reits': typeof ReitsRoute
   '/research-checklist': typeof ResearchChecklistRoute
+  '/research-desk': typeof ResearchDeskRoute
   '/screener': typeof ScreenerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
@@ -490,6 +499,7 @@ export interface FileRouteTypes {
     | '/refund-policy'
     | '/reits'
     | '/research-checklist'
+    | '/research-desk'
     | '/screener'
     | '/sitemap.xml'
     | '/terms'
@@ -541,6 +551,7 @@ export interface FileRouteTypes {
     | '/refund-policy'
     | '/reits'
     | '/research-checklist'
+    | '/research-desk'
     | '/screener'
     | '/sitemap.xml'
     | '/terms'
@@ -592,6 +603,7 @@ export interface FileRouteTypes {
     | '/refund-policy'
     | '/reits'
     | '/research-checklist'
+    | '/research-desk'
     | '/screener'
     | '/sitemap.xml'
     | '/terms'
@@ -644,6 +656,7 @@ export interface RootRouteChildren {
   RefundPolicyRoute: typeof RefundPolicyRoute
   ReitsRoute: typeof ReitsRoute
   ResearchChecklistRoute: typeof ResearchChecklistRoute
+  ResearchDeskRoute: typeof ResearchDeskRoute
   ScreenerRoute: typeof ScreenerRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
@@ -847,6 +860,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResearchChecklistRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/research-desk': {
+      id: '/research-desk'
+      path: '/research-desk'
+      fullPath: '/research-desk'
+      preLoaderRoute: typeof ResearchDeskRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/screener': {
       id: '/screener'
       path: '/screener'
@@ -1044,6 +1064,7 @@ const rootRouteChildren: RootRouteChildren = {
   RefundPolicyRoute: RefundPolicyRoute,
   ReitsRoute: ReitsRoute,
   ResearchChecklistRoute: ResearchChecklistRoute,
+  ResearchDeskRoute: ResearchDeskRoute,
   ScreenerRoute: ScreenerRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,

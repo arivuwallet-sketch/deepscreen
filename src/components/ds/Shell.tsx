@@ -24,6 +24,7 @@ const NAV_ITEMS: Array<readonly [string, string]> = [
 ];
 
 const MARKET_GUIDES: Array<readonly [string, string]> = [
+  ["/research-desk", "Research Desk"],
   ["/commodities", "Commodities"],
   ["/gift-nifty", "Gift Nifty"],
   ["/ipo-gmp", "IPO GMP"],
