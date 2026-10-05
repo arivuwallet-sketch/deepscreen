@@ -2,6 +2,7 @@ import { INVESTMENT_BLOG_POSTS } from "@/lib/content/investment-blog";
 import { GUIDES } from "@/lib/deepscreen/guides";
 import { ANSWERS } from "@/lib/discovery/answers";
 import { LANDING_FAQS } from "@/lib/discovery/landing-faq";
+import { LEGACY_BLOGS, LEGACY_BLOG_FAQS } from "@/lib/discovery/legacy-blog";
 import { INVESTMENT_FAQS } from "@/lib/seo/investment-faq";
 import { MARKET_GUIDE_FAQS } from "@/lib/seo/market-guide-faq";
 import { RATIOS, STRATEGY_GUIDES, ratioGuideSlug } from "@/lib/seo/content";
@@ -19,22 +20,6 @@ export type KnowledgeGroup = {
   description: string;
   entries: KnowledgeEntry[];
 };
-
-export const LEGACY_BLOGS = [
-  {
-    title: "Retail Investing Statistics You Need to Know in 2026",
-    href: "/blog/retail-investing-statistics-2026.html",
-  },
-] as const;
-
-export const LEGACY_BLOG_FAQS = [
-  "What percentage of Americans own stock in 2026?",
-  "How many retail investors does India have?",
-  "What share of US stock trading comes from retail investors?",
-  "Is options trading growing?",
-  "How big was the global IPO market in 2025?",
-  "Are younger investors taking on more risk than older investors?",
-] as const;
 
 const MARKET_PATH: Record<(typeof MARKET_GUIDE_FAQS)[number]["topic"], string> = {
   COMMODITIES: "/commodities",
