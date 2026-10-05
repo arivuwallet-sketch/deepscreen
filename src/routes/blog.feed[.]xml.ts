@@ -64,6 +64,8 @@ export const Route = createFileRoute("/blog/feed.xml")({
   staticData: { sitemap: false },
   server: {
     handlers: {
+      ANY: () =>
+        new Response(null, { status: 405, headers: { Allow: "GET", "Cache-Control": "no-store" } }),
       GET: () =>
         new Response(feedXml(), {
           headers: {
