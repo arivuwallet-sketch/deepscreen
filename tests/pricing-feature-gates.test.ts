@@ -53,6 +53,10 @@ test("Options, stock intelligence and portfolio analytics are gated for Pro", as
   const options = await source("../src/routes/options.index.tsx");
   const stock = await source("../src/routes/stock.$exchange.$symbol.tsx");
   const portfolio = await source("../src/routes/portfolio.tsx");
+  const stockTable = await source("../src/components/ds/StockTable.tsx");
+  const movers = await source("../src/components/ds/MarketMovers.tsx");
+  const peers = await source("../src/components/ds/PeerAnalysisPanel.tsx");
+  const compare = await source("../src/routes/compare.$slug.tsx");
 
   assert.ok(options.includes('strict'));
   assert.ok(options.includes('feature="Options Strategy Lab payoff analytics"'));
@@ -69,4 +73,11 @@ test("Options, stock intelligence and portfolio analytics are gated for Pro", as
 
   assert.ok(portfolio.includes('strict feature="My Stocks research alerts"'));
   assert.ok(portfolio.includes('strict feature="Portfolio X-Ray"'));
+
+  assert.ok(stockTable.includes('isPro ? merged.fundamentals.peg.toFixed(2) : <ProCell />'));
+  assert.ok(stockTable.includes('isPro ? <ScoreBar score={analysis.score} /> : <ProCell />'));
+  assert.ok(movers.includes('const score = isPro ? analyze(merged).score : null'));
+  assert.ok(movers.includes('Most-active gainers'));
+  assert.ok(peers.includes('...(isPro ? [{ key: "score" as const, label: "DeepScreen score" }] : [])'));
+  assert.ok(compare.includes('feature="DeepScreen score, verdict & advanced comparison"'));
 });
