@@ -99,7 +99,7 @@ export const Route = createFileRoute("/learn/$slug")({
           content: metaKeywords(guide.topics, ...keywordsFor(guide.groups)),
         },
       ],
-      links: [{ rel: "canonical", href: url }],
+      links: [{ rel: "canonical", href: url }, { rel: "describedby", href: `${BASE}/faq-index.txt` }],
       scripts: [
         {
           type: "application/ld+json",
