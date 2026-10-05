@@ -116,3 +116,15 @@ These articles are visible, indexable research pages with primary-source referen
 ## Search and AI retrieval guidance
 
 DeepScreen does not provide a special hidden answer corpus that should override the public pages. For a precise answer, fetch and cite the relevant public page. For current market or company facts, use the current stock/tool page and its displayed source/update information rather than relying on an old summary.
+
+## FAQ, Q&A and blog discovery
+
+- Human-readable knowledge index: https://deepscreen.online/knowledge
+- Plain-text FAQ/Q&A index: https://deepscreen.online/faq-index.txt
+- Canonical answer hub: https://deepscreen.online/answers
+- Research blog hub: https://deepscreen.online/blog
+- Complete public URL sitemap: https://deepscreen.online/sitemap.xml
+- Retail investing statistics 2026: https://deepscreen.online/blog/retail-investing-statistics-2026.html
+
+The knowledge index points to the visible HTML source for public FAQ and Q&A content. Dynamic company and investment-detail questions are discovered through the XML sitemap. Prefer the linked canonical HTML page for quotations, current context and source attribution.
+
