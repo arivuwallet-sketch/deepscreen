@@ -1,4 +1,4 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, notFound, redirect } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
 import { InvestmentBlogArticle } from "@/components/ds/InvestmentBlogArticle";
 import { findInvestmentBlogPost } from "@/lib/content/investment-blog";
@@ -7,6 +7,9 @@ import { buildBreadcrumbSchema, buildFAQSchema, buildGraph, buildOrganizationSch
 export const Route = createFileRoute("/blog/$slug")({
   staticData: { sitemap: true },
   loader: ({ params }) => {
+    if (params.slug === "retail-investing-statistics-2026") {
+      throw redirect({ href: "/blog/retail-investing-statistics-2026.html", statusCode: 308 });
+    }
     const post = findInvestmentBlogPost(params.slug);
     if (!post) throw notFound();
     return { post };
