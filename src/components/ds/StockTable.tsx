@@ -16,6 +16,8 @@ import { liveMarketCapBillions, liveQuoteVolume } from "@/lib/market/live-equity
 import type { LiveFundamentals, LiveQuote } from "@/lib/market/yahoo.server";
 import type { ScreenerRatios } from "@/lib/market/screener.server";
 import { cn } from "@/lib/utils";
+import { useSubscription } from "@/hooks/useSubscription";
+import { Lock } from "lucide-react";
 
 export function ScoreBar({ score }: { score: number }) {
   const tone = score >= 67 ? "bg-bull" : score >= 45 ? "bg-warn" : "bg-bear";
@@ -55,12 +57,14 @@ function StockRow({
   fundamentals,
   screener,
   delayMs,
+  isPro,
 }: {
   stock: Stock;
   quote: LiveQuote | null | undefined;
   fundamentals: LiveFundamentals | null | undefined;
   screener: ScreenerRatios | null | undefined;
   delayMs: number;
+  isPro: boolean;
 }) {
   const { stock: merged } = mergeLiveStock(stock, quote, fundamentals, screener);
   const analysis = analyze(merged);
@@ -108,7 +112,7 @@ function StockRow({
         ) : null}
       </td>
       <td className="num px-2 py-2.5 text-right">{merged.fundamentals.pe.toFixed(1)}</td>
-      <td className="num px-2 py-2.5 text-right">{merged.fundamentals.peg.toFixed(2)}</td>
+      <td className="num px-2 py-2.5 text-right">{isPro ? merged.fundamentals.peg.toFixed(2) : <ProCell />}</td>
       <td className="num px-2 py-2.5 text-right">{merged.fundamentals.roce.toFixed(1)}%</td>
       <td className="num px-2 py-2.5 text-right text-muted-foreground">
         {volume !== null ? formatVolume(volume) : "—"}
@@ -116,19 +120,22 @@ function StockRow({
           <span className="ml-1 inline-block size-1.5 rounded-full bg-bull align-middle" title="Latest provider volume" />
         ) : null}
       </td>
-      <td className="px-2 py-2.5" title="Calculated from the available live and modeled fundamentals">
-        <ScoreBar score={analysis.score} />
+      <td className="px-2 py-2.5" title={isPro ? "Calculated from the available live and modeled fundamentals" : "DeepScreen Pro feature"}>
+        {isPro ? <ScoreBar score={analysis.score} /> : <ProCell />}
       </td>
       <td className="px-4 py-2.5">
-        <span className={cn("num rounded border px-2 py-0.5 text-[11px] font-semibold transition-colors", verdictClass(analysis.verdict))}>
-          {analysis.verdict}
-        </span>
+        {isPro ? (
+          <span className={cn("num rounded border px-2 py-0.5 text-[11px] font-semibold transition-colors", verdictClass(analysis.verdict))}>
+            {analysis.verdict}
+          </span>
+        ) : <ProCell />}
       </td>
     </tr>
   );
 }
 
 export function StockTable({ stocks }: { stocks: Stock[] }) {
+  const { isPro } = useSubscription();
   const keys = stocks.map((stock) => ({ exchange: stock.exchange, symbol: stock.symbol, name: stock.name }));
   const { data: live } = useLiveQuotes(keys);
   const { data: liveFundamentals, isFetching: fundamentalsLoading } = useLiveFundamentalsBatch(keys);
@@ -165,13 +172,23 @@ export function StockTable({ stocks }: { stocks: Stock[] }) {
               fundamentals={liveFundamentals?.[quoteKey(stock)]}
               screener={screenerRatios?.[quoteKey(stock)]}
               delayMs={Math.min(index, 20) * 15}
+              isPro={isPro}
             />
           ))}
         </tbody>
       </table>
       <p className="border-t border-border px-4 py-2 text-[11px] text-muted-foreground">
-        <span className="mr-1 inline-block size-1.5 rounded-full bg-bull align-middle" /> Price, volume and quote-derived market cap refresh every 15s while upstream quote data is available. Market cap uses latest price × reported shares outstanding, with provider market cap as a fallback{fundamentalsLoading ? " (updating…)" : ""}. Exchange/provider data can be delayed, especially outside market hours. Scores and verdicts are unchanged.
+        <span className="mr-1 inline-block size-1.5 rounded-full bg-bull align-middle" /> Price, volume and quote-derived market cap refresh every 15s while upstream quote data is available. Market cap uses latest price × reported shares outstanding, with provider market cap as a fallback{fundamentalsLoading ? " (updating…)" : ""}. Exchange/provider data can be delayed, especially outside market hours. Core quote/fundamental columns stay public; PEG, DeepScreen score and verdict require Pro.
       </p>
     </div>
+  );
+}
+
+
+function ProCell() {
+  return (
+    <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary">
+      <Lock className="size-3" /> Pro
+    </span>
   );
 }
