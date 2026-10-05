@@ -1,3 +1,5 @@
+export type NewsImpactLevel = "high" | "medium" | "low";
+
 export interface FeedItem {
   id: string;
   title: string;
@@ -6,6 +8,8 @@ export interface FeedItem {
   publishedAt: string;
   minutesAgo: number;
   category: string;
+  impactLevel?: NewsImpactLevel;
+  affectedMarkets?: string[];
 }
 
 function decode(s: string): string {

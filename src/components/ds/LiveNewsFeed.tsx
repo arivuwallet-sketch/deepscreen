@@ -5,6 +5,12 @@ import { getNewsFeed } from "@/lib/market/market.functions";
 import type { FeedItem } from "@/lib/rss.server";
 import { cn } from "@/lib/utils";
 
+function impactClasses(level: FeedItem["impactLevel"]): string {
+  if (level === "high") return "border-bear/35 bg-bear/10 text-bear";
+  if (level === "medium") return "border-warn/35 bg-warn/10 text-warn";
+  return "border-primary/25 bg-primary/5 text-primary";
+}
+
 function ago(min: number): string {
   if (min < 1) return "just now";
   if (min < 60) return `${min}m ago`;
@@ -38,14 +44,34 @@ export function FeedList({
           >
             {n.title}
           </a>
-          <p className="num mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+          <div className="num mt-2 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
             {showCategory && n.category && n.category !== "market" ? (
               <span className="rounded border border-primary/20 px-1.5 py-0.5 text-[9px] tracking-wide text-primary">
                 {n.category}
               </span>
             ) : null}
+            <span
+              className={cn(
+                "rounded border px-1.5 py-0.5 text-[9px] font-semibold tracking-wide",
+                impactClasses(n.impactLevel),
+              )}
+              title="Estimated impact from the headline and topic; not a guaranteed market reaction or trading signal."
+            >
+              EST. IMPACT {(n.impactLevel ?? "low").toUpperCase()}
+            </span>
             <span>{n.source} · {ago(n.minutesAgo)}</span>
-          </p>
+          </div>
+          <div className="num mt-1.5 flex flex-wrap items-center gap-1.5 text-[10px] text-muted-foreground">
+            <span className="text-[9px] tracking-wide">AFFECTS:</span>
+            {(n.affectedMarkets?.length ? n.affectedMarkets : ["Global Equities"]).map((market) => (
+              <span
+                key={market}
+                className="rounded border border-border/80 bg-background/30 px-1.5 py-0.5 text-[9px] text-foreground/80"
+              >
+                {market}
+              </span>
+            ))}
+          </div>
         </li>
       ))}
     </ul>

@@ -59,7 +59,8 @@ test("global market feed aggregates regions and market-moving themes", async () 
     assert.ok(market.includes(`category: "${category}"`), category);
   }
 
-  assert.ok(market.includes("GLOBAL_MARKET_NEWS_TOPICS.map"));
+  assert.ok(market.includes("GLOBAL_MARKET_NEWS_TOPICS.slice(start, start + 4)"));
+  assert.ok(market.includes("start += 4"));
   assert.ok(market.includes("categoryCounts"));
   assert.ok(market.includes("if (count >= 6) return false"));
 });
@@ -74,4 +75,71 @@ test("provider-specific queries do not leak Google freshness syntax into Bing or
   assert.ok(market.includes("googleNewsFeed(freshQuery)") || market.includes("googleNewsFeed(query)"));
   assert.ok(market.includes("bingNewsFeed(genericQuery)"));
   assert.ok(market.includes("fetchYahooNews(genericQuery"));
+});
+
+
+test("news feed attaches impact levels and affected-market signals", async () => {
+  const market = await source("../src/lib/market/market.functions.ts");
+  const feed = await source("../src/components/ds/LiveNewsFeed.tsx");
+  const rss = await source("../src/lib/rss.server.ts");
+
+  assert.ok(rss.includes('export type NewsImpactLevel = "high" | "medium" | "low"'));
+  assert.ok(rss.includes("impactLevel?: NewsImpactLevel"));
+  assert.ok(rss.includes("affectedMarkets?: string[]"));
+
+  assert.ok(market.includes("HIGH_IMPACT_NEWS_RE"));
+  assert.ok(market.includes("MEDIUM_IMPACT_NEWS_RE"));
+  assert.ok(market.includes("AFFECTED_MARKET_RULES"));
+  assert.ok(market.includes('label: "NSE/BSE"'));
+  assert.ok(market.includes('label: "NYSE/Nasdaq"'));
+  assert.ok(market.includes('label: "LSE"'));
+  assert.ok(market.includes('label: "Europe"'));
+  assert.ok(market.includes('label: "Asia"'));
+  assert.ok(market.includes('label: "FX"'));
+  assert.ok(market.includes('label: "Bonds"'));
+  assert.ok(market.includes('label: "Commodities"'));
+  assert.ok(market.includes('label: "Tech"'));
+  assert.ok(market.includes("withNewsSignals("));
+
+  assert.ok(feed.includes("EST. IMPACT {(n.impactLevel ?? \"low\").toUpperCase()}"));
+  assert.ok(feed.includes("AFFECTS:"));
+  assert.ok(feed.includes("n.affectedMarkets?.length"));
+  assert.ok(feed.includes("not a guaranteed market reaction or trading signal"));
+});
+
+test("high and medium impact rules cover major macro and corporate catalysts", async () => {
+  const market = await source("../src/lib/market/market.functions.ts");
+
+  for (const term of [
+    "fomc",
+    "rate decision",
+    "cpi",
+    "inflation",
+    "payrolls",
+    "gdp",
+    "recession",
+    "default",
+    "bankruptcy",
+    "war",
+    "sanctions",
+    "tariffs",
+    "crash",
+  ]) {
+    assert.ok(market.toLowerCase().includes(term), term);
+  }
+
+  for (const term of [
+    "earnings",
+    "guidance",
+    "merger",
+    "acquisition",
+    "regulation",
+    "downgrade",
+    "upgrade",
+    "oil",
+    "yield",
+    "currency",
+  ]) {
+    assert.ok(market.toLowerCase().includes(term), term);
+  }
 });

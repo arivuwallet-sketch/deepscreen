@@ -580,6 +580,79 @@ function filterRecentNews(items: FeedItem[], maxAgeHours?: number): FeedItem[] {
   });
 }
 
+const HIGH_IMPACT_NEWS_RE =
+  /\b(fomc|federal reserve|fed decision|rate decision|rate hike|rate cut|interest rates?|cpi|inflation|nonfarm payrolls?|payrolls|jobs report|gdp|recession|default|bankruptcy|bailout|war|missile|invasion|attack|sanctions?|tariffs?|emergency|crash|meltdown|circuit breaker|trading halt|sovereign debt|debt ceiling)\b/i;
+const MEDIUM_IMPACT_NEWS_RE =
+  /\b(earnings|results|guidance|forecast|outlook|merger|acquisition|takeover|buyout|ipo|regulation|regulator|antitrust|lawsuit|probe|downgrade|upgrade|oil|crude|gold|yield|treasury|bond|currency|dollar|rupee|euro|sterling|election|trade deal|strike|layoffs?|recall)\b/i;
+
+const AFFECTED_MARKET_RULES: { label: string; re: RegExp }[] = [
+  { label: "NSE/BSE", re: /\b(india|nifty|sensex|nse|bse|rbi|rupee|mumbai)\b/i },
+  { label: "NYSE/Nasdaq", re: /\b(u\.?s\.?|united states|wall street|s&p|nasdaq|dow|federal reserve|\bfed\b|treasury|sec)\b/i },
+  { label: "LSE", re: /\b(uk|u\.?k\.?|britain|british|london|ftse|bank of england|\bboe\b|sterling|pound)\b/i },
+  { label: "Europe", re: /\b(europe|eurozone|stoxx|dax|cac|ecb|european central bank|\beuro\b)\b/i },
+  { label: "Asia", re: /\b(asia|china|japan|hong kong|south korea|korea|nikkei|hang seng|shanghai|kospi|boj|pboc|yen|yuan)\b/i },
+  { label: "FX", re: /\b(forex|fx|currency|currencies|dollar|rupee|euro|sterling|pound|yen|yuan)\b/i },
+  { label: "Bonds", re: /\b(bond|bonds|yield|yields|treasury|gilts?|sovereign debt)\b/i },
+  { label: "Commodities", re: /\b(oil|crude|brent|wti|gold|silver|copper|natural gas|commodity|commodities|opec)\b/i },
+  { label: "Tech", re: /\b(ai|artificial intelligence|chip|chips|semiconductor|technology|tech stocks?|nvidia|apple|microsoft|amazon|google|alphabet|meta)\b/i },
+];
+
+const CATEGORY_MARKET_FALLBACKS: Record<string, string[]> = {
+  GLOBAL: ["Global Equities"],
+  US: ["NYSE/Nasdaq"],
+  INDIA: ["NSE/BSE"],
+  EUROPE: ["Europe"],
+  ASIA: ["Asia"],
+  MACRO: ["Global Equities", "Bonds", "FX"],
+  EARNINGS: ["Equities"],
+  "M&A": ["Equities"],
+  TECH: ["Tech"],
+  COMMODITIES: ["Commodities"],
+  "FX/BONDS": ["FX", "Bonds"],
+  GEOPOLITICS: ["Global Equities", "Commodities"],
+  market: ["Equities"],
+  company: ["Equities"],
+  workplace: ["Equities"],
+};
+
+function classifyNewsImpact(item: FeedItem): FeedItem {
+  const text = `${item.title} ${item.category}`;
+  const category = item.category.toUpperCase();
+
+  let impactLevel: "high" | "medium" | "low" = "low";
+  if (HIGH_IMPACT_NEWS_RE.test(text)) {
+    impactLevel = "high";
+  } else if (
+    MEDIUM_IMPACT_NEWS_RE.test(text) ||
+    category === "MACRO" ||
+    category === "GEOPOLITICS" ||
+    category === "EARNINGS" ||
+    category === "M&A"
+  ) {
+    impactLevel = "medium";
+  }
+
+  const affectedMarkets = AFFECTED_MARKET_RULES
+    .filter((rule) => rule.re.test(text))
+    .map((rule) => rule.label);
+
+  for (const fallback of CATEGORY_MARKET_FALLBACKS[item.category] ?? CATEGORY_MARKET_FALLBACKS[category] ?? []) {
+    if (!affectedMarkets.includes(fallback)) affectedMarkets.push(fallback);
+  }
+
+  if (affectedMarkets.length === 0) affectedMarkets.push("Global Equities");
+
+  return {
+    ...item,
+    impactLevel,
+    affectedMarkets: affectedMarkets.slice(0, 4),
+  };
+}
+
+function withNewsSignals(items: FeedItem[]): FeedItem[] {
+  return items.map(classifyNewsImpact);
+}
+
 /**
  * Build conservative fallback searches for company queries.
  * Google/Bing/Yahoo can all interpret quoted OR queries differently, and some
@@ -645,7 +718,9 @@ export const getNewsFeed = createServerFn({ method: "GET" })
       const { readNewsCache, writeNewsCache } = await import("./news-cache.server");
       const persisted = await readNewsCache(key);
       if (persisted && Date.now() - persisted.fetchedAt < NEWS_CACHE_TTL_MS) {
-        const recentPersisted = filterRecentNews(refreshAges(persisted.items), maxAgeHours);
+        const recentPersisted = withNewsSignals(
+          filterRecentNews(refreshAges(persisted.items), maxAgeHours),
+        );
         const result = {
           items: recentPersisted.slice(0, limit),
           fetchedAt: persisted.fetchedAt,
@@ -742,9 +817,11 @@ export const getNewsFeed = createServerFn({ method: "GET" })
             return true;
           })
         : sorted;
-      const items = balanced
-        .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
-        .slice(0, limit);
+      const items = withNewsSignals(
+        balanced
+          .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
+          .slice(0, limit),
+      );
 
       if (items.length > 0) {
         const fetchedAt = Date.now();
@@ -760,7 +837,9 @@ export const getNewsFeed = createServerFn({ method: "GET" })
       }
 
       if (persisted) {
-        const recentPersisted = filterRecentNews(refreshAges(persisted.items), maxAgeHours).slice(0, limit);
+        const recentPersisted = withNewsSignals(
+          filterRecentNews(refreshAges(persisted.items), maxAgeHours).slice(0, limit),
+        );
         if (recentPersisted.length > 0) {
           console.warn(`[news] providers empty for ${key}; serving recent last-good cache`);
           const result = {
