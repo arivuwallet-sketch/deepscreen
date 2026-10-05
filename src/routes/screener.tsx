@@ -81,13 +81,6 @@ export const Route = createFileRoute("/screener")({
 
 function Home() {
   const top = [...STOCKS].sort((a, b) => a.name.localeCompare(b.name)).slice(0, 10);
-  const liveMoverUniverse = EXCHANGES.flatMap((exchange) =>
-    STOCKS
-      .filter((stock) => stock.exchange === exchange.code)
-      .sort((a, b) => b.marketCap - a.marketCap)
-      .slice(0, 20),
-  );
-
   return (
     <Shell>
       <section className="border-b border-border bg-[radial-gradient(ellipse_at_top,color-mix(in_oklch,var(--primary)_14%,transparent),transparent_60%)]">
@@ -162,7 +155,7 @@ function Home() {
           />
         </div>
 
-        <MarketMovers stocks={liveMoverUniverse} title="Live global market movers" />
+        <MarketMovers stocks={STOCKS} title="Live global market movers" />
 
         <StockCategoryScreener stocks={STOCKS} />
 
