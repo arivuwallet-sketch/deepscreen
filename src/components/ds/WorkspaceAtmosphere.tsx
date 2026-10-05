@@ -10,6 +10,7 @@ const CHAPTERS: Record<string, readonly [string, string, string]> = {
   portfolio: ["Your research, connected", "Follow the companies.", "Keep the context."],
   calendar: ["The market calendar", "Watch what matters.", "Stay in perspective."],
   "chart-reader": ["DeepChart", "Technical structure.", "Read with clarity."],
+  trading: ["Trading education", "Risk before signal.", "Understand the instrument."],
   options: ["The strategy lab", "Explore the possibilities.", "Understand the risk."],
   "options-strategy": [
     "The strategy library",
