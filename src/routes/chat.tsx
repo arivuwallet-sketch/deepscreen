@@ -1,5 +1,5 @@
 import { useChat } from "@ai-sdk/react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useHydrated } from "@tanstack/react-router";
 import {
   DefaultChatTransport,
   getToolName,
@@ -194,14 +194,9 @@ function DeepScreenChatSession({ initialMessages }: { initialMessages: UIMessage
 }
 
 function DeepScreenChat() {
-  const [initialMessages, setInitialMessages] = useState<UIMessage[] | null>(null);
-
-  useEffect(() => {
-    setInitialMessages(readSavedMessages());
-  }, []);
-
-  if (initialMessages === null) return null;
-  return <DeepScreenChatSession initialMessages={initialMessages} />;
+  const hydrated = useHydrated();
+  if (!hydrated) return null;
+  return <DeepScreenChatSession initialMessages={readSavedMessages()} />;
 }
 
 export const Route = createFileRoute("/chat")({
