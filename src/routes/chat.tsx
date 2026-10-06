@@ -200,7 +200,9 @@ function DeepScreenChat() {
 }
 
 export const Route = createFileRoute("/chat")({
-  staticData: { sitemap: true },
+  // Conversations are browser-private and the server-rendered route has no
+  // answer content, so this tool should not compete with public research pages.
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title },
@@ -209,6 +211,7 @@ export const Route = createFileRoute("/chat")({
       { property: "og:description", content: description },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "robots", content: "noindex,follow" },
     ],
   }),
   component: DeepScreenChat,
