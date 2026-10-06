@@ -43,35 +43,22 @@ function readSavedMessages(): UIMessage[] {
   }
 }
 
-function DeepScreenChat() {
+function DeepScreenChatSession({ initialMessages }: { initialMessages: UIMessage[] }) {
   const [draft, setDraft] = useState("");
-  const [historyReady, setHistoryReady] = useState(false);
-  const restored = useRef(false);
-  const pendingRestoredMessages = useRef(0);
   const draftRef = useRef("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const { messages, setMessages, sendMessage, status, stop, error, clearError } = useChat({
     id: "deepscreen-browser-conversation",
+    messages: initialMessages,
     transport,
     onError: (chatError) => toast.error(chatError.message || "DeepScreen could not answer that request."),
   });
   const busy = status === "submitted" || status === "streaming";
 
   useEffect(() => {
-    if (restored.current) return;
-    restored.current = true;
-    const savedMessages = readSavedMessages();
-    pendingRestoredMessages.current = savedMessages.length;
-    setMessages(savedMessages);
-    setHistoryReady(true);
-  }, [setMessages]);
-
-  useEffect(() => {
-    if (!historyReady || typeof window === "undefined") return;
-    if (pendingRestoredMessages.current > messages.length) return;
-    pendingRestoredMessages.current = 0;
+    if (typeof window === "undefined") return;
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
-  }, [historyReady, messages]);
+  }, [messages]);
 
   useEffect(() => {
     if (!busy) inputRef.current?.focus();
@@ -105,7 +92,6 @@ function DeepScreenChat() {
     setMessages([]);
     setDraft("");
     draftRef.current = "";
-    pendingRestoredMessages.current = 0;
     if (typeof window !== "undefined") window.localStorage.removeItem(STORAGE_KEY);
     window.requestAnimationFrame(() => inputRef.current?.focus());
   };
@@ -205,6 +191,17 @@ function DeepScreenChat() {
       </section>
     </Shell>
   );
+}
+
+function DeepScreenChat() {
+  const [initialMessages, setInitialMessages] = useState<UIMessage[] | null>(null);
+
+  useEffect(() => {
+    setInitialMessages(readSavedMessages());
+  }, []);
+
+  if (initialMessages === null) return null;
+  return <DeepScreenChatSession initialMessages={initialMessages} />;
 }
 
 export const Route = createFileRoute("/chat")({
