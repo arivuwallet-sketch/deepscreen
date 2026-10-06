@@ -27,7 +27,7 @@
 // Shared types & constants
 // ---------------------------------------------------------------------------
 
-import { DEEPSCREEN_ENTITY_DESCRIPTION, DEEPSCREEN_NAME } from "@/lib/seo/brand";
+import { DEEPSCREEN_ENTITY_DESCRIPTION, DEEPSCREEN_NAME, DEEPSCREEN_TITLE } from "@/lib/seo/brand";
 
 export type JsonLdNode = Record<string, unknown>;
 
@@ -69,13 +69,14 @@ export function buildOrganizationSchema(): JsonLdNode {
     "@type": "Organization",
     "@id": `${SITE_URL}/#organization`,
     name: SITE_NAME,
-    alternateName: ["DeepScreen Stock Screener", "DeepScreen Investment Research"],
+    alternateName: ["DeepScreen Global Stock Screener", DEEPSCREEN_TITLE],
     url: SITE_URL,
     logo: {
       "@type": "ImageObject",
       url: LOGO_URL,
     },
     description: DEEPSCREEN_ENTITY_DESCRIPTION,
+    slogan: DEEPSCREEN_TITLE,
     founder: {
       "@type": "Person",
       name: "Sooraj",
@@ -131,12 +132,14 @@ export function buildWebSiteSchema(): JsonLdNode {
     url: SITE_URL,
     publisher: { "@id": `${SITE_URL}/#organization` },
     inLanguage: "en",
-    alternateName: ["DeepScreen Stock Screener", "DeepScreen Investment Research"],
+    alternateName: ["DeepScreen Global Stock Screener", DEEPSCREEN_TITLE],
     description: DEEPSCREEN_ENTITY_DESCRIPTION,
     about: { "@id": `${SITE_URL}/#organization` },
     keywords: [
       "DeepScreen",
-      "DeepScreen Stock Research",
+      "Global Stock Screener",
+      "filter 13000+ stocks",
+      "analyze 13000+ stocks",
       "stock research for beginners",
       "fundamental analysis",
       "financial ratios",
@@ -172,7 +175,7 @@ export function buildWebApplicationSchema(app: WebApplicationFacts): JsonLdNode 
     "@type": "WebApplication",
     "@id": `${app.url}#application`,
     name: app.name,
-    alternateName: ["DeepScreen Stock Screener", "DeepScreen Investment Research"],
+    alternateName: ["DeepScreen Global Stock Screener", DEEPSCREEN_TITLE],
     url: app.url,
     applicationCategory: "FinanceApplication",
     operatingSystem: "Web browser",
@@ -181,7 +184,7 @@ export function buildWebApplicationSchema(app: WebApplicationFacts): JsonLdNode 
     description: app.description,
     audience: {
       "@type": "Audience",
-      audienceType: "Investors and researchers using global stock screening and investment research tools",
+      audienceType: "Investors and researchers filtering and analyzing listed stocks across supported global markets",
     },
     ...(app.featureList?.length ? { featureList: app.featureList } : {}),
   };

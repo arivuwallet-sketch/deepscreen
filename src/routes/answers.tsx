@@ -9,7 +9,7 @@ export const Route = createFileRoute("/answers")({
   head: () => resourceHead(
     "/answers",
     "DeepScreen & Stock Market FAQ: 38 Questions Answered",
-    "Clear answers about DeepScreen, stock-market basics, fundamental analysis, valuation, financial ratios, stock screening and investment research.",
+    "Clear answers about DeepScreen, its 13,000+ stock coverage, stock-market basics, fundamental analysis, valuation, financial ratios and stock screening.",
     ["DeepScreen FAQ", "stock market questions and answers", "stock market FAQ", "fundamental analysis questions", "stock analysis explained", "financial ratios explained", "stock screener questions", "how to research a stock", "P/E ratio", "ROE", "ROCE", "DCF valuation"],
     ANSWERS,
   ),
@@ -28,7 +28,7 @@ function Answers() {
             valuation, financial ratios and stock-research decisions. Each answer links to a deeper
             guide, methodology page or research tool when more context is useful.
           </p>
-          <p className="mt-3 text-xs text-muted-foreground">DeepScreen editorial team · Reviewed <time dateTime={ANSWERS_REVIEWED}>4 October 2026</time></p>
+          <p className="mt-3 text-xs text-muted-foreground">DeepScreen editorial team · Reviewed <time dateTime={ANSWERS_REVIEWED}>6 October 2026</time></p>
         </header>
 
         <nav className="rounded-lg border border-border bg-panel p-5" aria-label="Questions and answers topics">

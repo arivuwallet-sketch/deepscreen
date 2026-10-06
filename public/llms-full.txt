@@ -1,6 +1,6 @@
-# DeepScreen — Global Stock Screener & Investment Research
+# Global Stock Screener - Filter & Analyze 13000+ Stocks
 
-> DeepScreen at https://deepscreen.online/ is a global stock screener and investment research platform covering NSE, BSE, NYSE, Nasdaq and LSE. This file is a compact, crawl-friendly companion to the public DeepScreen pages. It is not a replacement for current stock pages, filings, provider data, or the site's methodology and limitations.
+> DeepScreen at https://deepscreen.online/ is a global stock screener for filtering and analyzing more than 13,000 stocks across NSE, BSE, NYSE, Nasdaq and LSE. This file is a compact, crawl-friendly companion to the public DeepScreen pages. It is not a replacement for current stock pages, filings, provider data, or the site's methodology and limitations.
 
 ## Core answers
 
@@ -70,7 +70,7 @@ It contains 38 answer-first questions grouped into:
 - Stock risk and research decisions
 
 Important canonical answers include:
-- DeepScreen is a global stock-research and investment-research platform covering supported NSE, BSE, NYSE, Nasdaq and LSE listings.
+- DeepScreen is a global stock screener for filtering and analyzing more than 13,000 stocks across supported NSE, BSE, NYSE, Nasdaq and LSE listings.
 - DeepScreen's 13-factor stock score is a research-shortlisting output, not a guaranteed prediction.
 - Missing or unverified company data should remain unavailable/insufficient rather than being replaced with invented values.
 - A stock screener creates a research shortlist; it does not make the final buy decision.

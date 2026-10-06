@@ -26,7 +26,7 @@ import { MarketScene } from "./MarketScene";
 import { useMotionPreference } from "@/hooks/useMotionPreference";
 import { LANDING_FAQS } from "@/lib/discovery/landing-faq";
 import { faqAnchor } from "@/lib/seo/faq-anchor";
-import { DEEPSCREEN_ENTITY_SENTENCE } from "@/lib/seo/brand";
+import { DEEPSCREEN_ENTITY_SENTENCE, DEEPSCREEN_TITLE } from "@/lib/seo/brand";
 import "./landing.css";
 
 const MARKETS = [
@@ -590,7 +590,7 @@ export function LandingPage() {
           <MarketScene paused={paused} market={market} />
           <section className="ds-chapter ds-hero">
             <div className="ds-hero-copy">
-              <Eyebrow>DeepScreen · Global stock screener & investment research</Eyebrow>
+              <Eyebrow>{DEEPSCREEN_TITLE}</Eyebrow>
               <h1>
                 See the signal.
                 <br />

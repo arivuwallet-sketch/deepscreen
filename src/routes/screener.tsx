@@ -17,31 +17,32 @@ import { NewsletterForm } from "@/components/ds/NewsletterForm";
 import { MarketMovers } from "@/components/ds/MarketMovers";
 import { MarketIndexMarquee } from "@/components/ds/MarketIndexMarquee";
 import { SCREENER_ANSWERS } from "@/lib/discovery/answers";
+import { DEEPSCREEN_META_DESCRIPTION, DEEPSCREEN_TITLE } from "@/lib/seo/brand";
 
 export const Route = createFileRoute("/screener")({
   staticData: { sitemap: true },
   head: () => ({
     meta: [
-      { title: "Stock Screener for NSE, BSE, US & UK Markets | DeepScreen" },
+      { title: DEEPSCREEN_TITLE },
       {
         name: "description",
         content:
-          "DeepScreen is a global stock screener and investment research platform for NSE, BSE, NYSE, Nasdaq and LSE, combining fundamental analysis, valuation and market context.",
+          DEEPSCREEN_META_DESCRIPTION,
       },
-      { property: "og:title", content: "Stock Screener for NSE, BSE, US & UK Markets | DeepScreen" },
+      { property: "og:title", content: DEEPSCREEN_TITLE },
       {
         property: "og:description",
         content:
-          "Understand stocks before you trust the numbers: beginner-friendly ratio explanations, trap checks, 13-factor analysis and company research across India, the US and the UK.",
+          DEEPSCREEN_META_DESCRIPTION,
       },
       { property: "og:url", content: "https://deepscreen.online/screener" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Stock Screener for NSE, BSE, US & UK Markets | DeepScreen" },
+      { name: "twitter:title", content: DEEPSCREEN_TITLE },
       {
         name: "twitter:description",
         content:
-          "Beginner-first stock research across NSE, BSE, NYSE, Nasdaq and LSE, with ratio explanations, potential-trap checks, fundamental scoring and company research.",
+          DEEPSCREEN_META_DESCRIPTION,
       },
       { name: "keywords", content: metaKeywords(screenerKeywords, stocksKeywords, learnKeywords) },
     ],
@@ -52,10 +53,10 @@ export const Route = createFileRoute("/screener")({
         children: jsonLd(
           buildGraph(
             buildWebApplicationSchema({
-              name: "DeepScreen Stock Research",
+              name: DEEPSCREEN_TITLE,
               url: "https://deepscreen.online/screener",
               description:
-                "Beginner-first multi-exchange stock research platform that explains financial ratios, highlights potential accounting and valuation traps, and uses a documented 13-factor fundamental model for Indian, US and UK listings.",
+                DEEPSCREEN_META_DESCRIPTION,
               featureList: [
                 "13-factor fundamental scoring",
                 "Cap-based screening across NSE, BSE, NYSE, Nasdaq and LSE",
@@ -87,10 +88,10 @@ function Home() {
         <div className="mx-auto max-w-7xl px-4 py-14">
           <p className="num text-xs uppercase tracking-[0.25em] text-primary">God-mode screening</p>
           <h1 className="mt-3 max-w-3xl text-4xl font-bold leading-tight tracking-tight md:text-5xl">
-            Global stock screener and fundamental research
+            Global Stock Screener - Filter & Analyze 13000+ Stocks
           </h1>
           <p className="mt-4 max-w-2xl text-muted-foreground">
-            DeepScreen is a stock screener for NSE, BSE, NYSE, Nasdaq and LSE listings, with fundamental research for beginners. It explains what ratios mean, highlights potential traps and tells you what to investigate next. Its 13-factor model covers P/E, PEG, P/S, P/B, EV/Revenue, EV/EBITDA, ROE, ROA, ROCE, leverage, payout and operating leverage — across
+            DeepScreen lets you filter and analyze more than 13,000 stocks across NSE, BSE, NYSE, Nasdaq and LSE. Use fundamental filters, valuation metrics, financial-ratio explanations and the documented 13-factor model to narrow the market and investigate what matters next — across
             Indian, US and UK markets, then pairs it with live news and macro events.
           </p>
           <div className="mt-6 max-w-xl">

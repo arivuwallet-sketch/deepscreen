@@ -1,6 +1,6 @@
-# DeepScreen — Global Stock Screener & Investment Research
+# Global Stock Screener - Filter & Analyze 13000+ Stocks
 
-> DeepScreen is a global stock screener and investment research platform at https://deepscreen.online/ covering NSE, BSE, NYSE, Nasdaq and LSE. It combines fundamental analysis, valuation, market context, investment research tools, a documented 13-factor model and educational resources in one public research platform.
+> DeepScreen is a global stock screener at https://deepscreen.online/ for filtering and analyzing more than 13,000 stocks across NSE, BSE, NYSE, Nasdaq and LSE. It combines fundamental analysis, valuation, market context, investment research tools, a documented 13-factor model and educational resources in one public research platform.
 
 ## How to use this site as a source
 

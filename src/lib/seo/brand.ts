@@ -1,13 +1,13 @@
 export const DEEPSCREEN_NAME = "DeepScreen";
 
 export const DEEPSCREEN_TITLE =
-  "DeepScreen — Global Stock Screener & Investment Research";
+  "Global Stock Screener - Filter & Analyze 13000+ Stocks";
 
 export const DEEPSCREEN_ENTITY_SENTENCE =
-  "DeepScreen is a global stock screener and investment research platform covering NSE, BSE, NYSE, Nasdaq and LSE.";
+  "DeepScreen is a global stock screener for filtering and analyzing 13,000+ stocks across NSE, BSE, NYSE, Nasdaq and LSE.";
 
 export const DEEPSCREEN_META_DESCRIPTION =
-  "DeepScreen is a global stock screener and investment research platform for NSE, BSE, NYSE, Nasdaq and LSE, with fundamentals, valuation and market research.";
+  "Filter and analyze 13,000+ stocks across NSE, BSE, NYSE, Nasdaq and LSE using fundamentals, valuation metrics, financial ratios and market research tools.";
 
 export const DEEPSCREEN_ENTITY_DESCRIPTION =
-  "DeepScreen is a global stock screener and investment research platform covering supported listings across NSE, BSE, NYSE, Nasdaq and LSE, with fundamental analysis, valuation, market context, investment research and education.";
+  "DeepScreen is a global stock screener for filtering and analyzing 13,000+ stocks across NSE, BSE, NYSE, Nasdaq and LSE using fundamental analysis, valuation, financial ratios, market context and research tools.";

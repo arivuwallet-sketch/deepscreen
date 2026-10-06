@@ -6,6 +6,7 @@ import {
   buildWebSiteSchema,
   jsonLd,
 } from "./json-ld";
+import { DEEPSCREEN_ENTITY_DESCRIPTION, DEEPSCREEN_NAME, DEEPSCREEN_TITLE } from "./brand";
 export const ORIGIN = "https://deepscreen.online";
 export const ORGANIZATION_ID = `${ORIGIN}/#organization`;
 export const WEBSITE_ID = `${ORIGIN}/#website`;
@@ -15,8 +16,10 @@ export const SITE_GRAPH = {
     {
       "@type": "Organization",
       "@id": ORGANIZATION_ID,
-      name: "DeepScreen",
+      name: DEEPSCREEN_NAME,
       url: `${ORIGIN}/`,
+      alternateName: ["DeepScreen Global Stock Screener", DEEPSCREEN_TITLE],
+      description: DEEPSCREEN_ENTITY_DESCRIPTION,
       email: "deepscreen.online@outlook.com",
       areaServed: ["IN", "US", "GB"],
       contactPoint: {
@@ -29,12 +32,12 @@ export const SITE_GRAPH = {
     {
       "@type": "WebSite",
       "@id": WEBSITE_ID,
-      name: "DeepScreen",
+      name: DEEPSCREEN_NAME,
       url: `${ORIGIN}/`,
       inLanguage: "en",
       publisher: { "@id": ORGANIZATION_ID },
-      description:
-        "Stock screening and investment research across supported Indian, US and UK listings, including mutual funds, ETFs and REITs.",
+      alternateName: ["DeepScreen Global Stock Screener", DEEPSCREEN_TITLE],
+      description: DEEPSCREEN_ENTITY_DESCRIPTION,
     },
   ],
 };
@@ -73,6 +76,7 @@ export function resourceHead(
       { property: "og:description", content: description },
       { property: "og:url", content: url },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: DEEPSCREEN_NAME },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: title },
       { name: "twitter:description", content: description },
@@ -104,7 +108,7 @@ export function resourceHead(
                   breadcrumb: { "@id": `${url}#breadcrumbs` },
                 },
             buildBreadcrumbSchema([
-              { name: "DeepScreen", url: `${ORIGIN}/` },
+              { name: DEEPSCREEN_NAME, url: `${ORIGIN}/` },
               { name: title.split(" | ")[0] ?? title, url },
             ]),
           ),

@@ -1,4 +1,4 @@
-export const ANSWERS_REVIEWED = "2026-10-04";
+export const ANSWERS_REVIEWED = "2026-10-06";
 
 export type DiscoveryAnswer = {
   id: string;
@@ -13,7 +13,7 @@ export const DEEPSCREEN_ANSWERS: readonly DiscoveryAnswer[] = [
     id: "what-is-deepscreen",
     question: "What is DeepScreen?",
     answer:
-      "DeepScreen is a global stock-research and investment-research platform covering supported listings across NSE, BSE, NYSE, Nasdaq and LSE. It combines screening, financial-ratio explanations, a documented 13-factor stock model, valuation tools, company research and market context in one workflow.",
+      "DeepScreen is a global stock screener for filtering and analyzing more than 13,000 stocks across NSE, BSE, NYSE, Nasdaq and LSE. It combines fundamental filters, financial-ratio explanations, a documented 13-factor stock model, valuation tools, company research and market context in one workflow.",
     href: "/about",
     label: "About DeepScreen",
   },

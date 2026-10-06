@@ -1,6 +1,8 @@
 # DeepScreen
 
-DeepScreen is a global stock screener, company-research, technical-analysis and market-education platform covering supported listings across **NSE, BSE, NYSE, Nasdaq and LSE**.
+**Global Stock Screener - Filter & Analyze 13000+ Stocks**
+
+DeepScreen is a global stock screener for filtering and analyzing **13,000+ stocks** across supported listings on **NSE, BSE, NYSE, Nasdaq and LSE**.
 
 It combines fundamental analysis, valuation, stock filtering, technical analysis, options modeling, portfolio research, funds/ETF/REIT analysis, commodities, IPO research, market education and public search/AI discovery in one research workspace.
 

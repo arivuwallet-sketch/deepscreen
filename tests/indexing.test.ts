@@ -585,15 +585,17 @@ test('DeepScreen brand identity stays consistent across search and AI discovery 
   const llms = await readFile(new URL('../public/llms.txt', import.meta.url), 'utf8');
   const llmsFull = await readFile(new URL('../public/llms-full.txt', import.meta.url), 'utf8');
 
-  assert.match(brand, /DeepScreen — Global Stock Screener & Investment Research/);
-  assert.match(brand, /DeepScreen is a global stock screener and investment research platform covering NSE, BSE, NYSE, Nasdaq and LSE/);
+  assert.match(brand, /Global Stock Screener - Filter & Analyze 13000\+ Stocks/);
+  assert.match(brand, /DeepScreen is a global stock screener for filtering and analyzing 13,000\+ stocks across NSE, BSE, NYSE, Nasdaq and LSE/);
   assert.match(home, /DEEPSCREEN_TITLE/);
   assert.match(root, /DEEPSCREEN_TITLE/);
   assert.match(landing, /DEEPSCREEN_ENTITY_SENTENCE/);
+  assert.match(landing, /DEEPSCREEN_TITLE/);
   assert.match(schema, /DEEPSCREEN_ENTITY_DESCRIPTION/);
-  assert.match(llms, /# DeepScreen — Global Stock Screener & Investment Research/);
-  assert.match(llmsFull, /# DeepScreen — Global Stock Screener & Investment Research/);
+  assert.match(llms, /# Global Stock Screener - Filter & Analyze 13000\+ Stocks/);
+  assert.match(llmsFull, /# Global Stock Screener - Filter & Analyze 13000\+ Stocks/);
   assert.doesNotMatch(root, /Beginner Stock Research & Financial Analysis/);
+  assert.doesNotMatch(brand, /DeepScreen — Global Stock Screener & Investment Research/);
   assert.doesNotMatch(llms, /beginner-first stock-research and financial-analysis platform/i);
   assert.doesNotMatch(llmsFull, /beginner-first stock-research and financial-analysis platform/i);
 });
