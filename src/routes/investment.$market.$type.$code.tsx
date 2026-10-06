@@ -145,7 +145,7 @@ function InvestmentPage() {
           <LiveNewsFeed
             query={`"${item.name.replace(/"/g, "").slice(0, 110)}" "${item.code}"`}
             title={`${item.type === "FUND" ? "Mutual fund" : item.type} news · ${item.code}`}
-            limit={20}
+            limit={30}
             maxAgeHours={24}
             mode={item.type === "FUND" ? "mutual-fund" : item.type === "ETF" ? "etf" : "reit"}
             entityName={item.name}
@@ -155,7 +155,7 @@ function InvestmentPage() {
           />
           <p className="mt-3 text-xs text-muted-foreground">
             Product-specific headlines are combined with relevant {item.type === "FUND" ? "mutual-fund" : item.type === "ETF" ? "ETF" : "REIT"} market news.
-            Only verified publication times from the last 24 hours are shown, newest first, with checks every 30 seconds while open.
+            Only verified publication times from the last 24 hours are shown, newest first, with checks for newer provider headlines every 20 seconds while open.
           </p>
         </div>
         <InvestmentFaqSection faqs={investmentDetailFaq(item)} title={`Questions about ${item.name}`} description={`Research answers for ${item.name} (${item.code}) using the analysis framework appropriate to a ${item.type === "FUND" ? "mutual fund" : item.type}.`} />
