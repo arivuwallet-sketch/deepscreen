@@ -16,6 +16,7 @@ import { Route as AnswersDotssmlRouteImport } from './routes/answers[.]ssml'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as ChartReaderRouteImport } from './routes/chart-reader'
+import { Route as ChatRouteImport } from './routes/chat'
 import { Route as CommoditiesRouteImport } from './routes/commodities'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DataSourcesRouteImport } from './routes/data-sources'
@@ -42,6 +43,7 @@ import { Route as ScreenerRouteImport } from './routes/screener'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TradingRouteImport } from './routes/trading'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as BestSlugRouteImport } from './routes/best.$slug'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
@@ -98,6 +100,11 @@ const CalendarRoute = CalendarRouteImport.update({
 const ChartReaderRoute = ChartReaderRouteImport.update({
   id: '/chart-reader',
   path: '/chart-reader',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChatRoute = ChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CommoditiesRoute = CommoditiesRouteImport.update({
@@ -230,6 +237,11 @@ const TradingRoute = TradingRouteImport.update({
   path: '/trading',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BestSlugRoute = BestSlugRouteImport.update({
   id: '/best/$slug',
   path: '/best/$slug',
@@ -352,6 +364,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/calendar': typeof CalendarRoute
   '/chart-reader': typeof ChartReaderRoute
+  '/chat': typeof ChatRoute
   '/commodities': typeof CommoditiesRoute
   '/contact': typeof ContactRoute
   '/data-sources': typeof DataSourcesRoute
@@ -378,6 +391,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/trading': typeof TradingRoute
+  '/api/chat': typeof ApiChatRoute
   '/best/$slug': typeof BestSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/feed.xml': typeof BlogFeedDotxmlRoute
@@ -409,6 +423,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/calendar': typeof CalendarRoute
   '/chart-reader': typeof ChartReaderRoute
+  '/chat': typeof ChatRoute
   '/commodities': typeof CommoditiesRoute
   '/contact': typeof ContactRoute
   '/data-sources': typeof DataSourcesRoute
@@ -435,6 +450,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/trading': typeof TradingRoute
+  '/api/chat': typeof ApiChatRoute
   '/best/$slug': typeof BestSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/feed.xml': typeof BlogFeedDotxmlRoute
@@ -467,6 +483,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/calendar': typeof CalendarRoute
   '/chart-reader': typeof ChartReaderRoute
+  '/chat': typeof ChatRoute
   '/commodities': typeof CommoditiesRoute
   '/contact': typeof ContactRoute
   '/data-sources': typeof DataSourcesRoute
@@ -493,6 +510,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/trading': typeof TradingRoute
+  '/api/chat': typeof ApiChatRoute
   '/best/$slug': typeof BestSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/feed.xml': typeof BlogFeedDotxmlRoute
@@ -526,6 +544,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/calendar'
     | '/chart-reader'
+    | '/chat'
     | '/commodities'
     | '/contact'
     | '/data-sources'
@@ -552,6 +571,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/trading'
+    | '/api/chat'
     | '/best/$slug'
     | '/blog/$slug'
     | '/blog/feed.xml'
@@ -583,6 +603,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/calendar'
     | '/chart-reader'
+    | '/chat'
     | '/commodities'
     | '/contact'
     | '/data-sources'
@@ -609,6 +630,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/trading'
+    | '/api/chat'
     | '/best/$slug'
     | '/blog/$slug'
     | '/blog/feed.xml'
@@ -640,6 +662,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/calendar'
     | '/chart-reader'
+    | '/chat'
     | '/commodities'
     | '/contact'
     | '/data-sources'
@@ -666,6 +689,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/trading'
+    | '/api/chat'
     | '/best/$slug'
     | '/blog/$slug'
     | '/blog/feed.xml'
@@ -698,6 +722,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CalendarRoute: typeof CalendarRoute
   ChartReaderRoute: typeof ChartReaderRoute
+  ChatRoute: typeof ChatRoute
   CommoditiesRoute: typeof CommoditiesRoute
   ContactRoute: typeof ContactRoute
   DataSourcesRoute: typeof DataSourcesRoute
@@ -724,6 +749,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   TradingRoute: typeof TradingRoute
+  ApiChatRoute: typeof ApiChatRoute
   BestSlugRoute: typeof BestSlugRoute
   BlogSlugRoute: typeof BlogSlugRoute
   BlogFeedDotxmlRoute: typeof BlogFeedDotxmlRoute
@@ -797,6 +823,13 @@ declare module '@tanstack/react-router' {
       path: '/chart-reader'
       fullPath: '/chart-reader'
       preLoaderRoute: typeof ChartReaderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chat': {
+      id: '/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/commodities': {
@@ -981,6 +1014,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TradingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/best/$slug': {
       id: '/best/$slug'
       path: '/best/$slug'
@@ -1146,6 +1186,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CalendarRoute: CalendarRoute,
   ChartReaderRoute: ChartReaderRoute,
+  ChatRoute: ChatRoute,
   CommoditiesRoute: CommoditiesRoute,
   ContactRoute: ContactRoute,
   DataSourcesRoute: DataSourcesRoute,
@@ -1172,6 +1213,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   TradingRoute: TradingRoute,
+  ApiChatRoute: ApiChatRoute,
   BestSlugRoute: BestSlugRoute,
   BlogSlugRoute: BlogSlugRoute,
   BlogFeedDotxmlRoute: BlogFeedDotxmlRoute,

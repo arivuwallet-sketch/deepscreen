@@ -9,6 +9,7 @@
 - Five-day refund policy and founder contact details
 - Original commodities, Gift Nifty and IPO GMP pages with navigation; no stock or IPO page changes
 - Product-specific, recent news on mutual fund, ETF and REIT detail pages
+- DeepScreen AI finance chat with browser-saved history and verified stock research tools
 
 ## Backlink plan (low budget)
 1. Publish one data-led exchange or sector study monthly and pitch its findings to finance newsletters and market-data journalists.
