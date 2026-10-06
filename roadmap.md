@@ -11,6 +11,7 @@
 - Product-specific, recent news on mutual fund, ETF and REIT detail pages
 - DeepScreen AI finance chat with browser-saved history and verified stock research tools
 - Technical SEO, GEO, AEO and AAO audit: corrected private chat indexability and verified public metadata, crawler access, structured answers, and the complete sitemap
+- Explicit access for established AI search, chatbot, answer-engine and model-discovery crawlers, with wildcard access for other robots-compliant agents
 
 ## Backlink plan (low budget)
 1. Publish one data-led exchange or sector study monthly and pitch its findings to finance newsletters and market-data journalists.
