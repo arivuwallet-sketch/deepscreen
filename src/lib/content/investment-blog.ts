@@ -2954,6 +2954,605 @@ export const INVESTMENT_BLOG_POSTS: BlogPost[] = [
       { label: "DeepScreen research blog", href: "/blog" },
     ],
   },
+
+  {
+    slug: "credit-card-minimum-due-trap-india",
+    category: "Save Money",
+    title: "Credit Card Minimum Due Trap in India: How to Escape It | DeepScreen",
+    h1: "Credit card minimum due trap in India: how to escape revolving debt",
+    description:
+      "Paying only the minimum due can keep credit-card debt alive for months or years. Learn how revolving interest works and use the DeepScreen CARD Exit Plan.",
+    excerpt:
+      "The minimum amount due is not a discounted bill. It is a payment threshold that can leave most of the statement balance revolving and exposed to finance charges.",
+    primaryKeyword: "credit card minimum due trap India",
+    secondaryKeywords: [
+      "minimum amount due credit card India",
+      "credit card interest India",
+      "how to pay off credit card debt India",
+      "minimum payment trap",
+      "revolving credit card balance",
+      "credit card APR India",
+      "credit card debt repayment plan",
+    ],
+    published: "2026-10-06",
+    updated: "2026-10-06",
+    readingMinutes: 10,
+    directAnswer:
+      "Paying only the minimum amount due can keep a credit-card account from being treated as unpaid for the required minimum, but it does not clear the statement balance. The unpaid balance can continue attracting interest, and RBI requires card issuers to warn that repeated minimum-only payments can stretch repayment over months or years with consequential compounded interest. If you can afford it, clearing the total amount due by the due date is generally the cleanest way to avoid revolving-interest costs under your card terms.",
+    uniqueAngle:
+      "The DeepScreen CARD Exit Plan turns credit-card cleanup into four steps: Capture the real balance and APR, Arrest new discretionary card spending, Repay above the minimum, and Defend the next billing cycle.",
+    keyTakeaways: [
+      "The minimum amount due is not the same as the total amount due.",
+      "RBI requires issuers to disclose the consequences of minimum-only repayment and how finance charges are calculated.",
+      "The interest-free credit period can be suspended when a previous statement balance remains outstanding, subject to the card's terms and RBI directions.",
+      "A repayment plan should use the APR, total outstanding and fixed monthly repayment capacity rather than the minimum-payment number alone.",
+      "Do not refinance solely because the monthly instalment looks smaller; compare effective cost, fees and tenure.",
+    ],
+    sections: [
+      {
+        id: "minimum-due-meaning",
+        heading: "What does minimum amount due actually mean?",
+        answer:
+          "It is the minimum payment the issuer asks you to make for the billing cycle; it is not evidence that the rest of the bill has disappeared.",
+        table: {
+          caption: "Credit-card statement choices and their likely consequences",
+          headers: ["Payment choice", "What happens now", "What to watch"],
+          rows: [
+            ["Pay total amount due", "Statement balance is cleared", "Generally preserves the normal interest-free treatment when card terms are met"],
+            ["Pay more than minimum but less than total", "A balance remains", "Finance charges may apply under issuer terms"],
+            ["Pay only minimum", "Required minimum is met", "Most of the balance may keep revolving"],
+            ["Pay below minimum", "Required minimum is not met", "Past-due treatment or charges may apply subject to RBI rules and issuer terms"],
+          ],
+        },
+        paragraphs: [
+          {
+            text:
+              "RBI's credit-card directions require issuers to explain the implications of paying only the minimum amount due and to display a warning that minimum-only repayment can stretch over months or years with consequential compounded interest.",
+            sources: ["rbi-card-directions"],
+          },
+          {
+            text:
+              "RBI also requires the Most Important Terms and Conditions to explain that the interest-free credit period is suspended when a previous month's bill balance remains outstanding, with the issuer disclosing how finance charges are calculated.",
+            sources: ["rbi-card-directions"],
+          },
+        ],
+      },
+      {
+        id: "card-exit-plan",
+        heading: "Use the DeepScreen CARD Exit Plan",
+        answer:
+          "CARD stands for Capture, Arrest, Repay and Defend.",
+        table: {
+          caption: "DeepScreen CARD Exit Plan",
+          headers: ["Step", "Action", "Purpose"],
+          rows: [
+            ["C — Capture", "Write down total outstanding, APR, minimum due, due date, fees and every card balance", "See the real debt instead of only the minimum payment"],
+            ["A — Arrest", "Pause new discretionary card purchases and unnecessary recurring charges", "Stop the target from growing"],
+            ["R — Repay", "Pay required minimums, then direct safe extra cash toward the expensive revolving balance", "Reduce principal faster"],
+            ["D — Defend", "Set full-statement autopay if suitable, maintain a buffer and review spending weekly", "Reduce the chance of rebuilding the balance"],
+          ],
+        },
+      },
+      {
+        id: "worked-example",
+        heading: "Worked example: why the minimum can feel slow",
+        answer:
+          "A simple illustration shows how finance charges can absorb a meaningful part of a small payment.",
+        paragraphs: [
+          {
+            text:
+              "Suppose Priya has a ₹60,000 card balance and the statement minimum is ₹3,000. For illustration only, assume a 3% monthly finance charge and ignore taxes, fees, new purchases and the issuer's exact daily-balance method. A rough one-month finance charge would be ₹60,000 × 3% = ₹1,800.",
+          },
+          {
+            text:
+              "If she pays only ₹3,000, the balance falls much more slowly than the payment amount suggests because financing cost consumes part of the cash outflow. If she can safely redirect ₹8,000 a month instead, more cash can attack principal and the amount exposed to future interest can fall faster.",
+          },
+        ],
+        note:
+          "Illustration only. Use the APR, calculation method, taxes and fees shown by your own issuer for an accurate repayment estimate.",
+      },
+      {
+        id: "multiple-debts",
+        heading: "If you have multiple cards, rank cost before convenience",
+        answer:
+          "Pay all required minimums first, then compare effective interest rates and fees before choosing where extra repayment money goes.",
+        bullets: [
+          "List every card's outstanding balance, APR and minimum due.",
+          "Keep required payments current across all accounts.",
+          "Direct additional repayment to the highest-cost balance unless another approach is necessary for cash-flow or behavioural reasons.",
+          "Do not move debt to a new product without comparing processing fees, effective annual cost, tenure and prepayment rules.",
+          "Stop using cleared cards for new discretionary debt while the repayment plan is still fragile.",
+        ],
+      },
+      {
+        id: "five-minute-audit",
+        heading: "The five-minute monthly credit-card audit",
+        answer:
+          "A recurring review catches balance creep before it becomes a long-term repayment problem.",
+        bullets: [
+          "Record the total amount due and minimum amount due.",
+          "Check the APR and finance-charge calculation shown in the statement or MITC.",
+          "Identify subscriptions and recurring transactions still hitting the card.",
+          "Confirm the fixed repayment amount you can safely commit this month.",
+          "Review whether your emergency buffer is large enough to avoid putting the next small shock back on the card.",
+        ],
+      },
+      {
+        id: "when-cash-is-tight",
+        heading: "What if you cannot make the required payment?",
+        answer:
+          "Contact the card issuer early rather than ignoring the account, and compare any restructuring or refinancing offer using total cost rather than monthly payment alone.",
+        paragraphs: [
+          {
+            text:
+              "A smaller monthly instalment can still be more expensive overall if it extends the repayment period or adds processing charges. Ask for the effective rate, total rupee repayment, tenure, fees and prepayment terms before accepting an alternative.",
+          },
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "Is paying the minimum amount due enough?",
+        a: "It may satisfy the required minimum payment for that billing cycle, but it does not clear the remaining balance. Finance charges can continue according to the issuer's terms.",
+      },
+      {
+        q: "Will I still get an interest-free period after paying only the minimum?",
+        a: "Do not assume so. RBI requires card terms to explain that the interest-free credit period is suspended if a previous month's bill balance remains outstanding.",
+      },
+      {
+        q: "Is the minimum due calculated the same way by every bank?",
+        a: "No. Issuer methodologies and card terms can differ. Check the statement and Most Important Terms and Conditions for your specific card.",
+      },
+      {
+        q: "Should I empty my emergency fund to clear card debt?",
+        a: "Not automatically. Revolving card debt can be expensive, but eliminating every rupee of emergency liquidity can leave you exposed to the next shock. Balance debt reduction with a basic cash buffer appropriate to your situation.",
+      },
+      {
+        q: "Should I take a personal loan to repay a credit card?",
+        a: "Only after comparing the effective interest rate, processing charges, tenure, prepayment conditions and total rupee cost. Moving debt helps only if it genuinely improves the economics and you do not rebuild the card balance.",
+      },
+    ],
+    sources: [
+      {
+        id: "rbi-card-directions",
+        title: "Master Direction — Credit Card and Debit Card — Issuance and Conduct Directions, 2022",
+        publisher: "Reserve Bank of India",
+        date: "as updated; accessed 6 October 2026",
+        href: "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12300",
+      },
+    ],
+    relatedLinks: [
+      { label: "How to save money every month", href: "/blog/how-to-save-money-every-month-india" },
+      { label: "Stop subscription creep", href: "/blog/stop-subscription-creep-recurring-payments-india" },
+      { label: "Health insurance portability checklist", href: "/blog/health-insurance-portability-india-checklist" },
+      { label: "Make money from intellectual property", href: "/blog/make-money-intellectual-property-india" },
+      { label: "DeepScreen research blog", href: "/blog" },
+    ],
+  },
+  {
+    slug: "health-insurance-portability-india-checklist",
+    category: "Protect Money",
+    title: "Health Insurance Portability in India: What You Keep When You Switch | DeepScreen",
+    h1: "Health insurance portability in India: what to check before switching",
+    description:
+      "Switching health insurers? Learn how portability, waiting-period credits and the 60-month moratorium work, plus the DeepScreen PORT checklist.",
+    excerpt:
+      "A cheaper health policy is not automatically a better one. Portability decisions should preserve valuable continuity while comparing exclusions, co-payments, hospital access and real protection.",
+    primaryKeyword: "health insurance portability India",
+    secondaryKeywords: [
+      "port health insurance India",
+      "health insurance moratorium 60 months",
+      "health insurance waiting period India",
+      "IRDAI portability rules",
+      "switch health insurance company India",
+      "pre existing disease waiting period portability",
+      "health insurance portability checklist",
+    ],
+    published: "2026-10-06",
+    updated: "2026-10-06",
+    readingMinutes: 11,
+    directAnswer:
+      "You can port an eligible health-insurance policy to another insurer, and IRDAI says portability can transfer eligible credits such as sum insured, no-claim bonus, specific waiting periods, pre-existing-disease waiting periods and the moratorium period. But portability is not a reason to cancel your old policy before the new insurer has accepted you. Compare coverage, exclusions, underwriting, hospital access and continuity benefits — not premium alone.",
+    uniqueAngle:
+      "The DeepScreen PORT portability checklist separates protection quality from price: Protection first, Old-policy continuity, Read the new policy, and Transfer before termination.",
+    keyTakeaways: [
+      "IRDAI says portability is available at renewal for eligible individual, family floater and group health policies.",
+      "Eligible continuity credits can include sum insured, no-claim bonus, waiting periods and the moratorium period.",
+      "IRDAI currently describes the moratorium as 60 continuous months of coverage, including portability and migration.",
+      "Current IRDAI consumer guidance says waiting periods, including PED waiting periods, may be up to 36 months.",
+      "Premium is only one decision factor; exclusions, co-pay, deductible, room restrictions and hospital access can materially change out-of-pocket risk.",
+    ],
+    sections: [
+      {
+        id: "what-portability-does",
+        heading: "What does health insurance portability actually transfer?",
+        answer:
+          "Portability is designed to preserve eligible continuity credits when you move from one insurer to another at renewal.",
+        paragraphs: [
+          {
+            text:
+              "IRDAI defines portability as the facility for a health-insurance policyholder to transfer credits gained for pre-existing diseases and specific waiting periods from one insurer to another.",
+            sources: ["irdai-health-faq"],
+          },
+          {
+            text:
+              "IRDAI's current consumer guidance says indemnity-policy portability or migration can transfer credits including sum insured, no-claim bonus, specific waiting periods, PED waiting period and moratorium-period credit.",
+            sources: ["irdai-health-faq"],
+          },
+        ],
+      },
+      {
+        id: "port-framework",
+        heading: "Use the DeepScreen PORT portability checklist",
+        answer:
+          "PORT stands for Protection, Old-policy continuity, Read, and Transfer.",
+        table: {
+          caption: "DeepScreen PORT health-insurance portability checklist",
+          headers: ["Step", "What to check", "Why it matters"],
+          rows: [
+            ["P — Protection", "Sum insured, room rules, co-pay, deductible, exclusions, restoration and hospital network", "A lower premium can still produce higher out-of-pocket risk"],
+            ["O — Old-policy continuity", "Original start date, uninterrupted renewals, waiting periods served, claims and prior sum-insured increases", "Continuity has financial value"],
+            ["R — Read", "Policy wording, Customer Information Sheet and benefit schedule", "Marketing summaries do not show every restriction"],
+            ["T — Transfer", "Complete portability before voluntarily terminating existing protection", "Avoid an uninsured gap"],
+          ],
+        },
+      },
+      {
+        id: "moratorium",
+        heading: "Why the 60-month moratorium matters",
+        answer:
+          "Long, continuous coverage can become more valuable over time because IRDAI's moratorium rules restrict contestability after the required period, subject to fraud and the treatment of enhanced sums insured.",
+        paragraphs: [
+          {
+            text:
+              "IRDAI currently states that after 60 continuous months of health-insurance coverage, including portability and migration, a policy and claim cannot be contested on grounds of non-disclosure or misrepresentation except established fraud.",
+            sources: ["irdai-health-faq"],
+          },
+          {
+            text:
+              "IRDAI also states that when the sum insured is enhanced, the 60-month period applies separately from the date of enhancement to the enhanced limits.",
+            sources: ["irdai-health-faq"],
+          },
+        ],
+      },
+      {
+        id: "waiting-periods",
+        heading: "Check waiting-period credit before you compare premiums",
+        answer:
+          "The value of years already served can be more important than a small first-year premium saving.",
+        paragraphs: [
+          {
+            text:
+              "IRDAI's current consumer guidance says the maximum waiting period under a health-insurance policy, including PED waiting period, can be up to 36 months. Portability can transfer eligible waiting-period credit rather than automatically restarting from zero.",
+            sources: ["irdai-health-faq"],
+          },
+        ],
+      },
+      {
+        id: "comparison-table",
+        heading: "Build a portability comparison before you apply",
+        answer:
+          "Put the existing and proposed policy side by side using the fields that can change real claim outcomes.",
+        table: {
+          caption: "DeepScreen health-policy portability comparison",
+          headers: ["Check", "Existing policy", "Proposed policy"],
+          rows: [
+            ["Base sum insured", "₹___", "₹___"],
+            ["PED waiting credit served", "___ months", "Credit recognised: ___"],
+            ["Specific waiting periods", "___", "___"],
+            ["Moratorium continuity", "___ months", "___ months recognised"],
+            ["Room restriction", "___", "___"],
+            ["Co-pay", "___%", "___%"],
+            ["Deductible", "₹___", "₹___"],
+            ["Preferred hospitals in network", "___", "___"],
+            ["Major exclusions", "___", "___"],
+            ["Annual premium", "₹___", "₹___"],
+          ],
+        },
+      },
+      {
+        id: "worked-example",
+        heading: "Worked example: ₹4,000 cheaper is not the whole decision",
+        answer:
+          "A visible premium saving should be weighed against continuity and coverage differences that can be much larger during a claim.",
+        paragraphs: [
+          {
+            text:
+              "Assume Arjun has maintained continuous health cover for 48 months and finds a new policy that is ₹4,000 cheaper per year. Before switching, he should confirm the continuity credit the acquiring insurer recognises, whether his preferred hospitals remain available, whether new co-pays or sub-limits apply, and how any higher sum insured is treated.",
+          },
+          {
+            text:
+              "The ₹4,000 saving is easy to measure. The value of keeping suitable protection and continuity is harder to see, so the decision should be based on total protection rather than premium alone.",
+          },
+        ],
+      },
+      {
+        id: "renewal-review",
+        heading: "Run this protection review before every renewal",
+        answer:
+          "Annual review reduces the chance of discovering an important restriction only when you need to claim.",
+        bullets: [
+          "Update family and medical information accurately.",
+          "Check whether the current sum insured remains suitable.",
+          "Verify nearby hospitals you would realistically use.",
+          "Review exclusions, co-pay, deductible and room eligibility.",
+          "Keep old schedules and renewal receipts as continuity evidence.",
+          "Start portability comparison early enough to meet the current process timelines.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "Can I move my health insurance to another insurer?",
+        a: "Eligible health policies can be ported at renewal under the IRDAI framework, subject to the acquiring insurer's process and underwriting.",
+      },
+      {
+        q: "Do I lose all my waiting-period history when I port?",
+        a: "Not necessarily. IRDAI provides for transfer of eligible continuity credits, including specific and pre-existing-disease waiting-period credits.",
+      },
+      {
+        q: "What is the health-insurance moratorium period?",
+        a: "IRDAI currently describes it as 60 continuous months of coverage, including portability and migration, subject to its rules and separate treatment of enhanced sums insured.",
+      },
+      {
+        q: "Is the cheapest health-insurance policy the best one?",
+        a: "No. Compare premium with coverage, exclusions, co-pay, deductible, hospital network, room rules and your actual protection needs.",
+      },
+      {
+        q: "Can I hide an illness because I already served a waiting period?",
+        a: "No. Answer proposal and underwriting questions truthfully and completely. Portability does not justify withholding requested medical information.",
+      },
+      {
+        q: "Should I cancel the old policy before applying for portability?",
+        a: "Avoid creating an uninsured gap. Complete the portability process according to current rules and confirm the new cover and terms before voluntarily giving up existing protection.",
+      },
+    ],
+    sources: [
+      {
+        id: "irdai-health-faq",
+        title: "Health Department — Health Insurance Consumer FAQs",
+        publisher: "Insurance Regulatory and Development Authority of India",
+        date: "accessed 6 October 2026",
+        href: "https://irdai.gov.in/health-dept",
+      },
+    ],
+    relatedLinks: [
+      { label: "How to protect your money", href: "/blog/how-to-protect-your-money-india" },
+      { label: "What to do after UPI or bank fraud", href: "/blog/what-to-do-after-upi-bank-fraud-india" },
+      { label: "Credit card minimum due trap", href: "/blog/credit-card-minimum-due-trap-india" },
+      { label: "Make money from intellectual property", href: "/blog/make-money-intellectual-property-india" },
+      { label: "DeepScreen research blog", href: "/blog" },
+    ],
+  },
+  {
+    slug: "make-money-intellectual-property-india",
+    category: "Make More Money",
+    title: "How to Make Money From Intellectual Property in India | DeepScreen",
+    h1: "How to turn intellectual property into a legitimate income-producing asset",
+    description:
+      "Learn how creators and small businesses can turn copyright, trademarks and reusable intellectual property into legitimate income with DeepScreen's ASSET framework.",
+    excerpt:
+      "Original work can sometimes earn more than once through authorised reuse, licensing or productisation — but only when ownership is clear, customer value is real and the revenue model is legally structured.",
+    primaryKeyword: "make money from intellectual property India",
+    secondaryKeywords: [
+      "intellectual property income India",
+      "copyright licensing India",
+      "sell digital products India",
+      "license creative work India",
+      "trademark small business India",
+      "creator income intellectual property",
+      "monetize copyright India",
+    ],
+    published: "2026-10-06",
+    updated: "2026-10-06",
+    readingMinutes: 12,
+    directAnswer:
+      "If you repeatedly create useful original work — software, photographs, illustrations, music, written material, templates, designs, courses or other eligible content — you may be able to earn from the same underlying intellectual property more than once through licensing, subscriptions, productisation or authorised reuse. That is not guaranteed passive income. The real business is creating something people value, establishing who owns the rights, protecting the relevant IP appropriately and building repeatable distribution.",
+    uniqueAngle:
+      "The DeepScreen ASSET Framework treats intellectual property as a business system: Audit what you created, Secure ownership, Select a revenue model, Establish appropriate protection, and Test distribution.",
+    keyTakeaways: [
+      "Copyright in eligible work arises automatically in India; registration is not required for copyright to exist.",
+      "The Register of Copyrights can provide prima facie evidence of the particulars entered in it.",
+      "Copyright protects eligible original expression, not a bare idea, method, title or short phrase by itself.",
+      "Copyright, trademarks, patents and design protection solve different problems; use the right tool for the asset.",
+      "Licensing or productising IP works only when you actually control the rights and there is paying demand.",
+    ],
+    sections: [
+      {
+        id: "work-vs-ip",
+        heading: "Separate one-time work from reusable intellectual property",
+        answer:
+          "A service project is paid once unless your contract and ownership structure allow the underlying asset to be reused or licensed again.",
+        bullets: [
+          "A photographer may license an original photograph.",
+          "A developer may license software they own.",
+          "A designer may sell a reusable template created from their own assets.",
+          "An educator may license original training material.",
+          "A small business may license a brand or creative asset where the rights support it.",
+        ],
+        paragraphs: [
+          {
+            text:
+              "Not every creation is commercially valuable and not every reuse is legally permitted. Employment contracts, client assignments, collaborator agreements, open-source licences, stock assets and platform terms can determine who owns what.",
+          },
+        ],
+      },
+      {
+        id: "copyright-basics",
+        heading: "Copyright does not begin only after registration",
+        answer:
+          "India's Copyright Office says acquisition of copyright is automatic for eligible work and does not require a registration formality.",
+        paragraphs: [
+          {
+            text:
+              "The Copyright Office FAQ says copyright comes into existence as soon as an eligible work is created. Registration is optional, but the certificate and register entries can serve as prima facie evidence in ownership disputes.",
+            sources: ["copyright-faq", "copyright-act-register"],
+          },
+          {
+            text:
+              "The current Copyright Rules fee schedule lists ₹500 per work for an application to register copyright in a literary, dramatic, musical or artistic work, with different fees for some other categories and uses.",
+            sources: ["copyright-fees"],
+          },
+          {
+            text:
+              "The Copyright Office also states that copyright protects original expression rather than ideas, procedures, methods of operation or mathematical concepts as such, and it does not ordinarily protect a title, name, short phrase or factual information by itself.",
+            sources: ["copyright-faq"],
+          },
+        ],
+      },
+      {
+        id: "rights-map",
+        heading: "Copyright, trademark, patent or design?",
+        answer:
+          "Different rights protect different business assets, so filing every possible registration is rarely a sensible strategy.",
+        table: {
+          caption: "DeepScreen IP rights map",
+          headers: ["Asset", "Protection to investigate", "Core question"],
+          rows: [
+            ["Original article, photograph, artwork or code", "Copyright", "Who owns and may reproduce or license the expression?"],
+            ["Brand name or logo", "Trademark", "Who identifies goods or services under this sign?"],
+            ["Novel technical invention", "Patent assessment", "Is the invention eligible and commercially worth protecting?"],
+            ["Product appearance", "Design protection may be relevant", "Is the visual design protectable and commercially important?"],
+          ],
+        },
+      },
+      {
+        id: "asset-framework",
+        heading: "Use the DeepScreen ASSET Framework",
+        answer:
+          "ASSET stands for Audit, Secure, Select, Establish and Test.",
+        table: {
+          caption: "DeepScreen ASSET intellectual-property framework",
+          headers: ["Step", "Action", "Decision"],
+          rows: [
+            ["A — Audit", "List valuable work, creator, date, source files, contracts and third-party components", "What do you actually have?"],
+            ["S — Secure", "Confirm ownership, assignments, licences and collaborator rights", "Can you legally reuse or license it?"],
+            ["S — Select", "Choose sale, licence, subscription, SaaS, royalty, white-label or customisation model", "How will customers pay?"],
+            ["E — Establish", "Use the appropriate records, contracts and registrations where justified", "What protection fits the asset?"],
+            ["T — Test", "Validate the buyer, problem, price and distribution channel", "Will anyone pay repeatedly or refer others?"],
+          ],
+        },
+      },
+      {
+        id: "trademark-cost",
+        heading: "Trademark protection can matter when the brand itself becomes valuable",
+        answer:
+          "Trademark registration is a separate decision from copyright and is usually most relevant when a name, logo or sign is becoming an important source identifier.",
+        paragraphs: [
+          {
+            text:
+              "IP India's current fee schedule lists an electronic filing fee of ₹4,500 per class and per mark for an individual, startup or small enterprise, and ₹9,000 in other cases. Classification and conflict checks matter, so verify the current schedule before filing.",
+            sources: ["ipindia-trademark-fees"],
+          },
+        ],
+      },
+      {
+        id: "worked-example",
+        heading: "Worked example: turn custom work into a reusable asset",
+        answer:
+          "The opportunity is to create a clean, generic asset you own rather than reselling a client's proprietary work.",
+        paragraphs: [
+          {
+            text:
+              "Suppose Maya builds custom spreadsheet dashboards for ₹12,000 each. She notices that a large share of each project uses the same architecture. Instead of copying client-owned files, she creates a new generic dashboard entirely from assets she owns.",
+          },
+          {
+            text:
+              "She could test a generic template at ₹1,500, a small-business commercial licence at ₹4,000, a custom setup service at ₹8,000 and an optional update/support package at ₹3,000.",
+          },
+          {
+            text:
+              "If she hypothetically sells 10 generic licences at ₹1,500 and two setup projects at ₹8,000, gross revenue would be ₹31,000. That does not mean she will earn ₹31,000 every month; demand, marketing, taxes, refunds, support and platform fees all matter.",
+          },
+        ],
+        note:
+          "Illustration only. It demonstrates a revenue structure, not expected earnings or guaranteed passive income.",
+      },
+      {
+        id: "ip-income-test",
+        heading: "Use the DeepScreen IP Income Test before spending on protection",
+        answer:
+          "Score commercial usefulness and ownership clarity before paying for registrations that may not support a real business.",
+        table: {
+          caption: "DeepScreen IP Income Test",
+          headers: ["Question", "0 points", "1 point", "2 points"],
+          rows: [
+            ["Does it solve a real problem?", "No evidence", "Some interest", "Paying demand"],
+            ["Are ownership rights clear?", "Unclear", "Mostly", "Documented"],
+            ["Can it be reused legally?", "No", "Limited", "Yes"],
+            ["Is the buyer identifiable?", "No", "Broad idea", "Specific segment"],
+            ["Can distribution repeat?", "No", "Manual", "Repeatable channel"],
+            ["Is copying a meaningful commercial risk?", "Low", "Moderate", "Material"],
+          ],
+        },
+        note:
+          "A high score does not predict success. It only indicates that further validation and protection analysis may be worth your time.",
+      },
+    ],
+    faqs: [
+      {
+        q: "Do I need to register copyright before I own copyright in India?",
+        a: "No. The Copyright Office states that acquisition of copyright is automatic for eligible works. Registration is available and can provide evidentiary value.",
+      },
+      {
+        q: "Can I copyright an idea?",
+        a: "Copyright does not protect a bare idea or concept by itself. It protects eligible original expression.",
+      },
+      {
+        q: "Should every freelancer register a trademark?",
+        a: "No. A trademark is a business decision. Consider the value of the brand, relevant classes, conflicts with existing marks and the cost of protection.",
+      },
+      {
+        q: "Can I resell work I made for a client?",
+        a: "Do not assume so. Ownership and reuse depend on the contract, assignments and applicable law. Keep pre-existing reusable IP clearly separated from client-specific deliverables.",
+      },
+      {
+        q: "Is intellectual-property income passive income?",
+        a: "Usually not in the simplistic online sense. Creation, customer acquisition, licensing, updates, support, accounting and enforcement can all require ongoing work.",
+      },
+      {
+        q: "What should I protect first?",
+        a: "Start with ownership records and contracts. Then identify which asset is creating meaningful commercial value and choose protection appropriate to that asset rather than filing registrations indiscriminately.",
+      },
+    ],
+    sources: [
+      {
+        id: "copyright-faq",
+        title: "Frequently Asked Questions — Copyright",
+        publisher: "Copyright Office, Government of India",
+        date: "accessed 6 October 2026",
+        href: "https://copyright.gov.in/frmFAQ.aspx",
+      },
+      {
+        id: "copyright-act-register",
+        title: "Copyright Act, 1957 — Chapter X: Registration of Copyright",
+        publisher: "Copyright Office, Government of India",
+        date: "accessed 6 October 2026",
+        href: "https://copyright.gov.in/Copyright_Act_1957/chapter_x.html",
+      },
+      {
+        id: "copyright-fees",
+        title: "Copyright Rules — Second Schedule of Fees",
+        publisher: "Copyright Office, Government of India",
+        date: "accessed 6 October 2026",
+        href: "https://www.copyright.gov.in/Copyright_Rules_2013/second_schedule.html",
+      },
+      {
+        id: "ipindia-trademark-fees",
+        title: "Trade Marks — Forms and Official Fees",
+        publisher: "Office of the Controller General of Patents, Designs and Trade Marks, Government of India",
+        date: "accessed 6 October 2026",
+        href: "https://www.ipindia.gov.in/pages/trade-marks/learn/forms-and-official-fees",
+      },
+    ],
+    relatedLinks: [
+      { label: "How to make more money", href: "/blog/how-to-make-more-money-income-paths-india" },
+      { label: "Freelancing pricing, profit and tax", href: "/blog/freelancing-pricing-profit-tax-india" },
+      { label: "Credit card minimum due trap", href: "/blog/credit-card-minimum-due-trap-india" },
+      { label: "Health insurance portability checklist", href: "/blog/health-insurance-portability-india-checklist" },
+      { label: "DeepScreen research blog", href: "/blog" },
+    ],
+  },
   ...TRADING_BLOG_POSTS,
 ];
 
