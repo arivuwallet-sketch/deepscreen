@@ -300,7 +300,7 @@ function ExchangePage() {
           <LiveNewsFeed
             query={`${exchange.code} ${exchange.country} stock market`}
             title={`${exchange.code} market news`}
-            limit={20}
+            limit={30}
             maxAgeHours={24}
           />
           <section className="rounded-lg border border-border bg-panel p-4">
