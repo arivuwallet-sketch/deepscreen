@@ -113,13 +113,13 @@ function BlogIndex() {
         </section>
 
         <section className="mt-12 rounded-xl border border-primary/20 bg-primary/5 p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-primary">Today · 5 October 2026</p>
-          <h2 className="mt-2 text-lg font-semibold">Today's money guide: recurring costs, fraud response and freelance economics</h2>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">Today's three-part series turns common money problems into practical systems: audit recurring payments, respond quickly to UPI or bank fraud, and price freelance work from sustainable business economics.</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-primary">Today · 6 October 2026</p>
+          <h2 className="mt-2 text-lg font-semibold">Today's money guide: card debt, health cover and creator IP</h2>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">Today's three-part series tackles three different money decisions: escaping the credit-card minimum-due trap, switching health insurance without wasting valuable continuity, and turning owned intellectual property into legitimate reusable income.</p>
           <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm">
-            <a href="/blog/stop-subscription-creep-recurring-payments-india" className="text-primary hover:underline">Stop subscription creep</a>
-            <a href="/blog/what-to-do-after-upi-bank-fraud-india" className="text-primary hover:underline">What to do after UPI or bank fraud</a>
-            <a href="/blog/freelancing-pricing-profit-tax-india" className="text-primary hover:underline">Freelancing: pricing, profit and tax</a>
+            <a href="/blog/credit-card-minimum-due-trap-india" className="text-primary hover:underline">Escape the credit-card minimum-due trap</a>
+            <a href="/blog/health-insurance-portability-india-checklist" className="text-primary hover:underline">Health insurance portability checklist</a>
+            <a href="/blog/make-money-intellectual-property-india" className="text-primary hover:underline">Make money from intellectual property</a>
           </div>
         </section>
 
