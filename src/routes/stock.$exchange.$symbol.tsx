@@ -636,7 +636,7 @@ function StockPage() {
             <LiveNewsFeed
               query={newsSearchQuery(stock.name, stock.symbol)}
               title={`${stock.symbol} live news`}
-              limit={20}
+              limit={30}
               maxAgeHours={24}
               mode="company"
               entityName={stock.name}
