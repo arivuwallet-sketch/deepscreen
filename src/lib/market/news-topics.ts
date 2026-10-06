@@ -17,10 +17,10 @@ function clean(value: string | undefined, max = 120): string {
 }
 
 function exchangeMarket(exchange: string | undefined): string {
-  const code = clean(exchange, 12).toUpperCase();
-  if (code === "NSE" || code === "BSE") return "NSE/BSE";
-  if (code === "NYSE" || code === "NASDAQ") return "NYSE/Nasdaq";
-  if (code === "LSE") return "LSE";
+  const code = clean(exchange, 20).toUpperCase();
+  if (["NSE", "BSE", "IN", "INDIA"].includes(code)) return "NSE/BSE";
+  if (["NYSE", "NASDAQ", "US", "USA", "UNITED STATES"].includes(code)) return "NYSE/Nasdaq";
+  if (["LSE", "UK", "GB", "UNITED KINGDOM"].includes(code)) return "LSE";
   return "Global Equities";
 }
 
