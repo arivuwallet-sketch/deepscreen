@@ -46,13 +46,12 @@ function readSavedMessages(): UIMessage[] {
 function DeepScreenChat() {
   const [draft, setDraft] = useState("");
   const [historyReady, setHistoryReady] = useState(false);
-  const [initialMessages, setInitialMessages] = useState<UIMessage[]>([]);
   const restored = useRef(false);
+  const pendingRestoredMessages = useRef(0);
   const draftRef = useRef("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const { messages, setMessages, sendMessage, status, stop, error, clearError } = useChat({
-    id: historyReady ? "deepscreen-browser-conversation" : "deepscreen-browser-conversation-loading",
-    messages: initialMessages,
+    id: "deepscreen-browser-conversation",
     transport,
     onError: (chatError) => toast.error(chatError.message || "DeepScreen could not answer that request."),
   });
@@ -62,12 +61,15 @@ function DeepScreenChat() {
     if (restored.current) return;
     restored.current = true;
     const savedMessages = readSavedMessages();
-    setInitialMessages(savedMessages);
+    pendingRestoredMessages.current = savedMessages.length;
+    setMessages(savedMessages);
     setHistoryReady(true);
-  }, []);
+  }, [setMessages]);
 
   useEffect(() => {
     if (!historyReady || typeof window === "undefined") return;
+    if (pendingRestoredMessages.current > messages.length) return;
+    pendingRestoredMessages.current = 0;
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
   }, [historyReady, messages]);
 
@@ -103,7 +105,7 @@ function DeepScreenChat() {
     setMessages([]);
     setDraft("");
     draftRef.current = "";
-    setInitialMessages([]);
+    pendingRestoredMessages.current = 0;
     if (typeof window !== "undefined") window.localStorage.removeItem(STORAGE_KEY);
     window.requestAnimationFrame(() => inputRef.current?.focus());
   };
