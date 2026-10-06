@@ -554,7 +554,7 @@ const GLOBAL_MARKET_NEWS_TOPICS = [
   { category: "GEOPOLITICS", query: "geopolitics war sanctions trade markets stocks" },
 ] as const;
 
-const NEWS_CACHE_TTL_MS = 30_000;
+const NEWS_CACHE_TTL_MS = 20_000;
 const newsMemoryCache = new Map<string, { data: LiveNewsResult; fetchedAt: number }>();
 const newsInFlight = new Map<string, Promise<LiveNewsResult>>();
 
@@ -793,7 +793,7 @@ export const getNewsFeed = createServerFn({ method: "GET" })
                 market: data.market,
               });
 
-        const perTopicLimit = Math.max(8, Math.min(16, Math.ceil(limit / 2)));
+        const perTopicLimit = Math.max(10, Math.min(20, Math.ceil(limit * 0.7)));
         const fetchTopic = async (
           topic: { category: string; query: string; affectedMarkets?: string[] },
           topicIndex: number,
@@ -803,9 +803,7 @@ export const getNewsFeed = createServerFn({ method: "GET" })
           const includeYahoo =
             mode === "global-market"
               ? topicIndex < 6
-              : mode === "company"
-                ? topicIndex < 2
-                : topicIndex < 3;
+              : true;
 
           const [google, bing, yahoo] = await Promise.all([
             fetchFeed(googleNewsFeed(freshQuery), "Google News", topic.category, perTopicLimit),
@@ -825,8 +823,9 @@ export const getNewsFeed = createServerFn({ method: "GET" })
           }));
         };
 
-        for (let batchStart = 0; batchStart < topics.length; batchStart += 4) {
-          const batch = topics.slice(batchStart, batchStart + 4);
+        const batchSize = mode === "global-market" ? 4 : 3;
+        for (let batchStart = 0; batchStart < topics.length; batchStart += batchSize) {
+          const batch = topics.slice(batchStart, batchStart + batchSize);
           const topicResults = await Promise.all(
             batch.map((topic, offset) => fetchTopic(topic, batchStart + offset)),
           );
@@ -871,7 +870,7 @@ export const getNewsFeed = createServerFn({ method: "GET" })
       // topic; asset/product feeds get eight so relevant company/product news
       // can still dominate when there is genuine activity.
       const categoryCounts = new Map<string, number>();
-      const categoryCap = mode === "global-market" ? 6 : 8;
+      const categoryCap = mode === "global-market" ? 6 : 10;
       const balanced = mode !== "generic"
         ? sorted.filter((item) => {
             const count = categoryCounts.get(item.category) ?? 0;
