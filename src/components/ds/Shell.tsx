@@ -10,6 +10,7 @@ import { ResearchNextSteps } from "./ResearchNextSteps";
 import { WorkspaceAtmosphere } from "./WorkspaceAtmosphere";
 
 const NAV_ITEMS: Array<readonly [string, string]> = [
+  ["/chat", "Ask AI"],
   ["/screener", "Screener"],
   ["/investments", "Investments"],
   ["/stock-filters", "Filters"],
