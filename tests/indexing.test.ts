@@ -266,6 +266,9 @@ test('investment blog cluster remains indexable, sourced and sitemap-discoverabl
     'stop-subscription-creep-recurring-payments-india',
     'what-to-do-after-upi-bank-fraud-india',
     'freelancing-pricing-profit-tax-india',
+    'credit-card-minimum-due-trap-india',
+    'health-insurance-portability-india-checklist',
+    'make-money-intellectual-property-india',
   ]) {
     assert.match(blogContent, new RegExp('slug: "' + slug + '"'));
     assert.match(llms, new RegExp('https://deepscreen\\.online/blog/' + slug));
@@ -284,6 +287,9 @@ test('investment blog cluster remains indexable, sourced and sitemap-discoverabl
   assert.match(blogContent, /DeepScreen RACE recurring-payment audit/);
   assert.match(blogContent, /DeepScreen FREEZE fraud-response protocol/);
   assert.match(blogContent, /DeepScreen FLOOR freelance pricing method/);
+  assert.match(blogContent, /DeepScreen CARD Exit Plan/);
+  assert.match(blogContent, /DeepScreen PORT portability checklist/);
+  assert.match(blogContent, /DeepScreen ASSET Framework/);
 });
 
 test('commodities GIFT Nifty and IPO GMP Q&A stay visible indexable and source-backed', async () => {
