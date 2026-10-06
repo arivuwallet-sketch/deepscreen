@@ -24,7 +24,7 @@ test("market-moving news is constrained to genuinely recent publication times", 
   assert.ok(market.includes("newsKey(data.query, maxAgeHours, scope)"));
   assert.ok(market.includes("maxAgeHours <= 24"));
   assert.ok(market.includes('"1d"'));
-  assert.ok(market.includes("const NEWS_CACHE_TTL_MS = 30_000"));
+  assert.ok(market.includes("const NEWS_CACHE_TTL_MS = 20_000"));
   assert.ok(market.includes("filterRecentNews(allItems, maxAgeHours).sort("));
 
   assert.ok(feed.includes('"news-feed"'));
@@ -33,7 +33,7 @@ test("market-moving news is constrained to genuinely recent publication times", 
   assert.ok(feed.includes("entityCode"));
   assert.ok(feed.includes("exchange"));
   assert.ok(feed.includes("market"));
-  assert.ok(feed.includes("refetchInterval: 30_000"));
+  assert.ok(feed.includes("refetchInterval: 20_000"));
   assert.ok(feed.includes('"LATEST · " + ago(newest.minutesAgo)'));
 });
 
@@ -161,30 +161,44 @@ test("stock commodity ETF mutual-fund and REIT news use widened scoped feeds", a
   for (const category of [
     "COMPANY",
     "EARNINGS",
+    "FILINGS",
     "ANALYSTS",
     "CORPORATE",
+    "CAPITAL",
     "MANAGEMENT",
+    "INDUSTRY",
     "GOLD",
     "SILVER",
     "OIL",
     "NAT GAS",
     "COPPER",
+    "PRECIOUS",
+    "ENERGY",
+    "METALS",
     "MF FLOWS",
+    "MF NFO",
+    "MF RULES",
+    "MF MANAGERS",
     "ETF FLOWS",
+    "ETF LAUNCH",
+    "ETF INDEX",
+    "ETF THEMES",
     "REIT MARKET",
+    "REIT DISTRIBUTION",
+    "REIT CAPITAL",
   ]) {
     assert.ok(topics.includes(`category: "${category}"`), category);
   }
 
   assert.ok(stock.includes('mode="company"'));
   assert.ok(stock.includes("maxAgeHours={24}"));
-  assert.ok(stock.includes("limit={20}"));
+  assert.ok(stock.includes("limit={30}"));
   assert.ok(stock.includes("entityName={stock.name}"));
   assert.ok(stock.includes("entityCode={stock.symbol}"));
   assert.ok(stock.includes("exchange={stock.exchange}"));
 
   assert.ok(commodities.includes('mode="commodities"'));
-  assert.ok(commodities.includes("limit={30}"));
+  assert.ok(commodities.includes("limit={40}"));
   assert.ok(commodities.includes("maxAgeHours={24}"));
 
   assert.ok(investment.includes('"mutual-fund"'));
@@ -198,9 +212,9 @@ test("stock commodity ETF mutual-fund and REIT news use widened scoped feeds", a
   assert.ok(etfs.includes('mode="etf"'));
   assert.ok(reits.includes('mode="reit"'));
   assert.ok(exchange.includes("maxAgeHours={24}"));
-  assert.ok(exchange.includes("limit={20}"));
+  assert.ok(exchange.includes("limit={30}"));
   for (const hub of [funds, etfs, reits]) {
-    assert.ok(hub.includes("limit={30}"));
+    assert.ok(hub.includes("limit={40}"));
     assert.ok(hub.includes("maxAgeHours={24}"));
     assert.ok(hub.includes("showCategory"));
   }
@@ -213,6 +227,8 @@ test("scoped news uses all three providers and preserves affected-market context
   assert.ok(market.includes('fetchFeed(googleNewsFeed(freshQuery)'));
   assert.ok(market.includes('fetchFeed(bingNewsFeed(genericQuery)'));
   assert.ok(market.includes('includeYahoo ? fetchYahooNews(genericQuery'));
+  assert.ok(market.includes('mode === "global-market"'));
+  assert.ok(market.includes(': true;'));
   assert.ok(market.includes("topic.affectedMarkets ?? []"));
   assert.ok(market.includes('mode !== "generic"'));
 
@@ -223,4 +239,31 @@ test("scoped news uses all three providers and preserves affected-market context
   assert.ok(topics.includes('"NSE/BSE"'));
   assert.ok(topics.includes('"NYSE/Nasdaq"'));
   assert.ok(topics.includes('"LSE"'));
+});
+
+
+test("widened scoped news keeps every provider and deduplicates syndicated variants", async () => {
+  const market = await source("../src/lib/market/market.functions.ts");
+  const rss = await source("../src/lib/rss.server.ts");
+  const feed = await source("../src/components/ds/LiveNewsFeed.tsx");
+  const investment = await source("../src/routes/investment.$market.$type.$code.tsx");
+
+  assert.ok(market.includes("Math.min(20, Math.ceil(limit * 0.7))"));
+  assert.ok(market.includes('const batchSize = mode === "global-market" ? 4 : 3'));
+  assert.ok(market.includes('const categoryCap = mode === "global-market" ? 6 : 10'));
+  assert.ok(feed.includes("refetchInterval: 20_000"));
+  assert.ok(feed.includes("staleTime: 7_500"));
+  assert.ok(investment.includes("limit={30}"));
+
+  assert.ok(rss.includes("function newsFingerprint"));
+  assert.ok(rss.includes(".slice(0, 14)"));
+  assert.ok(rss.includes("seen.has(key)"));
+});
+
+test("investment market aliases map to the correct affected exchange groups", async () => {
+  const topics = await source("../src/lib/market/news-topics.ts");
+
+  assert.ok(topics.includes('["NSE", "BSE", "IN", "INDIA"]'));
+  assert.ok(topics.includes('["NYSE", "NASDAQ", "US", "USA", "UNITED STATES"]'));
+  assert.ok(topics.includes('["LSE", "UK", "GB", "UNITED KINGDOM"]'));
 });

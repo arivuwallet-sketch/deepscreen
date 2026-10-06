@@ -149,12 +149,23 @@ export function refreshAges(items: FeedItem[]): FeedItem[] {
   });
 }
 
+function newsFingerprint(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/\s+[-–—|]\s+[a-z0-9][a-z0-9 .&'/-]{1,45}$/i, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim()
+    .split(/\s+/)
+    .slice(0, 14)
+    .join(" ");
+}
+
 export function dedupe(items: FeedItem[]): FeedItem[] {
   const seen = new Set<string>();
-  return items.filter((i) => {
-    const k = i.title.toLowerCase().slice(0, 70);
-    if (seen.has(k)) return false;
-    seen.add(k);
+  return items.filter((item) => {
+    const key = newsFingerprint(item.title);
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
     return true;
   });
 }

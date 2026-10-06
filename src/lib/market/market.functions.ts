@@ -554,7 +554,7 @@ const GLOBAL_MARKET_NEWS_TOPICS = [
   { category: "GEOPOLITICS", query: "geopolitics war sanctions trade markets stocks" },
 ] as const;
 
-const NEWS_CACHE_TTL_MS = 30_000;
+const NEWS_CACHE_TTL_MS = 20_000;
 const newsMemoryCache = new Map<string, { data: LiveNewsResult; fetchedAt: number }>();
 const newsInFlight = new Map<string, Promise<LiveNewsResult>>();
 
@@ -585,7 +585,7 @@ function filterRecentNews(items: FeedItem[], maxAgeHours?: number): FeedItem[] {
 const HIGH_IMPACT_NEWS_RE =
   /\b(fomc|federal reserve|fed decision|rate decision|rate hike|rate cut|interest rates?|cpi|inflation|nonfarm payrolls?|payrolls|jobs report|gdp|recession|default|bankruptcy|bailout|war|missile|invasion|attack|sanctions?|tariffs?|emergency|crash|meltdown|circuit breaker|trading halt|sovereign debt|debt ceiling)\b/i;
 const MEDIUM_IMPACT_NEWS_RE =
-  /\b(earnings|results|guidance|forecast|outlook|merger|acquisition|takeover|buyout|ipo|regulation|regulator|antitrust|lawsuit|probe|downgrade|upgrade|oil|crude|gold|yield|treasury|bond|currency|dollar|rupee|euro|sterling|election|trade deal|strike|layoffs?|recall)\b/i;
+  /\b(earnings|results|guidance|forecast|outlook|merger|acquisition|takeover|buyout|ipo|filing|disclosure|dividend|buyback|share split|bonus issue|capital raise|nfo|rebalance|distribution|refinancing|regulation|regulator|antitrust|lawsuit|probe|downgrade|upgrade|oil|crude|gold|yield|treasury|bond|currency|dollar|rupee|euro|sterling|election|trade deal|strike|layoffs?|recall)\b/i;
 
 const AFFECTED_MARKET_RULES: { label: string; re: RegExp }[] = [
   { label: "NSE/BSE", re: /\b(india|nifty|sensex|nse|bse|rbi|rupee|mumbai)\b/i },
@@ -613,29 +613,41 @@ const CATEGORY_MARKET_FALLBACKS: Record<string, string[]> = {
   "FX/BONDS": ["FX", "Bonds"],
   GEOPOLITICS: ["Global Equities", "Commodities"],
   COMPANY: ["Global Equities"],
+  FILINGS: ["Global Equities"],
   ANALYSTS: ["Global Equities"],
   CORPORATE: ["Global Equities"],
+  CAPITAL: ["Global Equities"],
   MANAGEMENT: ["Global Equities"],
+  INDUSTRY: ["Global Equities"],
   GOLD: ["Commodities"],
   SILVER: ["Commodities"],
   OIL: ["Commodities"],
   "NAT GAS": ["Commodities"],
   COPPER: ["Commodities"],
+  PRECIOUS: ["Commodities"],
+  ENERGY: ["Commodities", "Global Equities"],
+  METALS: ["Commodities"],
   "COMMODITY MACRO": ["Commodities", "FX", "Bonds"],
   FUND: ["Mutual Funds"],
   "FUND UPDATE": ["Mutual Funds"],
   "MF FLOWS": ["Mutual Funds", "NSE/BSE"],
+  "MF NFO": ["Mutual Funds", "NSE/BSE"],
   "MF RULES": ["Mutual Funds", "NSE/BSE"],
+  "MF MANAGERS": ["Mutual Funds", "NSE/BSE"],
   "MF MARKET": ["Mutual Funds", "NSE/BSE"],
   ETF: ["ETFs"],
   "ETF UPDATE": ["ETFs"],
   "ETF FLOWS": ["ETFs"],
+  "ETF LAUNCH": ["ETFs"],
   "ETF INDEX": ["ETFs"],
+  "ETF THEMES": ["ETFs"],
   "ETF RULES": ["ETFs"],
   REIT: ["REITs"],
   "REIT UPDATE": ["REITs"],
   "REIT MARKET": ["REITs"],
+  "REIT DISTRIBUTION": ["REITs"],
   "REAL ESTATE": ["REITs"],
+  "REIT CAPITAL": ["REITs", "Bonds"],
   "REIT RATES": ["REITs", "Bonds"],
   market: ["Equities"],
   company: ["Equities"],
@@ -793,7 +805,7 @@ export const getNewsFeed = createServerFn({ method: "GET" })
                 market: data.market,
               });
 
-        const perTopicLimit = Math.max(8, Math.min(16, Math.ceil(limit / 2)));
+        const perTopicLimit = Math.max(10, Math.min(20, Math.ceil(limit * 0.7)));
         const fetchTopic = async (
           topic: { category: string; query: string; affectedMarkets?: string[] },
           topicIndex: number,
@@ -803,9 +815,7 @@ export const getNewsFeed = createServerFn({ method: "GET" })
           const includeYahoo =
             mode === "global-market"
               ? topicIndex < 6
-              : mode === "company"
-                ? topicIndex < 2
-                : topicIndex < 3;
+              : true;
 
           const [google, bing, yahoo] = await Promise.all([
             fetchFeed(googleNewsFeed(freshQuery), "Google News", topic.category, perTopicLimit),
@@ -825,8 +835,9 @@ export const getNewsFeed = createServerFn({ method: "GET" })
           }));
         };
 
-        for (let batchStart = 0; batchStart < topics.length; batchStart += 4) {
-          const batch = topics.slice(batchStart, batchStart + 4);
+        const batchSize = mode === "global-market" ? 4 : 3;
+        for (let batchStart = 0; batchStart < topics.length; batchStart += batchSize) {
+          const batch = topics.slice(batchStart, batchStart + batchSize);
           const topicResults = await Promise.all(
             batch.map((topic, offset) => fetchTopic(topic, batchStart + offset)),
           );
@@ -871,7 +882,7 @@ export const getNewsFeed = createServerFn({ method: "GET" })
       // topic; asset/product feeds get eight so relevant company/product news
       // can still dominate when there is genuine activity.
       const categoryCounts = new Map<string, number>();
-      const categoryCap = mode === "global-market" ? 6 : 8;
+      const categoryCap = mode === "global-market" ? 6 : 10;
       const balanced = mode !== "generic"
         ? sorted.filter((item) => {
             const count = categoryCounts.get(item.category) ?? 0;

@@ -136,8 +136,8 @@ export function LiveNewsFeed({
           market,
         },
       }),
-    refetchInterval: 30_000,
-    staleTime: 10_000,
+    refetchInterval: 20_000,
+    staleTime: 7_500,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
   });

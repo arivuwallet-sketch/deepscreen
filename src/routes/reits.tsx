@@ -58,14 +58,14 @@ function TopicPage() {
         <LiveNewsFeed
           query="REIT real estate investment trusts markets"
           title="Latest REIT news"
-          limit={30}
+          limit={40}
           maxAgeHours={24}
           mode="reit"
           showCategory
         />
         <p className="mt-3 text-xs text-muted-foreground">
           The feed combines multiple topic searches and providers, keeps only verified publication
-          times from the last 24 hours, and checks for newer headlines every 30 seconds while open.
+          times from the last 24 hours, and checks for newer provider headlines every 20 seconds while open.
         </p>
       </div>
     </Shell>
