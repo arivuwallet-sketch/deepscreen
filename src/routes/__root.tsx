@@ -107,6 +107,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   staticData: { sitemap: false },
   head: () => ({
     meta: [
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: DEEPSCREEN_TITLE },
       { name: "description", content: DEEPSCREEN_META_DESCRIPTION },
       { name: "author", content: "DeepScreen" },
@@ -156,10 +157,6 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, viewport-fit=cover"
-        />
         <style dangerouslySetInnerHTML={{ __html: CRITICAL_RESPONSIVE_CSS }} />
         <HeadContent />
         <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18457575020" />
