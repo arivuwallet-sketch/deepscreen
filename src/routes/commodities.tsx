@@ -178,7 +178,7 @@ function CommoditiesPage() {
           <LiveNewsFeed
             query="commodities"
             title="Latest commodities news"
-            limit={30}
+            limit={40}
             maxAgeHours={24}
             mode="commodities"
             showCategory
@@ -186,7 +186,7 @@ function CommoditiesPage() {
           <p className="mt-3 text-xs text-muted-foreground">
             Gold, silver, crude oil, natural gas, copper and commodity-macro headlines are merged
             newest-first from multiple news providers. Only verified publication times from the
-            last 24 hours are shown; the feed checks for updates every 30 seconds while open.
+            last 24 hours are shown; the feed checks for newer provider headlines every 20 seconds while open.
           </p>
         </div>
 
