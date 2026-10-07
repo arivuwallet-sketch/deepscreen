@@ -27,11 +27,25 @@ import { Shimmer } from "@/components/ai-elements/shimmer";
 import { Tool, ToolContent, ToolHeader, ToolInput, ToolOutput } from "@/components/ai-elements/tool";
 import { Button } from "@/components/ui/button";
 import { Shell } from "@/components/ds/Shell";
+import { DeepScreenAiFaq } from "@/components/ds/DeepScreenAiFaq";
+import { AI_CHAT_FAQS } from "@/lib/seo/ai-chat-faq";
+import {
+  buildBreadcrumbSchema,
+  buildFAQSchema,
+  buildGraph,
+  buildOrganizationSchema,
+  buildWebApplicationSchema,
+  buildWebPageSchema,
+  buildWebSiteSchema,
+  jsonLd,
+} from "@/lib/seo/json-ld";
 
 const STORAGE_KEY = "deepscreen-chat-v1";
 const transport = new DefaultChatTransport({ api: "/api/chat" });
-const title = "DeepScreen AI Finance Assistant";
-const description = "Ask DeepScreen about stocks, funds, ETFs, REITs, personal finance, trading, options, IPOs, ratios, crypto and commodities.";
+const canonical = "https://deepscreen.online/chat";
+const title = "DeepScreen AI Chatbot: Stock Research & Finance Q&A | DeepScreen";
+const description =
+  "Ask DeepScreen AI about 13,000+ stocks across NSE, BSE, NYSE, Nasdaq and LSE, fundamental ratios, ETFs, REITs, options and personal finance. Explore chatbot FAQs.";
 
 function readSavedMessages(): UIMessage[] {
   if (typeof window === "undefined") return [];
@@ -97,21 +111,25 @@ function DeepScreenChatSession({ initialMessages }: { initialMessages: UIMessage
   };
 
   return (
-    <Shell>
-      <section className="mx-auto flex h-[calc(100svh-132px)] min-h-[620px] max-w-5xl flex-col px-4 py-5 sm:px-6 lg:px-8">
+    <section className="mx-auto flex h-[calc(100svh-132px)] min-h-[620px] max-w-5xl flex-col px-4 py-5 sm:px-6 lg:px-8">
         <header className="mb-4 flex items-start justify-between gap-4 border-b border-border pb-4">
           <div className="flex min-w-0 items-center gap-3">
             <span className="grid size-10 shrink-0 place-items-center rounded-md border border-primary/30 text-primary" aria-hidden="true">
               <Activity className="size-5" />
             </span>
             <div className="min-w-0">
-              <h1 className="text-xl font-semibold text-foreground">DeepScreen AI</h1>
-              <p className="text-sm text-muted-foreground">Finance research with current DeepScreen market context</p>
+              <h1 className="text-xl font-semibold text-foreground">DeepScreen AI Chatbot</h1>
+              <p className="text-sm text-muted-foreground">Finance Q&amp;A, 13,000+ stocks and latest available market context</p>
             </div>
           </div>
-          <Button type="button" variant="ghost" size="icon" onClick={reset} aria-label="New conversation" title="New conversation">
-            <RefreshCw className="size-4" />
-          </Button>
+          <div className="flex shrink-0 items-center gap-2">
+            <a href="#chatbot-faq" className="text-xs font-medium text-primary hover:underline">
+              FAQ
+            </a>
+            <Button type="button" variant="ghost" size="icon" onClick={reset} aria-label="New conversation" title="New conversation">
+              <RefreshCw className="size-4" />
+            </Button>
+          </div>
         </header>
 
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-border bg-panel/40">
@@ -188,30 +206,99 @@ function DeepScreenChatSession({ initialMessages }: { initialMessages: UIMessage
             </PromptInput>
           </div>
         </div>
-      </section>
-    </Shell>
+    </section>
   );
 }
 
 function DeepScreenChat() {
   const hydrated = useHydrated();
-  if (!hydrated) return null;
-  return <DeepScreenChatSession initialMessages={readSavedMessages()} />;
+
+  return (
+    <Shell>
+      {hydrated ? (
+        <DeepScreenChatSession initialMessages={readSavedMessages()} />
+      ) : (
+        <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            DeepScreen AI chatbot for stock research and finance questions
+          </h1>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-muted-foreground">
+            Ask about supported NSE, BSE, NYSE, Nasdaq and LSE stocks, ratios,
+            company comparisons, investing basics and personal finance.
+            The interactive chat loads in your browser; the public answers below
+            are available without starting a conversation.
+          </p>
+        </section>
+      )}
+      <DeepScreenAiFaq />
+    </Shell>
+  );
 }
 
 export const Route = createFileRoute("/chat")({
-  // Conversations are browser-private and the server-rendered route has no
-  // answer content, so this tool should not compete with public research pages.
-  staticData: { sitemap: false },
+  // The public FAQ and product explanations are SSR indexable. Individual
+  // conversations remain browser-local UI state and never enter page metadata.
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title },
       { name: "description", content: description },
+      {
+        name: "keywords",
+        content:
+          "DeepScreen AI chatbot, AI stock screener assistant, finance AI questions, stock analysis chatbot, fundamental analysis Q&A, DeepScreen AI FAQ",
+      },
+      { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" },
       { property: "og:title", content: title },
       { property: "og:description", content: description },
+      { property: "og:url", content: canonical },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "robots", content: "noindex,follow" },
+      { property: "og:site_name", content: "DeepScreen" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: title },
+      { name: "twitter:description", content: description },
+    ],
+    links: [
+      { rel: "canonical", href: canonical },
+      { rel: "describedby", href: "https://deepscreen.online/llms.txt" },
+      { rel: "alternate", type: "text/plain", href: "https://deepscreen.online/faq-index.txt" },
+      { rel: "help", href: "https://deepscreen.online/answers" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: jsonLd(
+          buildGraph(
+            buildOrganizationSchema(),
+            buildWebSiteSchema(),
+            {
+              ...buildWebPageSchema({ name: title, description, url: canonical }),
+              "@id": canonical + "#webpage",
+              inLanguage: "en",
+              about: { "@id": canonical + "#application" },
+            },
+            buildWebApplicationSchema({
+              name: "DeepScreen AI Finance Assistant",
+              url: canonical,
+              description,
+              featureList: [
+                "Stock lookup across the five DeepScreen exchanges",
+                "Latest available provider-backed quotes and ratios for supported companies",
+                "Documented 13-factor stock analysis with risk context",
+                "Education about funds, ETFs, REITs, options and personal finance",
+                "Browser-stored chat with a new-conversation reset",
+              ],
+            }),
+            buildBreadcrumbSchema([
+              { name: "DeepScreen", url: "https://deepscreen.online/" },
+              { name: "DeepScreen AI chatbot", url: canonical },
+            ]),
+            buildFAQSchema(
+              AI_CHAT_FAQS.map(({ question, answer }) => ({ question, answer })),
+            ),
+          ),
+        ),
+      },
     ],
   }),
   component: DeepScreenChat,

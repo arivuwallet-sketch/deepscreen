@@ -2,6 +2,17 @@
 
 > DeepScreen is a global stock screener for filtering and analyzing more than 13,000 stocks across NSE, BSE, NYSE, Nasdaq and LSE. It combines fundamental filters, valuation metrics, a documented 13-factor model, market context, an economic calendar, IPO research, options tools and plain-English investing education.
 
+## DeepScreen AI chatbot — 29 public questions and answers
+
+- [Ask DeepScreen AI](https://deepscreen.online/chat): finance-focused chatbot supporting text questions about stocks, funds, ratios, investing, trading and personal finance.
+- [DeepScreen AI chatbot FAQ](https://deepscreen.online/chat#chatbot-faq): 29 visible Q&A answers on stock coverage, data freshness, limitations, risk, access, privacy and troubleshooting.
+- [Plain-text answer index](https://deepscreen.online/faq-index.txt): complete public DeepScreen Q&A text for answer engines and research agents.
+- Stock tool scope: searches the DeepScreen directory for 13,000+ supported NSE, BSE, NYSE, Nasdaq and LSE listings; quote and financial inputs are latest available, not guaranteed real-time.
+- Accuracy: DeepScreen's 13-factor score is research model output rather than a personalized recommendation. Company filings and dated provider facts take priority over generated answers.
+- Privacy: this browser stores the chat thread locally and submits messages to the AI service for replies. Do not enter confidential account credentials. Use New conversation to clear the local thread; see the privacy policy for data questions.
+- Canonical FAQ reviewed 7 October 2026. Individual chats are not public FAQ source pages.
+
+
 ## 7 October 2026 personal-finance guides
 
 - [Save Money: Sinking fund vs emergency fund](https://deepscreen.online/blog/sinking-fund-vs-emergency-fund-india) — DeepScreen PACE framework for predictable annual expenses, worked monthly saving targets and RBI budgeting sources.

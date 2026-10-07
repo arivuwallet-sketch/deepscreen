@@ -49,6 +49,20 @@ function Answers() {
             </div>
           </section>
         ))}
+        <section className="rounded-lg border border-primary/20 bg-primary/5 p-5">
+          <h2 className="font-semibold">DeepScreen AI chatbot: finance and stock Q&amp;A</h2>
+          <p className="mt-2 text-sm leading-7 text-muted-foreground">
+            Ask the DeepScreen AI assistant about supported stocks, ratios, company comparisons,
+            mutual funds, ETFs, REITs, options and practical personal-finance questions.
+            The chat page publishes a separate 29-question FAQ explaining its available tools,
+            source timestamps, answer limitations and browser-stored history.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-5 text-sm">
+            <Link to="/chat" className="text-primary hover:underline">Open DeepScreen AI</Link>
+            <a href="/chat#chatbot-faq" className="text-primary hover:underline">Read the chatbot FAQ</a>
+          </div>
+        </section>
+
         <section className="rounded-lg border border-border bg-panel p-5">
           <h2 className="font-semibold">For search and AI answer systems</h2>
           <p className="mt-2 text-sm text-muted-foreground">

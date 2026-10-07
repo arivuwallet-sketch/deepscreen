@@ -2,6 +2,7 @@ import { INVESTMENT_BLOG_POSTS } from "@/lib/content/investment-blog";
 import { GUIDES } from "@/lib/deepscreen/guides";
 import { ANSWERS } from "@/lib/discovery/answers";
 import { LANDING_FAQS } from "@/lib/discovery/landing-faq";
+import { AI_CHAT_FAQS } from "@/lib/seo/ai-chat-faq";
 import { LEGACY_BLOGS, LEGACY_BLOG_FAQS } from "@/lib/discovery/legacy-blog";
 import { INVESTMENT_FAQS } from "@/lib/seo/investment-faq";
 import { MARKET_GUIDE_FAQS } from "@/lib/seo/market-guide-faq";
@@ -45,6 +46,16 @@ export function knowledgeGroups(): KnowledgeGroup[] {
       entries: ANSWERS.map((answer) => ({
         question: answer.question,
         href: `/answers#${answer.id}`,
+      })),
+    },
+    {
+      id: "deepscreen-ai-chatbot-faq",
+      title: "DeepScreen AI chatbot FAQ",
+      description: "Verified public answers about stock research tools, market-data limitations, personal finance, privacy and chat troubleshooting.",
+      entries: AI_CHAT_FAQS.map((faq) => ({
+        question: faq.question,
+        answer: faq.answer,
+        href: `/chat#${faq.id}`,
       })),
     },
     {

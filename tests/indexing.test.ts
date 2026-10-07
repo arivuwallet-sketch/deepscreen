@@ -5,6 +5,7 @@ import { createSnapshotLoader } from '../src/lib/market/snapshot-cache.ts';
 import { directoryPage, exchangePath, stockPath } from '../src/lib/seo/directory.ts';
 import { canonicalRedirect } from '../src/lib/seo/canonical.ts';
 import { sitemapXML } from '../src/lib/sitemap.ts';
+import { AI_CHAT_FAQS, AI_CHAT_FAQ_GROUPS } from '../src/lib/seo/ai-chat-faq.ts';
 
 const key = { exchange: 'NSE', symbol: 'RELIANCE' };
 const quote = { price: 100 } as never;
@@ -620,4 +621,53 @@ test('7 October personal-finance articles integrate without changing screening l
   assert.match(newArticles, /"faqs": \[/);
   assert.match(newArticles, /"table": \{/);
   assert.doesNotMatch(newArticles, /guaranteed passive income|guaranteed returns/i);
+});
+
+
+test('DeepScreen AI chatbot FAQ is server-rendered, indexable, and consistent across SEO and AI discovery', async () => {
+  const chat = await readFile(new URL('../src/routes/chat.tsx', import.meta.url), 'utf8');
+  const faqView = await readFile(new URL('../src/components/ds/DeepScreenAiFaq.tsx', import.meta.url), 'utf8');
+  const knowledge = await readFile(new URL('../src/lib/discovery/knowledge-index.ts', import.meta.url), 'utf8');
+  const answers = await readFile(new URL('../src/routes/answers.tsx', import.meta.url), 'utf8');
+  const llms = await readFile(new URL('../public/llms.txt', import.meta.url), 'utf8');
+  const llmsFull = await readFile(new URL('../public/llms-full.txt', import.meta.url), 'utf8');
+  const robots = await readFile(new URL('../public/robots.txt', import.meta.url), 'utf8');
+  const server = await readFile(new URL('../src/lib/ai/deepscreen-chat.server.ts', import.meta.url), 'utf8');
+
+  assert.equal(AI_CHAT_FAQ_GROUPS.length, 4);
+  assert.equal(AI_CHAT_FAQS.length, 29);
+  assert.equal(new Set(AI_CHAT_FAQS.map((faq) => faq.id)).size, 29, 'FAQ anchor IDs must be unique');
+  for (const faq of AI_CHAT_FAQS) {
+    assert.match(faq.id, /^[a-z0-9]+(?:-[a-z0-9]+)*$/);
+    assert.ok(faq.question.endsWith('?'), faq.question);
+    assert.ok(faq.answer.length > 80, faq.id);
+    assert.ok(faq.link.href.startsWith('/'), faq.id);
+    assert.ok(llmsFull.includes('https://deepscreen.online/chat#' + faq.id), faq.id);
+  }
+
+  assert.match(chat, /staticData:\s*\{\s*sitemap:\s*true\s*\}/);
+  assert.match(chat, /index,follow,max-image-preview:large,max-snippet:-1/);
+  assert.doesNotMatch(chat, /noindex,follow/);
+  assert.match(chat, /canonical.*https:\/\/deepscreen\.online\/chat/);
+  assert.match(chat, /buildFAQSchema\([\s\S]*AI_CHAT_FAQS\.map/);
+  assert.match(chat, /buildWebApplicationSchema/);
+  assert.match(chat, /buildOrganizationSchema/);
+  assert.match(chat, /<DeepScreenAiFaq\s*\/>/);
+  assert.match(chat, /The interactive chat loads in your browser/);
+  assert.match(faqView, /AI_CHAT_FAQ_GROUPS\.map/);
+  assert.match(faqView, /\{faq\.question\}/);
+  assert.match(faqView, /\{faq\.answer\}/);
+  assert.match(faqView, /id=\{faq\.id\}/);
+  assert.match(knowledge, /AI_CHAT_FAQS\.map/);
+  assert.match(knowledge, /href: `\/chat#\$\{faq\.id\}`/);
+  assert.match(answers, /href="\/chat#chatbot-faq"/);
+  assert.ok(llms.includes('https://deepscreen.online/chat#chatbot-faq'));
+  assert.ok(robots.includes('Allow: /chat'));
+  assert.match(server, /getStockResearch/);
+  assert.match(server, /https:\/\/deepscreen\.online\/chat#chatbot-faq/);
+  // Preserves the working browser chat and avoids exposing user threads in SSR.
+  assert.match(chat, /deepscreen-chat-v1/);
+  assert.match(chat, /DefaultChatTransport\(\{ api: "\/api\/chat" \}\)/);
+  assert.match(chat, /window\.localStorage\.removeItem\(STORAGE_KEY\)/);
+  assert.match(chat, /hydrated \? \(/);
 });

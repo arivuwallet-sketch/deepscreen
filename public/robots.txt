@@ -35,6 +35,7 @@ User-agent: Timpibot
 User-agent: ImagesiftBot
 Allow: /
 Allow: /answers
+Allow: /chat
 Allow: /chart-reader
 Allow: /trading
 Allow: /knowledge
@@ -58,6 +59,7 @@ Disallow: /account/
 User-agent: *
 Allow: /
 Allow: /answers
+Allow: /chat
 Allow: /chart-reader
 Allow: /trading
 Allow: /knowledge
