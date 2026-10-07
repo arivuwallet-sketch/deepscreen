@@ -113,13 +113,13 @@ function BlogIndex() {
         </section>
 
         <section className="mt-12 rounded-xl border border-primary/20 bg-primary/5 p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-primary">Today · 6 October 2026</p>
-          <h2 className="mt-2 text-lg font-semibold">Today's money guide: card debt, health cover and creator IP</h2>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">Today's three-part series tackles three different money decisions: escaping the credit-card minimum-due trap, switching health insurance without wasting valuable continuity, and turning owned intellectual property into legitimate reusable income.</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-primary">Today · 7 October 2026</p>
+          <h2 className="mt-2 text-lg font-semibold">Today's money guide: planned bills, bank safety and better pay</h2>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">Today’s three-part series shows how to save for expected annual costs, understand DICGC bank-deposit protection and negotiate higher salary using documented results. Each guide includes a worked example and official source links.</p>
           <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm">
-            <a href="/blog/credit-card-minimum-due-trap-india" className="text-primary hover:underline">Escape the credit-card minimum-due trap</a>
-            <a href="/blog/health-insurance-portability-india-checklist" className="text-primary hover:underline">Health insurance portability checklist</a>
-            <a href="/blog/make-money-intellectual-property-india" className="text-primary hover:underline">Make money from intellectual property</a>
+            <a href="/blog/sinking-fund-vs-emergency-fund-india" className="text-primary hover:underline">Save for annual bills with PACE</a>
+            <a href="/blog/dicgc-bank-deposit-insurance-india" className="text-primary hover:underline">Understand DICGC’s ₹5 lakh limit</a>
+            <a href="/blog/salary-negotiation-guide-india" className="text-primary hover:underline">Negotiate better pay using VALUE</a>
           </div>
         </section>
 

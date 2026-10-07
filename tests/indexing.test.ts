@@ -362,8 +362,8 @@ test('daily personal finance posts remain indexable sourced and AI-discoverable'
   assert.match(blogContent, /Deposit Insurance and Credit Guarantee Corporation/);
   assert.match(blogContent, /Insurance Regulatory and Development Authority of India/);
   assert.match(blogContent, /Ministry of Micro, Small and Medium Enterprises/);
-  assert.match(blogIndex, /Today · 5 October 2026/);
-  assert.match(blogIndex, /Today's money guide: recurring costs, fraud response and freelance economics/);
+  assert.match(blogIndex, /Today · 7 October 2026/);
+  assert.match(blogIndex, /Today's money guide: planned bills, bank safety and better pay/);
 });
 
 test('investment blog registry has no sparse array entries', async () => {
@@ -598,4 +598,26 @@ test('DeepScreen brand identity stays consistent across search and AI discovery 
   assert.doesNotMatch(brand, /DeepScreen — Global Stock Screener & Investment Research/);
   assert.doesNotMatch(llms, /beginner-first stock-research and financial-analysis platform/i);
   assert.doesNotMatch(llmsFull, /beginner-first stock-research and financial-analysis platform/i);
+});
+
+
+test('7 October personal-finance articles integrate without changing screening logic', async () => {
+  const registry = await readFile(new URL('../src/lib/content/investment-blog.ts', import.meta.url), 'utf8');
+  const newArticles = await readFile(new URL('../src/lib/content/personal-finance-2026-10-07.ts', import.meta.url), 'utf8');
+  const blogIndex = await readFile(new URL('../src/routes/blog.index.tsx', import.meta.url), 'utf8');
+  const llms = await readFile(new URL('../public/llms.txt', import.meta.url), 'utf8');
+  const llmsFull = await readFile(new URL('../public/llms-full.txt', import.meta.url), 'utf8');
+  assert.match(registry, /\.\.\.PERSONAL_FINANCE_2026_10_07/);
+  for (const slug of ['sinking-fund-vs-emergency-fund-india', 'dicgc-bank-deposit-insurance-india', 'salary-negotiation-guide-india']) {
+    assert.match(newArticles, new RegExp(slug));
+    assert.match(blogIndex, new RegExp(slug));
+    assert.match(llms, new RegExp(slug));
+    assert.match(llmsFull, new RegExp(slug));
+  }
+  for (const marker of ['PACE Sinking-Fund Framework', 'SAFE Bank-Cash Audit', 'VALUE Salary Framework', '2026-10-07', 'Reserve Bank of India', 'Deposit Insurance and Credit Guarantee Corporation', 'Employees']) {
+    assert.match(newArticles, new RegExp(marker));
+  }
+  assert.match(newArticles, /"faqs": \[/);
+  assert.match(newArticles, /"table": \{/);
+  assert.doesNotMatch(newArticles, /guaranteed passive income|guaranteed returns/i);
 });

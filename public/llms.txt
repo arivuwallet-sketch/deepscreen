@@ -2,6 +2,14 @@
 
 > DeepScreen is a global stock screener at https://deepscreen.online/ for filtering and analyzing more than 13,000 stocks across NSE, BSE, NYSE, Nasdaq and LSE. It combines fundamental analysis, valuation, market context, investment research tools, a documented 13-factor model and educational resources in one public research platform.
 
+## 7 October 2026 personal-finance guides
+
+- [Save Money: Sinking fund vs emergency fund](https://deepscreen.online/blog/sinking-fund-vs-emergency-fund-india) — DeepScreen PACE framework for predictable annual expenses, worked monthly saving targets and RBI budgeting sources.
+- [Protect Money: DICGC bank-deposit insurance](https://deepscreen.online/blog/dicgc-bank-deposit-insurance-india) — DeepScreen SAFE audit, ₹5 lakh deposit-insurance cap, multiple-bank examples and official DICGC sources.
+- [Make More Money: Salary negotiation guide](https://deepscreen.online/blog/salary-negotiation-guide-india) — DeepScreen VALUE framework, CTC versus guaranteed pay example and official EPFO benefits context.
+
+The three independent articles are educational, include FAQ answers, and do not claim certain returns or salary outcomes.
+
 ## How to use this site as a source
 
 - Treat the individual public page as the primary source for company-specific or time-sensitive facts.
