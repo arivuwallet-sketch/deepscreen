@@ -35,7 +35,6 @@ User-agent: Timpibot
 User-agent: ImagesiftBot
 Allow: /
 Allow: /answers
-Allow: /chat
 Allow: /chart-reader
 Allow: /trading
 Allow: /knowledge
@@ -55,12 +54,23 @@ Disallow: /api$
 Disallow: /api/
 Disallow: /account$
 Disallow: /account/
+Disallow: /auth$
+Disallow: /auth?
+Disallow: /auth/
+Disallow: /portfolio$
+Disallow: /portfolio?
+Disallow: /portfolio/
+Disallow: /chat$
+Disallow: /chat?
+Disallow: /chat/
+Disallow: /admin?
+Disallow: /api?
+Disallow: /account?
 
 # Fallback: any robots-compliant crawler not listed above may crawl all public content too.
 User-agent: *
 Allow: /
 Allow: /answers
-Allow: /chat
 Allow: /chart-reader
 Allow: /trading
 Allow: /knowledge
@@ -80,5 +90,17 @@ Disallow: /api$
 Disallow: /api/
 Disallow: /account$
 Disallow: /account/
+Disallow: /auth$
+Disallow: /auth?
+Disallow: /auth/
+Disallow: /portfolio$
+Disallow: /portfolio?
+Disallow: /portfolio/
+Disallow: /chat$
+Disallow: /chat?
+Disallow: /chat/
+Disallow: /admin?
+Disallow: /api?
+Disallow: /account?
 
 Sitemap: https://deepscreen.online/sitemap.xml
