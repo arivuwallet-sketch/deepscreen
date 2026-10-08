@@ -1,4 +1,5 @@
 import { TRADING_BLOG_POSTS } from "@/lib/content/trading-blog";
+import { PERSONAL_FINANCE_2026_10_08 } from "@/lib/content/personal-finance-2026-10-08";
 import { PERSONAL_FINANCE_2026_10_07 } from "@/lib/content/personal-finance-2026-10-07";
 
 export type BlogSource = {
@@ -57,6 +58,7 @@ export type BlogPost = {
 };
 
 export const INVESTMENT_BLOG_POSTS: BlogPost[] = [
+  ...PERSONAL_FINANCE_2026_10_08,
   ...PERSONAL_FINANCE_2026_10_07,
   {
     slug: "direct-vs-regular-mutual-funds-india",
