@@ -45,7 +45,7 @@ import {
 const STORAGE_KEY = "deepscreen-chat-v1";
 const transport = new DefaultChatTransport({
   api: "/api/chat",
-  headers: async () => {
+  headers: async (): Promise<Record<string, string>> => {
     const { data } = await supabase.auth.getSession();
     const token = data.session?.access_token;
     return token ? { Authorization: `Bearer ${token}` } : {};
