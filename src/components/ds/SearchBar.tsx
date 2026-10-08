@@ -3,7 +3,7 @@ import { Search } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { searchStocks } from "@/lib/deepscreen/stocks";
-import { searchInvestments, type Investment } from "@/lib/deepscreen/investments";
+import type { Investment } from "@/lib/deepscreen/investments";
 import { formatPrice } from "@/lib/deepscreen/format";
 import { quoteKey, useLiveQuotes } from "@/hooks/useLiveQuotes";
 import { cn } from "@/lib/utils";
@@ -16,9 +16,23 @@ export function SearchBar({ className, placeholder }: { className?: string; plac
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
+  const [investmentSearch, setInvestmentSearch] = useState<{
+    search: typeof import("@/lib/deepscreen/investments").searchInvestments;
+  } | null>(null);
   const results = useMemo(() => searchStocks(query), [query]);
-  const investments = useMemo(() => searchInvestments(query), [query]);
+  const investments = useMemo(() => investmentSearch?.search(query) ?? [], [query, investmentSearch]);
   const { data: live } = useLiveQuotes(open ? results : []);
+
+  // The 20,000+ investment directory is only needed when search is opened.
+  // Dynamic imports share a cached download across the header and page searches.
+  useEffect(() => {
+    if (!open || investmentSearch) return;
+    let cancelled = false;
+    void import("@/lib/deepscreen/investments").then((module) => {
+      if (!cancelled) setInvestmentSearch({ search: module.searchInvestments });
+    }).catch(() => { /* Stock search remains available; reopening retries. */ });
+    return () => { cancelled = true; };
+  }, [open, investmentSearch]);
 
   useEffect(() => setActive(0), [query]);
 
@@ -98,7 +112,7 @@ export function SearchBar({ className, placeholder }: { className?: string; plac
                 <span className="min-w-0 truncate text-muted-foreground">{s.name}</span>
                 <span className="num min-w-0 truncate text-right text-xs text-muted-foreground">
                   {s.exchange} · {live?.[quoteKey(s)]?.price != null
-                    ? formatPrice(live[quoteKey(s)]!.price, s.exchange)
+                    ? formatPrice(live[quoteKey(s)]?.price ?? 0, s.exchange)
                     : "—"}
                 </span>
               </Button>

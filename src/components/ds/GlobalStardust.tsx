@@ -105,14 +105,22 @@ export function GlobalStardust() {
     };
 
     const animate = (now: number) => {
-      const delta = Math.min(34, now - last);
+      frame = 0;
+      if (document.hidden) return;
+      // Decorative motion does not need to redraw at a display's 60–144 Hz.
+      if (now - last < 1000 / 30) {
+        frame = window.requestAnimationFrame(animate);
+        return;
+      }
+      const delta = Math.min(68, now - last);
       last = now;
 
       ctx.clearRect(0, 0, width, height);
       ctx.globalCompositeOperation = "lighter";
 
       for (let i = 0; i < particles.length; i += 1) {
-        const p = particles[i]!;
+        const p = particles[i];
+        if (!p) continue;
         p.twinkle += delta * p.twinkleSpeed;
         p.rotation += p.spin * delta;
         p.x += p.vx * delta;
@@ -157,13 +165,23 @@ export function GlobalStardust() {
       frame = window.requestAnimationFrame(animate);
     };
 
+    const onVisibility = () => {
+      window.cancelAnimationFrame(frame);
+      frame = 0;
+      if (!document.hidden) {
+        last = performance.now();
+        frame = window.requestAnimationFrame(animate);
+      }
+    };
     resize();
     window.addEventListener("resize", resize, { passive: true });
+    document.addEventListener("visibilitychange", onVisibility);
     frame = window.requestAnimationFrame(animate);
 
     return () => {
       window.cancelAnimationFrame(frame);
       window.removeEventListener("resize", resize);
+      document.removeEventListener("visibilitychange", onVisibility);
       ctx.clearRect(0, 0, width, height);
     };
   }, [paused]);
