@@ -17,4 +17,5 @@
 - Investment detail data loads verified NAV/price history first and bounds supplementary provider waits; alternate chart hosts mitigate rate limits, and thin BSE ETF history may use a price- and currency-matched NSE cross-listing while preserving the BSE quote, without inventing specialist figures.
 - Standalone market-topic pages keep their quotes and user-entered calculations separate from stock and IPO research; this prevents unofficial premiums or proxy index values from being presented as verified exchange data.
 - AI chat streams through a dedicated server route and stores its single conversation only in browser localStorage, keeping credentials server-side and avoiding a parallel chat database.
+- Paid AI actions verify bearer identity and caller-owned payment-ledger entitlement server-side before model use; interactive Pro tools mount only after access resolves, preventing client-only payment bypasses.
 - TypeScript retains strict mode but omits unchecked-index, exact-optional, and index-signature property checks because legacy market-analysis modules intentionally use guarded array and provider-record access patterns.
