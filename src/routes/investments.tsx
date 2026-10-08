@@ -14,7 +14,6 @@ import { buildBreadcrumbSchema, buildFAQSchema, buildGraph, buildOrganizationSch
 const title = "Mutual Fund, ETF & REIT Screener & Analysis | DeepScreen";
 const description = "Research mutual funds, ETFs and REITs with type-specific analysis. Compare NAV, fees, tracking, holdings, risk, REIT cash flow and valuation across supported markets.";
 const PAGE_SIZE = INVESTMENT_DIRECTORY_PAGE_SIZE;
-const directoryPageCount = Math.ceil(INVESTMENTS.length / PAGE_SIZE);
 
 export const Route = createFileRoute("/investments")({
   staticData: { sitemap: true },
@@ -22,7 +21,9 @@ export const Route = createFileRoute("/investments")({
     search["page"] === undefined ? {} : { page: search["page"] }
   ),
   loaderDeps: ({ search }) => ({ page: directoryPage(search.page) }),
-  loader: ({ deps, location }) => {
+  loader: async ({ deps, location }) => {
+    const { INVESTMENTS: listings } = await import("@/lib/deepscreen/investments");
+    const directoryPageCount = Math.ceil(listings.length / PAGE_SIZE);
     if (deps.page < 1 || deps.page > directoryPageCount) throw notFound();
     if (deps.page === 1 && new URLSearchParams(location.searchStr).has("page")) {
       const query = new URLSearchParams(location.searchStr);
@@ -67,6 +68,7 @@ export const Route = createFileRoute("/investments")({
 });
 
 function InvestmentsPage() {
+  const directoryPageCount = Math.ceil(INVESTMENTS.length / PAGE_SIZE);
   const routePage = Route.useLoaderData().page;
   const [type, setType] = useState<InvestmentType | "ALL">("ALL");
   const [market, setMarket] = useState("ALL");

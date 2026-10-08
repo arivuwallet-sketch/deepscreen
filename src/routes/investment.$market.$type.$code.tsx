@@ -2,7 +2,6 @@ import { investmentQuoteCode } from "@/lib/deepscreen/investment-symbol";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Shell } from "@/components/ds/Shell";
 import { InvestmentAnalysisAvailable } from "@/components/ds/InvestmentAnalysisAvailable";
-import { findInvestment } from "@/lib/deepscreen/investments";
 import { useLiveQuote } from "@/hooks/useLiveQuotes";
 import { formatPrice } from "@/lib/deepscreen/format";
 import { getInvestmentAnalysis } from "@/lib/market/investment-analysis.functions";
@@ -14,6 +13,7 @@ import { buildBreadcrumbSchema, buildFAQSchema, buildGraph, buildOrganizationSch
 export const Route = createFileRoute("/investment/$market/$type/$code")({
   staticData: { sitemap: true },
   loader: async ({ params }) => {
+    const { findInvestment } = await import("@/lib/deepscreen/investments");
     const item = findInvestment(params.market, params.type, params.code);
     if (!item) throw notFound();
     try {
