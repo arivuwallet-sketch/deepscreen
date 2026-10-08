@@ -7,6 +7,7 @@ import {
   type UIMessage,
 } from "ai";
 import { z } from "zod";
+import { checkProRequest } from "@/lib/billing/pro-access.server";
 
 import { analyze } from "@/lib/deepscreen/metrics";
 import { mergeLiveStock } from "@/lib/deepscreen/live-merge";
@@ -59,6 +60,8 @@ function compactNumber(value: number | null | undefined) {
 }
 
 export async function handleDeepScreenChat(request: Request): Promise<Response> {
+  const accessDenied = await checkProRequest(request);
+  if (accessDenied) return accessDenied;
   let body: { messages?: UIMessage[] };
   try {
     body = (await request.json()) as { messages?: UIMessage[] };

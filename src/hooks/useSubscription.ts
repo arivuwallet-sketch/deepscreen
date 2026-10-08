@@ -33,7 +33,7 @@ export const PLANS: Plan[] = [
     days: 7,
     perMonth: "₹50 / week",
     anchorQuote: "🍪 The cost of one packet of biscuits.",
-    features: ["Standard Pro Features", "Real-Time Alerts", "Basic Screener"],
+    features: ["DeepScreen AI finance chat", "Commodity momentum & trend analysis", "Specialist fund, ETF & REIT metrics", "DCF, Graham & forensic tools", "Portfolio X-Ray & alerts"],
     blurb: "Try the full god-mode engine for a week — every metric unlocked.",
   },
   {
@@ -43,7 +43,7 @@ export const PLANS: Plan[] = [
     days: 30,
     perMonth: "₹175 / month",
     anchorQuote: "🍿 The price of a single movie ticket.",
-    features: ["Standard Pro Features", "Real-Time Alerts", "Basic Screener"],
+    features: ["DeepScreen AI finance chat", "Commodity momentum & trend analysis", "Specialist fund, ETF & REIT metrics", "DCF, Graham & forensic tools", "Portfolio X-Ray & alerts"],
     blurb: "The everyday plan: deep scores, DCF, portfolio matrix and alerts.",
   },
   {
@@ -53,7 +53,7 @@ export const PLANS: Plan[] = [
     days: 365,
     perMonth: "Only ₹150/month!",
     anchorQuote: "📺 Cheaper than your yearly Netflix plan, but it actually makes you smarter.",
-    features: ["All Pro Features", "Priority Support", "Beta Access", "Advanced Forensic Badges"],
+    features: ["DeepScreen AI finance chat", "Commodity momentum & trend analysis", "Specialist fund, ETF & REIT metrics", "DCF, Graham & forensic tools", "Portfolio X-Ray & alerts", "Priority Support & Beta Access"],
     badge: "Most Popular",
     blurb: "Best value. A full year of DeepScreen Pro plus every upcoming feature.",
   },
