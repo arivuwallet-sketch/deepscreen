@@ -1,5 +1,8 @@
 # DeepScreen search and growth roadmap
 
+## In progress
+- Improve initial loading and rendering speed without changing public research, crawler access or Pro entitlements; verify search and page navigation.
+
 ## Shipped
 - October 8 indexing audit: Google reports 33,800 submitted URLs without sitemap errors; live sitemap has 34,211 unique URLs. Homepage indexed; sampled research URLs unknown to Google, with public HTTP 200, self-canonicals and index permission. All crawler groups permit public research; private auth, account, admin, API, portfolio and research-note paths excluded.
 - Page-specific metadata, social cards, canonicals and structured data
