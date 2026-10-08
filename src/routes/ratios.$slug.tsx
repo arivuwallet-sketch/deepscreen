@@ -3,6 +3,9 @@ import { findRatio, ratioGuideSlug } from "@/lib/seo/content";
 
 export const Route = createFileRoute("/ratios/$slug")({
   staticData: { sitemap: false },
+  head: () => ({
+    meta: [{ name: "robots", content: "noindex, follow" }],
+  }),
   beforeLoad: ({ params }) => {
     if (!findRatio(params.slug)) throw notFound();
     throw redirect({ to: "/learn/$slug", params: { slug: ratioGuideSlug(params.slug) }, statusCode: 301 });
