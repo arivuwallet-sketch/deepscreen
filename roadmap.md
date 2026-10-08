@@ -13,6 +13,9 @@
 - Technical SEO, GEO, AEO and AAO audit: corrected private chat indexability and verified public metadata, crawler access, structured answers, and the complete sitemap
 - Explicit access for established AI search, chatbot, answer-engine and model-discovery crawlers, with wildcard access for other robots-compliant agents
 
+- Pro access for AI chat, commodity indicators and specialist investment metrics/holdings; updated pricing with unchanged charges and existing stock/IPO access.
+- Verified anonymous AI rejection, paid-account finance chat, expiry and fail-closed entitlement tests; clean build diagnostics.
+
 ## Backlink plan (low budget)
 1. Publish one data-led exchange or sector study monthly and pitch its findings to finance newsletters and market-data journalists.
 2. Offer glossary definitions and methodology citations to university investment clubs, finance educators and relevant resource pages.

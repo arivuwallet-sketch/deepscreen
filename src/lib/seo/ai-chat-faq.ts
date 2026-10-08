@@ -71,7 +71,7 @@ export const AI_CHAT_FAQ_GROUPS: AiChatFaqGroup[] = [
       {
         "id": "chatbot-free-access",
         "question": "Can I open DeepScreen AI without buying a subscription?",
-        "answer": "The chat page is publicly accessible, but successful responses depend on the AI service being configured and available. Usage limits, paid features and subscription terms can change; check DeepScreen's current pricing page rather than assuming unlimited access.",
+        "answer": "Yes. The chat page and its FAQs are publicly accessible, but sending questions to DeepScreen AI requires a signed-in account with an active Pro plan. Stock search, prices, scores, news and educational research remain free. Check the pricing page for current plan features; Pro does not guarantee unlimited AI usage or provider data availability.",
         "link": {
           "label": "Check current pricing and features",
           "href": "/pricing"

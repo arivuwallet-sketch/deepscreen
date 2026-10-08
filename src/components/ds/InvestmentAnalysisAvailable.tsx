@@ -1,4 +1,5 @@
 import { InvestmentHistory } from "@/components/research/InvestmentHistory";
+import { ProAccess } from "@/components/ds/ProAccess";
 import type { ReactNode } from "react";
 
 import { useInvestmentAnalysis } from "@/hooks/useInvestmentAnalysis";
@@ -349,7 +350,9 @@ export function InvestmentAnalysisAvailable({ item, initialData }: { item: Inves
           </div>
           <InvestmentHistory item={item} data={data} />
           {hasMetrics ? (
-            <Sections sections={sections} />
+            <ProAccess feature="Specialist fund, ETF and REIT metrics">
+              <Sections sections={sections} />
+            </ProAccess>
           ) : (
             <div className="mt-6 rounded-lg border border-border bg-card/30 p-5 text-sm leading-relaxed text-muted-foreground">
               No verified supplemental metrics were returned for this listing. Its directory NAV or market quote remains available above; DeepScreen will not substitute stock ratios or estimated fund data.
@@ -366,7 +369,9 @@ export function InvestmentAnalysisAvailable({ item, initialData }: { item: Inves
               <p className="mt-3 max-w-4xl text-sm leading-relaxed text-muted-foreground">{data.officialFund.objective}</p>
             </section>
           ) : null}
-          {(item.type === "ETF" || item.type === "FUND") ? <TopHoldings data={data} /> : null}
+          {(item.type === "ETF" || item.type === "FUND") && data.fundProfile?.holdings.length ? (
+            <ProAccess feature="Investment holdings breakdown"><TopHoldings data={data} /></ProAccess>
+          ) : null}
         </>
       )}
 

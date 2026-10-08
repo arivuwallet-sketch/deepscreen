@@ -36,7 +36,7 @@ export const Route = createFileRoute("/pricing")({
       {
         name: "description",
         content:
-          "Unlock DeepScreen Pro: 13-factor deep scores, DCF & Graham valuation, Vision score, Secret Tips, forensic breakdowns, sell alerts and portfolio X-ray.",
+          "Unlock DeepScreen AI chat, commodity indicators, specialist fund, ETF and REIT metrics, DCF & Graham valuation, forensic tools and portfolio X-Ray.",
       },
       { name: "keywords", content: metaKeywords(screenerKeywords, stocksKeywords) },
       { property: "og:title", content: "DeepScreen Pro Pricing" },
@@ -61,7 +61,7 @@ export const Route = createFileRoute("/pricing")({
           name: "DeepScreen Pro",
           url: "https://deepscreen.online/pricing",
           description:
-            "Full DeepScreen analysis engine: 13-factor verdict, DCF and Graham valuation, forensic breakdowns, alerts and portfolio X-Ray.",
+            "DeepScreen AI finance chat, commodity indicators, specialist investment metrics, DCF and Graham valuation, forensic tools, alerts and portfolio X-Ray.",
           brand: { "@type": "Brand", name: "DeepScreen" },
           offers: [
             {
@@ -110,13 +110,18 @@ export const Route = createFileRoute("/pricing")({
 const FREE = [
   "Search all 13,000+ listed companies with live prices",
   "Raw fundamental ratios (P/E, ROE, ROCE, P/B, D/E, ROA, PEG)",
+  "DeepScreen stock scores, verdicts and basic peer comparison",
   "Live IPO pipeline across every tracked exchange",
   "Company financials, news feed and economic calendar",
-  "Basic peer comparison — raw metrics side by side",
+  "Fund, ETF and REIT directory, prices/NAV and history charts",
+  "Commodity quotes, history charts and current news",
+  "GIFT Nifty guide, IPO GMP calculator and Research Desk",
 ];
 
 const PRO = [
-  "DeepScreen Verdict — 13-factor weighted score",
+  "DeepScreen AI finance chat with evidence-backed stock comparisons",
+  "Commodity momentum, RSI and moving-average trend analysis",
+  "Specialist mutual fund, ETF and REIT metrics and holdings where available",
   "Holding period, target price, trim level & stop-loss",
   "Automated DCF and Graham intrinsic-value models",
   "Vision & Utility score (10–40 year hold horizon)",
@@ -282,8 +287,9 @@ function PricingPage() {
             Unlock the full god-mode engine
           </h1>
           <p className="mx-auto mt-3 max-w-2xl text-sm text-muted-foreground">
-            Search, live prices, raw ratios, IPOs and news stay free forever. Pro opens the
-            verdict, valuation models, forensic breakdowns, sell alerts and portfolio X-ray.
+            Search, prices, stock scores, verdicts, IPOs, news and investment history stay free.
+            Pro opens AI chat, commodity indicators, specialist investment metrics,
+            valuation models, forensic breakdowns, alerts and portfolio X-Ray.
           </p>
           {verifying && (
             <p className="num mt-4 text-xs text-muted-foreground">Verifying your payment…</p>

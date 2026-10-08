@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ArrowDownRight, ArrowUpRight, RefreshCw, Activity } from "lucide-react";
 import { commodityAnalysis } from "@/lib/market/commodity-analysis";
 import type { CommodityBar, CommoditySnapshot } from "@/lib/market/commodity-analysis";
+import { ProAccess } from "@/components/ds/ProAccess";
 
 export const COMMODITIES = [
   { symbol: "GC=F", name: "Gold", contract: "COMEX gold futures", unit: "troy ounce", decimals: 2 },
@@ -330,6 +331,7 @@ export function CommodityDashboard({
               name={selected.name}
               decimals={selected.decimals}
             />
+            <ProAccess feature="Commodity momentum and trend analysis">
             <div className="mt-7 grid gap-4 sm:grid-cols-3">
               {[
                 ["20-observation change", percent(analysis.change20)],
@@ -372,6 +374,7 @@ export function CommodityDashboard({
                 quote above. Missing history is not estimated.
               </p>
             </div>
+            </ProAccess>
           </>
         ) : (
           <p className="mt-6 rounded-lg border border-dashed border-border p-6 text-sm text-muted-foreground">

@@ -28,6 +28,8 @@ import { Tool, ToolContent, ToolHeader, ToolInput, ToolOutput } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Shell } from "@/components/ds/Shell";
 import { DeepScreenAiFaq } from "@/components/ds/DeepScreenAiFaq";
+import { ProAccess } from "@/components/ds/ProAccess";
+import { supabase } from "@/integrations/supabase/client";
 import { AI_CHAT_FAQS } from "@/lib/seo/ai-chat-faq";
 import {
   buildBreadcrumbSchema,
@@ -41,7 +43,14 @@ import {
 } from "@/lib/seo/json-ld";
 
 const STORAGE_KEY = "deepscreen-chat-v1";
-const transport = new DefaultChatTransport({ api: "/api/chat" });
+const transport = new DefaultChatTransport({
+  api: "/api/chat",
+  headers: async (): Promise<Record<string, string>> => {
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  },
+});
 const canonical = "https://deepscreen.online/chat";
 const title = "DeepScreen AI Chatbot: Stock Research & Finance Q&A | DeepScreen";
 const description =
@@ -216,7 +225,11 @@ function DeepScreenChat() {
   return (
     <Shell>
       {hydrated ? (
-        <DeepScreenChatSession initialMessages={readSavedMessages()} />
+        <section className="mx-auto max-w-5xl">
+          <ProAccess feature="DeepScreen AI chat">
+            <DeepScreenChatSession initialMessages={readSavedMessages()} />
+          </ProAccess>
+        </section>
       ) : (
         <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
           <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
