@@ -63,10 +63,10 @@ export interface SitemapEntry {
 }
 
 function isSafeSitemapPath(pathname: string): boolean {
-  // Only the real, self-canonical exchange directory pages may carry a query.
+  // Only real, self-canonical exchange and investment directory pages may carry a query.
   // Arbitrary filters/tracking parameters must never enter the sitemap.
   if (pathname.includes("?")) {
-    return /^\/exchange\/(?:NSE|BSE|NYSE|NASDAQ|LSE)\?page=(?:[2-9]|[1-9]\d+)$/.test(pathname);
+    return /^\/(?:exchange\/(?:NSE|BSE|NYSE|NASDAQ|LSE)|investments)\?page=(?:[2-9]|[1-9]\d+)$/.test(pathname);
   }
   if (!pathname.startsWith("/") || pathname.startsWith("//") || /[#\\]/.test(pathname)) return false;
   try {

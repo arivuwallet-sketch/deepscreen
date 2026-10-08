@@ -17,3 +17,9 @@ export function exchangePath(code: string, page = 1): string {
 export function stockPath(exchange: string, symbol: string): string {
   return `/stock/${encodeURIComponent(exchange)}/${encodeURIComponent(symbol)}`;
 }
+
+export const INVESTMENT_DIRECTORY_PAGE_SIZE = 50;
+
+export function investmentDirectoryPath(page = 1): string {
+  return `/investments${page > 1 ? `?page=${page}` : ""}`;
+}

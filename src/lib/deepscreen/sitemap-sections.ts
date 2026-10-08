@@ -1,4 +1,4 @@
-import { DIRECTORY_PAGE_SIZE, exchangePath } from "@/lib/seo/directory";
+import { DIRECTORY_PAGE_SIZE, exchangePath, INVESTMENT_DIRECTORY_PAGE_SIZE, investmentDirectoryPath } from "@/lib/seo/directory";
 import type { AnyRouter } from "@tanstack/react-router";
 
 import {
@@ -166,6 +166,12 @@ export function buildSitemapSections(router: AnyRouter): Map<string, SitemapEntr
         }));
       })
     : [];
+
+  if (isSitemapRouteIncluded(router.routesById["/investments"])) {
+    for (let page = 2; page <= Math.ceil(INVESTMENTS.length / INVESTMENT_DIRECTORY_PAGE_SIZE); page += 1) {
+      directories.push({ path: investmentDirectoryPath(page) });
+    }
+  }
 
   const learn = [
     ...collectDynamic(

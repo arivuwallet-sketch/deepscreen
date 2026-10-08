@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { createSnapshotLoader } from '../src/lib/market/snapshot-cache.ts';
-import { directoryPage, exchangePath, stockPath } from '../src/lib/seo/directory.ts';
+import { directoryPage, exchangePath, stockPath, investmentDirectoryPath } from '../src/lib/seo/directory.ts';
 import { canonicalRedirect } from '../src/lib/seo/canonical.ts';
 import { sitemapXML } from '../src/lib/sitemap.ts';
 import { AI_CHAT_FAQS, AI_CHAT_FAQ_GROUPS } from '../src/lib/seo/ai-chat-faq.ts';
@@ -115,6 +115,12 @@ test('sitemaps allow real directory pagination and reject arbitrary query varian
   const xml = sitemapXML('https://deepscreen.online', [{ path: exchangePath('BSE', 52) }, { path: stockPath('NSE', 'M&M') }]);
   assert.match(xml, /exchange\/BSE\?page=52/);
   assert.match(xml, /M%26M/);
+  assert.equal(investmentDirectoryPath(1), '/investments');
+  assert.equal(investmentDirectoryPath(405), '/investments?page=405');
+  assert.match(sitemapXML('https://deepscreen.online', [{ path: investmentDirectoryPath(405) }]), /investments\?page=405/);
+  for (const path of ['/investments?page=1', '/investments?page=02', '/investments?page=2&type=ETF', '/investments?page=-1']) {
+    assert.throws(() => sitemapXML('https://deepscreen.online', [{ path }]), path);
+  }
   for (const path of ['/exchange/BSE?page=1', '/exchange/BSE?page=2&sort=score', '/exchange/BSE?page=02', '/stock/NSE/TCS?x=1', '//elsewhere.test', '/exchange/BSE?page=2#x']) {
     assert.throws(() => sitemapXML('https://deepscreen.online', [{ path }]), path);
   }
@@ -167,11 +173,14 @@ test('public crawler policy allows major search and AI crawlers', async () => {
     '/faq-index.txt',
     '/blog/',
     '/learn/',
-    '/api/v1/answers',
-    '/api/v1/metrics',
   ]) {
     assert.ok(robots.includes('Allow: ' + path), path + ' must be crawlable');
   }
+  for (const path of ['api', 'admin', 'account']) {
+    assert.ok(robots.includes(`Disallow: /${path}$`));
+    assert.ok(robots.includes(`Disallow: /${path}/`));
+  }
+  assert.ok(!robots.includes('Allow: /api/'));
   assert.match(robots, /Sitemap: https:\/\/deepscreen\.online\/sitemap\.xml/);
 });
 

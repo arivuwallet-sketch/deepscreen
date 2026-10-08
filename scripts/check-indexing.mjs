@@ -63,6 +63,29 @@ try {
   assert.equal((await get('/stock/NSE/NOT_A_REAL_STOCK')).status, 404);
   console.log('PASS invalid-page 404s and permanent redirects for duplicate URLs');
 
+  const investmentDirectories = urls.filter(url => new URL(url).pathname === '/investments');
+  assert.ok(investmentDirectories.length > 1, 'Investment directory pagination is sitemap-discoverable');
+  for (const target of [investmentDirectories[0], investmentDirectories[1], investmentDirectories.at(-1)]) {
+    const url = new URL(target);
+    const response = await get(url.pathname + url.search);
+    assert.equal(response.status, 200, target);
+    const html = await response.text();
+    assert.deepEqual(canonical(html), [target]);
+    const links = hrefs(html);
+    assert.ok(links.some(href => href.startsWith('/investment/')), 'Investment rows must be SSR links');
+    for (const directory of investmentDirectories) {
+      const page = new URL(directory);
+      assert.ok(links.includes(page.pathname + page.search), `Missing investment directory link: ${directory}`);
+    }
+  }
+  for (const page of ['0', '-1', '1.5', 'abc', '999999']) {
+    assert.equal((await get(`/investments?page=${page}`)).status, 404);
+  }
+  const firstInvestmentPage = await get('/investments?page=1', { redirect: 'manual' });
+  assert.equal(firstInvestmentPage.status, 308);
+  assert.equal(new URL(firstInvestmentPage.headers.get('location'), origin).pathname, '/investments');
+  console.log('PASS investment SSR pagination, canonical URLs, sitemap links and invalid-page handling');
+
   for (const path of ['/stock/NSE/M%26M', '/stock/NASDAQ/AAPL']) {
     const start = Date.now();
     const response = await get(path);

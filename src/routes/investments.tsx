@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { directoryPage, investmentDirectoryPath, INVESTMENT_DIRECTORY_PAGE_SIZE } from "@/lib/seo/directory";
+import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Shell } from "@/components/ds/Shell";
 import { Button } from "@/components/ui/button";
@@ -12,18 +13,35 @@ import { buildBreadcrumbSchema, buildFAQSchema, buildGraph, buildOrganizationSch
 
 const title = "Mutual Fund, ETF & REIT Screener & Analysis | DeepScreen";
 const description = "Research mutual funds, ETFs and REITs with type-specific analysis. Compare NAV, fees, tracking, holdings, risk, REIT cash flow and valuation across supported markets.";
-const canonical = "https://deepscreen.online/investments";
-const PAGE_SIZE = 50;
+const PAGE_SIZE = INVESTMENT_DIRECTORY_PAGE_SIZE;
+const directoryPageCount = Math.ceil(INVESTMENTS.length / PAGE_SIZE);
 
 export const Route = createFileRoute("/investments")({
   staticData: { sitemap: true },
-  head: () => ({
+  validateSearch: (search: Record<string, unknown>): { page?: unknown } => (
+    search["page"] === undefined ? {} : { page: search["page"] }
+  ),
+  loaderDeps: ({ search }) => ({ page: directoryPage(search.page) }),
+  loader: ({ deps, location }) => {
+    if (deps.page < 1 || deps.page > directoryPageCount) throw notFound();
+    if (deps.page === 1 && new URLSearchParams(location.searchStr).has("page")) {
+      const query = new URLSearchParams(location.searchStr);
+      query.delete("page");
+      throw redirect({ href: `/investments${query.size ? `?${query}` : ""}`, statusCode: 308 });
+    }
+    return { page: deps.page };
+  },
+  head: ({ loaderData }) => {
+    const page = loaderData?.page ?? 1;
+    const canonical = `https://deepscreen.online${investmentDirectoryPath(page)}`;
+    const pageTitle = page > 1 ? `Mutual Fund, ETF & REIT Directory — Page ${page} | DeepScreen` : title;
+    return {
     meta: [
-      { title },
+      { title: pageTitle },
       { name: "description", content: description },
       { name: "robots", content: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" },
       { name: "keywords", content: metaKeywords(investmentDirectoryKeywords, mutualFundKeywords, etfKeywords, reitKeywords) },
-      { property: "og:title", content: title },
+      { property: "og:title", content: pageTitle },
       { property: "og:description", content: description },
       { property: "og:type", content: "website" },
       { property: "og:url", content: canonical },
@@ -43,11 +61,13 @@ export const Route = createFileRoute("/investments")({
         buildFAQSchema(INVESTMENT_FAQS.map((faq) => ({ question: faq.question, answer: faq.answer }))),
       )),
     }],
-  }),
+    };
+  },
   component: InvestmentsPage,
 });
 
 function InvestmentsPage() {
+  const routePage = Route.useLoaderData().page;
   const [type, setType] = useState<InvestmentType | "ALL">("ALL");
   const [market, setMarket] = useState("ALL");
   const [query, setQuery] = useState("");
@@ -57,11 +77,13 @@ function InvestmentsPage() {
     return INVESTMENTS.filter((item) => (type === "ALL" || item.type === type) && (market === "ALL" || item.market === market) && (!q || item.code.toLowerCase().includes(q) || item.name.toLowerCase().includes(q)));
   }, [type, market, query]);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const currentPage = Math.min(page, totalPages);
+  const isFiltered = type !== "ALL" || market !== "ALL" || query.trim() !== "";
+  const currentPage = Math.min(isFiltered ? page : routePage, totalPages);
   const rows = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
   const keys = rows.filter((item) => item.type !== "FUND").map((item) => ({ exchange: item.market, symbol: item.code }));
   const { data: quotes } = useLiveQuotes(keys);
   const change = (action: () => void) => { action(); setPage(1); };
+  const clearFilters = () => { setType("ALL"); setMarket("ALL"); setQuery(""); setPage(1); };
   return (
     <Shell>
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
@@ -102,7 +124,16 @@ function InvestmentsPage() {
           </table>
           {rows.length === 0 && <p className="py-12 text-center text-sm text-muted-foreground">No investments match your search.</p>}
         </div>
-        <div className="mt-5 flex items-center justify-end gap-3"><Button variant="outline" disabled={currentPage <= 1} onClick={() => setPage(currentPage - 1)}>Previous</Button><span className="text-sm text-muted-foreground">{currentPage} / {totalPages}</span><Button variant="outline" disabled={currentPage >= totalPages} onClick={() => setPage(currentPage + 1)}>Next</Button></div>
+        <div className="mt-5 flex items-center justify-end gap-3">
+          {isFiltered ? <Button variant="outline" disabled={currentPage <= 1} onClick={() => setPage(currentPage - 1)}>Previous</Button> : <Button variant="outline" disabled={currentPage <= 1} asChild={currentPage > 1}>{currentPage > 1 ? <Link to="/investments" search={currentPage === 2 ? {} : { page: currentPage - 1 }}>Previous</Link> : <span>Previous</span>}</Button>}
+          <span className="text-sm text-muted-foreground">{currentPage} / {totalPages}</span>
+          {isFiltered ? <Button variant="outline" disabled={currentPage >= totalPages} onClick={() => setPage(currentPage + 1)}>Next</Button> : <Button variant="outline" disabled={currentPage >= totalPages} asChild={currentPage < totalPages}>{currentPage < totalPages ? <Link to="/investments" search={{ page: currentPage + 1 }}>Next</Link> : <span>Next</span>}</Button>}
+        </div>
+        <details className="mt-5"><summary className="cursor-pointer text-sm text-primary">Browse all investment directory pages</summary>
+        <nav aria-label="All investment directory pages" className="mt-5 flex flex-wrap gap-2 text-xs">
+          {Array.from({ length: directoryPageCount }, (_, index) => index + 1).map((number) => <Link key={number} onClick={clearFilters} to="/investments" search={number === 1 ? {} : { page: number }} aria-current={!isFiltered && number === currentPage ? "page" : undefined} className="rounded border border-border px-2 py-1 text-primary hover:bg-accent">{number}</Link>)}
+        </nav>
+        </details>
         <InvestmentFaqSection faqs={INVESTMENT_FAQS} title="Mutual fund, ETF and REIT questions answered" description="Concise answers to common research questions about NAV, TER, Direct vs Regular plans, ETF tracking and liquidity, REIT occupancy, WALE, NDCF, AFFO, leverage and valuation." />
         <section className="mt-10 rounded-lg border border-border bg-panel p-5" aria-labelledby="investment-faq-sources"><h2 id="investment-faq-sources" className="font-semibold">Primary educational sources</h2><p className="mt-2 text-sm leading-6 text-muted-foreground">DeepScreen writes these explanations from primary regulator and investor-education material, then applies its own research framework. Product-specific facts should still be checked against the latest issuer or scheme disclosure.</p><div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm">{INVESTMENT_SOURCE_LINKS.map((source) => <a key={source.href} href={source.href} target="_blank" rel="noreferrer" className="text-primary hover:underline">{source.label}</a>)}</div></section>
         <p className="mt-8 text-xs text-muted-foreground">Source: AMFI scheme NAV snapshot (30 Sep 2026), Nasdaq Trader directory (1 Oct 2026), and exchange listings. Directory coverage is not a guarantee of every active listing. NAVs are dated, not live trading prices. Quotes depend on provider availability.</p>

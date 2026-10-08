@@ -49,10 +49,11 @@ Allow: /investments
 Allow: /commodities
 Allow: /gift-nifty
 Allow: /ipo-gmp
-Allow: /api/v1/answers
-Allow: /api/v1/metrics
+Disallow: /admin$
 Disallow: /admin/
+Disallow: /api$
 Disallow: /api/
+Disallow: /account$
 Disallow: /account/
 
 # Fallback: any robots-compliant crawler not listed above may crawl all public content too.
@@ -73,10 +74,11 @@ Allow: /investments
 Allow: /commodities
 Allow: /gift-nifty
 Allow: /ipo-gmp
-Allow: /api/v1/answers
-Allow: /api/v1/metrics
+Disallow: /admin$
 Disallow: /admin/
+Disallow: /api$
 Disallow: /api/
+Disallow: /account$
 Disallow: /account/
 
 Sitemap: https://deepscreen.online/sitemap.xml

@@ -11,7 +11,6 @@ export const Route = createFileRoute("/openapi.json")({
           headers: {
             "Cache-Control": "public, max-age=3600",
             "Access-Control-Allow-Origin": "*",
-            "X-Robots-Tag": "noindex",
           },
         }),
     },

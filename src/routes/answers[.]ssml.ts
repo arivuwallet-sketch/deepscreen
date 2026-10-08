@@ -20,7 +20,6 @@ export const Route = createFileRoute("/answers.ssml")({
               "Content-Type": "application/ssml+xml; charset=utf-8",
               "Content-Disposition": 'attachment; filename="deepscreen-answers.ssml"',
               "Cache-Control": "public, max-age=3600",
-              "X-Robots-Tag": "noindex",
             },
           },
         ),
