@@ -3,9 +3,6 @@ import { findStrategyGuide } from "@/lib/seo/content";
 
 export const Route = createFileRoute("/options-strategy/$slug")({
   staticData: { sitemap: false },
-  head: () => ({
-    meta: [{ name: "robots", content: "noindex, follow" }],
-  }),
   beforeLoad: ({ params }) => {
     if (!findStrategyGuide(params.slug)) throw notFound();
     throw redirect({ to: "/options/$slug", params: { slug: params.slug }, statusCode: 301 });

@@ -33,7 +33,7 @@ function allowed(agent: string, path: string): boolean {
 const agents = [...new Set(groups.flatMap((item) => item.agents)), "UnknownResearchBot"];
 test("all named and unknown crawlers can fetch every public research family", () => {
   for (const agent of agents) {
-    for (const path of ["/", "/stock/NSE/RELIANCE", "/exchange/BSE?page=52", "/investment/BSE/ETF/ABSLBANETF", "/investments?page=405", "/mutual-funds", "/etfs", "/reits", "/answers", "/knowledge", "/learn/pe-ratio", "/methodology", "/commodities", "/gift-nifty", "/ipo-gmp", "/llms.txt", "/llms-full.txt", "/sitemap.xml"]) {
+    for (const path of ["/", "/chat", "/stock/NSE/RELIANCE", "/exchange/BSE?page=52", "/investment/BSE/ETF/ABSLBANETF", "/investments?page=405", "/mutual-funds", "/etfs", "/reits", "/answers", "/knowledge", "/learn/pe-ratio", "/methodology", "/commodities", "/gift-nifty", "/ipo-gmp", "/llms.txt", "/llms-full.txt", "/sitemap.xml"]) {
       expect(allowed(agent, path), `${agent}: ${path}`).toBe(true);
     }
   }
@@ -41,7 +41,7 @@ test("all named and unknown crawlers can fetch every public research family", ()
 
 test("only private path boundaries are excluded, including query variants", () => {
   for (const agent of agents) {
-    for (const prefix of ["api", "admin", "account", "auth", "portfolio", "chat"]) {
+    for (const prefix of ["api", "admin", "account", "auth", "portfolio", "research-desk"]) {
       for (const suffix of ["", "/", "/private", "?redirect=%2Fpricing"]) {
         expect(allowed(agent, `/${prefix}${suffix}`), `${agent}: /${prefix}${suffix}`).toBe(false);
       }

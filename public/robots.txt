@@ -66,6 +66,12 @@ Disallow: /portfolio$
 Disallow: /portfolio/
 Disallow: /research-desk$
 Disallow: /research-desk/
+Disallow: /api?
+Disallow: /admin?
+Disallow: /account?
+Disallow: /auth?
+Disallow: /portfolio?
+Disallow: /research-desk?
 
 # Fallback: any robots-compliant crawler not listed above may crawl all public content too.
 User-agent: *
@@ -102,5 +108,11 @@ Disallow: /portfolio$
 Disallow: /portfolio/
 Disallow: /research-desk$
 Disallow: /research-desk/
+Disallow: /api?
+Disallow: /admin?
+Disallow: /account?
+Disallow: /auth?
+Disallow: /portfolio?
+Disallow: /research-desk?
 
 Sitemap: https://deepscreen.online/sitemap.xml
