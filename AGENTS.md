@@ -20,3 +20,4 @@
 - Paid AI actions verify bearer identity and caller-owned payment-ledger entitlement server-side before model use; interactive Pro tools mount only after access resolves, preventing client-only payment bypasses.
 - TypeScript retains strict mode but omits unchecked-index, exact-optional, and index-signature property checks because legacy market-analysis modules intentionally use guarded array and provider-record access patterns.
 - Explicit crawler groups and the wildcard group share identical private-path exclusions; public crawling must never depend on a recognized bot name or bypass authentication.
+- Shared search loads the investment directory on demand, while decorative scenes initialize after initial painting and cap redraws at 30 FPS; this keeps research rendering and interaction ahead of optional visual work.

@@ -21,7 +21,9 @@ export function MarketScene({
     let cleanup = () => {};
     const element = host.current;
     if (!element) return;
-    void Promise.all([import("three"), import("three/addons/environments/RoomEnvironment.js")])
+    // Keep shader compilation and decorative downloads out of initial hydration.
+    // The existing CSS scene remains visible while the browser paints the page.
+    const start = () => { void Promise.all([import("three"), import("three/addons/environments/RoomEnvironment.js")])
       .then(([T, { RoomEnvironment }]) => {
         if (disposed) return;
         let renderer: InstanceType<typeof T.WebGLRenderer>;
@@ -161,8 +163,16 @@ export function MarketScene({
           lastTime = 0;
         let visible = true;
         let hasRendered = false;
+        let lastRender = 0;
+        const journey = element.closest(".ds-journey");
+        const marketSection = journey?.querySelector<HTMLElement>("#markets");
+        const engineSection = journey?.querySelector<HTMLElement>("#engine");
+        let marketTop = 0;
+        let engineTop = 0;
         const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
         const resize = () => {
+          marketTop = marketSection?.offsetTop ?? 0;
+          engineTop = engineSection?.offsetTop ?? 0;
           camera.aspect = element.clientWidth / Math.max(1, element.clientHeight);
           camera.updateProjectionMatrix();
           renderer.setSize(element.clientWidth, element.clientHeight);
@@ -183,16 +193,16 @@ export function MarketScene({
           frame = 0;
           if (disposed || document.hidden || !visible) return;
           const reduced = motion.matches || controls.current.paused;
+          if (hasRendered && !reduced && time - lastRender < 1000 / 30) {
+            schedule();
+            return;
+          }
+          lastRender = time;
           const delta = Math.min((time - lastTime) / 1000, 0.04);
           lastTime = time;
           if (!reduced) rotation += delta * 0.13;
-          const journey = element.closest(".ds-journey");
           const height = window.innerHeight;
           const scroll = journey ? -journey.getBoundingClientRect().top : window.scrollY;
-          const marketTop =
-            (journey?.querySelector("#markets") as HTMLElement | null)?.offsetTop ?? 0;
-          const engineTop =
-            (journey?.querySelector("#engine") as HTMLElement | null)?.offsetTop ?? 0;
           const toMarkets =
             variant === "compact"
               ? 0
@@ -295,8 +305,15 @@ export function MarketScene({
       .catch(() => {
         /* The CSS fallback remains visible when WebGL is unavailable. */
       });
+    };
+    const idle = "requestIdleCallback" in window
+      ? window.requestIdleCallback(start, { timeout: 1500 })
+      : null;
+    const timer = idle === null ? window.setTimeout(start, 150) : null;
     return () => {
       disposed = true;
+      if (idle !== null) window.cancelIdleCallback(idle);
+      if (timer !== null) window.clearTimeout(timer);
       cleanup();
     };
   }, [variant]);
