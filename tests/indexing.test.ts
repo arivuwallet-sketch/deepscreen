@@ -676,7 +676,8 @@ test('DeepScreen AI chatbot FAQ is server-rendered, indexable, and consistent ac
   assert.match(server, /https:\/\/deepscreen\.online\/chat#chatbot-faq/);
   // Preserves the working browser chat and avoids exposing user threads in SSR.
   assert.match(chat, /deepscreen-chat-v1/);
-  assert.match(chat, /DefaultChatTransport\(\{ api: "\/api\/chat" \}\)/);
+  assert.match(chat, /DefaultChatTransport\(\{\s*api: "\/api\/chat"/);
+  assert.match(chat, /Authorization: `Bearer \$\{token\}`/);
   assert.match(chat, /window\.localStorage\.removeItem\(STORAGE_KEY\)/);
   assert.match(chat, /hydrated \? \(/);
 });

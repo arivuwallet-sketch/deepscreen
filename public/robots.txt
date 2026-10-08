@@ -40,6 +40,11 @@ Allow: /chart-reader
 Allow: /trading
 Allow: /knowledge
 Allow: /faq-index.txt
+Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /openapi.json
+Allow: /blog/feed.xml
+Allow: /answers.ssml
 Allow: /blog/
 Allow: /learn/
 Allow: /mutual-funds
@@ -55,6 +60,18 @@ Disallow: /api$
 Disallow: /api/
 Disallow: /account$
 Disallow: /account/
+Disallow: /auth$
+Disallow: /auth/
+Disallow: /portfolio$
+Disallow: /portfolio/
+Disallow: /research-desk$
+Disallow: /research-desk/
+Disallow: /api?
+Disallow: /admin?
+Disallow: /account?
+Disallow: /auth?
+Disallow: /portfolio?
+Disallow: /research-desk?
 
 # Fallback: any robots-compliant crawler not listed above may crawl all public content too.
 User-agent: *
@@ -65,6 +82,11 @@ Allow: /chart-reader
 Allow: /trading
 Allow: /knowledge
 Allow: /faq-index.txt
+Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /openapi.json
+Allow: /blog/feed.xml
+Allow: /answers.ssml
 Allow: /blog/
 Allow: /learn/
 Allow: /mutual-funds
@@ -80,5 +102,17 @@ Disallow: /api$
 Disallow: /api/
 Disallow: /account$
 Disallow: /account/
+Disallow: /auth$
+Disallow: /auth/
+Disallow: /portfolio$
+Disallow: /portfolio/
+Disallow: /research-desk$
+Disallow: /research-desk/
+Disallow: /api?
+Disallow: /admin?
+Disallow: /account?
+Disallow: /auth?
+Disallow: /portfolio?
+Disallow: /research-desk?
 
 Sitemap: https://deepscreen.online/sitemap.xml

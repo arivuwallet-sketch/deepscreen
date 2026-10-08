@@ -6,6 +6,10 @@ export const Route = createFileRoute("/research-desk")({
   head: () => ({
     meta: [
       { title: "Research Desk — Watchlists, Notes & Portfolio Imports | DeepScreen" },
+      { property: "og:title", content: "Research Desk — Watchlists, Notes & Portfolio Imports | DeepScreen" },
+      { property: "og:description", content: "Personal investment research, source documents and manually entered holdings with local backups and CSV exports." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex,follow" },
       {
         name: "description",
