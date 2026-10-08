@@ -1,5 +1,8 @@
 # DeepScreen search and growth roadmap
 
+## In progress
+- Check Google's reported low index coverage against URL Inspection evidence; correct confirmed public crawler/indexing blockers while preserving private access controls.
+
 ## Shipped
 - Page-specific metadata, social cards, canonicals and structured data
 - Open stock ratios, scores, verdicts, summaries, FAQs and breadcrumbs
