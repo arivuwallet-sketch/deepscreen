@@ -1,4 +1,5 @@
 import { TRADING_BLOG_POSTS } from "@/lib/content/trading-blog";
+import { PERSONAL_FINANCE_2026_10_10 } from "@/lib/content/personal-finance-2026-10-10";
 import { PERSONAL_FINANCE_2026_10_08 } from "@/lib/content/personal-finance-2026-10-08";
 import { PERSONAL_FINANCE_2026_10_07 } from "@/lib/content/personal-finance-2026-10-07";
 
@@ -58,6 +59,7 @@ export type BlogPost = {
 };
 
 export const INVESTMENT_BLOG_POSTS: BlogPost[] = [
+  ...PERSONAL_FINANCE_2026_10_10,
   ...PERSONAL_FINANCE_2026_10_08,
   ...PERSONAL_FINANCE_2026_10_07,
   {
