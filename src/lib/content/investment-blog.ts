@@ -1,4 +1,7 @@
 import { TRADING_BLOG_POSTS } from "@/lib/content/trading-blog";
+import { PERSONAL_FINANCE_2026_10_18_SAVE } from "@/lib/content/personal-finance-2026-10-18-save";
+import { PERSONAL_FINANCE_2026_10_18_PROTECT } from "@/lib/content/personal-finance-2026-10-18-protect";
+import { PERSONAL_FINANCE_2026_10_18_MAKE } from "@/lib/content/personal-finance-2026-10-18-make";
 import { PERSONAL_FINANCE_2026_10_10 } from "@/lib/content/personal-finance-2026-10-10";
 import { PERSONAL_FINANCE_2026_10_08 } from "@/lib/content/personal-finance-2026-10-08";
 import { PERSONAL_FINANCE_2026_10_07 } from "@/lib/content/personal-finance-2026-10-07";
@@ -59,6 +62,9 @@ export type BlogPost = {
 };
 
 export const INVESTMENT_BLOG_POSTS: BlogPost[] = [
+  ...PERSONAL_FINANCE_2026_10_18_SAVE,
+  ...PERSONAL_FINANCE_2026_10_18_PROTECT,
+  ...PERSONAL_FINANCE_2026_10_18_MAKE,
   ...PERSONAL_FINANCE_2026_10_10,
   ...PERSONAL_FINANCE_2026_10_08,
   ...PERSONAL_FINANCE_2026_10_07,
